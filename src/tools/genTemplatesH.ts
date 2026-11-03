@@ -1,0 +1,79 @@
+/* ================================================================== */
+/* Generator katalog template v7 bagian H (dashboard).                              */
+/*                                                                    */
+/*   npx tsx src/tools/genTemplatesH.ts                                */
+/*                                                                    */
+/* Menulis ulang pages/webTemplates/templates/v7/catalogH.ts (harga     */
+/* statis dihitung dengan rumus templatePrice dari isi template) serta  */
+/* nama, deskripsi, dan kategori baru di src/locales/{id,en}.json.      */
+/* Jalankan ulang setiap kali spesifikasi di setH/ berubah.             */
+/* ================================================================== */
+
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { V7H_SPECS as SPECS } from "../pages/webTemplates/templates/v7/setH/specs";
+import { buildContent } from "../pages/webTemplates/templates/v7/setH/kitH";
+import { SHELL_TEXT, CARD_TEXT } from "../pages/webTemplates/templates/v7/setH/dsl";
+import { NEW_CATEGORIES_H } from "../pages/webTemplates/templates/v7/categoriesH";
+import { templateContents } from "../marketplace/data/templateCatalog";
+import { templatePrice } from "../marketplace/templatePricing";
+import { isPremiumPreset } from "../pages/pageMaker/helpers/sectionPresets";
+import { ELEMENT_DEFINITION_BY_TYPE as D } from "../pages/pageMaker/core/elementDefinitions";
+import type { WebTemplate } from "../pages/webTemplates/registry";
+
+const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
+
+/* Id set H tidak boleh menimpa template lama: locale-nya ikut tertimpa. */
+const older = new Set(["v2/catalogA", "v2/catalogB", "v3/catalogC", "v3/catalogD", "v4/catalogE", "v5/catalogF", "v6/catalogG"].flatMap((f) => [...readFileSync(here(`../pages/webTemplates/templates/${f}.ts`), "utf8").matchAll(/id: "([^"]+)"/g)].map((m) => m[1])));
+for (const m of readFileSync(here("../config/templates.ts"), "utf8").matchAll(/id: "([^"]+)"/g)) older.add(m[1]);
+const clash = SPECS.filter((s) => older.has(s.id)).map((s) => s.id);
+if (clash.length) throw new Error(`id sudah dipakai template lama: ${clash.join(", ")}`);
+
+const rows: string[] = [];
+for (const s of SPECS) {
+  const content = buildContent(s);
+  const tags = [...new Set([...s.domain.tags, ...(s.tags ?? [])])].slice(0, 5);
+  const t = { id: s.id, version: 1, category: s.cat, tier: s.tier, price: 0, accent: s.pal[2], tags, content } as WebTemplate;
+  const c = templateContents(t);
+  const prem = c.sectionIds.filter((id) => isPremiumPreset(id.replace("preset:", ""))).length + c.elementIds.filter((id) => D[id.replace("element:", "")]?.premium).length;
+  const price = s.tier === "free" ? 0 : templatePrice(content.pages.length, prem, c.libraries.length);
+  const tier = s.tier === "free" ? "free" : "premium";
+  rows.push(`  { id: ${JSON.stringify(s.id)}, version: 1, category: ${JSON.stringify(s.cat)}, tier: "${tier}", price: ${tier === "free" ? "TEMPLATE_PRICE.free" : price}, accent: ${JSON.stringify(s.pal[2])}, tags: ${JSON.stringify(tags)}, isNew: true },`);
+  console.log(`${s.id.padEnd(34)} ${tier.padEnd(8)} ${content.pages.length} hlm  premium=${prem} libs=${c.libraries.join("+")}  → ${price}`);
+}
+
+const free = SPECS.filter((s) => s.tier === "free").length;
+writeFileSync(
+  here("../pages/webTemplates/templates/v7/catalogH.ts"),
+  `import { TEMPLATE_PRICE } from "../../../../config/marketplace";
+import type { TemplateMeta } from "../../../../config/templates";
+
+/**
+ * Metadata ${SPECS.length} template katalog v7 (bagian H, dashboard). Konten: ./setH/ (data di h*.ts).
+ * ${free} Free + ${SPECS.length - free} Premium. Berkas ini DIHASILKAN oleh src/tools/genTemplatesH.ts:
+ * harga Premium = rumus templatePrice dari jumlah halaman, item Premium, dan library.
+ */
+export const V7H_CATALOG: TemplateMeta[] = [
+${rows.join("\n")}
+];
+`,
+);
+
+for (const lang of ["id", "en"] as const) {
+  const file = here(`../locales/${lang}.json`);
+  const json = JSON.parse(readFileSync(file, "utf8"));
+  const tpl = json.templates;
+  for (const [cat, label] of Object.entries(NEW_CATEGORIES_H)) tpl.categories[cat] = label[lang === "id" ? 0 : 1];
+  // Buang entri item yang tidak lagi ada di katalog mana pun (mis. id set G yang diganti).
+  const live = new Set([...older, ...SPECS.map((s) => s.id)]);
+  for (const id of Object.keys(tpl.items)) if (!live.has(id)) delete tpl.items[id];
+  for (const s of SPECS) {
+    const n = s.pages.length + 1;
+    const i = lang === "id" ? 0 : 1;
+    const d = s.domain.desc.split("|")[i].replace(/\.$/, "");
+    const style = lang === "id" ? `dengan ${SHELL_TEXT[s.shell][0]} dan ${CARD_TEXT[s.look.card][0]}${s.look.dark ? ", tema gelap" : ""}` : `with ${SHELL_TEXT[s.shell][1]} and ${CARD_TEXT[s.look.card][1]}${s.look.dark ? ", dark theme" : ""}`;
+    tpl.items[s.id] = { name: s.brand, description: lang === "id" ? `${d}, ${style}. Terdiri dari ${n} halaman.` : `${d}, ${style}. Includes ${n} pages.` };
+  }
+  writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
+}
+console.log(`\n${SPECS.length} template, ${free} Free. catalogH.ts & locales diperbarui.`);

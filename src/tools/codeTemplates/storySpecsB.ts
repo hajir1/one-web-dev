@@ -1,0 +1,102 @@
+import type { StorySpec } from "./story3d";
+import { SCENE_GEMBOK, SCENE_KOPI, SCENE_POHON, SCENE_RUMAH } from "./storyScenesB";
+
+const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
+
+export const STORY_SPECS_B: StorySpec[] = [
+  /* Palu mengetuk tanah → fondasi → bata tersusun baris demi baris → atap turun → lampu menyala → taman tumbuh. */
+  {
+    id: "story-palu-rumah",
+    title: "Bangun Karya · Kontraktor Rumah Tinggal",
+    description: "Kontraktor rumah: palu mengetuk tanah, saat digulir fondasi muncul, bata tersusun baris demi baris sampai menjadi rumah, atap turun, lampu menyala, dan taman tumbuh.",
+    brand: "Bangun Karya",
+    footer: "Jl. Soekarno-Hatta 120, Bandung · Kontraktor & renovasi rumah tinggal",
+    font: F("Archivo", "Archivo", "family=Archivo:wght@400;600;800"),
+    colors: { bg: "#f3eee6", bg2: "#ffd9a8", panel: "#fffaf3", ink: "#2a221b", inkSoft: "#6b5d50", accent: "#d2552d", accent2: "#2f6f5e", line: "rgba(42,34,27,.14)", obj: "#c8714a", obj2: "#4a3b33", veil: "#2a221b", dark: false },
+    configLabel: "Pengaturan adegan",
+    config: {},
+    thumb: 3,
+    acts: [
+      { id: "ketuk", kind: "hero", side: "left", fx: "rise", kicker: "Kontraktor rumah tinggal", title: "Semua rumah dimulai dari satu ketukan.", body: ["Gulir untuk melihat palu kami bekerja: dari tanah kosong sampai rumah yang lampunya menyala."], key: { cam: [6.5, 3.6, 8.6], look: [-1.8, 1.0, 0], hammer: 1, found: 0, build: 0, roof: 0, light: 0, garden: 0, rest: 0 } },
+      { id: "fondasi", nav: "Proses", kind: "text", side: "right", fx: "type", kicker: "Minggu 1-3", title: "Fondasi dulu, baru mimpi.", body: ["Uji tanah, gambar struktur, dan rencana anggaran yang tidak berubah di tengah jalan."], key: { cam: [-5.6, 4.2, 6.6], look: [1.8, 0.4, 0], found: 1, build: 0.04 } },
+      { id: "bata", kind: "text", side: "left", fx: "wipe", vh: 220, kicker: "Minggu 4-14", title: "Bata demi bata, baris demi baris.", body: ["Setiap baris diperiksa mandor dan difoto untuk laporan mingguan Anda."], key: { cam: [6.2, 2.6, 7.4], look: [-1.9, 1.3, 0], build: 1 } },
+      { id: "atap", nav: "Layanan", kind: "cards", side: "right", fx: "chars", kicker: "Yang kami bangun", title: "Atap menutup, rumah bernapas.", cards: [{ tag: "Desain & bangun", title: "Rumah baru", text: "Satu tim dari gambar kerja sampai serah terima kunci." }, { tag: "Tanpa pindah", title: "Renovasi & tambah lantai", text: "Pekerjaan bertahap sehingga keluarga tetap bisa tinggal." }, { tag: "Garansi 2 tahun", title: "Perawatan", text: "Atap bocor, retak dinding, dan instalasi listrik." }], key: { cam: [-6.6, 5.2, 7.0], look: [2.0, 1.4, 0], roof: 1, hammer: 0.4 } },
+      { id: "nyala", nav: "Angka", kind: "stats", side: "left", fx: "flip", kicker: "Rumah yang kami serahkan", title: "Lampunya sudah menyala.", stats: [["320", "rumah selesai"], ["14", "tahun berdiri"], ["0", "proyek mangkrak"]], key: { cam: [5.8, 1.6, 6.2], look: [-1.9, 1.2, 0], light: 1, garden: 1, hammer: 0, rest: 1 } },
+      { id: "kunci", nav: "Kontak", kind: "contact", side: "right", fx: "rise", kicker: "Konsultasi gratis", title: "Tanahnya sudah ada? Kami bawa palunya.", body: ["Kirim lokasi dan ukuran lahan, kami hitung perkiraan biaya dalam tiga hari."], cta: [{ label: "Chat WhatsApp", href: "wa" }, { label: "Lihat dari awal", href: "#ketuk", ghost: true }], key: { cam: [-3.6, 7.5, 11.5], look: [2.6, 0.6, 0] } },
+    ],
+    email: "halo@bangunkarya.id",
+    wa: "6281200001003",
+    scene: SCENE_RUMAH,
+  },
+  /* Biji melayang → jatuh ke tanah → batang & cabang tumbuh → daun & buah → satu buah jatuh → hutan tumbuh di sekeliling. */
+  {
+    id: "story-biji-hutan",
+    title: "Benih Bumi · Gerakan Tanam Pohon",
+    description: "Gerakan tanam pohon: sebutir biji jatuh ke tanah, saat digulir batang dan cabang tumbuh, daun dan buah muncul, satu buah jatuh, lalu hutan tumbuh di sekelilingnya.",
+    brand: "Benih Bumi",
+    footer: "Yayasan Benih Bumi · Bogor, Jawa Barat",
+    font: F("Fraunces", "Work Sans", "family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Work+Sans:wght@400;600"),
+    colors: { bg: "#eef2e4", bg2: "#d9ecc0", panel: "#fbfdf6", ink: "#1f2a1c", inkSoft: "#566451", accent: "#d9642b", accent2: "#e8a33d", line: "rgba(31,42,28,.14)", obj: "#5a7f3c", obj2: "#9b6a3f", veil: "#1f2a1c", dark: false },
+    configLabel: "Pengaturan adegan",
+    config: {},
+    thumb: 3,
+    acts: [
+      { id: "biji", kind: "hero", side: "left", fx: "chars", kicker: "Gerakan tanam pohon", title: "Satu biji. Gulir pelan.", body: ["Kami ingin Anda melihat sendiri apa yang terjadi pada sebutir biji yang ditanam dengan benar."], key: { cam: [0.4, 2.6, 9.0], look: [-2.2, 2.0, 0], drop: 0, plant: 0, grow: 0, leaf: 0, fruit: 0, harvest: 0, forest: 0, autumn: 0 } },
+      { id: "tanam", nav: "Cerita", kind: "text", side: "right", fx: "rise", kicker: "Hari pertama", title: "Jatuh, lalu menetap.", body: ["Relawan kami menanam di lahan kritis yang sudah disurvei, bukan sembarang tempat."], key: { cam: [-2.4, 1.8, 4.8], look: [1.3, 0.4, 0], drop: 1, plant: 1, grow: 0 } },
+      { id: "tumbuh", kind: "quote", side: "left", fx: "type", vh: 220, title: "Batang mencari cahaya, cabang mencari ruang.", key: { cam: [5.0, 3.4, 10.0], look: [-2.2, 2.6, 0], grow: 1, plant: 1 } },
+      { id: "daun", nav: "Program", kind: "cards", side: "right", fx: "flip", kicker: "Program kami", title: "Daun, buah, dan orang-orangnya.", cards: [{ tag: "Rp25.000/pohon", title: "Adopsi pohon", text: "Pohon Anda diberi tanda dan difoto setiap enam bulan." }, { tag: "Desa mitra", title: "Kebun buah warga", text: "Mangga, alpukat, dan durian untuk penghasilan petani." }, { tag: "Sekolah", title: "Kelas hijau", text: "Siswa ikut menanam dan merawat pohon di sekolahnya." }], key: { cam: [-5.2, 3.8, 8.4], look: [2.2, 3.0, 0], leaf: 1, fruit: 1 } },
+      { id: "hutan", nav: "Dampak", kind: "stats", side: "left", fx: "slide", kicker: "Satu buah jatuh", title: "Lalu jadi hutan.", stats: [["412.000", "pohon tertanam"], ["86", "desa mitra"], ["73%", "pohon bertahan hidup"]], key: { cam: [9.0, 9.5, 17.0], look: [-3.5, 1.0, 0], harvest: 1, forest: 1, autumn: 0.5 } },
+      { id: "ikut", nav: "Ikut", kind: "contact", side: "right", fx: "rise", kicker: "Giliran Anda", title: "Tanam satu. Kami rawat sampai besar.", body: ["Adopsi pohon atau ajak kantor Anda menanam bersama."], cta: [{ label: "Chat WhatsApp", href: "wa" }, { label: "Ulangi dari biji", href: "#biji", ghost: true }], key: { cam: [-7.5, 4.5, 11.0], look: [3.0, 2.4, 0], autumn: 0 } },
+    ],
+    email: "halo@benihbumi.org",
+    wa: "6281200001004",
+    scene: SCENE_POHON,
+  },
+  /* Uap dari cangkir → tetes jatuh → riak → kamera menyelam ke permukaan kopi → lereng gunung & kebun → label asal kopi → kembali ke cangkir. */
+  {
+    id: "story-tetes-kopi",
+    title: "Kopi Lereng · Roastery & Kedai",
+    description: "Roastery kopi: secangkir kopi mengepul, setetes kopi jatuh dan membuat riak, kamera menyelam ke permukaan, lalu muncul lereng gunung dengan label daerah asal biji kopi.",
+    brand: "Kopi Lereng",
+    footer: "Jl. Braga 44, Bandung · Buka 07.00 sampai 22.00",
+    font: F("DM Serif Display", "DM Sans", "family=DM+Serif+Display&family=DM+Sans:wght@400;600"),
+    colors: { bg: "#1a120d", bg2: "#4a2c1a", panel: "#24180f", ink: "#f7ebdc", inkSoft: "#c9b29b", accent: "#f0a64a", accent2: "#9fd37a", line: "rgba(255,240,220,.14)", obj: "#3b1f10", obj2: "#f4ede4", veil: "#2a160b", dark: true },
+    configLabel: "Daerah asal kopi (label di peta)",
+    config: { asal: ["Gayo", "Toraja", "Kintamani", "Flores Bajawa"] },
+    acts: [
+      { id: "cangkir", kind: "hero", side: "left", fx: "rise", kicker: "Roastery & kedai", title: "Tunggu tetes berikutnya.", body: ["Kopi yang baik selalu punya cerita. Gulir, dan ikuti tetesnya."], key: { cam: [3.2, 3.2, 5.6], look: [-1.3, 0.8, 0], drop: 0, dive: 0, land: 0, pins: 0, route: 0 } },
+      { id: "tetes", nav: "Cerita", kind: "text", side: "right", fx: "type", kicker: "Satu tetes", title: "Riak kecil, aroma besar.", body: ["Kami sangrai dalam jumlah kecil setiap Senin dan Kamis, jadi biji di cangkir Anda tidak pernah lebih tua dari seminggu."], key: { cam: [-1.6, 2.4, 2.6], look: [0.6, 0.9, 0], drop: 1 } },
+      { id: "selam", kind: "quote", side: "center", fx: "zoom", vh: 180, title: "Setiap tetes membawa cerita dari lereng gunung.", key: { cam: [0, 1.12, 0.02], look: [0, 0.9, 0], dive: 1, veil: 1, sway: 0 } },
+      { id: "asal", nav: "Asal", kind: "cards", side: "left", fx: "chars", kicker: "Dari mana biji kami", title: "Empat lereng, empat rasa.", cards: [{ tag: "Aceh", title: "Gayo", text: "Rempah, cokelat hitam, badan tebal." }, { tag: "Sulawesi", title: "Toraja", text: "Karamel, buah merah, asam lembut." }, { tag: "Bali & NTT", title: "Kintamani & Bajawa", text: "Jeruk, gula aren, dan bunga." }], key: { cam: [9.0, 6.5, 14.0], look: [-3.5, -5.5, 0], land: 1, veil: 0, sway: 0.4, pins: 1 } },
+      { id: "jalur", nav: "Angka", kind: "stats", side: "right", fx: "slide", kicker: "Langsung dari petani", title: "Jalurnya kami tempuh sendiri.", stats: [["38", "petani mitra"], ["2.400", "km dari kebun ke kedai"], ["7", "hari maksimal umur sangrai"]], key: { cam: [-8.5, 7.5, 12.0], look: [3.5, -6.0, -1.0], route: 1 } },
+      { id: "pesan", nav: "Kontak", kind: "contact", side: "left", fx: "flip", kicker: "Kembali ke cangkir", title: "Mau kami kirimi biji minggu ini?", body: ["Langganan 250 gram setiap dua minggu, atau mampir ke kedai kami di Braga."], cta: [{ label: "Chat WhatsApp", href: "wa" }, { label: "Ulangi tetesnya", href: "#cangkir", ghost: true }], key: { cam: [3.6, 2.6, 5.2], look: [-1.5, 0.7, 0], dive: 0, land: 0, pins: 0, route: 0, drop: 0.7 } },
+    ],
+    email: "halo@kopilereng.id",
+    wa: "6281200001005",
+    scene: SCENE_KOPI,
+  },
+  /* Kunci melayang → masuk ke lubang → diputar → belenggu terangkat & berayun → perisai heksagon menyebar dari tengah. */
+  {
+    id: "story-kunci-gembok",
+    title: "Benteng Siber · Keamanan Digital",
+    description: "Konsultan keamanan siber: kunci melayang lalu masuk ke gembok saat digulir, diputar, gembok terbuka, kemudian perisai heksagon menyala menyebar dari tengah.",
+    brand: "Benteng Siber",
+    footer: "Benteng Siber · Jakarta & Surabaya · Tersertifikasi ISO 27001",
+    font: F("Sora", "Inter", "family=Sora:wght@500;700&family=Inter:wght@400;600"),
+    colors: { bg: "#070b14", bg2: "#14243f", panel: "#0d1424", ink: "#eaf2ff", inkSoft: "#93a3c3", accent: "#ffcc4d", accent2: "#3fd2ff", line: "rgba(160,190,255,.14)", obj: "#7a869c", obj2: "#1b3a5c", veil: "#05070c", dark: true },
+    configLabel: "Pengaturan adegan",
+    config: {},
+    thumb: 3,
+    acts: [
+      { id: "kunci", kind: "hero", side: "left", fx: "chars", kicker: "Keamanan siber untuk bisnis", title: "Siapa yang memegang kuncinya?", body: ["Kebocoran data jarang dimulai dari peretas jenius. Biasanya dari kunci yang tertinggal."], key: { cam: [3.6, 1.4, 6.4], look: [-1.5, 0.5, 0], insert: 0, turn: 0, open: 0, shield: 0, away: 0 } },
+      { id: "masuk", nav: "Cara kerja", kind: "text", side: "right", fx: "slide", kicker: "Audit", title: "Kami masuk lewat pintu yang sama.", body: ["Uji penetrasi meniru penyerang sungguhan, dengan izin tertulis Anda dan laporan yang bisa ditindaklanjuti."], key: { cam: [-2.2, 1.2, 4.2], look: [1.2, 0.3, 0], insert: 1 } },
+      { id: "buka", kind: "quote", side: "center", fx: "wipe", vh: 180, title: "Satu putaran kecil, dan semuanya terbuka.", key: { cam: [0.4, 1.4, 5.0], look: [0, 0.9, 0], turn: 1, open: 1 } },
+      { id: "perisai", nav: "Layanan", kind: "cards", side: "left", fx: "flip", kicker: "Lalu kami tutup celahnya", title: "Perisai berlapis.", cards: [{ tag: "Sekali setahun", title: "Uji penetrasi", text: "Web, aplikasi, jaringan, dan rekayasa sosial." }, { tag: "24/7", title: "Pemantauan SOC", text: "Analis kami memantau log Anda siang dan malam." }, { tag: "Tim Anda", title: "Pelatihan", text: "Simulasi phishing dan kelas singkat untuk karyawan." }], key: { cam: [3.8, 1.0, 7.5], look: [-2.2, 0.2, -1.0], shield: 1, away: 1, open: 0.3 } },
+      { id: "angka", nav: "Angka", kind: "stats", side: "right", fx: "rise", kicker: "Rekam jejak", title: "Celah yang sudah kami tutup.", stats: [["1.900+", "celah dilaporkan"], ["15", "menit rata-rata respons"], ["120", "klien aktif"]], key: { cam: [-3.4, -1.4, 7.0], look: [2.0, 0.2, -1.0], open: 0 } },
+      { id: "kontak", nav: "Kontak", kind: "contact", side: "center", fx: "rise", kicker: "Gratis untuk 30 menit pertama", title: "Periksa kunci Anda hari ini.", body: ["Ceritakan sistem Anda, kami beri tahu tiga risiko terbesar yang biasanya terlewat."], cta: [{ label: "Chat WhatsApp", href: "wa" }, { label: "Lihat dari awal", href: "#kunci", ghost: true }], key: { cam: [0, 0.2, 10.5], look: [0, -1.4, -1.0] } },
+    ],
+    email: "halo@bentengsiber.id",
+    wa: "6281200001006",
+    scene: SCENE_GEMBOK,
+  },
+];

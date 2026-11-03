@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="512px" height="512px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="85.1182" y1="90.1182" x2="428.8825" y2="433.8825">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="84.7642" y1="89.7642" x2="429.2357" y2="434.2357">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<path fill="url(#SVGID_1_)" stroke="url(#SVGID_2_)" stroke-miterlimit="10" d="M457,366c0,53.02-42.98,96-96,96H153
+	c-53.02,0-96-42.98-96-96V158c0-53.02,42.98-96,96-96h208c53.02,0,96,42.98,96,96V366z"/>
+<path fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M205,224"/>
+<path fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M60,226"/>
+<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="140" y1="222" x2="140" y2="222">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<path fill="url(#SVGID_3_)" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M140,222"/>
+<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="324" y1="150" x2="324" y2="150">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<linearGradient id="SVGID_5_" gradientUnits="userSpaceOnUse" x1="324" y1="150" x2="324" y2="150">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<path fill="url(#SVGID_4_)" stroke="url(#SVGID_5_)" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M324,150"/>
+<line fill="none" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="284" y1="166.011" x2="417.52" y2="249"/>
+<line fill="none" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="425.89" y1="255" x2="317" y2="317.242"/>
+<g>
+	<path fill="none" stroke="#F5BF22" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M200.814,317c68.703,0,68.703,0,68.703,0"/>
+	
+		<linearGradient id="SVGID_6_" gradientUnits="userSpaceOnUse" x1="165.3047" y1="163.7568" x2="212.3828" y2="163.7568" gradientTransform="matrix(0.5481 -0.0463 0.0843 0.9964 100.9258 11.6729)">
+		<stop  offset="0" style="stop-color:#5C86BD"/>
+		<stop  offset="1" style="stop-color:#37419B"/>
+	</linearGradient>
+	
+		<path fill="url(#SVGID_6_)" stroke="#F5BF22" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M205.842,173.194C230.629,159,230.629,159,230.629,159"/>
+	<path fill="none" stroke="#F5BF22" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M234.519,159c1.296,154.808,1.296,154.808,1.296,154.808"/>
+</g>
+<path fill="none" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M101,242.152C159.468,203.279,166,198,166,198"/>
+<linearGradient id="SVGID_7_" gradientUnits="userSpaceOnUse" x1="99.0737" y1="281.6875" x2="155" y2="281.6875">
+	<stop  offset="0" style="stop-color:#5C86BD"/>
+	<stop  offset="1" style="stop-color:#37419B"/>
+</linearGradient>
+<path fill="url(#SVGID_7_)" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M99.074,250.375C155,313,155,313,155,313"/>
+<path fill="#FFFFFF" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+	M96,373c297-3,297-3,297-3"/>
+</svg>

@@ -1,0 +1,25 @@
+# CI frontend OneWebDev (v10): typecheck, lint, uji unit, dan build PWA.
+name: frontend-ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          # Build CI tidak butuh backend sungguhan.
+          VITE_API_BASE_URL: https://api.example.com

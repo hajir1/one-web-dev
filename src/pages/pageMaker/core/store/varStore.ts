@@ -1,0 +1,86 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { makeId } from "../helpers/makeId";
+import {
+  BUILTIN_VARS,
+  withBuiltinVars,
+  isValidVarValue,
+  normalizeVarName,
+  sanitizeVars,
+  validateVarName,
+  type CssVar,
+  type VarError,
+  type VarType,
+} from "../helpers/cssVars";
+
+/* ================================================================== */
+/* Pustaka variabel global (v7) — persist ke localStorage seperti font. */
+/* Variabel bawaan selalu ada (nilai bisa diubah & direset); variabel   */
+/* buatan pengguna bisa ditambah, diedit, diganti nama, dan dihapus.    */
+/* Perapian referensi di desain (ganti nama / hapus) ada di             */
+/* globalSetting/ui/VariableManager.tsx agar store ini tetap kecil.     */
+/* ================================================================== */
+
+interface VarStore {
+  vars: CssVar[];
+  add: (input: { name: string; type: VarType; value: string }) => VarError | null;
+  update: (id: string, patch: { name?: string; value?: string }) => VarError | null;
+  remove: (id: string) => void;
+  reset: (id: string) => void;
+}
+
+/** Bawaan dulu (urutan tetap), lalu buatan pengguna. Nilai bawaan diambil dari data tersimpan bila valid. */
+/** Variabel bawaan selalu ada (nilai tersimpan menang), lalu variabel buatan pengguna. */
+export const withBuiltins = withBuiltinVars;
+
+export const useVarStore = create<VarStore>()(
+  persist(
+    (set, get) => ({
+      vars: withBuiltins([]),
+
+      add: (input) => {
+        const err = validateVarName(input.name, get().vars);
+        if (err) return err;
+        if (!isValidVarValue(input.type, input.value)) return "valueInvalid";
+        const v: CssVar = { id: makeId(), name: normalizeVarName(input.name), type: input.type, value: input.value.trim() };
+        set((s) => ({ vars: [...s.vars, v] }));
+        return null;
+      },
+
+      update: (id, patch) => {
+        const cur = get().vars.find((v) => v.id === id);
+        if (!cur) return "nameInvalid";
+        const next = { ...cur };
+        if (patch.name !== undefined && !cur.builtin) {
+          const err = validateVarName(patch.name, get().vars, id);
+          if (err) return err;
+          next.name = normalizeVarName(patch.name);
+        }
+        if (patch.value !== undefined) {
+          if (!isValidVarValue(cur.type, patch.value)) return "valueInvalid";
+          next.value = patch.value.trim();
+        }
+        set((s) => ({ vars: s.vars.map((v) => (v.id === id ? next : v)) }));
+        return null;
+      },
+
+      remove: (id) => set((s) => ({ vars: s.vars.filter((v) => v.id !== id || v.builtin) })),
+
+      reset: (id) =>
+        set((s) => ({
+          vars: s.vars.map((v) => {
+            const b = v.id === id && v.builtin ? BUILTIN_VARS.find((x) => x.id === v.id) : undefined;
+            return b ? { ...v, value: b.value } : v;
+          }),
+        })),
+    }),
+    {
+      name: "global-css-variables",
+      version: 1,
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as { vars?: unknown };
+        return { ...current, vars: withBuiltins(sanitizeVars(p.vars)) };
+      },
+    },
+  ),
+);

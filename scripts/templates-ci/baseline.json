@@ -1,0 +1,1931 @@
+{
+ "agency-marketing": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "agency-seo": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "agency-studio-gerak": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "agriculture-hidroponik": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "agriculture-hidroponik-makmur": {
+  "axe": {
+   "color-contrast": 8
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "agro-petik-kebun": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "app-dompetku": {
+  "axe": {
+   "color-contrast": 10
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "automotive-bengkel": {
+  "axe": {
+   "color-contrast": 8
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "automotive-dealer": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "bakery-patisserie": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "barber-cukur-jenggala": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "beauty-barbershop": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "beauty-salon-mahkota": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "bookstore-penerbit": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "bookstore-toko-pojok": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "brewery-ragi-nusa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "carwash-kilap": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "catering-dapur-bunda": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "cleaning-rapi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "cleaning-sofa-bersih": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "community-gowes-bareng": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "company-konsultan-pajak": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "construction-bangun": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "construction-bangun-rapi": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "construction-interior": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "coworking-hub-kreatif": {
+  "axe": {
+   "color-contrast": 21
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "coworking-meja-bersama": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "craft-keramik": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "creative-studio": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "creative-tanah-liat": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "creative-tattoo": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-absensi-pro": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-akademi": {
+  "axe": {
+   "color-contrast": 12
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-arena-fit": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-armada": {
+  "axe": {
+   "color-contrast": 10
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-bistro-malam": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-blok-admin": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-bugar": {
+  "axe": {
+   "color-contrast": 16
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-dapur-pro": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-depo-gelap": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-dompet-koin": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-ekspedisi": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-etalase-malam": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-gedung-pintar": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-gelombang": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-gema-sosial": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-gerai-pro": {
+  "axe": {
+   "color-contrast": 16
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-gudang-rapi": {
+  "axe": {
+   "color-contrast": 10
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-halo-desk": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-hunian-prima": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-insan-hr": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kampus-malam": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kanal-iklan": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kasir-kopi": {
+  "axe": {
+   "color-contrast": 11
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kasir-online": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kebun-pintar": {
+  "axe": {
+   "color-contrast": 18
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kluster": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kohort": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-konferensi": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kontrol-gelap": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-kreator-hub": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-ladang-malam": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-langganan": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-lentera-studio": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-linimasa": {
+  "axe": {
+   "color-contrast": 24
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-lintas-analytics": {
+  "axe": {
+   "color-contrast": 11
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-meja-depan": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-mrr-pulse": {
+  "axe": {
+   "color-contrast": 52
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-neraca": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-nimbus-admin": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-orbit-saas": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-otot": {
+  "axe": {
+   "color-contrast": 11
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-palet": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-panggung": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-panitia": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-papan-kerja": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-pasar-kita": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-peduli": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-pembukuan": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-pena-belajar": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-poli-ceria": {
+  "axe": {
+   "color-contrast": 23
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-prospek-plus": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-rantai": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-rekam-medis": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-rekan-kerja": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-relasi-crm": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-resor-senja": {
+  "axe": {
+   "color-contrast": 13
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-roas-lab": {
+  "axe": {
+   "color-contrast": 18
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-ruang-bantu": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-rute-malam": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-saldo-emas": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-satoshi": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sawah": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sehat-klinik": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sensorik": {
+  "axe": {
+   "color-contrast": 14
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sigap-cs": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sinyal": {
+  "axe": {
+   "color-contrast": 30
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-sprint-malam": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-stokku": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-studio-yoga": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-surya-panel": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-talenta": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-tani-maju": {
+  "axe": {
+   "color-contrast": 10
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-tenggat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-tiang-ops": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-tiket-fest": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-tiketin": {
+  "axe": {
+   "color-contrast": 31
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-uptime": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-watt": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dash-yayasan-terang": {
+  "axe": {
+   "color-contrast": 12
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dental-ortho": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dental-senyum-ceria": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "dental-senyum-sehat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "driving-setir-aman": {
+  "axe": {
+   "color-contrast": 20
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "education-sekolah-alam-rimba": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "education-tahfidz": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "energy-angin": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "energy-surya": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "esports-garuda-muda": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "event-festival-kuliner": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "event-music-fest": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "event-riang-pesta": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "event-summit": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "fashion-streetwear": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "film-layar-tancap": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "film-produksi": {
+  "axe": {
+   "color-contrast": 16
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "finance-investasi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "finance-pajak-beres": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "fitness-yoga": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "florist-kebun-kembang": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "florist-kembang": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "florist-wedding-bloom": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "foundation-tunas-harapan": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "furniture-kayu-jati": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "gallery-ruang-rupa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "gaming-arena": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "gaming-esports-team": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "gaming-markas-gim": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "garden-teduh-lanskap": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "government-dinas-pariwisata": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "hardware-bangun-jaya": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "health-dental": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "health-fisio-gerak": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "health-klinik": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "health-pharmacy": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "health-psikolog": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "hospitality-capsule-hotel": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "hospitality-losmen-kenanga": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "hospitality-villa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "hotel-teras-senja": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "insurance-auto": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "insurance-payung-mikro": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "itconsult-sinergi": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "jewelry-perak-sekar": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "kids-preschool": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "kids-toystore": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "laundry-bersih": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "laundry-wangi-express": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "logistics-cargo": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "logistics-kirim": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "logistics-kirim-kilat": {
+  "axe": {
+   "color-contrast": 8
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "maritime-bahari-charter": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "motorworkshop-gas-pol": {
+  "axe": {
+   "color-contrast": 26
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "moving-angkut-aman": {
+  "axe": {
+   "color-contrast": 11
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "museum-kota-lama": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "music-dj": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "music-gema-studio": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "music-nada-ria": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "music-school": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "news-warta-desa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "nonprofit-foundation-edu": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "nonprofit-lingkungan": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "nonprofit-peduli": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "pets-meong-pet-hotel": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "pets-shop": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "pets-vet-sahabat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "pharmacy-apotek-keluarga": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "pharmacy-sehat-sentosa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "photography-lensa": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "photography-studio-bingkai": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "podcast-obrolan-senja": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "podcast-ruang-dengar": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "podcast-studio-suara": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "portfolio-dimas-ilustrasi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "portfolio-illustrator": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "portfolio-minimal": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "printing-cetak-kilat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "printing-merch": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "printing-tinta-rakit": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "productphoto-kilau": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "professional-lexa": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "realestate-apartemen": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "realestate-kos-nyaman": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "realty-rumah-kita": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "recruitment-talenta": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "recruitment-talenta-nusa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "rental-lintas": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "rental-sewa-mobil-lancar": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "repair-servis-tuntas": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "restaurant-ramen": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "restaurant-saji": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "restaurant-warung-sambal": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "runclub-lari-pagi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "saas-analitik-data": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "saas-fakturin": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "saas-hr-absensi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "saas-launch": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "science-lab-riset-prima": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "science-museum": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "security-garda-prima": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "shop-gadget": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "solar-surya-atap": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "spa-pijat-refleksi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "spa-tirta-sari": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "sports-arena-futsal-gol": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "sports-futsal-arena": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "sports-runclub": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "startup-edtech": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "startup-pitch-deck": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tailor-jarum-emas": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tattoo-garis-hitam": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tattoo-tinta-nusantara": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tech-cybersecurity": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tech-devhub": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "technology-ai-lab": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "travel-diving": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "travel-jejak-rinjani": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "travel-jelajah": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "tutoring-cerdas-cermat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "vet-sahabat": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "village-kayu-manis": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "wedding-janji": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "wedding-janji-suci": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "wedding-organizer": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-aksara-studio": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-arena-nova": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-atlas-properti": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-aurelia-clinic": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-cahaya-ilmu": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-dompet-rapi": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-embun-botanica": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-festival-gelombang": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-insight-labs": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-kosmo-planetarium": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-kriya-loka": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-kuantum-cloud": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-lari-nusantara": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [
+   "rute.html@375 +8px div.page-rute__image-1-wrapper",
+   "rute.html@768 +21px div.page-rute__image-1-wrapper",
+   "rute.html@1280 +36px div.page-rute__image-1-wrapper"
+  ],
+  "errors": []
+ },
+ "x3d-lindung-asuransi": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-linguaria": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-lintas-benua": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-neuralis-ai": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-nusa-game": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-nusantara-charter": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-orbit-kargo": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-prima-baja": {
+  "axe": {
+   "color-contrast": 8
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-pulse-lab": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-rimba-roastery": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-robotika-cakra": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-roti-gandum": {
+  "axe": {
+   "color-contrast": 6
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-ruang-obrol": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-samudra-biru": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-satwa-sehat": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-segar-hidroponik": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-senyum-kristal": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-setrum-station": {
+  "axe": {
+   "color-contrast": 3
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-simpul-coworking": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-sinar-surya": {
+  "axe": {
+   "color-contrast": 5
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-teh-malabar": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-tirta-sari": {
+  "axe": {
+   "color-contrast": 4
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-turbo-garasi": {
+  "axe": {
+   "color-contrast": 2
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-velo-listrik": {
+  "axe": {
+   "color-contrast": 7
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-wangi-nusa": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "x3d-yoga-teratai": {
+  "axe": {
+   "color-contrast": 9
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "yoga-hening": {
+  "axe": {
+   "color-contrast": 12
+  },
+  "overflow": [],
+  "errors": []
+ },
+ "yoga-ruang-napas": {
+  "axe": {
+   "color-contrast": 1
+  },
+  "overflow": [],
+  "errors": []
+ }
+}

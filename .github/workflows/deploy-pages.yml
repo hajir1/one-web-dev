@@ -1,0 +1,59 @@
+# v13: deploy MODE DEMO (frontend tanpa backend) ke GitHub Pages.
+# Aktifkan sekali: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# Jalankan manual dari tab Actions ("Run workflow"). Agar otomatis tiap push ke main/master,
+# buat variabel repo DEMO_PAGES_AUTO = true (Settings → Secrets and variables → Actions → Variables).
+name: deploy-demo-pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || vars.DEMO_PAGES_AUTO == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - id: pages
+        uses: actions/configure-pages@v5
+      - run: npm ci
+      - run: npm test
+      - name: Build demo
+        run: npm run build:demo
+        env:
+          # Awalan path dari GitHub: "/repo/" untuk situs proyek, "/" untuk nama.github.io atau
+          # domain sendiri. Bisa ditimpa lewat variabel repo DEMO_BASE_PATH (Settings → Variables).
+          VITE_BASE_PATH: ${{ vars.DEMO_BASE_PATH || steps.pages.outputs.base_path || '/' }}
+      - name: SPA fallback & tanpa Jekyll
+        # GitHub Pages tidak punya rewrite: 404.html = index.html supaya /id/page-maker dll.
+        # tetap membuka aplikasi saat dibuka langsung atau di-refresh.
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1435"/><stop offset="1" stop-color="#1c3174"/></linearGradient>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b68f0"/><stop offset="1" stop-color="#1f3a8f"/></linearGradient></defs>
+<rect width="1200" height="630" fill="url(#bg)"/>
+<g font-family="'DejaVu Sans Mono', Menlo, Consolas, monospace" font-size="22" fill="#3b68f0" opacity="0.28">
+<text x="720" y="110">&lt;section class="hero"&gt;</text><text x="750" y="150">export default App;</text><text x="700" y="520">npm run build</text><text x="780" y="560">{ "pages": 3 }</text></g>
+<g transform="translate(110 175)"><rect width="280" height="280" rx="77" fill="url(#g)"/><g transform="scale(7)"><path d="M9.7 15.2 15.8 10.2V29.6" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.2 29.6H21.2" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/><rect x="23.8" y="27.8" width="6.6" height="3.6" rx="1.2" fill="#c0d2fd"/></g></g>
+<text x="450" y="300" font-family="Inter, 'Segoe UI', Roboto, Arial, sans-serif" font-size="74" font-weight="800" letter-spacing="-1.5" fill="#fff">OneWeb <tspan fill="#8fb0fb">DevTools</tspan></text>
+<text x="454" y="365" font-family="Inter, 'Segoe UI', Roboto, Arial, sans-serif" font-size="30" font-weight="500" fill="#c7d4f7">Generator kode, element maker, template web,</text>
+<text x="454" y="407" font-family="Inter, 'Segoe UI', Roboto, Arial, sans-serif" font-size="30" font-weight="500" fill="#c7d4f7">dan alat file untuk developer.</text>
+</svg>

@@ -1,0 +1,639 @@
+import { isLatestTemplate, type TemplateMeta } from "../../../config/templates";
+
+/* ================================================================== */
+/* Katalog TEMPLATE KODE (v16–v18): 37 template berupa satu            */
+/* berkas HTML mandiri (HTML + CSS + JS), bukan pohon Desain Halaman.    */
+/*                                                                    */
+/* - Pratinjau: berkas dirender apa adanya di iframe sandbox.          */
+/* - Unduh: zip berisi index.html + README.md.                          */
+/* - Tidak dibuka di Desain Halaman (animasi SVG/canvas, WebGL, dan      */
+/*   library tidak bisa diwakili elemen). Sejak v17 teks, warna, dan     */
+/*   data bisa diubah tanpa kode di Editor Template (editModel.ts).      */
+/*                                                                    */
+/* Berkas di ./files/ DIHASILKAN oleh src/tools/genCodeTemplates.ts     */
+/* (npm run gen:code). Jangan diedit langsung.                           */
+/* ================================================================== */
+
+export type CodeGroup = "animation" | "invitation" | "web3d" | "portfolio3d" | "motion3d" | "landing" | "biz3d";
+
+export interface CodeTemplateMeta extends TemplateMeta {
+  code: {
+    group: CodeGroup;
+    /** Batas ukuran berkas (KB) dari spesifikasi. */
+    budgetKb: number;
+    /** Library eksternal (CDN, versi dipatok). */
+    libs: string[];
+  };
+}
+
+const LIBS: Record<CodeGroup, string[]> = {
+  animation: [],
+  invitation: ["AOS 2.3.4", "Swiper 11.1.14", "canvas-confetti 1.9.3"],
+  web3d: ["three 0.169.0", "Lenis 1.1.13"],
+  portfolio3d: ["three 0.169.0", "Lenis 1.1.13"],
+  motion3d: ["three 0.169.0", "OWD Scrub (bawaan, pengganti GSAP)", "Motion 11.11.13", "Lenis 1.1.13"],
+  landing: [],
+  biz3d: ["three 0.169.0", "OWD Scrub (bawaan, pengganti GSAP)", "Motion 11.11.13", "Lenis 1.1.13"],
+};
+const BUDGET: Record<CodeGroup, number> = { animation: 80, invitation: 150, web3d: 250, portfolio3d: 200, motion3d: 250, landing: 120, biz3d: 250 };
+const PRICE: Record<CodeGroup, number> = { animation: 90, invitation: 120, web3d: 250, portfolio3d: 200, motion3d: 250, landing: 75, biz3d: 200 };
+
+const m = (id: string, group: CodeGroup, category: TemplateMeta["category"], accent: string, tags: string[]): CodeTemplateMeta => ({
+  id,
+  version: 1,
+  category,
+  tier: "premium",
+  price: PRICE[group],
+  accent,
+  tags: [...tags, group === "animation" ? "animasi" : group === "invitation" ? "undangan digital" : group === "landing" ? "landing page" : "3d", "template kode"],
+  isNew: isLatestTemplate(id),
+  code: { group, budgetKb: BUDGET[group], libs: LIBS[group] },
+});
+
+export const CODE_TEMPLATE_CATALOG: CodeTemplateMeta[] = [
+  m("anim-taman-kunang", "animation", "animation", "#ff7eb6", ["romantis", "kunang-kunang", "tulip", "malam", "svg"]),
+  m("anim-mawar-rembulan", "animation", "animation", "#e0315b", ["romantis", "mawar", "bulan", "kelopak", "svg"]),
+  m("anim-lentera-asmara", "animation", "animation", "#b69cff", ["romantis", "lentera", "lampion", "hari jadi", "svg"]),
+  m("anim-padang-aster", "animation", "animation", "#ffd166", ["romantis", "aster", "kupu-kupu", "padang bunga", "svg"]),
+  m("anim-teratai-purnama", "animation", "animation", "#ffb3c8", ["romantis", "teratai", "kolam", "bulan purnama", "svg"]),
+  m("anim-sakura-senja", "animation", "animation", "#ff8fab", ["romantis", "sakura", "senja", "hati", "svg"]),
+  m("undangan-nikah-rangkai-kasih", "invitation", "invitation", "#2f4a3a", ["pernikahan", "nikah", "wedding", "akad", "resepsi"]),
+  m("undangan-ultah-pesta-ceria", "invitation", "invitation", "#e5476f", ["ulang tahun", "birthday", "anak", "pesta"]),
+  m("undangan-khitanan-fathan", "invitation", "invitation", "#0f4c3a", ["khitanan", "sunatan", "tasyakuran", "islami"]),
+  m("undangan-aqiqah-humaira", "invitation", "invitation", "#4a6fa5", ["aqiqah", "bayi", "tasyakuran", "islami"]),
+  m("undangan-lamaran-dimas-anin", "invitation", "invitation", "#9c4f5c", ["lamaran", "tunangan", "engagement", "keluarga"]),
+  m("undangan-wisuda-rizky", "invitation", "invitation", "#1f3b73", ["wisuda", "kelulusan", "syukuran", "graduation"]),
+  m("undangan-nikah-jawa-sekar-arum", "invitation", "invitation", "#7a4a24", ["pernikahan", "adat jawa", "wedding", "siraman", "resepsi"]),
+  m("undangan-nikah-minimalis-nara-bima", "invitation", "invitation", "#161616", ["pernikahan", "minimalis", "wedding", "monogram"]),
+  m("undangan-nikah-rustic-tara-galih", "invitation", "invitation", "#a6532f", ["pernikahan", "rustic", "wedding", "garden party"]),
+  m("undangan-ultah-17-kirana", "invitation", "invitation", "#b03ad6", ["ulang tahun", "sweet seventeen", "17 tahun", "pesta"]),
+  m("undangan-rumah-baru-keluarga-hasan", "invitation", "invitation", "#2f5d50", ["rumah baru", "syukuran", "pengajian", "islami"]),
+  m("undangan-tujuh-bulanan-sari", "invitation", "invitation", "#c9735a", ["tujuh bulanan", "mitoni", "kehamilan", "syukuran"]),
+  m("undangan-reuni-smansa-2015", "invitation", "invitation", "#e5533d", ["reuni", "alumni", "sekolah", "retro"]),
+  m("web3d-nebula-labs", "web3d", "technology", "#8b7bff", ["three.js", "webgl", "scroll", "satelit", "startup"]),
+  m("web3d-ruang-lapis", "web3d", "architecture", "#b4532f", ["three.js", "webgl", "scroll", "arsitek", "interior"]),
+  m("web3d-arus-biru", "web3d", "nonprofit", "#39d0c3", ["three.js", "webgl", "scroll", "laut", "konservasi"]),
+  m("web3d-kopi-senja", "web3d", "restaurant", "#c8873a", ["three.js", "webgl", "scroll", "kopi", "kafe"]),
+  m("web3d-surya-nusa", "web3d", "technology", "#f2b632", ["three.js", "webgl", "scroll", "energi surya", "panel surya"]),
+  m("folio-arka-pradipta", "portfolio3d", "portfolio", "#c6f432", ["three.js", "webgl", "creative developer", "portfolio"]),
+  m("folio-sinta-maharani", "portfolio3d", "portfolio", "#9f5cf0", ["three.js", "webgl", "motion designer", "portfolio"]),
+  m("folio-bima-wiratama", "portfolio3d", "portfolio", "#e8552b", ["three.js", "webgl", "product designer", "portfolio"]),
+  m("folio-naya-kirana", "portfolio3d", "portfolio", "#ff8a3d", ["three.js", "webgl", "sound designer", "portfolio"]),
+  m("folio-raka-aditya", "portfolio3d", "portfolio", "#2f5bff", ["three.js", "webgl", "data visualization", "portfolio"]),
+  m("motion-ruang-kode", "motion3d", "portfolio", "#7cf0c5", ["three.js", "scroll scrub", "motion", "scroll", "pc", "developer", "biodata kode", "portfolio"]),
+  m("motion-studio-saku", "motion3d", "technology", "#6d4aff", ["three.js", "scroll scrub", "motion", "scroll", "hp", "aplikasi mobile", "studio", "biodata kode"]),
+  m("motion-lini-saas", "motion3d", "saas", "#3ddc97", ["three.js", "scroll scrub", "motion", "scroll", "laptop", "saas", "landing page", "biodata kode"]),
+  m("motion-lensa-nara", "motion3d", "photography", "#ffb36b", ["three.js", "scroll scrub", "motion", "scroll", "kamera", "fotografer", "portfolio", "biodata kode"]),
+  m("motion-nada-laras", "motion3d", "music", "#ff4fd8", ["three.js", "scroll scrub", "motion", "scroll", "piringan hitam", "musik", "produser", "biodata kode"]),
+  m("motion-parfum-senja", "motion3d", "beauty", "#d9825b", ["three.js", "scroll scrub", "motion", "scroll", "parfum", "brand", "produk", "biodata kode"]),
+  m("motion-roket-orbit", "motion3d", "startup", "#ff6b3d", ["three.js", "scroll scrub", "motion", "scroll", "roket", "startup", "akselerator", "biodata kode"]),
+  m("motion-buku-aksara", "motion3d", "creative", "#a4442b", ["three.js", "scroll scrub", "motion", "scroll", "buku", "penulis", "portfolio", "biodata kode"]),
+  m("story-layar-kosong", "motion3d", "agency", "#5cf2b8", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "komputer",  "studio web"]),
+  m("story-mata-kucing", "motion3d", "pets", "#ffb648", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "kucing",  "klinik hewan"]),
+  m("story-palu-rumah", "motion3d", "construction", "#d2552d", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "kontraktor",  "rumah"]),
+  m("story-biji-hutan", "motion3d", "nonprofit", "#d9642b", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "pohon",  "lingkungan"]),
+  m("story-tetes-kopi", "motion3d", "restaurant", "#f0a64a", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "kopi",  "kedai"]),
+  m("story-kunci-gembok", "motion3d", "technology", "#ffcc4d", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "keamanan siber",  "gembok"]),
+  m("story-pesawat-kertas", "motion3d", "agency", "#ff5a3c", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "pesawat kertas",  "agensi konten"]),
+  m("story-bola-lampu", "motion3d", "technology", "#ffc65c", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "bola lampu",  "konsultan ai"]),
+  m("story-jam-pasir", "motion3d", "creative", "#e6b45c", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "jam pasir",  "batik"]),
+  m("story-kapal-botol", "motion3d", "travel", "#e2553a", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "kapal",  "trip laut"]),
+  m("story-kubus-rubik", "motion3d", "professional", "#ffd43b", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "rubik",  "konsultan bisnis"]),
+  m("story-roda-gigi", "motion3d", "technology", "#ff7a1a", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "roda gigi",  "manufaktur"]),
+  m("story-peta-gunung", "motion3d", "travel", "#d2452b", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "peta",  "pendakian"]),
+  m("story-kardus-dunia", "motion3d", "logistics", "#e85d2a", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "kardus",  "pengiriman"]),
+  m("story-pena-tinta", "motion3d", "professional", "#b48a3c", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "pena",  "kantor hukum"]),
+  m("story-sel-dna", "motion3d", "health", "#ff6fa8", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "dna",  "laboratorium"]),
+  m("story-pintu-rimba", "motion3d", "hospitality", "#2f6b3f", ["three.js",  "scroll scrub",  "motion",  "scroll",  "cerita scroll",  "pintu",  "resor"]),
+  m("anim-surat-merpati", "animation", "animation", "#c2304a", ["cerita",  "surat",  "burung kertas",  "romantis",  "canvas"]),
+  m("anim-balon-kota", "animation", "animation", "#ff5d8f", ["cerita",  "balon",  "ulang tahun",  "kota",  "canvas"]),
+  m("anim-payung-hujan", "animation", "animation", "#e2574c", ["cerita",  "hujan",  "maaf",  "pelangi",  "canvas"]),
+  m("anim-kembang-api", "animation", "animation", "#ffcf5c", ["cerita",  "kembang api",  "tahun baru",  "canvas"]),
+  m("anim-toples-bintang", "animation", "animation", "#ffd76a", ["cerita",  "bintang",  "hari jadi",  "canvas"]),
+  m("anim-botol-pesan", "animation", "animation", "#ffc56b", ["cerita",  "laut",  "rindu",  "sahabat",  "canvas"]),
+  m("anim-bunga-matahari", "animation", "animation", "#ffc93c", ["cerita",  "wisuda",  "bunga matahari",  "canvas"]),
+  m("anim-aurora-pondok", "animation", "animation", "#4dffb5", ["cerita",  "aurora",  "hari jadi",  "salju",  "canvas"]),
+  m("anim-kereta-malam", "animation", "animation", "#ffd27a", ["cerita",  "kereta",  "mudik",  "rindu",  "canvas"]),
+  m("anim-kupu-kepompong", "animation", "animation", "#ff8a3d", ["cerita",  "kupu-kupu",  "semangat",  "canvas"]),
+  m("anim-kolam-koi", "animation", "animation", "#ff6b3d", ["cerita",  "koi",  "pernikahan",  "canvas"]),
+  m("anim-pohon-musim", "animation", "animation", "#ff9ec4", ["cerita",  "musim",  "hari jadi",  "pohon",  "canvas"]),
+  m("anim-lilin-ulang-tahun", "animation", "animation", "#f0728f", ["cerita",  "ulang tahun",  "kue",  "interaktif",  "canvas"]),
+  m("anim-gelembung-sabun", "animation", "animation", "#9b7bff", ["cerita",  "terima kasih",  "gelembung",  "canvas"]),
+  m("anim-paus-langit", "animation", "animation", "#7fa8ff", ["cerita",  "paus",  "pengantar tidur",  "canvas"]),
+  m("anim-jendela-salju", "animation", "animation", "#c8553d", ["cerita",  "salju",  "liburan",  "canvas"]),
+  m("undangan-nikah-amplop-surat", "invitation", "invitation", "#8c4a5a", ["pernikahan",  "nikah",  "amplop",  "animasi pembuka"]),
+  m("undangan-nikah-tirai-panggung", "invitation", "invitation", "#7a1c2b", ["pernikahan",  "nikah",  "teater",  "animasi pembuka"]),
+  m("undangan-nikah-pintu-gebyok", "invitation", "invitation", "#6b3d1e", ["pernikahan",  "adat jawa",  "pintu",  "animasi pembuka"]),
+  m("undangan-nikah-ombak-pantai", "invitation", "invitation", "#0f5e74", ["pernikahan",  "pantai",  "wedding",  "animasi pembuka"]),
+  m("undangan-nikah-kelopak-sakura", "invitation", "invitation", "#b4546f", ["pernikahan",  "sakura",  "minimalis",  "animasi pembuka"]),
+  m("undangan-lamaran-cincin-diagonal", "invitation", "invitation", "#4c5a35", ["lamaran",  "tunangan",  "animasi pembuka"]),
+  m("undangan-lamaran-rol-film", "invitation", "invitation", "#1d1b18", ["tunangan",  "film analog",  "animasi pembuka"]),
+  m("undangan-khitanan-gulungan", "invitation", "invitation", "#0e6b5e", ["khitanan",  "islami",  "gulungan",  "animasi pembuka"]),
+  m("undangan-aqiqah-gelembung", "invitation", "invitation", "#3f86ad", ["aqiqah",  "bayi",  "gelembung",  "animasi pembuka"]),
+  m("undangan-ultah-kado-kejutan", "invitation", "invitation", "#2f6fd6", ["ulang tahun",  "anak",  "kado",  "animasi pembuka"]),
+  m("undangan-ultah-sirkus", "invitation", "invitation", "#c8283c", ["ulang tahun",  "anak",  "sirkus",  "animasi pembuka"]),
+  m("undangan-ultah-puzzle-oma", "invitation", "invitation", "#4f6b5a", ["ulang tahun",  "60 tahun",  "puzzle",  "animasi pembuka"]),
+  m("undangan-ultah-peta-petualangan", "invitation", "invitation", "#7a5230", ["ulang tahun",  "anak",  "petualangan",  "animasi pembuka"]),
+  m("undangan-wisuda-buku", "invitation", "invitation", "#1f2f57", ["wisuda",  "syukuran",  "buku",  "animasi pembuka"]),
+  m("undangan-rumah-baru-krepyak", "invitation", "invitation", "#a4532f", ["rumah baru",  "syukuran",  "jendela",  "animasi pembuka"]),
+  m("undangan-baby-shower-awan", "invitation", "invitation", "#6d84c4", ["baby shower",  "kehamilan",  "awan",  "animasi pembuka"]),
+  m("undangan-halal-bihalal-lentera", "invitation", "invitation", "#1f2f6b", ["halal bihalal",  "lebaran",  "lentera",  "animasi pembuka"]),
+  m("lp-ayam-geprek-mbak-sri", "landing", "restaurant", "#e2441c", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-bakso-urat-pak-kumis", "landing", "restaurant", "#ffcf4a", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-nasi-padang-uni-ros", "landing", "restaurant", "#b2291e", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-soto-betawi-bang-udin", "landing", "restaurant", "#a8431f", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sate-klatak-pak-darmo", "landing", "restaurant", "#8c3b1f", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-seblak-neng-ica", "landing", "restaurant", "#ff3b2f", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-mie-ayam-bu-tini", "landing", "restaurant", "#f2785c", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-seafood-dermaga", "landing", "restaurant", "#d9a85b", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-gudeg-yu-narti", "landing", "shop", "#7a4b1e", ["umkm",  "toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-pecel-lele-cak-mat", "landing", "restaurant", "#1f8a5b", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-kopi-teras-sawah", "landing", "restaurant", "#4d6b2f", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-teh-poci-mbak-lis", "landing", "restaurant", "#c6402b", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-jus-segar-pak-harun", "landing", "restaurant", "#3fa34d", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-boba-mbul", "landing", "restaurant", "#7b3fe4", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-jamu-bu-sumi", "landing", "shop", "#a8661b", ["umkm",  "toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sangrai-kopi-gayo", "landing", "brewery", "#c98a4b", ["umkm",  "minuman fermentasi",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-teh-tarik-bang-dol", "landing", "restaurant", "#f2b84b", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-es-kelapa-pak-ujang", "landing", "restaurant", "#1d7a54", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-susu-saung-lembang", "landing", "shop", "#2e74b5", ["umkm",  "toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-wedang-ronde-pak-gito", "landing", "restaurant", "#d4572a", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-roti-oven-bu-ratna", "landing", "bakery", "#b7652a", ["umkm",  "toko roti",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-kue-kering-dapur-hana", "landing", "bakery", "#d9566f", ["umkm",  "toko roti",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-brownies-panggang-kakak", "landing", "bakery", "#d39b63", ["umkm",  "toko roti",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-keripik-mak-ijah", "landing", "shop", "#e8380d", ["umkm",  "toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-martabak-koh-liong", "landing", "restaurant", "#ffb238", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-donat-kentang-ceria", "landing", "bakery", "#e33d8c", ["umkm",  "toko roti",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-jajan-pasar-mbok-yem", "landing", "catering", "#4f7d2b", ["umkm",  "katering",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-cookies-oven-kecil", "landing", "bakery", "#9c4a1f", ["umkm",  "toko roti",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-pempek-cek-yuni", "landing", "restaurant", "#8d2e1f", ["umkm",  "restoran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sambal-bu-tatik", "landing", "shop", "#c8261b", ["umkm",  "toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-batik-tulis-laweyan", "landing", "fashion", "#7b3f1d", ["fesyen",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-konveksi-kaos-sablon-jaya", "landing", "fashion", "#ff4f1f", ["fesyen",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-hijab-segi-empat-nara", "landing", "fashion", "#c47a74", ["fesyen",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sepatu-kulit-cibaduyut", "landing", "craft", "#b8875a", ["kerajinan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-tas-rajut-benang-ibu", "landing", "craft", "#b5603b", ["kerajinan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-perak-kotagede-sasmito", "landing", "jewelry", "#59656f", ["perhiasan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-tenun-ikat-sumba-rambu", "landing", "craft", "#9a2f1f", ["kerajinan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sablon-kilat-cetakin", "landing", "printing", "#2f5bff", ["percetakan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-penjahit-pak-darto", "landing", "tailor", "#e8c26a", ["penjahit",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-anyaman-rotan-cirebon", "landing", "furniture", "#b36b1f", ["furnitur",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-salon-muslimah-zahra", "landing", "beauty", "#b55c86", ["kecantikan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-barbershop-kapster-bung", "landing", "barbershop", "#d6322a", ["barbershop",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-pijat-refleksi-sehat-sejahtera", "landing", "spa", "#3d6b45", ["spa",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-nail-art-kuku-cantik", "landing", "spa", "#e0457b", ["spa",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-sabun-herbal-sekar-wangi", "landing", "shop", "#5d7b3a", ["toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-skincare-lokal-glow-nusa", "landing", "beauty", "#c9b38a", ["kecantikan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-mua-rias-dinda", "landing", "beauty", "#c5546a", ["kecantikan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-rias-pengantin-jawa-ayu", "landing", "wedding", "#7a2c1f", ["pernikahan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-lash-studio-mata-indah", "landing", "spa", "#8a5cf6", ["spa",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-parfum-lokal-aroma-pagi", "landing", "shop", "#e8b86d", ["toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-laundry-kiloan-wangi", "landing", "laundry", "#2f80ed", ["laundry",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-cleaning-rumah-kinclong", "landing", "cleaning", "#14a38b", ["jasa kebersihan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-jasa-pindahan-angkut-aman", "landing", "moving", "#ff7a00", ["jasa pindahan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-service-ac-dingin-lagi", "landing", "repair", "#1677d2", ["jasa servis",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-cuci-mobil-steam-kilap", "landing", "carwash", "#3fc1ff", ["cuci mobil",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-rental-mobil-jalan-jalan", "landing", "rental", "#e85d3c", ["rental",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-kursus-mengemudi-setir-aman", "landing", "driving", "#2e7d32", ["kursus mengemudi",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-cctv-satpam-rumah-aman", "landing", "security", "#1f4fa3", ["jasa keamanan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-tukang-taman-hijau-asri", "landing", "garden", "#3f7a2a", ["taman & lanskap",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-bengkel-motor-pak-min", "landing", "automotive", "#ffb020", ["otomotif",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-apotek-sehat-keluarga", "landing", "pharmacy", "#14936b", ["apotek",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-klinik-gigi-senyum-rapi", "landing", "dental", "#1d9bd1", ["klinik gigi",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-optik-mata-jernih", "landing", "optician", "#ffcc00", ["optik",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-notaris-ppat-amanah", "landing", "notary", "#1f3a5f", ["notaris",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-agen-asuransi-lindungi", "landing", "insurance", "#5cc8a8", ["asuransi",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-koperasi-simpan-pinjam-maju", "landing", "cooperative", "#2f6b2f", ["koperasi",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-lpk-kerja-jepang", "landing", "recruitment", "#d7263d", ["rekrutmen",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-konsultan-pajak-umkm", "landing", "company", "#2459c9", ["company profile / landing",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-studio-tato-garis-hitam", "landing", "tattoo", "#e0b44c", ["studio tato",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-desa-wisata-sukamaju", "landing", "government", "#2f8a3e", ["pemerintahan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-kursus-inggris-speak-up", "landing", "language", "#3355ff", ["kursus bahasa",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-daycare-rumah-ceria", "landing", "kids", "#f28c38", ["anak & paud",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-taman-baca-pelita", "landing", "library", "#a6522d", ["perpustakaan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-toko-buku-bekas-lawas", "landing", "bookstore", "#8b3a1f", ["toko buku",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-masjid-al-ikhlas-program", "landing", "worship", "#d4af5a", ["rumah ibadah",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-komunitas-sepeda-gowes-pagi", "landing", "community", "#4caf50", ["komunitas",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-lapangan-futsal-gol", "landing", "sports", "#1f9d3a", ["olahraga",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-kelas-robotik-anak", "landing", "science", "#3d5afe", ["sains",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-museum-rumah-tenun", "landing", "museum", "#8f3b2a", ["museum",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-coworking-ruang-kerja-teduh", "landing", "coworking", "#7ad3a6", ["coworking",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-rumah-produksi-video-gerak", "landing", "film", "#ff5a36", ["film",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-studio-podcast-suara-kita", "landing", "podcast", "#8b5cf6", ["podcast",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-studio-foto-keluarga-senja", "landing", "photography", "#c06c4a", ["fotografi",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-event-organizer-rayakan", "landing", "event", "#e83f8f", ["event",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-wedding-organizer-sederhana", "landing", "wedding", "#9a6b4f", ["pernikahan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-toko-bunga-kelopak", "landing", "florist", "#c4506a", ["toko bunga",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-percetakan-undangan-cetak-kilat", "landing", "printing", "#d64933", ["percetakan",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-kabar-kampung-newsletter", "landing", "news", "#b3261e", ["berita & media",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-konselor-keluarga-rina", "landing", "personal", "#5c8d74", ["personal brand",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-jasa-desain-rumah-ruang", "landing", "architecture", "#c45a2a", ["arsitektur",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-sewa-kapal-wisata-bajo", "landing", "maritime", "#0e7c86", ["maritim",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-kombucha-seduh-rumah", "landing", "brewery", "#c2410c", ["minuman fermentasi",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-catering-nasi-kotak-bu-har", "landing", "catering", "#d97706", ["katering",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-toko-sembako-berkah", "landing", "shop", "#dc2626", ["toko online",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-rental-ps-arena-main", "landing", "gaming", "#22d3ee", ["gaming & esports",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-gym-otot-kampung", "landing", "fitness", "#facc15", ["kebugaran",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-kos-putri-griya-asri", "landing", "realestate", "#7c3aed", ["properti",  "whatsapp",  "jam buka",  "jasa"]),
+  m("lp-grooming-kucing-meong", "landing", "pets", "#ec4899", ["hewan peliharaan",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-studio-musik-nada-garasi", "landing", "music", "#e11d48", ["musik",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("lp-bibit-hidroponik-tani-muda", "landing", "agriculture", "#3f8f2f", ["pertanian",  "whatsapp",  "jam buka",  "keranjang"]),
+  m("biz-kopi-lereng-ijen", "biz3d", "shop", "#a4502a", ["umkm",  "three.js",  "scroll scrub",  "motion",  "toko online",  "cangkir kopi",  "website bisnis"]),
+  m("biz-roti-sobat-oven", "biz3d", "bakery", "#d0496b", ["umkm",  "three.js",  "scroll scrub",  "motion",  "toko roti",  "kue tart",  "website bisnis"]),
+  m("biz-batik-canting-sari", "biz3d", "fashion", "#7b3f1d", ["umkm",  "three.js",  "scroll scrub",  "motion",  "fesyen",  "kain batik",  "website bisnis"]),
+  m("biz-gerabah-kasongan-tanah", "biz3d", "craft", "#b5562f", ["umkm",  "three.js",  "scroll scrub",  "motion",  "kerajinan",  "gerabah",  "website bisnis"]),
+  m("biz-madu-hutan-sumbawa", "biz3d", "agriculture", "#c7861a", ["umkm",  "three.js",  "scroll scrub",  "motion",  "pertanian",  "toples madu",  "website bisnis"]),
+  m("biz-servis-gawai-klinik", "biz3d", "technology", "#2563eb", ["three.js",  "scroll scrub",  "motion",  "teknologi",  "ponsel",  "website bisnis"]),
+  m("biz-kasir-awan-saas", "biz3d", "saas", "#6d5efc", ["three.js",  "scroll scrub",  "motion",  "saas",  "laptop dasbor",  "website bisnis"]),
+  m("biz-akselerator-lepas-landas", "biz3d", "startup", "#ff5a36", ["three.js",  "scroll scrub",  "motion",  "startup",  "roket",  "website bisnis"]),
+  m("biz-agensi-ruang-ide", "biz3d", "agency", "#ff4d8d", ["three.js",  "scroll scrub",  "motion",  "agensi",  "simpul abstrak",  "website bisnis"]),
+  m("biz-fotografer-arka-lensa", "biz3d", "portfolio", "#c2410c", ["three.js",  "scroll scrub",  "motion",  "portofolio",  "kamera",  "website bisnis"]),
+  m("biz-bimbel-cerdas-ceria", "biz3d", "education", "#2563eb", ["three.js",  "scroll scrub",  "motion",  "pendidikan",  "topi wisuda & buku",  "website bisnis"]),
+  m("biz-klinik-pratama-sehati", "biz3d", "health", "#0d9488", ["three.js",  "scroll scrub",  "motion",  "kesehatan",  "kapsul obat",  "website bisnis"]),
+  m("biz-tour-jelajah-nusantara", "biz3d", "travel", "#0f766e", ["three.js",  "scroll scrub",  "motion",  "travel",  "koper & globe",  "website bisnis"]),
+  m("biz-ramen-kedai-uap", "biz3d", "restaurant", "#c2361f", ["three.js",  "scroll scrub",  "motion",  "restoran",  "mangkuk ramen",  "website bisnis"]),
+  m("biz-perumahan-griya-lestari", "biz3d", "realestate", "#2f6f4f", ["three.js",  "scroll scrub",  "motion",  "properti",  "rumah",  "website bisnis"]),
+  m("biz-perencana-keuangan-cermat", "biz3d", "finance", "#1f7a4d", ["three.js",  "scroll scrub",  "motion",  "keuangan",  "koin & grafik",  "website bisnis"]),
+  m("biz-guesthouse-rumah-singgah", "biz3d", "hospitality", "#8a5a2b", ["three.js",  "scroll scrub",  "motion",  "hotel & resor",  "tempat tidur",  "website bisnis"]),
+  m("biz-gym-besi-tua", "biz3d", "fitness", "#e8ff3a", ["three.js",  "scroll scrub",  "motion",  "kebugaran",  "dumbel & kettlebell",  "website bisnis"]),
+  m("biz-parfum-rumah-wangi", "biz3d", "beauty", "#b0476b", ["three.js",  "scroll scrub",  "motion",  "kecantikan",  "botol parfum",  "website bisnis"]),
+  m("biz-mobil-bekas-amanah", "biz3d", "automotive", "#dc2626", ["three.js",  "scroll scrub",  "motion",  "otomotif",  "mobil",  "website bisnis"]),
+  m("biz-toko-piringan-senja", "biz3d", "music", "#f08a24", ["three.js",  "scroll scrub",  "motion",  "musik",  "pemutar piringan hitam",  "website bisnis"]),
+  m("biz-kontraktor-bangun-kokoh", "biz3d", "construction", "#f59e0b", ["three.js",  "scroll scrub",  "motion",  "konstruksi",  "helm proyek & bata",  "website bisnis"]),
+  m("biz-petshop-sahabat-bulu", "biz3d", "pets", "#f97316", ["three.js",  "scroll scrub",  "motion",  "hewan peliharaan",  "mangkuk hewan",  "website bisnis"]),
+  m("biz-ekspedisi-kirim-cepat", "biz3d", "logistics", "#d97706", ["three.js",  "scroll scrub",  "motion",  "logistik",  "tumpukan paket",  "website bisnis"]),
+  m("biz-toko-konsol-kita", "biz3d", "gaming", "#7c5cff", ["three.js",  "scroll scrub",  "motion",  "gaming & esports",  "stik gim",  "website bisnis"]),
+  m("biz-panel-surya-terang", "biz3d", "energy", "#1f8a4c", ["three.js",  "scroll scrub",  "motion",  "energi",  "panel surya & kincir",  "website bisnis"]),
+  m("biz-cuci-mobil-busa-prima", "biz3d", "carwash", "#0284c7", ["three.js",  "scroll scrub",  "motion",  "cuci mobil",  "mobil berbusa",  "website bisnis"]),
+  m("biz-pindahan-angkut-rapi", "biz3d", "moving", "#e85d04", ["three.js",  "scroll scrub",  "motion",  "jasa pindahan",  "truk pindahan",  "website bisnis"]),
+  m("biz-smart-lock-sinergi-aman", "biz3d", "security", "#155eef", ["three.js",  "scroll scrub",  "motion",  "jasa keamanan",  "gembok pintar",  "website bisnis"]),
+  m("biz-optik-lensa-jelas", "biz3d", "optician", "#0f766e", ["three.js",  "scroll scrub",  "motion",  "optik",  "kacamata",  "website bisnis"]),
+  m("biz-klinik-gigi-ceria", "biz3d", "dental", "#0891b2", ["three.js",  "scroll scrub",  "motion",  "klinik gigi",  "gigi & sikat",  "website bisnis"]),
+  m("biz-florist-ranting-kembang", "biz3d", "florist", "#c2416b", ["three.js",  "scroll scrub",  "motion",  "toko bunga",  "buket bunga",  "website bisnis"]),
+  m("biz-museum-kota-lama", "biz3d", "museum", "#8c3b2a", ["three.js",  "scroll scrub",  "motion",  "museum",  "pilar & guci",  "website bisnis"]),
+  m("biz-charter-kapal-seribu", "biz3d", "maritime", "#0369a1", ["three.js",  "scroll scrub",  "motion",  "maritim",  "kapal layar",  "website bisnis"]),
+  m("biz-rental-alat-film-klap", "biz3d", "film", "#f5c518", ["three.js",  "scroll scrub",  "motion",  "film",  "papan klap & rol film",  "website bisnis"]),
+  m("biz-gema-podcast-studio", "biz3d", "podcast", "#f97316", ["three.js",  "scroll scrub",  "motion",  "podcast",  "mikrofon studio",  "website bisnis"]),
+  m("biz-coworking-meja-bersama", "biz3d", "coworking", "#2f6f4f", ["three.js",  "scroll scrub",  "motion",  "coworking",  "meja kerja",  "website bisnis"]),
+  m("biz-eksplorasi-sains-cilik", "biz3d", "science", "#2563eb", ["three.js",  "scroll scrub",  "motion",  "sains",  "atom",  "website bisnis"]),
+  m("biz-mebel-jati-jepara", "biz3d", "furniture", "#8a5a2b", ["three.js",  "scroll scrub",  "motion",  "furnitur",  "kursi jati",  "website bisnis"]),
+  m("biz-toko-buku-halaman", "biz3d", "bookstore", "#9b2c2c", ["three.js",  "scroll scrub",  "motion",  "toko buku",  "tumpukan buku",  "website bisnis"]),
+  m("undangan-nikah-kipas-peranakan", "invitation", "invitation", "#8f1d24", ["pernikahan",  "peranakan",  "kipas",  "animasi pembuka"]),
+  m("undangan-lamaran-kotak-cincin", "invitation", "invitation", "#0f4d3f", ["lamaran",  "tunangan",  "cincin",  "animasi pembuka"]),
+  m("undangan-reuni-tiket-sobek", "invitation", "invitation", "#1e2a5a", ["reuni",  "sekolah",  "tiket",  "animasi pembuka"]),
+  m("undangan-tujuh-bulan-kelambu", "invitation", "invitation", "#4f6b3a", ["tujuh bulanan",  "mitoni",  "kehamilan",  "animasi pembuka"]),
+  m("undangan-ultah-17-resleting", "invitation", "invitation", "#3048a0", ["ulang tahun",  "sweet seventeen",  "remaja",  "animasi pembuka"]),
+  m("anim-layangan-bukit", "animation", "animation", "#e94f37", ["cerita",  "layangan",  "semangat",  "kelulusan",  "canvas"]),
+  m("anim-mercusuar-pulang", "animation", "animation", "#d64545", ["cerita",  "mercusuar",  "terima kasih",  "guru",  "canvas"]),
+  m("anim-kopi-pagi", "animation", "animation", "#2f5d62", ["cerita",  "kopi",  "hari jadi",  "pagi",  "canvas"]),
+  m("anim-rasi-nama", "animation", "animation", "#ff8c42", ["cerita",  "bintang",  "lamaran",  "kejutan",  "canvas"]),
+  m("anim-piringan-lagu", "animation", "animation", "#f2a65a", ["cerita",  "musik",  "hari jadi",  "piringan hitam",  "canvas"]),
+];
+
+export const CODE_TEMPLATE_IDS: readonly string[] = CODE_TEMPLATE_CATALOG.map((t) => t.id);
+const BY_ID = new Map(CODE_TEMPLATE_CATALOG.map((t) => [t.id, t]));
+
+export const isCodeTemplate = (id: string | null | undefined): boolean => !!id && BY_ID.has(id);
+export const codeTemplateMeta = (id: string): CodeTemplateMeta | undefined => BY_ID.get(id);
+
+/** Isi berkas (dimuat saat dibuka, satu chunk per template). */
+const LOADERS: Record<string, () => Promise<{ default: string }>> = {
+  "anim-taman-kunang": () => import("./files/anim-taman-kunang.html?raw"),
+  "anim-mawar-rembulan": () => import("./files/anim-mawar-rembulan.html?raw"),
+  "anim-lentera-asmara": () => import("./files/anim-lentera-asmara.html?raw"),
+  "anim-padang-aster": () => import("./files/anim-padang-aster.html?raw"),
+  "anim-teratai-purnama": () => import("./files/anim-teratai-purnama.html?raw"),
+  "anim-sakura-senja": () => import("./files/anim-sakura-senja.html?raw"),
+  "undangan-nikah-rangkai-kasih": () => import("./files/undangan-nikah-rangkai-kasih.html?raw"),
+  "undangan-ultah-pesta-ceria": () => import("./files/undangan-ultah-pesta-ceria.html?raw"),
+  "undangan-khitanan-fathan": () => import("./files/undangan-khitanan-fathan.html?raw"),
+  "undangan-aqiqah-humaira": () => import("./files/undangan-aqiqah-humaira.html?raw"),
+  "undangan-lamaran-dimas-anin": () => import("./files/undangan-lamaran-dimas-anin.html?raw"),
+  "undangan-wisuda-rizky": () => import("./files/undangan-wisuda-rizky.html?raw"),
+  "web3d-nebula-labs": () => import("./files/web3d-nebula-labs.html?raw"),
+  "web3d-ruang-lapis": () => import("./files/web3d-ruang-lapis.html?raw"),
+  "web3d-arus-biru": () => import("./files/web3d-arus-biru.html?raw"),
+  "web3d-kopi-senja": () => import("./files/web3d-kopi-senja.html?raw"),
+  "web3d-surya-nusa": () => import("./files/web3d-surya-nusa.html?raw"),
+  "folio-arka-pradipta": () => import("./files/folio-arka-pradipta.html?raw"),
+  "folio-sinta-maharani": () => import("./files/folio-sinta-maharani.html?raw"),
+  "folio-bima-wiratama": () => import("./files/folio-bima-wiratama.html?raw"),
+  "folio-naya-kirana": () => import("./files/folio-naya-kirana.html?raw"),
+  "folio-raka-aditya": () => import("./files/folio-raka-aditya.html?raw"),
+  "motion-ruang-kode": () => import("./files/motion-ruang-kode.html?raw"),
+  "motion-studio-saku": () => import("./files/motion-studio-saku.html?raw"),
+  "motion-lini-saas": () => import("./files/motion-lini-saas.html?raw"),
+  "motion-lensa-nara": () => import("./files/motion-lensa-nara.html?raw"),
+  "motion-nada-laras": () => import("./files/motion-nada-laras.html?raw"),
+  "motion-parfum-senja": () => import("./files/motion-parfum-senja.html?raw"),
+  "motion-roket-orbit": () => import("./files/motion-roket-orbit.html?raw"),
+  "motion-buku-aksara": () => import("./files/motion-buku-aksara.html?raw"),
+  "undangan-nikah-jawa-sekar-arum": () => import("./files/undangan-nikah-jawa-sekar-arum.html?raw"),
+  "undangan-nikah-minimalis-nara-bima": () => import("./files/undangan-nikah-minimalis-nara-bima.html?raw"),
+  "undangan-nikah-rustic-tara-galih": () => import("./files/undangan-nikah-rustic-tara-galih.html?raw"),
+  "undangan-ultah-17-kirana": () => import("./files/undangan-ultah-17-kirana.html?raw"),
+  "undangan-rumah-baru-keluarga-hasan": () => import("./files/undangan-rumah-baru-keluarga-hasan.html?raw"),
+  "undangan-tujuh-bulanan-sari": () => import("./files/undangan-tujuh-bulanan-sari.html?raw"),
+  "undangan-reuni-smansa-2015": () => import("./files/undangan-reuni-smansa-2015.html?raw"),
+  "story-layar-kosong": () => import("./files/story-layar-kosong.html?raw"),
+  "story-mata-kucing": () => import("./files/story-mata-kucing.html?raw"),
+  "story-palu-rumah": () => import("./files/story-palu-rumah.html?raw"),
+  "story-biji-hutan": () => import("./files/story-biji-hutan.html?raw"),
+  "story-tetes-kopi": () => import("./files/story-tetes-kopi.html?raw"),
+  "story-kunci-gembok": () => import("./files/story-kunci-gembok.html?raw"),
+  "story-pesawat-kertas": () => import("./files/story-pesawat-kertas.html?raw"),
+  "story-bola-lampu": () => import("./files/story-bola-lampu.html?raw"),
+  "story-jam-pasir": () => import("./files/story-jam-pasir.html?raw"),
+  "story-kapal-botol": () => import("./files/story-kapal-botol.html?raw"),
+  "story-kubus-rubik": () => import("./files/story-kubus-rubik.html?raw"),
+  "story-roda-gigi": () => import("./files/story-roda-gigi.html?raw"),
+  "story-peta-gunung": () => import("./files/story-peta-gunung.html?raw"),
+  "story-kardus-dunia": () => import("./files/story-kardus-dunia.html?raw"),
+  "story-pena-tinta": () => import("./files/story-pena-tinta.html?raw"),
+  "story-sel-dna": () => import("./files/story-sel-dna.html?raw"),
+  "story-pintu-rimba": () => import("./files/story-pintu-rimba.html?raw"),
+  "anim-surat-merpati": () => import("./files/anim-surat-merpati.html?raw"),
+  "anim-balon-kota": () => import("./files/anim-balon-kota.html?raw"),
+  "anim-payung-hujan": () => import("./files/anim-payung-hujan.html?raw"),
+  "anim-kembang-api": () => import("./files/anim-kembang-api.html?raw"),
+  "anim-toples-bintang": () => import("./files/anim-toples-bintang.html?raw"),
+  "anim-botol-pesan": () => import("./files/anim-botol-pesan.html?raw"),
+  "anim-bunga-matahari": () => import("./files/anim-bunga-matahari.html?raw"),
+  "anim-aurora-pondok": () => import("./files/anim-aurora-pondok.html?raw"),
+  "anim-kereta-malam": () => import("./files/anim-kereta-malam.html?raw"),
+  "anim-kupu-kepompong": () => import("./files/anim-kupu-kepompong.html?raw"),
+  "anim-kolam-koi": () => import("./files/anim-kolam-koi.html?raw"),
+  "anim-pohon-musim": () => import("./files/anim-pohon-musim.html?raw"),
+  "anim-lilin-ulang-tahun": () => import("./files/anim-lilin-ulang-tahun.html?raw"),
+  "anim-gelembung-sabun": () => import("./files/anim-gelembung-sabun.html?raw"),
+  "anim-paus-langit": () => import("./files/anim-paus-langit.html?raw"),
+  "anim-jendela-salju": () => import("./files/anim-jendela-salju.html?raw"),
+  "undangan-nikah-amplop-surat": () => import("./files/undangan-nikah-amplop-surat.html?raw"),
+  "undangan-nikah-tirai-panggung": () => import("./files/undangan-nikah-tirai-panggung.html?raw"),
+  "undangan-nikah-pintu-gebyok": () => import("./files/undangan-nikah-pintu-gebyok.html?raw"),
+  "undangan-nikah-ombak-pantai": () => import("./files/undangan-nikah-ombak-pantai.html?raw"),
+  "undangan-nikah-kelopak-sakura": () => import("./files/undangan-nikah-kelopak-sakura.html?raw"),
+  "undangan-lamaran-cincin-diagonal": () => import("./files/undangan-lamaran-cincin-diagonal.html?raw"),
+  "undangan-lamaran-rol-film": () => import("./files/undangan-lamaran-rol-film.html?raw"),
+  "undangan-khitanan-gulungan": () => import("./files/undangan-khitanan-gulungan.html?raw"),
+  "undangan-aqiqah-gelembung": () => import("./files/undangan-aqiqah-gelembung.html?raw"),
+  "undangan-ultah-kado-kejutan": () => import("./files/undangan-ultah-kado-kejutan.html?raw"),
+  "undangan-ultah-sirkus": () => import("./files/undangan-ultah-sirkus.html?raw"),
+  "undangan-ultah-puzzle-oma": () => import("./files/undangan-ultah-puzzle-oma.html?raw"),
+  "undangan-ultah-peta-petualangan": () => import("./files/undangan-ultah-peta-petualangan.html?raw"),
+  "undangan-wisuda-buku": () => import("./files/undangan-wisuda-buku.html?raw"),
+  "undangan-rumah-baru-krepyak": () => import("./files/undangan-rumah-baru-krepyak.html?raw"),
+  "undangan-baby-shower-awan": () => import("./files/undangan-baby-shower-awan.html?raw"),
+  "undangan-halal-bihalal-lentera": () => import("./files/undangan-halal-bihalal-lentera.html?raw"),
+  "lp-ayam-geprek-mbak-sri": () => import("./files/lp-ayam-geprek-mbak-sri.html?raw"),
+  "lp-bakso-urat-pak-kumis": () => import("./files/lp-bakso-urat-pak-kumis.html?raw"),
+  "lp-nasi-padang-uni-ros": () => import("./files/lp-nasi-padang-uni-ros.html?raw"),
+  "lp-soto-betawi-bang-udin": () => import("./files/lp-soto-betawi-bang-udin.html?raw"),
+  "lp-sate-klatak-pak-darmo": () => import("./files/lp-sate-klatak-pak-darmo.html?raw"),
+  "lp-seblak-neng-ica": () => import("./files/lp-seblak-neng-ica.html?raw"),
+  "lp-mie-ayam-bu-tini": () => import("./files/lp-mie-ayam-bu-tini.html?raw"),
+  "lp-seafood-dermaga": () => import("./files/lp-seafood-dermaga.html?raw"),
+  "lp-gudeg-yu-narti": () => import("./files/lp-gudeg-yu-narti.html?raw"),
+  "lp-pecel-lele-cak-mat": () => import("./files/lp-pecel-lele-cak-mat.html?raw"),
+  "lp-kopi-teras-sawah": () => import("./files/lp-kopi-teras-sawah.html?raw"),
+  "lp-teh-poci-mbak-lis": () => import("./files/lp-teh-poci-mbak-lis.html?raw"),
+  "lp-jus-segar-pak-harun": () => import("./files/lp-jus-segar-pak-harun.html?raw"),
+  "lp-boba-mbul": () => import("./files/lp-boba-mbul.html?raw"),
+  "lp-jamu-bu-sumi": () => import("./files/lp-jamu-bu-sumi.html?raw"),
+  "lp-sangrai-kopi-gayo": () => import("./files/lp-sangrai-kopi-gayo.html?raw"),
+  "lp-teh-tarik-bang-dol": () => import("./files/lp-teh-tarik-bang-dol.html?raw"),
+  "lp-es-kelapa-pak-ujang": () => import("./files/lp-es-kelapa-pak-ujang.html?raw"),
+  "lp-susu-saung-lembang": () => import("./files/lp-susu-saung-lembang.html?raw"),
+  "lp-wedang-ronde-pak-gito": () => import("./files/lp-wedang-ronde-pak-gito.html?raw"),
+  "lp-roti-oven-bu-ratna": () => import("./files/lp-roti-oven-bu-ratna.html?raw"),
+  "lp-kue-kering-dapur-hana": () => import("./files/lp-kue-kering-dapur-hana.html?raw"),
+  "lp-brownies-panggang-kakak": () => import("./files/lp-brownies-panggang-kakak.html?raw"),
+  "lp-keripik-mak-ijah": () => import("./files/lp-keripik-mak-ijah.html?raw"),
+  "lp-martabak-koh-liong": () => import("./files/lp-martabak-koh-liong.html?raw"),
+  "lp-donat-kentang-ceria": () => import("./files/lp-donat-kentang-ceria.html?raw"),
+  "lp-jajan-pasar-mbok-yem": () => import("./files/lp-jajan-pasar-mbok-yem.html?raw"),
+  "lp-cookies-oven-kecil": () => import("./files/lp-cookies-oven-kecil.html?raw"),
+  "lp-pempek-cek-yuni": () => import("./files/lp-pempek-cek-yuni.html?raw"),
+  "lp-sambal-bu-tatik": () => import("./files/lp-sambal-bu-tatik.html?raw"),
+  "lp-batik-tulis-laweyan": () => import("./files/lp-batik-tulis-laweyan.html?raw"),
+  "lp-konveksi-kaos-sablon-jaya": () => import("./files/lp-konveksi-kaos-sablon-jaya.html?raw"),
+  "lp-hijab-segi-empat-nara": () => import("./files/lp-hijab-segi-empat-nara.html?raw"),
+  "lp-sepatu-kulit-cibaduyut": () => import("./files/lp-sepatu-kulit-cibaduyut.html?raw"),
+  "lp-tas-rajut-benang-ibu": () => import("./files/lp-tas-rajut-benang-ibu.html?raw"),
+  "lp-perak-kotagede-sasmito": () => import("./files/lp-perak-kotagede-sasmito.html?raw"),
+  "lp-tenun-ikat-sumba-rambu": () => import("./files/lp-tenun-ikat-sumba-rambu.html?raw"),
+  "lp-sablon-kilat-cetakin": () => import("./files/lp-sablon-kilat-cetakin.html?raw"),
+  "lp-penjahit-pak-darto": () => import("./files/lp-penjahit-pak-darto.html?raw"),
+  "lp-anyaman-rotan-cirebon": () => import("./files/lp-anyaman-rotan-cirebon.html?raw"),
+  "lp-salon-muslimah-zahra": () => import("./files/lp-salon-muslimah-zahra.html?raw"),
+  "lp-barbershop-kapster-bung": () => import("./files/lp-barbershop-kapster-bung.html?raw"),
+  "lp-pijat-refleksi-sehat-sejahtera": () => import("./files/lp-pijat-refleksi-sehat-sejahtera.html?raw"),
+  "lp-nail-art-kuku-cantik": () => import("./files/lp-nail-art-kuku-cantik.html?raw"),
+  "lp-sabun-herbal-sekar-wangi": () => import("./files/lp-sabun-herbal-sekar-wangi.html?raw"),
+  "lp-skincare-lokal-glow-nusa": () => import("./files/lp-skincare-lokal-glow-nusa.html?raw"),
+  "lp-mua-rias-dinda": () => import("./files/lp-mua-rias-dinda.html?raw"),
+  "lp-rias-pengantin-jawa-ayu": () => import("./files/lp-rias-pengantin-jawa-ayu.html?raw"),
+  "lp-lash-studio-mata-indah": () => import("./files/lp-lash-studio-mata-indah.html?raw"),
+  "lp-parfum-lokal-aroma-pagi": () => import("./files/lp-parfum-lokal-aroma-pagi.html?raw"),
+  "lp-laundry-kiloan-wangi": () => import("./files/lp-laundry-kiloan-wangi.html?raw"),
+  "lp-cleaning-rumah-kinclong": () => import("./files/lp-cleaning-rumah-kinclong.html?raw"),
+  "lp-jasa-pindahan-angkut-aman": () => import("./files/lp-jasa-pindahan-angkut-aman.html?raw"),
+  "lp-service-ac-dingin-lagi": () => import("./files/lp-service-ac-dingin-lagi.html?raw"),
+  "lp-cuci-mobil-steam-kilap": () => import("./files/lp-cuci-mobil-steam-kilap.html?raw"),
+  "lp-rental-mobil-jalan-jalan": () => import("./files/lp-rental-mobil-jalan-jalan.html?raw"),
+  "lp-kursus-mengemudi-setir-aman": () => import("./files/lp-kursus-mengemudi-setir-aman.html?raw"),
+  "lp-cctv-satpam-rumah-aman": () => import("./files/lp-cctv-satpam-rumah-aman.html?raw"),
+  "lp-tukang-taman-hijau-asri": () => import("./files/lp-tukang-taman-hijau-asri.html?raw"),
+  "lp-bengkel-motor-pak-min": () => import("./files/lp-bengkel-motor-pak-min.html?raw"),
+  "lp-apotek-sehat-keluarga": () => import("./files/lp-apotek-sehat-keluarga.html?raw"),
+  "lp-klinik-gigi-senyum-rapi": () => import("./files/lp-klinik-gigi-senyum-rapi.html?raw"),
+  "lp-optik-mata-jernih": () => import("./files/lp-optik-mata-jernih.html?raw"),
+  "lp-notaris-ppat-amanah": () => import("./files/lp-notaris-ppat-amanah.html?raw"),
+  "lp-agen-asuransi-lindungi": () => import("./files/lp-agen-asuransi-lindungi.html?raw"),
+  "lp-koperasi-simpan-pinjam-maju": () => import("./files/lp-koperasi-simpan-pinjam-maju.html?raw"),
+  "lp-lpk-kerja-jepang": () => import("./files/lp-lpk-kerja-jepang.html?raw"),
+  "lp-konsultan-pajak-umkm": () => import("./files/lp-konsultan-pajak-umkm.html?raw"),
+  "lp-studio-tato-garis-hitam": () => import("./files/lp-studio-tato-garis-hitam.html?raw"),
+  "lp-desa-wisata-sukamaju": () => import("./files/lp-desa-wisata-sukamaju.html?raw"),
+  "lp-kursus-inggris-speak-up": () => import("./files/lp-kursus-inggris-speak-up.html?raw"),
+  "lp-daycare-rumah-ceria": () => import("./files/lp-daycare-rumah-ceria.html?raw"),
+  "lp-taman-baca-pelita": () => import("./files/lp-taman-baca-pelita.html?raw"),
+  "lp-toko-buku-bekas-lawas": () => import("./files/lp-toko-buku-bekas-lawas.html?raw"),
+  "lp-masjid-al-ikhlas-program": () => import("./files/lp-masjid-al-ikhlas-program.html?raw"),
+  "lp-komunitas-sepeda-gowes-pagi": () => import("./files/lp-komunitas-sepeda-gowes-pagi.html?raw"),
+  "lp-lapangan-futsal-gol": () => import("./files/lp-lapangan-futsal-gol.html?raw"),
+  "lp-kelas-robotik-anak": () => import("./files/lp-kelas-robotik-anak.html?raw"),
+  "lp-museum-rumah-tenun": () => import("./files/lp-museum-rumah-tenun.html?raw"),
+  "lp-coworking-ruang-kerja-teduh": () => import("./files/lp-coworking-ruang-kerja-teduh.html?raw"),
+  "lp-rumah-produksi-video-gerak": () => import("./files/lp-rumah-produksi-video-gerak.html?raw"),
+  "lp-studio-podcast-suara-kita": () => import("./files/lp-studio-podcast-suara-kita.html?raw"),
+  "lp-studio-foto-keluarga-senja": () => import("./files/lp-studio-foto-keluarga-senja.html?raw"),
+  "lp-event-organizer-rayakan": () => import("./files/lp-event-organizer-rayakan.html?raw"),
+  "lp-wedding-organizer-sederhana": () => import("./files/lp-wedding-organizer-sederhana.html?raw"),
+  "lp-toko-bunga-kelopak": () => import("./files/lp-toko-bunga-kelopak.html?raw"),
+  "lp-percetakan-undangan-cetak-kilat": () => import("./files/lp-percetakan-undangan-cetak-kilat.html?raw"),
+  "lp-kabar-kampung-newsletter": () => import("./files/lp-kabar-kampung-newsletter.html?raw"),
+  "lp-konselor-keluarga-rina": () => import("./files/lp-konselor-keluarga-rina.html?raw"),
+  "lp-jasa-desain-rumah-ruang": () => import("./files/lp-jasa-desain-rumah-ruang.html?raw"),
+  "lp-sewa-kapal-wisata-bajo": () => import("./files/lp-sewa-kapal-wisata-bajo.html?raw"),
+  "lp-kombucha-seduh-rumah": () => import("./files/lp-kombucha-seduh-rumah.html?raw"),
+  "lp-catering-nasi-kotak-bu-har": () => import("./files/lp-catering-nasi-kotak-bu-har.html?raw"),
+  "lp-toko-sembako-berkah": () => import("./files/lp-toko-sembako-berkah.html?raw"),
+  "lp-rental-ps-arena-main": () => import("./files/lp-rental-ps-arena-main.html?raw"),
+  "lp-gym-otot-kampung": () => import("./files/lp-gym-otot-kampung.html?raw"),
+  "lp-kos-putri-griya-asri": () => import("./files/lp-kos-putri-griya-asri.html?raw"),
+  "lp-grooming-kucing-meong": () => import("./files/lp-grooming-kucing-meong.html?raw"),
+  "lp-studio-musik-nada-garasi": () => import("./files/lp-studio-musik-nada-garasi.html?raw"),
+  "lp-bibit-hidroponik-tani-muda": () => import("./files/lp-bibit-hidroponik-tani-muda.html?raw"),
+  "biz-kopi-lereng-ijen": () => import("./files/biz-kopi-lereng-ijen.html?raw"),
+  "biz-roti-sobat-oven": () => import("./files/biz-roti-sobat-oven.html?raw"),
+  "biz-batik-canting-sari": () => import("./files/biz-batik-canting-sari.html?raw"),
+  "biz-gerabah-kasongan-tanah": () => import("./files/biz-gerabah-kasongan-tanah.html?raw"),
+  "biz-madu-hutan-sumbawa": () => import("./files/biz-madu-hutan-sumbawa.html?raw"),
+  "biz-servis-gawai-klinik": () => import("./files/biz-servis-gawai-klinik.html?raw"),
+  "biz-kasir-awan-saas": () => import("./files/biz-kasir-awan-saas.html?raw"),
+  "biz-akselerator-lepas-landas": () => import("./files/biz-akselerator-lepas-landas.html?raw"),
+  "biz-agensi-ruang-ide": () => import("./files/biz-agensi-ruang-ide.html?raw"),
+  "biz-fotografer-arka-lensa": () => import("./files/biz-fotografer-arka-lensa.html?raw"),
+  "biz-bimbel-cerdas-ceria": () => import("./files/biz-bimbel-cerdas-ceria.html?raw"),
+  "biz-klinik-pratama-sehati": () => import("./files/biz-klinik-pratama-sehati.html?raw"),
+  "biz-tour-jelajah-nusantara": () => import("./files/biz-tour-jelajah-nusantara.html?raw"),
+  "biz-ramen-kedai-uap": () => import("./files/biz-ramen-kedai-uap.html?raw"),
+  "biz-perumahan-griya-lestari": () => import("./files/biz-perumahan-griya-lestari.html?raw"),
+  "biz-perencana-keuangan-cermat": () => import("./files/biz-perencana-keuangan-cermat.html?raw"),
+  "biz-guesthouse-rumah-singgah": () => import("./files/biz-guesthouse-rumah-singgah.html?raw"),
+  "biz-gym-besi-tua": () => import("./files/biz-gym-besi-tua.html?raw"),
+  "biz-parfum-rumah-wangi": () => import("./files/biz-parfum-rumah-wangi.html?raw"),
+  "biz-mobil-bekas-amanah": () => import("./files/biz-mobil-bekas-amanah.html?raw"),
+  "biz-toko-piringan-senja": () => import("./files/biz-toko-piringan-senja.html?raw"),
+  "biz-kontraktor-bangun-kokoh": () => import("./files/biz-kontraktor-bangun-kokoh.html?raw"),
+  "biz-petshop-sahabat-bulu": () => import("./files/biz-petshop-sahabat-bulu.html?raw"),
+  "biz-ekspedisi-kirim-cepat": () => import("./files/biz-ekspedisi-kirim-cepat.html?raw"),
+  "biz-toko-konsol-kita": () => import("./files/biz-toko-konsol-kita.html?raw"),
+  "biz-panel-surya-terang": () => import("./files/biz-panel-surya-terang.html?raw"),
+  "biz-cuci-mobil-busa-prima": () => import("./files/biz-cuci-mobil-busa-prima.html?raw"),
+  "biz-pindahan-angkut-rapi": () => import("./files/biz-pindahan-angkut-rapi.html?raw"),
+  "biz-smart-lock-sinergi-aman": () => import("./files/biz-smart-lock-sinergi-aman.html?raw"),
+  "biz-optik-lensa-jelas": () => import("./files/biz-optik-lensa-jelas.html?raw"),
+  "biz-klinik-gigi-ceria": () => import("./files/biz-klinik-gigi-ceria.html?raw"),
+  "biz-florist-ranting-kembang": () => import("./files/biz-florist-ranting-kembang.html?raw"),
+  "biz-museum-kota-lama": () => import("./files/biz-museum-kota-lama.html?raw"),
+  "biz-charter-kapal-seribu": () => import("./files/biz-charter-kapal-seribu.html?raw"),
+  "biz-rental-alat-film-klap": () => import("./files/biz-rental-alat-film-klap.html?raw"),
+  "biz-gema-podcast-studio": () => import("./files/biz-gema-podcast-studio.html?raw"),
+  "biz-coworking-meja-bersama": () => import("./files/biz-coworking-meja-bersama.html?raw"),
+  "biz-eksplorasi-sains-cilik": () => import("./files/biz-eksplorasi-sains-cilik.html?raw"),
+  "biz-mebel-jati-jepara": () => import("./files/biz-mebel-jati-jepara.html?raw"),
+  "biz-toko-buku-halaman": () => import("./files/biz-toko-buku-halaman.html?raw"),
+  "undangan-nikah-kipas-peranakan": () => import("./files/undangan-nikah-kipas-peranakan.html?raw"),
+  "undangan-lamaran-kotak-cincin": () => import("./files/undangan-lamaran-kotak-cincin.html?raw"),
+  "undangan-reuni-tiket-sobek": () => import("./files/undangan-reuni-tiket-sobek.html?raw"),
+  "undangan-tujuh-bulan-kelambu": () => import("./files/undangan-tujuh-bulan-kelambu.html?raw"),
+  "undangan-ultah-17-resleting": () => import("./files/undangan-ultah-17-resleting.html?raw"),
+  "anim-layangan-bukit": () => import("./files/anim-layangan-bukit.html?raw"),
+  "anim-mercusuar-pulang": () => import("./files/anim-mercusuar-pulang.html?raw"),
+  "anim-kopi-pagi": () => import("./files/anim-kopi-pagi.html?raw"),
+  "anim-rasi-nama": () => import("./files/anim-rasi-nama.html?raw"),
+  "anim-piringan-lagu": () => import("./files/anim-piringan-lagu.html?raw"),
+};
+
+const cache = new Map<string, Promise<string>>();
+/**
+ * v21.2: sumber HTML di mode fullstack = backend v14 (POST /templates/:id/acquire,
+ * hanya untuk template gratis atau yang sudah dibeli). Build non-demo tidak
+ * membawa berkas ./files/ (lihat plugin owd-demo-content di vite.config.ts).
+ */
+let remote: ((id: string) => Promise<string>) | null = null;
+export function setCodeTemplateSource(fetcher: ((id: string) => Promise<string>) | null) {
+  remote = fetcher;
+  cache.clear();
+}
+/** Lupakan HTML yang sudah diambil (mis. setelah keluar akun). */
+export const clearCodeTemplateCache = () => cache.clear();
+
+export function loadCodeTemplate(id: string): Promise<string> {
+  let p = cache.get(id);
+  if (!p) {
+    const load = LOADERS[id];
+    if (!load) return Promise.reject(new Error("TEMPLATE_NOT_FOUND"));
+    p = remote ? remote(id) : load().then((mod) => mod.default);
+    cache.set(id, p);
+    p.catch(() => cache.delete(id));
+  }
+  return p;
+}
+
+/** Tandai mode thumbnail: template menggambar satu frame lalu berhenti (hemat CPU & konteks WebGL). */
+export const withThumbFlag = (html: string) => html.replace(/<head>/i, "<head><script>window.OWD_THUMB=true</script>");
+
+const OLD_ANIM = new Set(["anim-taman-kunang", "anim-mawar-rembulan", "anim-lentera-asmara", "anim-padang-aster", "anim-teratai-purnama", "anim-sakura-senja"]);
+
+/** README di dalam zip unduhan. */
+export function codeTemplateReadme(meta: CodeTemplateMeta, name: string, lang: "id" | "en"): string {
+  const libs = meta.code.libs.length ? meta.code.libs.join(", ") : meta.code.group === "landing" ? (lang === "en" ? "none (HTML, CSS, plain JavaScript)" : "tidak ada (HTML, CSS, JavaScript biasa)") : lang === "en" ? "none (SVG, CSS, canvas 2D)" : "tidak ada (SVG, CSS, canvas 2D)";
+  const edit: Record<CodeGroup, [string, string]> = {
+    animation: ["Ubah warna dan kecepatan lewat variabel CSS di `<style id=\"owd-theme\">` (`--flower`, `--glow`, `--speed`, …), teks di dalam `<main class=\"note\">`, dan jumlah kunang-kunang/parallax di objek `CONFIG`.", "Change colours and speed in the CSS variables of `<style id=\"owd-theme\">` (`--flower`, `--glow`, `--speed`, …), the text inside `<main class=\"note\">`, and the firefly count/parallax in the `CONFIG` object."],
+    invitation: ["Semua data acara ada di objek `CONFIG` di awal skrip: nama, jadwal, alamat, rekening, nomor WhatsApp, galeri, dan musik. Nama tamu diambil dari parameter URL, contoh: `index.html?to=Bapak%20Budi`.", "All event data lives in the `CONFIG` object at the top of the script: names, schedule, address, bank accounts, WhatsApp number, gallery and music. The guest name comes from the URL, e.g. `index.html?to=Mr%20Budi`."],
+    web3d: ["Teks ada di HTML biasa (section `data-adegan`). Warna, anggaran, dan jalur kamera ada di objek `CONFIG`; bentuk 3D tiap section ada di array `SCENES`.", "Copy is plain HTML (`data-adegan` sections). Colours, budgets and the camera path are in the `CONFIG` object; each section's 3D shapes are in the `SCENES` array."],
+    motion3d: ["Biodata yang tampil sebagai kode ada di objek `CONFIG` di awal skrip (`profil`, `variabel`, `komentar`, `bahasa`: js/py/json) beserta teks layar. Teks halaman ada di HTML biasa (section `data-ch`). Pose kamera dan objek 3D per bab ada di array `POSES`; animasi scroll memakai OWD Scrub (mesin scroll bawaan OneWebDev, tanpa CDN), teks dan angka memakai Motion.", "The biodata shown as code lives in the `CONFIG` object at the top of the script (`profil`, `variabel`, `komentar`, `bahasa`: js/py/json) together with the screen text. Page copy is plain HTML (`data-ch` sections). Camera and 3D object poses per chapter are in the `POSES` array; scroll animation uses OWD Scrub (the built-in scroll engine, no CDN), text and counters use Motion."],
+    landing: ["Nomor WhatsApp, zona waktu, jam buka, dan teks pesan pembuka ada di objek `CONFIG` di awal skrip. Nama usaha, menu atau layanan, harga, testimoni, dan FAQ ada di HTML biasa (atribut `data-owd`); warna dan font ada di variabel CSS `<style id=\"owd-theme\">`. Tombol pesan menyusun pesan WhatsApp dari isi keranjang atau nama layanan.", "The WhatsApp number, time zone, opening hours and greeting text live in the `CONFIG` object at the top of the script. Business name, menu or services, prices, reviews and FAQ are plain HTML (`data-owd` attributes); colours and fonts are CSS variables in `<style id=\"owd-theme\">`. Order buttons compose a WhatsApp message from the cart or the service name."],
+    biz3d: ["Nomor WhatsApp, zona waktu, jam buka, pilihan warna objek 3D (`varian`), dan putar otomatis ada di objek `CONFIG` di awal skrip. Semua teks bisnis (profil, katalog, paket, FAQ, kontak) ada di HTML biasa (atribut `data-owd`); warna dan font ada di variabel CSS `<style id=\"owd-theme\">`. Objek 3D dibuat three.js tanpa berkas model, posenya per section diatur di array `POSES` dan digerakkan OWD Scrub (mesin scroll bawaan). Cerita scroll: hero menampilkan benda awal (`buildSeed`, mis. palu atau biji kopi), saat digulir objek dirakit potong demi potong (`bld`), dibongkar (`exp`), kamera menyelam ke dalamnya (`dive`), lalu objek luruh jadi partikel nama usaha (`dis`); foto galeri dirender langsung dari objek 3D.", "The WhatsApp number, time zone, opening hours, 3D object colour options (`varian`) and autorotate live in the `CONFIG` object at the top of the script. All business copy (profile, catalogue, plans, FAQ, contact) is plain HTML (`data-owd` attributes); colours and fonts are CSS variables in `<style id=\"owd-theme\">`. The 3D object is built with three.js without model files, its pose per section is set in the `POSES` array and driven by OWD Scrub (the built-in scroll engine). Scroll story: the hero shows a starting object (`buildSeed`, e.g. a hammer or coffee bean), scrolling assembles the object piece by piece (`bld`), explodes it (`exp`), dives the camera inside (`dive`), then dissolves it into particles spelling the business name (`dis`); gallery images are rendered live from the 3D object."],
+    portfolio3d: ["Data proyek ada di array `PROJECTS` di awal skrip (judul, deskripsi, tautan, tag). HTML statis di `#daftar-proyek` dan `#detail-proyek` adalah salinan untuk pembaca tanpa JavaScript; perbarui juga bila mengubah proyek (editor tanpa kode melakukannya otomatis).", "Project data is in the `PROJECTS` array at the top of the script (title, description, link, tags). The static HTML in `#daftar-proyek` and `#detail-proyek` is a copy for readers without JavaScript; update it too when you change projects (the no-code editor does this for you)."],
+  };
+  const i = lang === "en" ? 1 : 0;
+  /* v22: cerita scroll 3D (story-*) dan animasi cerita canvas punya struktur berbeda. */
+  const story: [string, string] = [
+    "Teks tiap babak ada di HTML biasa (section `data-act`, atribut `data-owd`). Warna ada di variabel CSS `<style id=\"owd-theme\">`; pengaturan seperti kecepatan scroll ada di objek `CONFIG`. Objek 3D dibuat three.js, kamera digerakkan OWD Scrub (mesin scroll bawaan) per babak, dan efek teks memakai Motion.",
+    "Each act's copy is plain HTML (`data-act` sections, `data-owd` attributes). Colours are CSS variables in `<style id=\"owd-theme\">`; settings such as scroll speed live in the `CONFIG` object. The 3D object is built with three.js, the camera is driven per act by OWD Scrub (the built-in scroll engine), and text effects use Motion.",
+  ];
+  const anim2: [string, string] = [
+    "Animasi digambar di satu canvas 2D tanpa library. Ubah warna lewat variabel CSS di `<style id=\"owd-theme\">` (`--bg-1`, `--c-1`, `--ink`, …), kalimat tiap babak dan ucapan akhir di elemen ber-`data-owd`, serta lama tiap babak dan putar otomatis di objek `CONFIG`.",
+    "The animation is drawn on one 2D canvas with no libraries. Change colours in the CSS variables of `<style id=\"owd-theme\">` (`--bg-1`, `--c-1`, `--ink`, …), each beat's line and the final message in the `data-owd` elements, and beat length and autoplay in the `CONFIG` object.",
+  ];
+  const editText = meta.id.startsWith("story-") ? story[i] : meta.code.group === "animation" && !OLD_ANIM.has(meta.id) ? anim2[i] : edit[meta.code.group][i];
+  const noCode =
+    lang === "en"
+      ? "Prefer not to code? Open the template in OneWebDev and choose **Edit without code**: text, colours and data are form fields, with a live preview."
+      : "Tidak ingin menyentuh kode? Buka template di OneWebDev lalu pilih **Edit tanpa kode**: teks, warna, dan data tampil sebagai form dengan pratinjau langsung.";
+  return lang === "en"
+    ? `# ${name}
+
+Single-file template from OneWebDev (HTML + CSS + JavaScript).
+
+## Use
+1. Open \`index.html\` in a browser, or upload it to any static host (GitHub Pages, Vercel, Netlify).
+2. ${editText}
+3. ${noCode}
+
+## Libraries
+${libs}. Loaded from a CDN with pinned versions (jsDelivr, with unpkg as an automatic backup); no build step.
+
+## Visitor analytics (Vercel)
+The page already includes Vercel Web Analytics. Deploy to Vercel, then open the project dashboard and enable **Analytics**. On other hosts it stays inactive (one 404 request); remove the \`Vercel Web Analytics\` script in \`<head>\` if you don't need it.
+
+## Notes
+- File size: under ${meta.code.budgetKb} KB (excluding fonts and libraries).
+- Respects "reduce motion" settings.
+- All names, numbers and contacts are fictional examples.
+`
+    : `# ${name}
+
+Template satu berkas dari OneWebDev (HTML + CSS + JavaScript).
+
+## Cara pakai
+1. Buka \`index.html\` di browser, atau unggah ke hosting statis (GitHub Pages, Vercel, Netlify).
+2. ${editText}
+3. ${noCode}
+
+## Library
+${libs}. Dimuat dari CDN dengan versi dipatok (jsDelivr, dengan unpkg sebagai cadangan otomatis); tanpa proses build.
+
+## Analitik pengunjung (Vercel)
+Halaman sudah memuat Vercel Web Analytics. Deploy ke Vercel, lalu buka dashboard proyek dan aktifkan menu **Analytics**. Di hosting lain skrip ini tidak aktif (hanya satu permintaan 404); hapus skrip \`Vercel Web Analytics\` di \`<head>\` bila tidak dipakai.
+
+## Catatan
+- Ukuran berkas: di bawah ${meta.code.budgetKb} KB (di luar font dan library).
+- Menghormati pengaturan "kurangi gerak" (prefers-reduced-motion).
+- Semua nama, nomor, dan kontak adalah contoh fiktif.
+`;
+}

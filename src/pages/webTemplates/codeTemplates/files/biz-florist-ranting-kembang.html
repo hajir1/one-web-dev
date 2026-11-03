@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Ranting &amp; Kembang | Florist buket, dekorasi &amp; langganan bunga</title>
+<meta name="description" content="Ranting &amp; Kembang, florist buket, dekorasi &amp; langganan bunga di Jakarta Barat. Bunga segar yang menyampaikan perasaanmu.">
+<script>
+/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#fbf5f3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Lato:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Lato:wght@400;500;600;700&display=swap"></noscript>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.mjs">
+<link rel="preload" as="fetch" href="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js" crossorigin>
+<script>window.OWDScrub = (function () {
+  "use strict";
+  var all = [], tickers = [], t0 = 0, last = 0, running = false, dirty = true;
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  function power(n, mode) {
+    return function (t) {
+      if (mode === "in") return Math.pow(t, n);
+      if (mode === "inOut") return t < 0.5 ? Math.pow(2 * t, n) / 2 : 1 - Math.pow(2 - 2 * t, n) / 2;
+      return 1 - Math.pow(1 - t, n);
+    };
+  }
+  function easeOf(name) {
+    if (typeof name === "function") return name;
+    if (!name) return power(2, "out"); /* bawaan = power1.out (n=2 di sini setara kuadrat) */
+    if (name === "none" || name === "linear") return function (t) { return t; };
+    var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
+    if (!m) return power(2, "out");
+    if (m[1] === "sine") {
+      var mode = m[3] || "out";
+      return mode === "in" ? function (t) { return 1 - Math.cos((t * Math.PI) / 2); } : mode === "inOut" ? function (t) { return -(Math.cos(Math.PI * t) - 1) / 2; } : function (t) { return Math.sin((t * Math.PI) / 2); };
+    }
+    return power(Number(m[2]) + 1, m[3] || "out");
+  }
+  function els(t) {
+    if (typeof t === "string") return Array.prototype.slice.call(document.querySelectorAll(t));
+    if (t && typeof t.length === "number" && !t.nodeType) return Array.prototype.slice.call(t);
+    return [t];
+  }
+  var SPECIAL = { scrollTrigger: 1, ease: 1, stagger: 1, immediateRender: 1, duration: 1, transformOrigin: 1 };
+  var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
+  function isEl(o) { return o && o.nodeType === 1; }
+
+  /* Ambil angka-angka di dalam teks (mis. clipPath "inset(0 100% 0 0)") agar bisa di-interpolasi. */
+  function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
+  function mixStr(a, b, k) {
+    var na = nums(a), i = 0;
+    return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
+  }
+  /* Nilai transform awal diambil dari CSS (mis. scaleX(0) pada garis progres). */
+  function stateOf(el) {
+    if (el.__owds) return el.__owds;
+    var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
+    var tr = getComputedStyle(el).transform;
+    if (tr && tr !== "none" && window.DOMMatrixReadOnly) {
+      var m = new DOMMatrixReadOnly(tr);
+      st.x = m.m41; st.y = m.m42;
+      st.scaleX = Math.hypot(m.a, m.b); st.scaleY = Math.hypot(m.c, m.d);
+      st.rotate = (Math.atan2(m.b, m.a) * 180) / Math.PI;
+    }
+    return (el.__owds = st);
+  }
+  function readEl(el, key) {
+    var st = stateOf(el);
+    if (key in TRANSFORM) return st[key];
+    var v = getComputedStyle(el)[key];
+    return key === "opacity" ? parseFloat(v) : v;
+  }
+  function writeEl(el, key, v) {
+    var st = stateOf(el);
+    if (key in TRANSFORM) {
+      st[key] = v;
+      el.style.transform = "translate(" + st.x + "px," + st.y + "px)" + (st.rotate ? " rotate(" + st.rotate + "deg)" : "") + (st.rotateX ? " rotateX(" + st.rotateX + "deg)" : "") + (st.rotateY ? " rotateY(" + st.rotateY + "deg)" : "") + " scale(" + st.scale * st.scaleX + "," + st.scale * st.scaleY + ")";
+    } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
+  }
+
+  /* Satu tween = satu target, nilai awal & akhir, posisi dalam rentang 0..1. */
+  function makeTween(target, from, to, offset, span) {
+    var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
+    var el = isEl(target);
+    if (el && to.transformOrigin) target.style.transformOrigin = to.transformOrigin;
+    if (el && from && from.transformOrigin) target.style.transformOrigin = from.transformOrigin;
+    var a = {}, b = {};
+    keys.forEach(function (k) { a[k] = from && k in from ? from[k] : el ? readEl(target, k) : target[k]; b[k] = to[k]; });
+    var ease = easeOf(to.ease);
+    return {
+      render: function (p) {
+        var k = ease(clamp((p - offset) / span, 0, 1));
+        keys.forEach(function (key) {
+          var va = a[key], vb = b[key], v;
+          if (typeof va === "number" && typeof vb === "number") v = va + (vb - va) * k;
+          else if (typeof vb === "string" && /\d/.test(vb) && /\d/.test(String(va))) v = k >= 1 ? vb : k <= 0 ? va : mixStr(va, vb, k);
+          else v = k >= 0.5 ? vb : va;
+          if (el) writeEl(target, key, v); else target[key] = v;
+        });
+      },
+    };
+  }
+
+  /* Posisi "<tepi elemen> <tepi layar>" → piksel scroll. */
+  function edge(word, size) {
+    if (word === "top" || word === undefined) return 0;
+    if (word === "center") return size / 2;
+    if (word === "bottom") return size;
+    if (/%$/.test(word)) return (parseFloat(word) / 100) * size;
+    return parseFloat(word) || 0;
+  }
+  function pos(spec, trigger, isEnd) {
+    var max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    if (typeof spec === "number") return spec;
+    if (spec === "max") return max;
+    if (!trigger) return isEnd ? max : 0;
+    var parts = String(spec || (isEnd ? "bottom top" : "top bottom")).split(/\s+/);
+    var r = trigger.getBoundingClientRect(), top = r.top + scrollY;
+    return top + edge(parts[0], r.height) - edge(parts[1], innerHeight);
+  }
+
+  function ST(cfg) {
+    var self = this;
+    this.vars = cfg;
+    this.trigger = typeof cfg.trigger === "string" ? document.querySelector(cfg.trigger) : cfg.trigger || null;
+    this.tweens = [];
+    this.progress = 0;
+    this.shown = -1;
+    this.target = 0;
+    this.isActive = false;
+    this.lag = cfg.scrub === true || cfg.scrub === undefined ? 0 : Number(cfg.scrub) || 0;
+    this.kill = function () { var i = all.indexOf(self); if (i >= 0) all.splice(i, 1); };
+    this.refresh();
+    all.push(this);
+    dirty = true;
+    start();
+  }
+  ST.prototype.refresh = function () {
+    this.start = pos(this.vars.start, this.trigger, false);
+    this.end = pos(this.vars.end, this.trigger, true);
+    if (this.end <= this.start) this.end = this.start + 1;
+  };
+  ST.prototype.measure = function () {
+    var y = scrollY;
+    this.target = clamp((y - this.start) / (this.end - this.start), 0, 1);
+    var active = y >= this.start && y <= this.end;
+    if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
+  };
+  /* Majukan progres (scrub angka = menyusul pelan). Hasil: true bila berubah. */
+  ST.prototype.advance = function (dt, force) {
+    if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
+    else this.progress = this.target;
+    if (Math.abs(this.target - this.progress) < 0.0005) this.progress = this.target;
+    if (this.progress === this.shown && !force) return false;
+    this.changed = true;
+    return true;
+  };
+  ST.prototype.render = function () {
+    var first = this.shown < 0;
+    /* Seperti GSAP: tween yang belum pernah dimulai (progres 0) tidak menimpa nilai awal halaman. */
+    if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
+    this.shown = this.progress;
+    this.tweens.forEach(function (t) { t.render(this.progress); }, this);
+  };
+  ST.prototype.step = function (dt, force) {
+    if (!this.advance(dt, force)) return;
+    this.render();
+    this.changed = false;
+    if (this.vars.onUpdate) this.vars.onUpdate(this);
+  };
+
+  function add(targets, from, to) {
+    var cfg = to.scrollTrigger || {};
+    var st = cfg instanceof ST ? cfg : new ST(typeof cfg === "string" ? { trigger: cfg } : cfg);
+    var list = isEl(targets) || typeof targets === "string" || (targets && typeof targets.length === "number") ? els(targets) : [targets];
+    var n = list.length, gap = Number(to.stagger) || 0, dur = 0.5, total = dur + gap * (n - 1);
+    list.forEach(function (t, i) { st.tweens.push(makeTween(t, from, to, n > 1 ? (i * gap) / total : 0, n > 1 ? dur / total : 1)); });
+    if (from && to.immediateRender === false) st.lazy = true;
+    if (!from) st.lazy = true;
+    st.step(0, true);
+    return st;
+  }
+
+  /* Beberapa trigger boleh menggerakkan objek yang sama (pose per bab). Agar hasilnya   */
+  /* selalu "bab yang sedang dibaca", urutan gambar dibuat pasti: trigger yang kembali ke */
+  /* 0 digambar dari belakang ke depan, lalu semua yang sedang/sudah jalan (progres > 0)  */
+  /* digambar dari depan ke belakang, sehingga bab paling akhir yang aktif menang.         */
+  function frame(now) {
+    var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+    last = now;
+    if (!t0) t0 = now;
+    tickers.slice().forEach(function (fn) { fn((now - t0) / 1000); });
+    var any = false, i, s;
+    for (i = 0; i < all.length; i++) { s = all[i]; if (dirty) s.measure(); if (s.advance(dt, false)) any = true; }
+    dirty = false;
+    if (any) {
+      for (i = all.length - 1; i >= 0; i--) { s = all[i]; if (s.changed && s.progress === 0) s.render(); }
+      for (i = 0; i < all.length; i++) { s = all[i]; if (s.progress > 0 && s.tweens.length) s.render(); }
+      for (i = 0; i < all.length; i++) { s = all[i]; if (s.changed) { s.changed = false; if (s.vars.onUpdate) s.vars.onUpdate(s); } }
+    }
+    requestAnimationFrame(frame);
+  }
+  function start() { if (!running) { running = true; requestAnimationFrame(frame); } }
+  function refreshAll() { all.forEach(function (s) { s.refresh(); }); dirty = true; }
+  addEventListener("scroll", function () { dirty = true; }, { passive: true });
+  addEventListener("resize", refreshAll);
+  addEventListener("load", refreshAll);
+  if (window.ResizeObserver) new ResizeObserver(refreshAll).observe(document.documentElement);
+
+  var api = {
+    registerPlugin: function () {},
+    to: function (t, v) { return add(t, null, v); },
+    fromTo: function (t, a, b) { return add(t, a, b); },
+    timeline: function (v) {
+      var cfg = (v && v.scrollTrigger) || {};
+      var st = new ST(cfg);
+      var tl = { fromTo: function (t, a, b) { add(t, a, Object.assign({}, b, { scrollTrigger: st })); return tl; }, to: function (t, b) { add(t, null, Object.assign({}, b, { scrollTrigger: st })); return tl; }, scrollTrigger: st };
+      return tl;
+    },
+    ticker: { add: function (fn) { tickers.push(fn); start(); }, remove: function (fn) { var i = tickers.indexOf(fn); if (i >= 0) tickers.splice(i, 1); }, lagSmoothing: function () {} },
+    ScrollTrigger: {
+      create: function (cfg) { var st = new ST(cfg); st.step(0, true); return st; },
+      update: function () { dirty = true; },
+      refresh: refreshAll,
+      getAll: function () { return all.slice(); },
+    },
+  };
+  return api;
+})();</script>
+<script>
+document.documentElement.classList.add("js", "loading");
+setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
+</script>
+<style id="owd-theme">
+/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+:root {
+  --bg: #fbf5f3; /* Latar halaman */
+  --surface: #ffffff; /* Latar kartu */
+  --ink: #2e1f22; /* Teks utama */
+  --soft: #7a666a; /* Teks sekunder */
+  --accent: #c2416b; /* Warna utama (tombol, harga) */
+  --accent-2: #5f8a5a; /* Warna kedua (label, aksen) */
+  --on-accent: #ffffff; /* Teks di atas warna utama */
+  --on-accent-2: #ffffff; /* Teks di atas warna kedua */
+  --line: color-mix(in srgb, #2e1f22 13%, transparent); /* Garis */
+  --r: 30px; /* Sudut kartu [0,32,1] */
+  --pad: clamp(16px, 4vw, 48px); /* Jarak tepi halaman */
+  --fd: "Gilda Display"; /* Font judul */
+  --ft: "Lato"; /* Font teks */
+}
+</style>
+<style>
+* { box-sizing: border-box; }
+html { background: var(--bg); color-scheme: light; scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.65 var(--ft), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; }
+img, svg { display: block; }
+h1, h2, h3 { font-family: var(--fd), system-ui, sans-serif; letter-spacing: -.02em; margin: 0; }
+p { margin: 0; }
+.wrap { width: min(100% - 2 * var(--pad), 1180px); margin-inline: auto; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 80; padding: 10px 14px; border-radius: 8px; background: var(--accent); color: var(--on-accent); }
+.skip:focus { left: 8px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.soft { color: var(--soft); }
+
+#gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity .8s; pointer-events: none; }
+html.webgl #gl { opacity: 1; }
+.loader { position: fixed; left: 16px; bottom: 16px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border-radius: 999px; background: var(--surface); color: var(--soft); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; pointer-events: none; box-shadow: 0 10px 30px -18px rgba(0,0,0,.5); }
+html.loading .loader { display: flex; }
+.loader i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 0; background: var(--accent); color: var(--on-accent); font: 600 15px/1 var(--ft), system-ui, sans-serif; text-decoration: none; cursor: pointer; white-space: nowrap; transition: filter .2s; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn.sm { min-height: 40px; padding: 0 16px; font-size: 14px; }
+.wa-ico { width: 18px; height: 18px; fill: currentColor; }
+
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 14px; min-height: 66px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; font: 700 18px/1.1 var(--fd), system-ui, sans-serif; text-decoration: none; margin-right: auto; }
+.logo .ico { font-size: 30px; color: var(--ink); }
+.nav ul { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.nav ul a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 11px; border-radius: 999px; text-decoration: none; font-size: 14px; color: var(--soft); }
+.nav ul a:hover, .nav ul a.active { color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.menu-btn { display: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); cursor: pointer; }
+.menu-btn span, .menu-btn span::before, .menu-btn span::after { display: block; width: 18px; height: 2px; margin: auto; background: currentColor; position: relative; transition: transform .2s; }
+.menu-btn span::before, .menu-btn span::after { content: ""; position: absolute; left: 0; }
+.menu-btn span::before { top: -6px; } .menu-btn span::after { top: 6px; }
+.progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+.progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transform-origin: 0 50%; transform: scaleX(0); }
+
+main { position: relative; z-index: 2; }
+.s { position: relative; padding: clamp(72px, 10vw, 128px) 0; }
+.kick { margin: 0 0 10px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h2 { font-size: clamp(30px, 3.8vw, 50px); line-height: 1.06; margin-bottom: 14px; }
+h3 { font-size: 19px; line-height: 1.25; }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 32px; margin-bottom: 34px; }
+.head > div { max-width: 640px; }
+.head > p { max-width: 420px; color: var(--soft); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: #9aa0a6; }
+.status.on i { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.2); }
+.status.off i { background: #ef4444; }
+
+/* hero */
+.hero { min-height: 100vh; display: flex; align-items: center; padding: 96px 0 48px; }
+.hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 28px; align-items: center; }
+.flip .hero .stage { order: -1; }
+.hero h1 { font-size: clamp(40px, 5.4vw, 76px); line-height: 1.02; margin: 0 0 18px; }
+.hero .lead { font-size: clamp(17px, 1.4vw, 19px); color: var(--soft); max-width: 46ch; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.facts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 26px; font-size: 14px; color: var(--soft); }
+.facts b { color: var(--ink); }
+.facts .star { color: #f5b301; }
+.stage { position: relative; height: min(66vh, 600px); min-height: 340px; touch-action: pan-y; cursor: grab; border-radius: var(--r); }
+.stage.grab { cursor: grabbing; }
+.stage .fb { position: absolute; inset: 8%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent-2) 55%, var(--surface)), color-mix(in srgb, var(--accent) 35%, var(--bg)) 70%); font-size: clamp(120px, 18vw, 230px); color: var(--ink); }
+html.webgl .stage .fb { display: none; }
+.hint { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 80%, transparent); font-size: 12px; color: var(--soft); white-space: nowrap; pointer-events: none; }
+html:not(.webgl) .hint { display: none; }
+.variants { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; }
+.variants > span { font-size: 13px; color: var(--soft); margin-right: 4px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 6px; border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--ink); font: 500 14px/1 var(--ft), system-ui, sans-serif; cursor: pointer; }
+.chip i { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--c1) 50%, var(--c2) 50%); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+.chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* bagian samping: teks di satu sisi, objek di sisi lain */
+.side .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.side.r .copy { grid-column: 2; }
+.side .copy { min-width: 0; }
+
+.about p + p { margin-top: 14px; }
+.about p { color: var(--soft); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 26px; }
+.stats div { padding: 18px; }
+.stats b { display: block; font: 700 clamp(26px, 2.8vw, 38px)/1.05 var(--fd), system-ui, sans-serif; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats span { font-size: 14px; color: var(--soft); }
+.founder { margin: 26px 0 0; padding: 20px 22px; border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 0 var(--r) var(--r) 0; }
+.founder blockquote { margin: 0 0 10px; font: 500 18px/1.5 var(--fd), system-ui, sans-serif; }
+.founder figcaption { font-size: 14px; color: var(--soft); }
+
+/* katalog */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: -10px 0 26px; }
+.tab { min-height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 14px/1 var(--ft), system-ui, sans-serif; cursor: pointer; }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.item { position: relative; display: flex; flex-direction: column; padding: 18px; }
+.item[hidden] { display: none; }
+.item .pic { display: grid; place-items: center; aspect-ratio: 16 / 10; margin-bottom: 14px; border-radius: calc(var(--r) - 6px); background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), color-mix(in srgb, var(--accent-2) 22%, var(--surface))); font-size: 64px; color: var(--ink); }
+.item .tag { position: absolute; top: 26px; left: 26px; padding: 3px 10px; border-radius: 999px; background: var(--accent-2); color: var(--on-accent-2); font-size: 12px; font-weight: 700; }
+.item small.cat { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+.item h3 { margin: 4px 0 6px; }
+.item p { font-size: 14px; color: var(--soft); flex: 1; }
+.item .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.price { font: 700 19px/1.1 var(--fd), system-ui, sans-serif; color: var(--accent); }
+.price small { display: block; font: 500 12px/1.3 var(--ft), system-ui, sans-serif; color: var(--soft); }
+
+/* keunggulan & alur */
+.usp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.usp li { padding: 18px; }
+.usp .ico { font-size: 34px; margin-bottom: 10px; }
+.usp h3 { font-size: 17px; margin-bottom: 4px; }
+.usp p { font-size: 14px; color: var(--soft); }
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: st; display: grid; gap: 12px; }
+.steps li { position: relative; padding: 18px 18px 18px 74px; counter-increment: st; }
+.steps li::before { content: counter(st, decimal-leading-zero); position: absolute; left: 18px; top: 16px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--accent); color: var(--on-accent); font: 700 16px/1 var(--fd), system-ui, sans-serif; }
+.steps h3 { font-size: 17px; margin-bottom: 4px; }
+.steps p { font-size: 14px; color: var(--soft); }
+
+/* testimoni */
+.score { display: flex; align-items: center; gap: 14px; }
+.score b { font: 700 46px/1 var(--fd), system-ui, sans-serif; }
+.score span { font-size: 14px; color: var(--soft); max-width: 18ch; }
+.testi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.testi li { display: flex; flex-direction: column; padding: 22px; }
+.stars { color: #f5b301; letter-spacing: 2px; margin-bottom: 10px; }
+.testi blockquote { margin: 0 0 16px; flex: 1; }
+.testi .who b { display: block; }
+.testi .who span { font-size: 13px; color: var(--soft); }
+
+/* galeri: foto dirender dari objek 3D */
+.gal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.gal li { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--r); background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 30%, var(--surface)), color-mix(in srgb, var(--accent-2) 30%, var(--bg))); background-size: cover; background-position: center; }
+.gal li:nth-child(1) { grid-row: span 2; aspect-ratio: auto; }
+.gal li .ico { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); font-size: 90px; color: var(--ink); opacity: .55; }
+.gal li.shot .ico { display: none; }
+.gal figcaption { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 86%, transparent); font-size: 14px; font-weight: 500; }
+
+/* harga */
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.plan { display: flex; flex-direction: column; padding: 26px; }
+.plan.hot { border: 2px solid var(--accent); box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--accent) 70%, transparent); position: relative; }
+.plan .badge { position: absolute; top: -13px; left: 26px; padding: 4px 12px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 700; }
+.plan .amount { margin: 14px 0 6px; font: 700 clamp(28px, 3vw, 38px)/1 var(--fd), system-ui, sans-serif; }
+.plan .amount small { font: 500 14px/1 var(--ft), system-ui, sans-serif; color: var(--soft); }
+.plan > p { font-size: 14px; color: var(--soft); }
+.plan ul { margin: 18px 0 22px; padding: 0; list-style: none; display: grid; gap: 8px; flex: 1; font-size: 15px; }
+.plan li { position: relative; padding-left: 26px; }
+.plan li::before { content: ""; position: absolute; left: 0; top: .42em; width: 14px; height: 8px; border-left: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent); transform: rotate(-45deg); }
+.plan .btn { width: 100%; }
+
+/* lokasi */
+.loc { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+.map { position: relative; min-height: 340px; border-radius: var(--r); overflow: hidden; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border: 1px solid var(--line); color: var(--ink); }
+.map svg.grid-map { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .pin { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -100%); display: grid; justify-items: center; gap: 6px; }
+.map .pin b { padding: 8px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 14px; white-space: nowrap; }
+.map .pin i { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 4px solid var(--bg); box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 30%, transparent); }
+.map .btn { position: absolute; left: 16px; bottom: 16px; }
+.info { padding: 24px; }
+.info table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15px; }
+.info td { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.info td + td { text-align: right; font-variant-numeric: tabular-nums; }
+.info address { font-style: normal; color: var(--soft); }
+.contacts { display: grid; gap: 6px; margin-top: 14px; font-size: 15px; }
+.contacts a { text-decoration: none; }
+.contacts a:hover { color: var(--accent); }
+
+/* faq */
+.faq { display: grid; gap: 10px; }
+.faq details { padding: 0 20px; }
+.faq summary { display: flex; justify-content: space-between; gap: 14px; align-items: center; min-height: 58px; font-weight: 600; cursor: pointer; list-style: none; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-size: 22px; color: var(--accent); transition: transform .2s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 0 18px; color: var(--soft); }
+
+/* kontak */
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; padding: 22px; }
+.form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--soft); }
+.form .full { grid-column: 1 / -1; }
+.form input, .form select, .form textarea { width: 100%; min-height: 46px; padding: 10px 14px; border-radius: calc(var(--r) - 8px); border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 15px/1.4 var(--ft), system-ui, sans-serif; }
+.form textarea { resize: vertical; }
+.form .btn { grid-column: 1 / -1; }
+.quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+footer { position: relative; z-index: 2; padding: 56px 0 28px; background: color-mix(in srgb, var(--surface) 92%, var(--bg)); border-top: 1px solid var(--line); font-size: 15px; }
+.fgrid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
+.fgrid h3 { font-size: 15px; margin-bottom: 12px; }
+.fgrid ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--soft); }
+.fgrid a { text-decoration: none; }
+.fgrid a:hover { color: var(--accent); }
+.fbot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--soft); }
+.fab { position: fixed; right: 18px; bottom: 18px; z-index: 45; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #fff; box-shadow: 0 14px 30px -10px rgba(0,0,0,.5); }
+.fab svg { width: 30px; height: 30px; fill: currentColor; }
+
+html.js [data-rv] { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+html.js [data-rv].in { opacity: 1; transform: none; }
+html.no-webgl body { background: radial-gradient(80% 60% at 75% 10%, color-mix(in srgb, var(--accent) 18%, var(--bg)), var(--bg) 70%) fixed; }
+html.no-webgl #gl { display: none; }
+
+.ico { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.ico .f1 { fill: var(--accent); }
+.ico .f2 { fill: var(--accent-2); }
+
+@media (max-width: 1080px) {
+  .testi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nav ul a { padding: 0 8px; }
+}
+@media (max-width: 900px) {
+  .nav ul { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; padding: 10px var(--pad) 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .nav.open ul { display: flex; }
+  .nav ul a { min-height: 46px; font-size: 16px; }
+  .menu-btn { display: block; }
+  .nav .btn span { display: none; }
+  .nav .btn { width: 44px; min-height: 44px; padding: 0; }
+  .hero { padding-top: 80px; }
+  .hero .wrap { grid-template-columns: 1fr; gap: 8px; }
+  .hero .stage, .flip .hero .stage { order: -1; height: 42vh; min-height: 280px; }
+  .side .wrap { grid-template-columns: 1fr; }
+  .side.r .copy { grid-column: 1; }
+  .side .copy { padding: 22px; border-radius: var(--r); background: color-mix(in srgb, var(--bg) 84%, transparent); }
+  .side .copy .card { background: color-mix(in srgb, var(--surface) 92%, transparent); }
+  .gal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gal li:nth-child(1) { grid-row: auto; aspect-ratio: 4 / 3; }
+  .plans, .loc { grid-template-columns: 1fr; }
+  .fgrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .usp, .stats, .form { grid-template-columns: 1fr; }
+  .testi { grid-template-columns: 1fr; }
+  .gal { grid-template-columns: 1fr; }
+  .fgrid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-rv] { opacity: 1; transform: none; transition: none; }
+  #gl { transition: none; }
+  .loader i { animation: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#katalog">Lewati ke katalog bunga</a>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="loader" aria-hidden="true"><i></i>Memuat 3D</div>
+<header class="nav"><div class="wrap">
+  <a class="logo" href="#beranda"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><span data-owd-text="nama" data-owd-label="Nama usaha">Ranting &amp; Kembang</span></a>
+  <nav aria-label="Navigasi utama"><ul><li><a href="#profil" data-owd-text="menu1" data-owd-label="Menu 1">Profil</a></li><li><a href="#katalog" data-owd-text="menu2" data-owd-label="Menu 2">Katalog</a></li><li><a href="#harga" data-owd-text="menu3" data-owd-label="Menu 3">Harga</a></li><li><a href="#galeri" data-owd-text="menu4" data-owd-label="Menu 4">Galeri</a></li><li><a href="#lokasi" data-owd-text="menu5" data-owd-label="Menu 5">Lokasi</a></li><li><a href="#faq" data-owd-text="menu6" data-owd-label="Menu 6">FAQ</a></li></ul></nav>
+  <a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa aria-label="Chat WhatsApp"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg><span data-owd-text="navTombol" data-owd-label="Tombol di navigasi">Hubungi kami</span></a>
+  <button class="menu-btn" type="button" aria-label="Buka menu" aria-expanded="false"><span></span></button>
+</div><div class="progress" aria-hidden="true"><i></i></div></header>
+<main id="konten" class="flip">
+<section class="hero" id="beranda" data-pose="0" aria-labelledby="hero-t"><div class="wrap">
+  <div class="hero-text">
+    <p class="kick" data-owd-text="heroLabel" data-owd-label="Hero: label kecil">Florist buket, dekorasi &amp; langganan bunga</p>
+    <h1 id="hero-t" data-owd-text="heroJudul" data-owd-label="Hero: judul">Bunga segar yang menyampaikan perasaanmu.</h1>
+    <p class="lead" data-owd-text="heroTeks" data-owd-label="Hero: paragraf" data-owd-multi>Buket bunga segar, papan ucapan, dekorasi pernikahan, dan langganan bunga mingguan untuk rumah dan kantor. Bunga dari petani Lembang dan Berastagi, dirangkai pagi hari, diantar hari yang sama.</p>
+    <div class="ctas"><a class="btn" href="#katalog" data-owd-text="heroTombol1" data-owd-label="Hero: tombol 1">Lihat katalog bunga</a><a class="btn ghost" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg><span data-owd-text="heroTombol2" data-owd-label="Hero: tombol 2">Chat WhatsApp</span></a></div>
+    <div class="facts"><span class="status" data-status><i></i><span>Jam buka</span></span><span><span class="star">&#9733;</span> <b data-owd-text="rating" data-owd-label="Rating">4,9</b> <span data-owd-text="ratingKet" data-owd-label="Keterangan rating">dari 2.700 ulasan</span></span><span data-owd-text="kota" data-owd-label="Kota">Jakarta Barat</span></div>
+    <div class="variants" data-variants><span data-owd-text="varianLabel" data-owd-label="Label pilihan varian">Warna bunga:</span><button class="chip" type="button" aria-pressed="true" style="--c1:#d9577f;--c2:#f5c542"><i></i>Merah muda</button><button class="chip" type="button" aria-pressed="false" style="--c1:#c81e3a;--c2:#f8f0e6"><i></i>Merah</button><button class="chip" type="button" aria-pressed="false" style="--c1:#8b5cf6;--c2:#f9a8d4"><i></i>Ungu</button><button class="chip" type="button" aria-pressed="false" style="--c1:#f3ece0;--c2:#e8b4b8"><i></i>Putih krem</button></div>
+  </div>
+  <div class="stage" tabindex="0" role="img" aria-label="Model 3D Ranting &amp; Kembang. Geser atau pakai tombol panah untuk memutar."><div class="fb" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg></div><span class="hint" aria-hidden="true">&#8645; Gulir untuk merakit, geser untuk memutar</span></div>
+</div></section>
+<section class="s side l" id="profil" data-pose="1"><div class="wrap"><div class="copy about">
+  <p class="kick" data-rv data-owd-text="profilLabel" data-owd-label="Profil: label kecil">Tentang Ranting &amp; Kembang</p>
+  <h2 data-rv data-owd-text="profilJudul" data-owd-label="Profil: judul">Studio bunga kecil di belakang rumah</h2>
+  <p data-rv data-owd-text="profilTeks1" data-owd-label="Profil: paragraf 1" data-owd-multi>Ranting &amp; Kembang dimulai tahun 2017 dari studio kecil di belakang rumah Mbak Ayu. Kami percaya buket tidak harus mewah untuk berkesan, cukup segar dan dirangkai dengan hati.</p>
+  <p data-rv data-owd-text="profilTeks2" data-owd-label="Profil: paragraf 2" data-owd-multi>Bunga kami ambil langsung dari petani setiap pagi. Sisa bunga yang tidak terjual kami keringkan menjadi bunga kering dan pengharum, jadi hampir tidak ada yang terbuang.</p>
+  <div class="stats"><div class="card" data-rv style="--d:0s"><b data-count data-owd-text="angka1" data-owd-label="Angka 1">35.000+</b><span data-owd-text="angka1Label" data-owd-label="Angka 1: label">buket terkirim</span></div><div class="card" data-rv style="--d:0.06s"><b data-count data-owd-text="angka2" data-owd-label="Angka 2">7</b><span data-owd-text="angka2Label" data-owd-label="Angka 2: label">petani mitra</span></div><div class="card" data-rv style="--d:0.12s"><b data-count data-owd-text="angka3" data-owd-label="Angka 3">3 jam</b><span data-owd-text="angka3Label" data-owd-label="Angka 3: label">rata-rata waktu antar</span></div><div class="card" data-rv style="--d:0.18s"><b data-count data-owd-text="angka4" data-owd-label="Angka 4">4,9</b><span data-owd-text="angka4Label" data-owd-label="Angka 4: label">rating pelanggan</span></div></div>
+  <figure class="founder" data-rv><blockquote data-owd-text="pendiriKutipan" data-owd-label="Kutipan pendiri" data-owd-multi>&ldquo;Bunga adalah kata yang tidak sempat diucapkan. Kami membantu menyampaikannya.&rdquo;</blockquote><figcaption><b data-owd-text="pendiriNama" data-owd-label="Nama pendiri">Ayu Prameswari</b>, <span data-owd-text="pendiriPeran" data-owd-label="Peran pendiri">Perangkai bunga &amp; pendiri</span></figcaption></figure>
+</div></div></section>
+<section class="s" id="katalog" data-pose="2"><div class="wrap">
+  <div class="head" data-rv><div><p class="kick" data-owd-text="katalogLabel" data-owd-label="Katalog: label kecil">Harga jelas, pesan lewat WhatsApp</p><h2 data-owd-text="katalogJudul" data-owd-label="Katalog: judul">Katalog bunga</h2></div><p data-owd-text="katalogTeks" data-owd-label="Katalog: keterangan" data-owd-multi>Pilih kategori untuk menyaring. Tekan Pesan, pesan WhatsApp langsung tersusun dengan nama item.</p></div>
+  <div class="tabs" role="toolbar" aria-label="Saring kategori"><!--owd:render name="biz-tabs"--><button class="tab" type="button" data-f="all" aria-pressed="true">Semua</button><button class="tab" type="button" data-f="0" aria-pressed="false">Buket</button><button class="tab" type="button" data-f="1" aria-pressed="false">Acara</button><button class="tab" type="button" data-f="2" aria-pressed="false">Langganan</button><!--owd:end--></div>
+  <ul class="grid"><!--owd:render name="biz-katalog"--><li class="item card" data-c="0" data-rv style="--d:0s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg></div><span class="tag">Terlaris</span><small class="cat">Buket</small><h3>Buket Mawar 12 Tangkai</h3><p>Mawar segar dan daun eucalyptus.</p><div class="row"><span class="price"><span>Rp385.000</span><small>/buket</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Buket%20Mawar%2012%20Tangkai" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="0" data-rv style="--d:0.05s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg></div><small class="cat">Buket</small><h3>Buket Bunga Campur Musiman</h3><p>Dirangkai sesuai bunga terbaik hari itu.</p><div class="row"><span class="price"><span>Rp295.000</span><small>/buket</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Buket%20Bunga%20Campur%20Musiman" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="0" data-rv style="--d:0.1s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg></div><small class="cat">Buket</small><h3>Buket Bunga Kering</h3><p>Tahan berbulan-bulan.</p><div class="row"><span class="price"><span>Rp245.000</span><small>/buket</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Buket%20Bunga%20Kering" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="0" data-rv style="--d:0.15000000000000002s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><path class="f1" d="M24 6h16v6c0 4 12 10 12 24 0 12-8 20-20 20S12 48 12 36c0-14 12-20 12-24z"/><path d="M24 6h16v6c0 4 12 10 12 24 0 12-8 20-20 20S12 48 12 36c0-14 12-20 12-24z"/><path class="f2" d="M14 34h36v6H14z"/></svg></div><small class="cat">Buket</small><h3>Bunga Meja Kantor</h3><p>Vas kaca, segar seminggu.</p><div class="row"><span class="price"><span>Rp350.000</span><small>/rangkaian</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Bunga%20Meja%20Kantor" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="1" data-rv style="--d:0s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><path class="f1" d="M32 6l7 16 18 2-13 12 4 18-16-9-16 9 4-18L7 24l18-2z"/><path d="M32 6l7 16 18 2-13 12 4 18-16-9-16 9 4-18L7 24l18-2z"/></svg></div><small class="cat">Acara</small><h3>Papan Ucapan Selamat</h3><p>2 x 1,25 m, antar Jabodetabek.</p><div class="row"><span class="price"><span>Rp750.000</span><small>/papan</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Papan%20Ucapan%20Selamat" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="1" data-rv style="--d:0.05s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="40" r="16"/><circle class="f2" cx="32" cy="40" r="12"/><circle cx="32" cy="40" r="12"/><path class="f1" d="M24 18l4-8h8l4 8-8 8z"/><path d="M24 18l4-8h8l4 8-8 8zM24 18h16"/></svg></div><small class="cat">Acara</small><h3>Dekorasi Akad Nikah</h3><p>Pelaminan kecil dan meja akad.</p><div class="row"><span class="price"><span>Sesuai konsep</span></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Dekorasi%20Akad%20Nikah" target="_blank" rel="noopener" data-order>Tanya</a></div></li><li class="item card" data-c="1" data-rv style="--d:0.1s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg></div><small class="cat">Acara</small><h3>Bunga Duka Cita</h3><p>Krans dan papan, antar cepat.</p><div class="row"><span class="price"><span>Rp650.000</span><small>mulai</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Bunga%20Duka%20Cita" target="_blank" rel="noopener" data-order>Pesan</a></div></li><li class="item card" data-c="2" data-rv style="--d:0.15000000000000002s"><div class="pic" aria-hidden="true"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><rect class="f1" x="8" y="26" width="48" height="30" rx="2"/><rect x="8" y="26" width="48" height="30" rx="2"/><rect class="f2" x="6" y="18" width="52" height="10" rx="2"/><path d="M6 18h52v10H6zM32 18v38M32 18c-6-12-18-10-14-2 2 2 8 2 14 2zM32 18c6-12 18-10 14-2-2 2-8 2-14 2z"/></svg></div><small class="cat">Langganan</small><h3>Langganan Bunga Mingguan</h3><p>Rangkaian baru setiap Senin.</p><div class="row"><span class="price"><span>Rp950.000</span><small>/bulan</small></span><a class="btn sm" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20pesan%3A%0A-%20Langganan%20Bunga%20Mingguan" target="_blank" rel="noopener" data-order>Pesan</a></div></li><!--owd:end--></ul>
+</div></section>
+<section class="s side r" id="keunggulan" data-pose="3"><div class="wrap"><div class="copy">
+  <p class="kick" data-rv data-owd-text="uspLabel" data-owd-label="Keunggulan: label kecil">Kenapa memilih kami</p>
+  <h2 data-rv data-owd-text="uspJudul" data-owd-label="Keunggulan: judul">Yang membuat pelanggan kembali lagi</h2>
+  <ul class="usp"><!--owd:render name="biz-usp"--><li class="card" data-rv style="--d:0s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><h3>Petik pagi</h3><p>Bunga datang dari petani setiap pagi.</p></li><li class="card" data-rv style="--d:0.05s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><rect class="f1" x="4" y="16" width="34" height="28" rx="2"/><path d="M4 16h34v28H4zM38 26h12l8 10v8H38z"/><circle class="f2" cx="16" cy="48" r="6"/><circle class="f2" cx="48" cy="48" r="6"/><circle cx="16" cy="48" r="6"/><circle cx="48" cy="48" r="6"/></svg><h3>Antar hari yang sama</h3><p>Pesan sebelum jam 14.00.</p></li><li class="card" data-rv style="--d:0.1s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><rect class="f1" x="16" y="4" width="32" height="56" rx="6"/><rect x="16" y="4" width="32" height="56" rx="6"/><rect class="f2" x="20" y="12" width="24" height="38" rx="2"/><path d="M28 8h8M30 55h4"/></svg><h3>Foto sebelum kirim</h3><p>Kamu lihat buketnya sebelum diantar.</p></li><li class="card" data-rv style="--d:0.15000000000000002s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><path class="f1" d="M44 6l14 14-30 30-16 4 4-16z"/><path d="M44 6l14 14-30 30-16 4 4-16zM38 12l14 14M16 40l8 8"/><path d="M6 58h20"/></svg><h3>Kartu tulisan tangan</h3><p>Pesanmu kami tulis dengan rapi.</p></li><li class="card" data-rv style="--d:0.2s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><path class="f1" d="M10 54C10 26 26 10 54 10c0 28-16 44-44 44z"/><path d="M10 54C10 26 26 10 54 10c0 28-16 44-44 44zM10 54 40 24M24 40h10M30 34V24"/></svg><h3>Minim sampah</h3><p>Bunga sisa jadi bunga kering.</p></li><li class="card" data-rv style="--d:0.25s"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><path class="f1" d="M32 6l7 16 18 2-13 12 4 18-16-9-16 9 4-18L7 24l18-2z"/><path d="M32 6l7 16 18 2-13 12 4 18-16-9-16 9 4-18L7 24l18-2z"/></svg><h3>Garansi segar</h3><p>Layu dalam 2 hari, kami ganti.</p></li><!--owd:end--></ul>
+</div></div></section>
+<section class="s side l" id="alur" data-pose="4"><div class="wrap"><div class="copy">
+  <p class="kick" data-rv data-owd-text="alurLabel" data-owd-label="Alur: label kecil">Cara kerja</p>
+  <h2 data-rv data-owd-text="alurJudul" data-owd-label="Alur: judul">Dari chat pertama sampai selesai</h2>
+  <ol class="steps"><!--owd:render name="biz-alur"--><li class="card" data-rv style="--d:0s"><h3>Pilih buket</h3><p>Tekan Pesan atau kirim foto referensi.</p></li><li class="card" data-rv style="--d:0.07s"><h3>Tulis pesan</h3><p>Isi kartu ucapan dan alamat penerima.</p></li><li class="card" data-rv style="--d:0.14s"><h3>Kami rangkai</h3><p>Foto buket dikirim sebelum diantar.</p></li><li class="card" data-rv style="--d:0.21000000000000002s"><h3>Diantar</h3><p>Kurir kami mengantar dengan hati-hati.</p></li><!--owd:end--></ol>
+</div></div></section>
+<section class="s" id="testimoni" data-pose="5"><div class="wrap">
+  <div class="head" data-rv><div><p class="kick" data-owd-text="ulasanLabel" data-owd-label="Ulasan: label kecil">Kata pelanggan</p><h2 data-owd-text="ulasanJudul" data-owd-label="Ulasan: judul">Dipercaya pelanggan sungguhan</h2></div><div class="score"><b data-owd-text="rating" data-owd-label="Rating">4,9</b><span><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><br><span data-owd-text="ratingKet" data-owd-label="Keterangan rating">dari 2.700 ulasan</span></span></div></div>
+  <ul class="testi"><!--owd:render name="biz-ulasan"--><li class="card" data-rv style="--d:0s"><div class="stars" aria-label="Bintang 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div><blockquote>Buketnya lebih cantik dari fotonya, istri saya terharu.</blockquote><div class="who"><b>Rizky</b><span>Pelanggan</span></div></li><li class="card" data-rv style="--d:0.06s"><div class="stars" aria-label="Bintang 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div><blockquote>Dekorasi akad kami sederhana tapi sangat indah.</blockquote><div class="who"><b>Nadia &amp; Fikri</b><span>Dekorasi pernikahan</span></div></li><li class="card" data-rv style="--d:0.12s"><div class="stars" aria-label="Bintang 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div><blockquote>Bunga meja kantor selalu segar setiap Senin, tamu sering memuji.</blockquote><div class="who"><b>PT Lumbung Data</b><span>Langganan kantor</span></div></li><li class="card" data-rv style="--d:0.18s"><div class="stars" aria-label="Bintang 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div><blockquote>Papan duka cita datang cepat di saat genting. Terima kasih.</blockquote><div class="who"><b>Keluarga Wibowo</b><span>Pelanggan</span></div></li><!--owd:end--></ul>
+</div></section>
+<section class="s" id="galeri" data-pose="6"><div class="wrap">
+  <div class="head" data-rv><div><p class="kick" data-owd-text="galeriLabel" data-owd-label="Galeri: label kecil">Galeri</p><h2 data-owd-text="galeriJudul" data-owd-label="Galeri: judul">Lihat lebih dekat</h2></div><p data-owd-text="galeriTeks" data-owd-label="Galeri: keterangan" data-owd-multi>Setiap sudut dirender langsung dari model 3D di halaman ini, dalam warna yang berbeda.</p></div>
+  <ul class="gal"><!--owd:render name="biz-galeri"--><li data-shot data-rv style="--d:0s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Buket merah muda</figcaption></figure></li><li data-shot data-rv style="--d:0.05s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Kelopak dari dekat</figcaption></figure></li><li data-shot data-rv style="--d:0.1s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Buket merah</figcaption></figure></li><li data-shot data-rv style="--d:0.15000000000000002s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Pita dan kertas</figcaption></figure></li><li data-shot data-rv style="--d:0.2s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Buket ungu</figcaption></figure></li><li data-shot data-rv style="--d:0.25s"><figure style="margin:0"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><figcaption>Buket krem</figcaption></figure></li><!--owd:end--></ul>
+</div></section>
+<section class="s" id="harga" data-pose="7"><div class="wrap">
+  <div class="head" data-rv><div><p class="kick" data-owd-text="hargaLabel" data-owd-label="Harga: label kecil">Harga &amp; paket</p><h2 data-owd-text="hargaJudul" data-owd-label="Harga: judul">Langganan &amp; acara</h2></div><p data-owd-text="hargaTeks" data-owd-label="Harga: keterangan" data-owd-multi>Harga transparan. Butuh yang berbeda? Ceritakan kebutuhanmu, kami buatkan penawaran.</p></div>
+  <div class="plans"><!--owd:render name="biz-paket"--><article class="plan card" data-rv style="--d:0s"><h3>Langganan Rumah</h3><p class="amount"><span>Rp600.000</span> <small>/bulan</small></p><p>Bunga segar setiap minggu.</p><ul><li>4 rangkaian sedang</li><li>Vas pinjam</li><li>Antar setiap Senin</li><li>Bebas berhenti</li></ul><a class="btn ghost" href="https://wa.me/6281227180232?text=Halo%2C%20saya%20tertarik%20Langganan%20Rumah." target="_blank" rel="noopener" data-plan>Pilih Langganan Rumah</a></article><article class="plan card hot" data-rv style="--d:0.08s"><span class="badge">Paling dipilih</span><h3>Langganan Kantor</h3><p class="amount"><span>Rp950.000</span> <small>/bulan</small></p><p>Lobi dan meja resepsionis.</p><ul><li>4 rangkaian besar</li><li>Ganti tiap minggu</li><li>Perawatan vas</li><li>Faktur bulanan</li></ul><a class="btn" href="https://wa.me/6281227180232?text=Halo%2C%20saya%20tertarik%20Langganan%20Kantor." target="_blank" rel="noopener" data-plan>Pilih Langganan Kantor</a></article><article class="plan card" data-rv style="--d:0.16s"><h3>Dekorasi Acara</h3><p class="amount"><span>Sesuai konsep</span></p><p>Akad, lamaran, dan acara kantor.</p><ul><li>Konsultasi &amp; mood board</li><li>Bunga segar musiman</li><li>Pasang &amp; bongkar</li><li>Tim di hari acara</li></ul><a class="btn ghost" href="https://wa.me/6281227180232?text=Halo%2C%20saya%20tertarik%20Dekorasi%20Acara." target="_blank" rel="noopener" data-plan>Pilih Dekorasi Acara</a></article><!--owd:end--></div>
+</div></section>
+<section class="s" id="lokasi" data-pose="8"><div class="wrap">
+  <div class="head" data-rv><div><p class="kick" data-owd-text="lokasiLabel" data-owd-label="Lokasi: label kecil">Lokasi &amp; jam operasional</p><h2 data-owd-text="lokasiJudul" data-owd-label="Lokasi: judul">Mampir atau hubungi kami</h2></div></div>
+  <div class="loc">
+    <div class="map" data-rv><svg class="grid-map" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="currentColor" opacity=".16" stroke-width="10"><path d="M-20 80 420 60M-20 210 420 250M90 -20 120 320M290 -20 260 320"/></g><g fill="none" stroke="currentColor" opacity=".08" stroke-width="4"><path d="M-20 140 420 150M190 -20 200 320M-20 20 160 320M420 30 220 320"/></g><g fill="currentColor" opacity=".07"><rect x="140" y="90" width="40" height="40" rx="6"/><rect x="210" y="170" width="38" height="30" rx="6"/><rect x="20" y="230" width="50" height="40" rx="6"/><rect x="310" y="90" width="60" height="40" rx="6"/></g></svg><div class="pin"><b data-owd-text="nama" data-owd-label="Nama usaha">Ranting &amp; Kembang</b><i></i></div><a class="btn sm" href="https://www.google.com/maps/search/?api=1&amp;query=Ranting%20%26%20Kembang%20Jl.%20Tanjung%20Duren%20Raya%20No.%2077%2C%20Tanjung%20Duren%20Utara%2C%20Grogol%20Petamburan%2C%20Jakarta%20Barat" target="_blank" rel="noopener" data-owd-text="petaTombol" data-owd-label="Lokasi: tombol peta">Buka Google Maps</a></div>
+    <div class="info card" data-rv style="--d:.1s">
+      <span class="status" data-status><i></i><span>Jam buka</span></span>
+      <table><tbody><!--owd:render name="biz-jam"--><tr><td>Setiap hari</td><td>07.00 - 20.00 WIB</td></tr><!--owd:end--></tbody></table>
+      <address data-owd-text="alamat" data-owd-label="Alamat" data-owd-multi>Jl. Tanjung Duren Raya No. 77, Tanjung Duren Utara, Grogol Petamburan, Jakarta Barat</address>
+      <div class="contacts"><a href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa>WhatsApp <b data-owd-text="telepon" data-owd-label="Nomor tampil">0812-2718-0232</b></a><a href="mailto:pesan@rantingkembang.id" data-owd-text="email" data-owd-label="Email">pesan@rantingkembang.id</a><span>Instagram <b data-owd-text="instagram" data-owd-label="Instagram">@rantingkembang</b></span></div>
+    </div>
+  </div>
+</div></section>
+<section class="s side r" id="faq" data-pose="9"><div class="wrap"><div class="copy">
+  <p class="kick" data-rv data-owd-text="faqLabel" data-owd-label="FAQ: label kecil">Tanya jawab</p>
+  <h2 data-rv data-owd-text="faqJudul" data-owd-label="FAQ: judul">Pertanyaan yang sering masuk</h2>
+  <div class="faq"><!--owd:render name="biz-faq"--><details class="card" data-rv open><summary>Bisa antar hari ini?</summary><p>Bisa untuk pesanan sebelum pukul 14.00 di Jakarta.</p></details><details class="card" data-rv><summary>Apakah bisa kirim ke luar kota?</summary><p>Kami bekerja sama dengan florist mitra di kota besar.</p></details><details class="card" data-rv><summary>Berapa lama bunga bertahan?</summary><p>4 sampai 7 hari bila air vas diganti setiap hari.</p></details><details class="card" data-rv><summary>Bisa pesan bunga tertentu?</summary><p>Bisa, tergantung musim. Kami kabari ketersediaannya.</p></details><details class="card" data-rv><summary>Apakah ada garansi?</summary><p>Bunga layu dalam 2 hari kami ganti.</p></details><details class="card" data-rv><summary>Bisa merahasiakan nama pengirim?</summary><p>Bisa, tulis 'rahasia' di kartu ucapan.</p></details><!--owd:end--></div>
+</div></div></section>
+<section class="s side l" id="kontak" data-pose="10"><div class="wrap"><div class="copy">
+  <p class="kick" data-rv data-owd-text="kontakLabel" data-owd-label="Kontak: label kecil">Kontak</p>
+  <h2 data-rv data-owd-text="kontakJudul" data-owd-label="Kontak: judul">Ingin mengirim bunga untuk seseorang?</h2>
+  <p class="soft" data-rv data-owd-text="kontakTeks" data-owd-label="Kontak: isi" data-owd-multi>Ceritakan acaranya dan untuk siapa. Kami sarankan rangkaian yang paling pas.</p>
+  <form class="form card" data-form data-rv>
+    <label>Nama<input name="nama" required autocomplete="name" placeholder="Nama kamu"></label>
+    <label>Kebutuhan<select name="perlu"><!--owd:render name="biz-pilihan"--><option>Langganan Rumah</option><option>Langganan Kantor</option><option>Dekorasi Acara</option><option>Buket</option><option>Acara</option><option>Langganan</option><option>Lainnya</option><!--owd:end--></select></label>
+    <label class="full">Tanggal (opsional)<input type="date" name="tanggal"></label>
+    <label class="full">Pesan<textarea name="pesan" rows="4" placeholder="Ceritakan kebutuhanmu"></textarea></label>
+    <button class="btn" type="submit"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg><span data-owd-text="formTombol" data-owd-label="Formulir: tombol">Kirim lewat WhatsApp</span></button>
+  </form>
+  <div class="quick" data-rv><a class="btn ghost sm" href="mailto:pesan@rantingkembang.id" data-owd-text="email" data-owd-label="Email">pesan@rantingkembang.id</a><a class="btn ghost sm" href="#lokasi">Lihat lokasi</a></div>
+</div></div></section>
+</main>
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div><a class="logo" href="#beranda"><svg class="ico" viewBox="0 0 64 64" aria-hidden="true"><g class="f1"><circle cx="32" cy="16" r="8"/><circle cx="44" cy="26" r="8"/><circle cx="40" cy="40" r="8"/><circle cx="24" cy="40" r="8"/><circle cx="20" cy="26" r="8"/></g><circle class="f2" cx="32" cy="30" r="7"/><circle cx="32" cy="30" r="7"/><path d="M32 46v14M32 54c-6 0-10-4-10-8M32 54c6 0 10-4 10-8"/></svg><span data-owd-text="nama" data-owd-label="Nama usaha">Ranting &amp; Kembang</span></a><p class="soft" style="margin-top:12px" data-owd-text="kakiTeks" data-owd-label="Kaki halaman: deskripsi" data-owd-multi>Florist buket, dekorasi &amp; langganan bunga di Jakarta Barat.</p></div>
+    <div><h3>Jelajahi</h3><ul><li><a href="#profil">Profil</a></li><li><a href="#katalog">Katalog</a></li><li><a href="#harga">Harga</a></li><li><a href="#galeri">Galeri</a></li><li><a href="#lokasi">Lokasi</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+    <div><h3>Hubungi</h3><ul><li><a href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa>WhatsApp</a></li><li><a href="mailto:pesan@rantingkembang.id">Email</a></li><li>@rantingkembang</li></ul></div>
+    <div><h3>Jam buka</h3><ul><!--owd:render name="biz-jam-kaki"--><li>Setiap hari: 07.00 - 20.00 WIB</li><!--owd:end--></ul></div>
+  </div>
+  <div class="fbot"><span>&copy; <span data-year>2026</span> <span data-owd-text="nama" data-owd-label="Nama usaha">Ranting &amp; Kembang</span>, <span data-owd-text="kota" data-owd-label="Kota">Jakarta Barat</span></span><span data-owd-text="catatanKaki" data-owd-label="Catatan kaki">Usaha lokal, dibuat dengan sepenuh hati.</span></div>
+</div></footer>
+<a class="fab" href="https://wa.me/6281227180232?text=Halo%20Ranting%20%26%20Kembang%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa aria-label="Chat WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg></a>
+<script>
+/* ==== DATA USAHA: ubah di sini (atau lewat editor OneWebDev) ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan usaha (WhatsApp, jam buka, varian 3D)"*/{
+  "whatsapp": "6281227180232",
+  "zonaWaktu": 7,
+  "jamBuka": [
+    {
+      "hari": "0,1,2,3,4,5,6",
+      "buka": "07.00",
+      "tutup": "20.00"
+    }
+  ],
+  "pesanPembuka": "Halo Ranting & Kembang, saya mau pesan:",
+  "varian": [
+    {
+      "nama": "Merah muda",
+      "warna1": "#d9577f",
+      "warna2": "#f5c542"
+    },
+    {
+      "nama": "Merah",
+      "warna1": "#c81e3a",
+      "warna2": "#f8f0e6"
+    },
+    {
+      "nama": "Ungu",
+      "warna1": "#8b5cf6",
+      "warna2": "#f9a8d4"
+    },
+    {
+      "nama": "Putih krem",
+      "warna1": "#f3ece0",
+      "warna2": "#e8b4b8"
+    }
+  ],
+  "putarOtomatis": true
+}/*owd:end*/;
+/* Daftar isi: tambah, hapus, urutkan, atau duplikat item lewat editor OneWebDev (HTML di bawah dibangun ulang dari sini). */
+const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasan, FAQ, ...)" hide="ikon,katalog.ikon,keunggulan.ikon"*/{
+  "ikon": "flower",
+  "kategori": [
+    "Buket",
+    "Acara",
+    "Langganan"
+  ],
+  "katalog": [
+    {
+      "nama": "Buket Mawar 12 Tangkai",
+      "deskripsi": "Mawar segar dan daun eucalyptus.",
+      "harga": 385000,
+      "satuan": "/buket",
+      "kategori": "Buket",
+      "label": "Terlaris",
+      "ikon": "flower"
+    },
+    {
+      "nama": "Buket Bunga Campur Musiman",
+      "deskripsi": "Dirangkai sesuai bunga terbaik hari itu.",
+      "harga": 295000,
+      "satuan": "/buket",
+      "kategori": "Buket",
+      "label": "",
+      "ikon": "flower"
+    },
+    {
+      "nama": "Buket Bunga Kering",
+      "deskripsi": "Tahan berbulan-bulan.",
+      "harga": 245000,
+      "satuan": "/buket",
+      "kategori": "Buket",
+      "label": "",
+      "ikon": "flower"
+    },
+    {
+      "nama": "Bunga Meja Kantor",
+      "deskripsi": "Vas kaca, segar seminggu.",
+      "harga": 350000,
+      "satuan": "/rangkaian",
+      "kategori": "Buket",
+      "label": "",
+      "ikon": "vase"
+    },
+    {
+      "nama": "Papan Ucapan Selamat",
+      "deskripsi": "2 x 1,25 m, antar Jabodetabek.",
+      "harga": 750000,
+      "satuan": "/papan",
+      "kategori": "Acara",
+      "label": "",
+      "ikon": "star"
+    },
+    {
+      "nama": "Dekorasi Akad Nikah",
+      "deskripsi": "Pelaminan kecil dan meja akad.",
+      "harga": 0,
+      "satuan": "sesuai konsep",
+      "kategori": "Acara",
+      "label": "",
+      "ikon": "ring"
+    },
+    {
+      "nama": "Bunga Duka Cita",
+      "deskripsi": "Krans dan papan, antar cepat.",
+      "harga": 650000,
+      "satuan": "mulai",
+      "kategori": "Acara",
+      "label": "",
+      "ikon": "flower"
+    },
+    {
+      "nama": "Langganan Bunga Mingguan",
+      "deskripsi": "Rangkaian baru setiap Senin.",
+      "harga": 950000,
+      "satuan": "/bulan",
+      "kategori": "Langganan",
+      "label": "",
+      "ikon": "gift"
+    }
+  ],
+  "keunggulan": [
+    {
+      "judul": "Petik pagi",
+      "isi": "Bunga datang dari petani setiap pagi.",
+      "ikon": "flower"
+    },
+    {
+      "judul": "Antar hari yang sama",
+      "isi": "Pesan sebelum jam 14.00.",
+      "ikon": "truck"
+    },
+    {
+      "judul": "Foto sebelum kirim",
+      "isi": "Kamu lihat buketnya sebelum diantar.",
+      "ikon": "phone"
+    },
+    {
+      "judul": "Kartu tulisan tangan",
+      "isi": "Pesanmu kami tulis dengan rapi.",
+      "ikon": "pen"
+    },
+    {
+      "judul": "Minim sampah",
+      "isi": "Bunga sisa jadi bunga kering.",
+      "ikon": "leaf"
+    },
+    {
+      "judul": "Garansi segar",
+      "isi": "Layu dalam 2 hari, kami ganti.",
+      "ikon": "star"
+    }
+  ],
+  "alur": [
+    {
+      "judul": "Pilih buket",
+      "isi": "Tekan Pesan atau kirim foto referensi."
+    },
+    {
+      "judul": "Tulis pesan",
+      "isi": "Isi kartu ucapan dan alamat penerima."
+    },
+    {
+      "judul": "Kami rangkai",
+      "isi": "Foto buket dikirim sebelum diantar."
+    },
+    {
+      "judul": "Diantar",
+      "isi": "Kurir kami mengantar dengan hati-hati."
+    }
+  ],
+  "ulasan": [
+    {
+      "isi": "Buketnya lebih cantik dari fotonya, istri saya terharu.",
+      "nama": "Rizky",
+      "keterangan": "Pelanggan"
+    },
+    {
+      "isi": "Dekorasi akad kami sederhana tapi sangat indah.",
+      "nama": "Nadia & Fikri",
+      "keterangan": "Dekorasi pernikahan"
+    },
+    {
+      "isi": "Bunga meja kantor selalu segar setiap Senin, tamu sering memuji.",
+      "nama": "PT Lumbung Data",
+      "keterangan": "Langganan kantor"
+    },
+    {
+      "isi": "Papan duka cita datang cepat di saat genting. Terima kasih.",
+      "nama": "Keluarga Wibowo",
+      "keterangan": "Pelanggan"
+    }
+  ],
+  "galeri": [
+    "Buket merah muda",
+    "Kelopak dari dekat",
+    "Buket merah",
+    "Pita dan kertas",
+    "Buket ungu",
+    "Buket krem"
+  ],
+  "paket": [
+    {
+      "nama": "Langganan Rumah",
+      "harga": 600000,
+      "satuan": "/bulan",
+      "ringkasan": "Bunga segar setiap minggu.",
+      "fitur": [
+        "4 rangkaian sedang",
+        "Vas pinjam",
+        "Antar setiap Senin",
+        "Bebas berhenti"
+      ],
+      "unggulan": false
+    },
+    {
+      "nama": "Langganan Kantor",
+      "harga": 950000,
+      "satuan": "/bulan",
+      "ringkasan": "Lobi dan meja resepsionis.",
+      "fitur": [
+        "4 rangkaian besar",
+        "Ganti tiap minggu",
+        "Perawatan vas",
+        "Faktur bulanan"
+      ],
+      "unggulan": true
+    },
+    {
+      "nama": "Dekorasi Acara",
+      "harga": 0,
+      "satuan": "sesuai konsep",
+      "ringkasan": "Akad, lamaran, dan acara kantor.",
+      "fitur": [
+        "Konsultasi & mood board",
+        "Bunga segar musiman",
+        "Pasang & bongkar",
+        "Tim di hari acara"
+      ],
+      "unggulan": false
+    }
+  ],
+  "jam": [
+    {
+      "hari": "Setiap hari",
+      "jam": "07.00 - 20.00 WIB"
+    }
+  ],
+  "faq": [
+    {
+      "tanya": "Bisa antar hari ini?",
+      "jawab": "Bisa untuk pesanan sebelum pukul 14.00 di Jakarta."
+    },
+    {
+      "tanya": "Apakah bisa kirim ke luar kota?",
+      "jawab": "Kami bekerja sama dengan florist mitra di kota besar."
+    },
+    {
+      "tanya": "Berapa lama bunga bertahan?",
+      "jawab": "4 sampai 7 hari bila air vas diganti setiap hari."
+    },
+    {
+      "tanya": "Bisa pesan bunga tertentu?",
+      "jawab": "Bisa, tergantung musim. Kami kabari ketersediaannya."
+    },
+    {
+      "tanya": "Apakah ada garansi?",
+      "jawab": "Bunga layu dalam 2 hari kami ganti."
+    },
+    {
+      "tanya": "Bisa merahasiakan nama pengirim?",
+      "jawab": "Bisa, tulis 'rahasia' di kartu ucapan."
+    }
+  ]
+}/*owd:end*/;
+/* ================================================================ */
+(function () {
+  var root = document.documentElement, reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var nama = ((document.querySelector(".logo span") || {}).textContent || "").trim();
+  var wa = String(CONFIG.whatsapp || "").replace(/\D/g, "");
+  function waLink(text) { return "https://wa.me/" + wa + "?text=" + encodeURIComponent(text); }
+  var rp = function (v) { return "Rp" + v.toLocaleString("id-ID").replace(/,/g, "."); };
+  document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = waLink("Halo " + nama + ", saya mau tanya."); });
+  /* Tombol Pesan / Pilih paket: pesan tersusun dari teks yang tampil (ikut berubah bila diedit). */
+  document.querySelectorAll("[data-order]").forEach(function (a) {
+    a.addEventListener("click", function () { var it = a.closest(".item"), h = it.querySelector("h3").textContent.trim(), p = it.querySelector(".price").textContent.replace(/\s+/g, " ").trim(); a.href = waLink(CONFIG.pesanPembuka + "\n- " + h + " (" + p + ")\n\nNama:\nCatatan:"); });
+  });
+  document.querySelectorAll("[data-plan]").forEach(function (a) {
+    a.addEventListener("click", function () { var pl = a.closest(".plan"), h = pl.querySelector("h3").textContent.trim(); a.href = waLink("Halo " + nama + ", saya tertarik " + h + " (" + pl.querySelector(".amount").textContent.replace(/\s+/g, " ").trim() + ").\n\nNama:\nKebutuhan:"); });
+  });
+  var y = document.querySelector("[data-year]"); if (y) y.textContent = new Date().getFullYear();
+
+  /* Menu ponsel. */
+  var nav = document.querySelector(".nav"), mb = document.querySelector(".menu-btn");
+  if (mb) { mb.addEventListener("click", function () { var o = nav.classList.toggle("open"); mb.setAttribute("aria-expanded", o); }); nav.querySelectorAll("ul a").forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); mb.setAttribute("aria-expanded", "false"); }); }); }
+
+  /* Status buka sekarang (waktu usaha = UTC + zonaWaktu). */
+  function mins(s) { var p = String(s).split(/[.:]/); return (+p[0] || 0) * 60 + (+p[1] || 0); }
+  function status() {
+    var now = new Date(Date.now() + (Number(CONFIG.zonaWaktu) || 7) * 3600e3), d = now.getUTCDay(), m = now.getUTCHours() * 60 + now.getUTCMinutes();
+    var on = (CONFIG.jamBuka || []).some(function (j) { var days = String(j.hari).split(",").map(Number), a = mins(j.buka), b = mins(j.tutup); return days.indexOf(d) >= 0 && (b > a ? m >= a && m < b : m >= a || m < b); });
+    document.querySelectorAll("[data-status]").forEach(function (el) { el.classList.toggle("on", on); el.classList.toggle("off", !on); el.lastElementChild.textContent = on ? "Buka sekarang" : "Sedang tutup"; });
+  }
+  status(); setInterval(status, 60000);
+
+  /* Saring katalog. */
+  var tabs = document.querySelectorAll(".tab"), items = document.querySelectorAll(".item");
+  tabs.forEach(function (t) { t.addEventListener("click", function () { var f = t.getAttribute("data-f"); tabs.forEach(function (x) { x.setAttribute("aria-pressed", String(x === t)); }); items.forEach(function (it) { it.hidden = f !== "all" && it.getAttribute("data-c") !== f; if (!it.hidden) it.classList.add("in"); }); }); });
+
+  /* Chip varian dari CONFIG.varian; objek 3D mendengarkan event owd:varian. */
+  var vbox = document.querySelector("[data-variants]");
+  if (vbox && Array.isArray(CONFIG.varian) && CONFIG.varian.length) {
+    vbox.querySelectorAll(".chip").forEach(function (c) { c.remove(); });
+    CONFIG.varian.forEach(function (v, i) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.setAttribute("aria-pressed", String(i === 0));
+      b.style.setProperty("--c1", v.warna1); b.style.setProperty("--c2", v.warna2);
+      b.appendChild(document.createElement("i")); b.appendChild(document.createTextNode(v.nama));
+      b.addEventListener("click", function () { vbox.querySelectorAll(".chip").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); document.dispatchEvent(new CustomEvent("owd:varian", { detail: i })); });
+      vbox.appendChild(b);
+    });
+  }
+
+  /* Formulir kontak → pesan WhatsApp. */
+  var form = document.querySelector("[data-form]");
+  if (form) form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = new FormData(form), lines = ["Halo " + nama + ",", "", "Nama: " + (f.get("nama") || ""), "Kebutuhan: " + (f.get("perlu") || "")];
+    if (f.get("tanggal")) lines.push("Tanggal: " + f.get("tanggal"));
+    if (f.get("pesan")) lines.push("", String(f.get("pesan")));
+    window.open(waLink(lines.join("\n")), "_blank", "noopener");
+  });
+
+  /* Muncul saat digulir. */
+  var rv = document.querySelectorAll("[data-rv]");
+  if (window.OWD_THUMB || reduce || !("IntersectionObserver" in window)) rv.forEach(function (el) { el.classList.add("in"); });
+  else { var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" }); rv.forEach(function (el) { io.observe(el); }); }
+
+  /* Menu aktif sesuai bagian yang sedang dibaca. */
+  var links = document.querySelectorAll(".nav ul a");
+  if ("IntersectionObserver" in window) { var io2 = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id); }); }); }, { rootMargin: "-45% 0px -50% 0px" }); document.querySelectorAll("main > section").forEach(function (s) { io2.observe(s); }); }
+})();
+</script>
+<script type="module">
+/* ---- Pemuat library: CDN utama + cadangan ---- */
+const CDN = ["https://cdn.jsdelivr.net/npm/","https://unpkg.com/"];
+function race(path, get) {
+  const order = CDN.slice();
+  return new Promise((ok, no) => {
+    let i = 0, fails = 0, done = false;
+    const next = () => {
+      const cdn = order[i++], url = cdn + path;
+      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
+      if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
+    };
+    next();
+  });
+}
+const esm = (path) => race(path, (u) => import(u));
+const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
+const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
+const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
+/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, situs tetap jalan. */
+await umd("motion@11.11.13/dist/motion.js").catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
+
+/* Pose objek per bagian (urutan = section data-pose) & sudut foto galeri. */
+const POSES = [{"x":-0.5,"y":-0.05,"s":1,"ry":-0.55,"rx":0.14,"o":1,"ny":1.05,"ns":0.62,"no":1,"bld":0,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.56,"y":0,"s":0.9,"ry":0.8,"rx":0.22,"o":1,"ny":1,"ns":0.5,"no":0.3,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.7,"y":0.35,"s":0.5,"ry":2,"rx":0.1,"o":0.16,"ny":0.4,"ns":0.45,"no":0.08,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.56,"y":-0.05,"s":0.95,"ry":3.3,"rx":0.18,"o":1,"ny":1,"ns":0.5,"no":0.32,"bld":1,"exp":0,"orb":0,"lay":1,"dive":0,"dis":0},{"x":0.56,"y":0.05,"s":0.85,"ry":4.3,"rx":-0.1,"o":1,"ny":1,"ns":0.5,"no":0.32,"bld":1,"exp":0,"orb":0,"lay":0,"dive":1,"dis":0},{"x":0,"y":0.25,"s":1.3,"ry":5.4,"rx":0.2,"o":0.12,"ny":0.3,"ns":0.7,"no":0.08,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0,"y":0,"s":0.6,"ry":6.2,"rx":0.1,"o":0.06,"ny":0,"ns":0.4,"no":0.05,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.66,"y":0.2,"s":0.55,"ry":7,"rx":0.1,"o":0.14,"ny":0.4,"ns":0.45,"no":0.08,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.66,"y":0.1,"s":0.6,"ry":7.8,"rx":0.1,"o":0.18,"ny":0.4,"ns":0.45,"no":0.1,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.56,"y":0,"s":0.9,"ry":8.7,"rx":0.2,"o":1,"ny":1,"ns":0.5,"no":0.32,"bld":1,"exp":0,"orb":1,"lay":0,"dive":0,"dis":0},{"x":0.52,"y":0,"s":1.05,"ry":9.6,"rx":0.14,"o":1,"ny":1,"ns":0.55,"no":0.35,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":1}];
+const SHOTS = [{"ry":-0.6,"rx":0.2,"v":0,"z":6.4,"y":0.4},{"ry":0.9,"rx":0.35,"v":1,"z":5.6,"y":1.2},{"ry":2.4,"rx":0.05,"v":2,"z":6.8,"y":0},{"ry":-2.2,"rx":0.5,"v":0,"z":5.2,"y":2},{"ry":3.4,"rx":0.15,"v":1,"z":4.6,"y":0.3},{"ry":-1.2,"rx":-0.15,"v":2,"z":7.2,"y":-0.6}];
+/* Cerita scroll: benih di hero (tunas) lalu objek tersusun dengan gaya "grow". */
+/* Storyboard: keunggulan: lapisan berpilin → alur: menyelam → faq: orbit → kontak: partikel nama | dunia: kelopak mekar berpusar */
+const STORY = {"seed":"sprout","act":"burst","build":"grow","world":"bloom","variant":""};
+
+/* ---- Objek 3D (prosedural, tanpa model/tekstur eksternal) ---- */
+function buildModel(K, THREE, COL, BRAND) {
+  const M = K.M;
+  K.lathe([[.06,0],[.95,1.65],[.9,1.68],[.04,.04]], M.m3, {}, 40);
+  K.tor(.32, .05, M.m1, { p: [0, .55, 0], r: [Math.PI / 2, 0, 0] });
+  const stem = K.std("#4f8a3c");
+  const flower = (p, c, k) => { const f = K.grp({ p, r: [(K.rnd() - .5) * .6, 0, (K.rnd() - .5) * .6] }); for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; K.sph(.2 * k, c, { p: [Math.cos(a) * .2 * k, 0, Math.sin(a) * .2 * k], r: [0, -a, .5], s: [1.1, .35, .7], to: f }); } K.sph(.11 * k, M.m3, { p: [0, .05, 0], to: f }); K.cyl(.02, .02, 1.5, stem, { p: [0, -.75, 0], to: f }); };
+  [[0,2.0,0],[.45,1.85,.2],[-.45,1.85,.15],[.2,1.7,-.4],[-.25,1.72,-.38],[.05,1.62,.48],[-.55,1.55,-.05],[.6,1.55,-.15]].forEach((p, i) => flower(p, i % 2 ? M.m2 : M.m1, i ? .9 : 1.1));
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; K.sph(.3, stem, { p: [Math.cos(a) * .6, 1.55, Math.sin(a) * .6], r: [0, -a, .8], s: [1.2, .2, .45] }); }
+}
+/* ---- Benih cerita (muncul di hero sebelum objek dirakit) ---- */
+function buildSeed(K, THREE, COL) {
+  const M = K.M;
+  K.cyl(0.55, 0.45, 0.3, K.std("#6b4a2b", { roughness: 0.9 }), { p: [0, -0.6, 0] });
+  const g = K.std("#5aa04a", { roughness: 0.45 });
+  K.cyl(0.035, 0.045, 0.8, g, { p: [0, -0.1, 0] });
+  K.sph(0.3, g, { p: [-0.22, 0.32, 0], s: [1.2, 0.3, 0.6], r: [0, 0.3, 0.5] }); K.sph(0.26, g, { p: [0.2, 0.2, 0], s: [1.2, 0.3, 0.6], r: [0, -0.3, -0.5] });
+}
+/* ---- Dunia di dalam objek saat menyelam: bloom ---- */
+function buildWorld(W) {
+  const THREE = W.THREE;
+  const N = 220, geo = new THREE.SphereGeometry(0.22, 12, 8).scale(1, 0.22, 0.5), ms = [W.wstd(W.COL.accent, 1), W.wstd(W.COL.accent2, 1)];
+  const meshes = ms.map((m) => { const im = new THREE.InstancedMesh(geo, m, N / 2); im.frustumCulled = false; W.world.add(im); return im; });
+  const dm = new THREE.Object3D(), GA = 2.39996;
+  const core = W.K.spr(W.ink, 3.5, { to: W.world, p: [0, 0, -6] }); core.material.userData.o = 0.6; W.wm.push(core.material);
+  return { tick(dt, t) {
+    for (let i = 0; i < N; i++) { const f = ((t * 0.07 + i / N) % 1), r = f * 5.2, an = i * GA + t * 0.25; dm.position.set(Math.cos(an) * r, Math.sin(an) * r, -6 + f * 6); dm.rotation.set(0.6, 0, an); dm.scale.setScalar(0.4 + f * 1.1); dm.updateMatrix(); meshes[i % 2].setMatrixAt(i >> 1, dm.matrix); }
+    meshes.forEach((m) => (m.instanceMatrix.needsUpdate = true));
+  } };
+}
+function floatGeo(THREE) { return [new THREE.SphereGeometry(0.16, 14, 10).scale(1, 0.25, 0.55), new THREE.SphereGeometry(0.12, 14, 10).scale(1, 0.25, 0.5), new THREE.SphereGeometry(0.07, 12, 8), new THREE.SphereGeometry(0.14, 14, 10).scale(0.5, 0.25, 1)]; }
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const root = document.documentElement;
+/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+const G = window.OWDScrub, ST = G && G.ScrollTrigger, Mo = window.Motion;
+const hasG = !!(G && ST);
+const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+const COL = { bg: cssv("--bg"), surface: cssv("--surface"), ink: cssv("--ink"), accent: cssv("--accent"), accent2: cssv("--accent-2") };
+const BRAND = ((document.querySelector(".logo span") || {}).textContent || "").trim();
+const secs = Array.prototype.slice.call(document.querySelectorAll("[data-pose]"));
+const S = Object.assign({}, POSES[0]);
+const animated = !reduce && hasG;
+
+/* 1) Gulir halus + pose objek per bagian (OWD Scrub). */
+let lenis = null;
+if (hasG) G.registerPlugin(ST);
+if (animated) {
+  lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  lenis.on("scroll", ST.update);
+  G.ticker.add((time) => lenis.raf(time * 1000));
+  G.ticker.lagSmoothing(0);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    const el = a && a.getAttribute("href").length > 1 && document.getElementById(a.getAttribute("href").slice(1));
+    if (!el) return;
+    e.preventDefault();
+    lenis.scrollTo(el, { offset: el.id === "beranda" ? 0 : -66, duration: 1.4 });
+  });
+  G.to(".progress i", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: true } });
+  for (let i = 1; i < secs.length; i++) {
+    G.timeline({ scrollTrigger: { trigger: secs[i], start: "top bottom", end: "top 30%", scrub: 1 } })
+      .fromTo(S, Object.assign({}, POSES[i - 1]), Object.assign({}, POSES[i], { ease: "none", immediateRender: false }));
+  }
+} else if ("IntersectionObserver" in window) {
+  /* Tanpa mesin scroll / kurangi gerak: pose melompat ke bagian yang sedang dibaca. */
+  const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) Object.assign(S, POSES[secs.indexOf(e.target)]); }), { rootMargin: "-50% 0px -50% 0px" });
+  secs.forEach((s) => io.observe(s));
+}
+
+/* 2) Motion: judul hero per kata, angka berjalan, tombol magnetis. */
+if (!reduce && Mo && !window.OWD_THUMB) {
+  const { animate, inView, stagger } = Mo;
+  const ease = [0.2, 0.7, 0.2, 1];
+  const h1 = document.getElementById("hero-t");
+  if (h1) {
+    const words = h1.textContent.trim().split(/\s+/);
+    h1.setAttribute("aria-label", h1.textContent.trim());
+    h1.textContent = "";
+    words.forEach((w, i) => { const s = document.createElement("span"); s.setAttribute("aria-hidden", "true"); s.style.display = "inline-block"; s.textContent = w; h1.appendChild(s); if (i < words.length - 1) h1.appendChild(document.createTextNode(" ")); });
+    animate(h1.querySelectorAll("span"), { opacity: [0, 1], y: [36, 0], rotate: [4, 0] }, { delay: stagger(0.05, { startDelay: 0.1 }), duration: 0.8, ease });
+  }
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const m = /^(\D*)(\d+(?:[.,]\d+)?)(.*)$/.exec(el.textContent.trim());
+    if (!m) return;
+    const raw = m[2], dec = /,\d+$/.test(raw) ? raw.split(",")[1].length : 0, target = parseFloat(raw.replace(/\./g, "").replace(",", "."));
+    const fmt = (v) => m[1] + (dec ? v.toFixed(dec).replace(".", ",") : Math.round(v).toLocaleString("id-ID").replace(/,/g, ".")) + m[3];
+    inView(el, () => { animate(0, target, { duration: 1.6, ease, onUpdate: (v) => { el.textContent = fmt(v); } }); }, { amount: 0.6 });
+  });
+  if (matchMedia("(pointer: fine)").matches) document.querySelectorAll(".hero .btn, .plan .btn").forEach((b) => {
+    b.addEventListener("pointermove", (e) => { const r = b.getBoundingClientRect(); animate(b, { x: (e.clientX - r.left - r.width / 2) * 0.2, y: (e.clientY - r.top - r.height / 2) * 0.3 }, { type: "spring", stiffness: 320, damping: 18 }); });
+    b.addEventListener("pointerleave", () => { animate(b, { x: 0, y: 0 }, { type: "spring", stiffness: 260, damping: 14 }); });
+  });
+}
+
+/* 3) Three.js */
+function fail(reason) { root.classList.add("no-webgl"); root.classList.remove("loading"); console.warn("[owd] 3D tidak aktif:", reason); }
+function hasWebGL() { try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; } }
+const canvas = document.getElementById("gl");
+if (!hasWebGL()) fail("WebGL tidak tersedia");
+else { try { start(); } catch (e) { fail(e && e.message ? e.message : String(e)); } }
+
+function start() {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.set(0, 0, 8);
+  const textures = [], disposables = [];
+  const track = (x) => { disposables.push(x); return x; };
+
+  /* Lingkungan pantulan buatan (tanpa HDR eksternal). */
+  const pm = new THREE.PMREMGenerator(renderer), env = new THREE.Scene();
+  env.add(new THREE.Mesh(new THREE.BoxGeometry(12, 12, 12), new THREE.MeshBasicMaterial({ color: 0x6f6f74, side: THREE.BackSide })));
+  const panel = (c, k, p, w, h) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(p[0], p[1], p[2]); m.lookAt(0, 0, 0); env.add(m); };
+  panel("#ffffff", 5, [0, 5, 0], 7, 7); panel("#ffffff", 3, [-5, 1, 2], 3, 6); panel(COL.accent, 2.5, [5, 0, -2], 3, 6); panel("#ffffff", 2, [0, 0, 5], 5, 2);
+  const envTex = pm.fromScene(env, 0.04).texture; scene.environment = envTex; textures.push(envTex);
+  env.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+  pm.dispose();
+  scene.add(new THREE.HemisphereLight(0xffffff, new THREE.Color(COL.bg), 0.6));
+  const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(3, 6, 5); scene.add(key);
+  const rim = new THREE.DirectionalLight(new THREE.Color(COL.accent), 1.4); rim.position.set(-5, 2, -4); scene.add(rim);
+
+  /* Tekstur kanvas. */
+  function glowTex() {
+    const c = document.createElement("canvas"); c.width = c.height = 128;
+    const g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(0.35, "rgba(255,255,255,.35)"); r.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c); textures.push(t); return t;
+  }
+  const GLOW = glowTex();
+  const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  function canvasTex(w, h, draw, repeat) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    draw(c.getContext("2d"), w, h);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+    if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat, repeat); }
+    textures.push(t); return t;
+  }
+  /* Pola abu-abu: warna bahan (varian) yang mewarnainya. */
+  const PATTERNS = {
+    batik: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.fillStyle = "#6a6a6a"; for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { const cx = x * 64 + 32, cy = y * 64 + 32; for (let k = 0; k < 4; k++) { g.save(); g.translate(cx, cy); g.rotate(k * Math.PI / 2 + Math.PI / 4); g.beginPath(); g.ellipse(0, -16, 9, 15, 0, 0, 7); g.fill(); g.restore(); } g.beginPath(); g.arc(cx, cy, 4, 0, 7); g.fill(); } },
+    parang: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.strokeStyle = "#5c5c5c"; g.lineWidth = 12; for (let i = -4; i < 8; i++) { g.beginPath(); for (let t = 0; t <= 1; t += .05) { const x = i * 48 + t * 256, y = t * 256 + Math.sin(t * Math.PI * 6) * 12; t ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } },
+    stripe: (g, w) => { g.fillStyle = "#1a1a1a"; g.fillRect(0, 0, w, w); g.fillStyle = "#fff"; for (let i = -4; i < 8; i++) { g.beginPath(); g.moveTo(i * 64, 0); g.lineTo(i * 64 + 32, 0); g.lineTo(i * 64 + 32 + 64, w); g.lineTo(i * 64 + 64, w); g.fill(); } },
+    dots: (g, w) => { g.fillStyle = "#e6e6e6"; g.fillRect(0, 0, w, w); g.fillStyle = "#3a3a3a"; for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { g.beginPath(); g.arc(x * 16 + 8 + (y % 2) * 8, y * 16 + 8, 4, 0, 7); g.fill(); } },
+    grid: (g, w) => { g.fillStyle = "#ffffff"; g.fillRect(0, 0, w, w); g.strokeStyle = "#9a9a9a"; g.lineWidth = 3; for (let i = 0; i <= 8; i++) { g.beginPath(); g.moveTo(i * 32, 0); g.lineTo(i * 32, w); g.moveTo(0, i * 32); g.lineTo(w, i * 32); g.stroke(); } },
+    globe: (g, w) => { g.fillStyle = "#8a8a8a"; g.fillRect(0, 0, w, w); g.fillStyle = "#fff"; [[40,70,40,28],[90,150,30,46],[160,80,52,30],[200,160,30,22],[130,60,18,14]].forEach(([x, y, a, b]) => { g.beginPath(); g.ellipse(x, y, a, b, .4, 0, 7); g.fill(); }); },
+    rings: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); for (let i = 8; i > 0; i--) { g.fillStyle = i % 2 ? "#777" : "#fff"; g.beginPath(); g.arc(w * .6, w * .45, i * 18, 0, 7); g.fill(); } },
+  };
+  const REP = { batik: 2, parang: 2, dots: 3, grid: 2, stripe: 1, globe: 1, rings: 1 };
+
+  /* Bahan. Varian (CONFIG.varian) mewarnai m1 & m2. */
+  const VAR = Array.isArray(CONFIG.varian) && CONFIG.varian.length ? CONFIG.varian : [{ warna1: COL.accent, warna2: COL.accent2 }];
+  const std = (c, o) => track(new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.45, metalness: 0 }, o || {})));
+  const M = {
+    m1: std(VAR[0].warna1, { roughness: 0.38 }), m2: std(VAR[0].warna2, { roughness: 0.45 }),
+    m3: std("#f3efe7", { roughness: 0.5 }), dk: std("#1f2026", { roughness: 0.5 }),
+    mt: std("#c9cdd4", { metalness: 1, roughness: 0.28 }), au: std("#d9aa4b", { metalness: 1, roughness: 0.3 }),
+    gl: track(new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: 0.05, metalness: 0, transparent: true, opacity: 0.28, envMapIntensity: 1.6, depthWrite: false })),
+    gl2: std("#1b2331", { roughness: 0.08, metalness: 0.6 }),
+  };
+
+  /* Alat bantu menyusun objek. */
+  const model = new THREE.Group();
+  let seed = 11, target = model;
+  function put(o, opt) {
+    opt = opt || {};
+    if (opt.p) o.position.set(opt.p[0] || 0, opt.p[1] || 0, opt.p[2] || 0);
+    if (opt.r) o.rotation.set(opt.r[0] || 0, opt.r[1] || 0, opt.r[2] || 0);
+    if (opt.s) o.scale.set(opt.s[0], opt.s[1], opt.s[2]);
+    (opt.to || target).add(o); return o;
+  }
+  const mesh = (geo, mat, opt) => put(new THREE.Mesh(track(geo), mat), opt);
+  function rbox(w, h, d, r) {
+    if (!r) return new THREE.BoxGeometry(w, h, d);
+    const b = Math.min(r * 0.7, d * 0.45, w * 0.45, h * 0.45), cr = Math.max(0.001, Math.min(r, w / 2, h / 2) - b);
+    const ww = w - 2 * b, hh = h - 2 * b, sh = new THREE.Shape(), x = -ww / 2, y = -hh / 2;
+    sh.moveTo(x + cr, y); sh.lineTo(x + ww - cr, y); sh.quadraticCurveTo(x + ww, y, x + ww, y + cr); sh.lineTo(x + ww, y + hh - cr); sh.quadraticCurveTo(x + ww, y + hh, x + ww - cr, y + hh); sh.lineTo(x + cr, y + hh); sh.quadraticCurveTo(x, y + hh, x, y + hh - cr); sh.lineTo(x, y + cr); sh.quadraticCurveTo(x, y, x + cr, y);
+    const g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(0.001, d - 2 * b), bevelEnabled: true, bevelSize: b, bevelThickness: b, bevelSegments: 4, curveSegments: 8 });
+    g.center(); return g;
+  }
+  const K = {
+    M, rr, mesh,
+    rnd: () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; },
+    grp: (opt) => put(new THREE.Group(), opt),
+    std: (c, o) => std(c, o),
+    lathe: (pts, mat, opt, seg) => mesh(new THREE.LatheGeometry(pts.map((q) => new THREE.Vector2(q[0], q[1])), seg || 56), mat, opt),
+    box: (w, h, d, r, mat, opt) => mesh(rbox(w, h, d, r), mat, opt),
+    cyl: (rt, rb, h, mat, opt, seg, open) => mesh(new THREE.CylinderGeometry(rt, rb, h, seg || 40, 1, !!open), mat, opt),
+    sph: (r, mat, opt) => mesh(new THREE.SphereGeometry(r, 32, 20), mat, opt),
+    tor: (R, t, mat, opt, arc) => mesh(new THREE.TorusGeometry(R, t, 16, 64, arc || Math.PI * 2), mat, opt),
+    cap: (r, len, mat, opt) => mesh(new THREE.CapsuleGeometry(r, len, 8, 24), mat, opt),
+    plane: (w, h, mat, opt) => mesh(new THREE.PlaneGeometry(w, h), mat, opt),
+    ext: (pts, depth, mat, opt, bev) => { const sh = new THREE.Shape(pts.map((q) => new THREE.Vector2(q[0], q[1]))); const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: bev > 0, bevelSize: bev || 0, bevelThickness: bev || 0, bevelSegments: 3, curveSegments: 16 }); if (!(opt && opt.keep)) g.center(); return mesh(g, mat, opt); },
+    screen: (w, h, draw) => track(new THREE.MeshBasicMaterial({ map: canvasTex(w, h, draw), toneMapped: false })),
+    tex: (kind) => canvasTex(256, 256, PATTERNS[kind] || PATTERNS.grid, REP[kind] || 1),
+    spr: (c, size, opt) => { const s = put(new THREE.Sprite(track(new THREE.SpriteMaterial({ map: GLOW, color: c, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }))), opt); s.scale.setScalar(size); return s; },
+    tick: null,
+    target: (g) => { target = g; },
+  };
+  K.g = model;
+  buildModel(K, THREE, COL, BRAND);
+
+  /* Ukuran & titik tengah objek diseragamkan. */
+  model.updateMatrixWorld(true);
+  const bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), mid = bb.getCenter(new THREE.Vector3());
+  const k = 2.7 / Math.max(size.x, size.y, size.z);
+  const fit = new THREE.Group(); fit.add(model); model.position.sub(mid); fit.scale.setScalar(k);
+  const spin = new THREE.Group(); spin.add(fit);
+  const pivot = new THREE.Group(); pivot.add(spin); scene.add(pivot);
+  const shadow = new THREE.Mesh(track(new THREE.PlaneGeometry(1, 1)), track(new THREE.MeshBasicMaterial({ map: GLOW, color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false })));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = -size.y * k / 2 - 0.08; shadow.scale.set(3.4, 3.4, 1); pivot.add(shadow);
+
+  /* Partikel latar: bentuk kecil melayang. */
+  const floaters = new THREE.Group(); scene.add(floaters);
+  const fm = [std(COL.accent, { roughness: 0.4 }), std(COL.accent2, { roughness: 0.4 }), track(M.m3.clone())].map((x) => { x.transparent = true; x.opacity = 0.55; x.depthWrite = false; return x; });
+  const fg = floatGeo(THREE).map(track);
+  for (let i = 0; i < 12; i++) { const f = new THREE.Mesh(fg[i % 4], fm[i % 3]); f.position.set((K.rnd() - 0.5) * 13, (K.rnd() - 0.5) * 8, -1.5 - K.rnd() * 4); f.userData.v = 0.2 + K.rnd() * 0.5; f.userData.y = f.position.y; floaters.add(f); }
+
+/* ---- Cerita scroll: benih → rakit → urai → menyelam → partikel nama ---- */
+  const sm = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+  /* Benih di hero (dinormalkan, ikut diputar). */
+  const seedG = new THREE.Group();
+  K.target(seedG); buildSeed(K, THREE, COL); K.target(model);
+  seedG.updateMatrixWorld(true);
+  const sb = new THREE.Box3().setFromObject(seedG), ssz = sb.getSize(new THREE.Vector3()), smid = sb.getCenter(new THREE.Vector3());
+  const seedFit = new THREE.Group(); seedFit.add(seedG); seedG.position.sub(smid); seedFit.scale.setScalar(2.1 / Math.max(ssz.x, ssz.y, ssz.z));
+  const seedSpin = new THREE.Group(); seedSpin.add(seedFit); spin.add(seedSpin);
+
+  /* Potongan objek: tiap mesh dibungkus dua grup supaya bisa digeser, diputar, dan diskalakan di titik tengahnya
+     tanpa mengganggu animasi bawaan objek (K.tick). */
+  model.updateMatrixWorld(true);
+  const invModel = new THREE.Matrix4().copy(model.matrixWorld).invert();
+  const leaves = []; model.traverse((o) => { if ((o.isMesh || o.isSprite) && o !== model) leaves.push(o); });
+  const parts = [];
+  let minY = Infinity, maxY = -Infinity, maxR = 0;
+  for (const o of leaves) {
+    const par = o.parent;
+    const box = new THREE.Box3().setFromObject(o);
+    if (box.isEmpty()) continue;
+    const cw = box.getCenter(new THREE.Vector3());
+    const cm = cw.clone().applyMatrix4(invModel).sub(mid);               /* pusat di ruang objek (relatif titik tengah) */
+    const A = new THREE.Matrix4().copy(par.matrixWorld).invert().multiply(model.matrixWorld);
+    const A3 = new THREE.Matrix3().setFromMatrix4(A);
+    const cl = cw.clone().applyMatrix4(new THREE.Matrix4().copy(par.matrixWorld).invert()); /* pusat di ruang induk */
+    const w1 = new THREE.Group(), w2 = new THREE.Group();
+    w1.position.copy(cl); w2.position.copy(cl).negate();
+    const idx = par.children.indexOf(o); par.remove(o); w2.add(o); w1.add(w2); par.add(w1);
+    if (idx >= 0) { par.children.splice(par.children.indexOf(w1), 1); par.children.splice(idx, 0, w1); }
+    const r = K.rnd();
+    parts.push({ w1, cl, cm, A3, r, oa: 0, rx: (K.rnd() - 0.5) * 2.4, rz: (K.rnd() - 0.5) * 2.4, a: K.rnd() * Math.PI * 2 });
+    minY = Math.min(minY, cm.y); maxY = Math.max(maxY, cm.y); maxR = Math.max(maxR, cm.length());
+  }
+  const spanY = Math.max(1e-3, maxY - minY);
+  parts.forEach((p, i) => (p.oa = (i / Math.max(1, parts.length)) * Math.PI * 2));
+  parts.forEach((p) => { p.rank = STORY.build === "drop" ? (p.cm.y - minY) / spanY * 0.85 + p.r * 0.15 : STORY.build === "grow" ? p.cm.length() / Math.max(1e-3, maxR) * 0.7 + p.r * 0.3 : p.r; });
+  const tmp = new THREE.Vector3();
+  const U = 1 / k; /* satu satuan layar (objek dinormalkan 2,7) dalam satuan objek */
+
+  /* Partikel: titik dari permukaan objek, berubah menjadi nama usaha. */
+  const NP = 3200;
+  const base = new Float32Array(NP * 3), txt = new Float32Array(NP * 3), pos = new Float32Array(NP * 3), del = new Float32Array(NP);
+  {
+    spin.updateMatrixWorld(true);
+    const verts = []; let total = 0;
+    leaves.forEach((o) => { if (o.isMesh && o.geometry.attributes.position) total += o.geometry.attributes.position.count; });
+    const stride = Math.max(1, Math.floor(total / NP));
+    const v = new THREE.Vector3();
+    leaves.forEach((o) => { if (!o.isMesh) return; const pa = o.geometry.attributes.position; for (let i = 0; i < pa.count && verts.length < NP * 3; i += stride) { v.fromBufferAttribute(pa, i).applyMatrix4(o.matrixWorld); verts.push(v.x, v.y, v.z); } });
+    for (let i = 0; i < NP; i++) { const j = (i % Math.max(1, verts.length / 3)) * 3; base[i * 3] = verts[j] || 0; base[i * 3 + 1] = verts[j + 1] || 0; base[i * 3 + 2] = verts[j + 2] || 0; del[i] = K.rnd(); }
+    const c = document.createElement("canvas"), W = 640, H = 200; c.width = W; c.height = H;
+    const g = c.getContext("2d"), word = (BRAND || "OneWebDev").slice(0, 24);
+    let fs = 150; const fam = (getComputedStyle(root).getPropertyValue("--fd") || "sans-serif");
+    do { g.font = "800 " + fs + "px " + fam; fs -= 6; } while (g.measureText(word).width > W * 0.94 && fs > 24);
+    g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(word, W / 2, H / 2);
+    const d = g.getImageData(0, 0, W, H).data, tp = [];
+    for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 128) tp.push(x, y);
+    const n = Math.max(1, tp.length / 2), sc = 3.2 / W;
+    for (let i = 0; i < NP; i++) { const j = ((i * 7919) % n) * 2; txt[i * 3] = (tp[j] - W / 2) * sc + (K.rnd() - 0.5) * 0.02; txt[i * 3 + 1] = -(tp[j + 1] - H / 2) * sc; txt[i * 3 + 2] = (K.rnd() - 0.5) * 0.12; }
+  }
+  /* Latar gelap: titik bercahaya (aditif); latar terang: titik biasa supaya tetap kontras. */
+  const darkBg = new THREE.Color(COL.bg).getHSL({ h: 0, s: 0, l: 0 }).l < 0.4;
+  const blend = darkBg ? THREE.AdditiveBlending : THREE.NormalBlending;
+  const pgeo = track(new THREE.BufferGeometry()); pgeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const pmat = track(new THREE.PointsMaterial({ size: darkBg ? 0.09 : 0.07, map: GLOW, color: new THREE.Color(COL.accent).lerp(new THREE.Color("#ffffff"), darkBg ? 0.45 : 0), transparent: true, opacity: 0, depthWrite: false, sizeAttenuation: true, blending: blend, toneMapped: false }));
+  const points = new THREE.Points(pgeo, pmat); points.visible = false; points.frustumCulled = false; pivot.add(points);
+
+  /* Dunia di dalam objek: berbeda per template (buildWorld, lihat bizWorlds.ts). */
+  const world = new THREE.Group(); world.visible = false; scene.add(world);
+  const ink = darkBg ? "#ffffff" : COL.ink, wm = [];
+  const fade = (m, o) => { m.transparent = true; m.opacity = 0; m.depthWrite = false; m.userData.o = o == null ? 0.85 : o; wm.push(track(m)); return m; };
+  const WB = {
+    THREE, K, COL, world, ink, wm, rnd: K.rnd, variant: STORY.variant || "",
+    wmat: (c, o) => fade(new THREE.MeshBasicMaterial({ color: c, blending: blend, toneMapped: false, side: THREE.DoubleSide }), o),
+    wstd: (c, o) => fade(new THREE.MeshStandardMaterial({ color: c, roughness: 0.45, metalness: 0.2 }), o),
+    wline: (c, o) => fade(new THREE.LineBasicMaterial({ color: c, blending: blend, toneMapped: false }), o),
+    wpts: (arr, size, c, o) => { const g = track(new THREE.BufferGeometry()); g.setAttribute("position", new THREE.BufferAttribute(arr, 3)); const p = new THREE.Points(g, fade(new THREE.PointsMaterial({ size, map: GLOW, color: new THREE.Color(c), blending: blend, toneMapped: false, sizeAttenuation: true }), o == null ? 1 : o)); p.frustumCulled = false; world.add(p); return p; },
+    loop: (o, v, dt, far, lim) => { o.position.z += (dt || 0) * v; if (o.position.z > (lim || 7.5)) o.position.z -= far || 30; },
+  };
+  WB.stream = (n, r0, r1, v, size, c) => { const a = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const an = K.rnd() * Math.PI * 2, rr = r0 + K.rnd() * (r1 - r0); a[i * 3] = Math.cos(an) * rr; a[i * 3 + 1] = Math.sin(an) * rr; a[i * 3 + 2] = 7 - K.rnd() * 30; } const p = WB.wpts(a, size, c); return (dt) => { for (let i = 0; i < n; i++) { a[i * 3 + 2] += (dt || 0) * v; if (a[i * 3 + 2] > 7.5) a[i * 3 + 2] -= 30; } p.geometry.attributes.position.needsUpdate = true; }; };
+  const core = K.spr(COL.accent, 6, { to: world, p: [0, 0, -22] }); fade(core.material, 0.9);
+  const W3 = buildWorld(WB);
+  world.traverse((o) => { if (o.geometry) track(o.geometry); });
+
+  const FIXED = { bld: 1, exp: 0, orb: 0, lay: 0, dive: 0, dis: 0 };
+  const qv = new THREE.Quaternion(), ev = new THREE.Euler();
+  let lastKey = "";
+  /** Terapkan kanal cerita ke potongan, benih, partikel, dan dunia. */
+  function story(C, t, dt) {
+    const bld = C.bld, exp = C.exp, dis = C.dis, orb = C.orb || 0, lay = C.lay || 0;
+    const key = bld.toFixed(4) + exp.toFixed(4) + dis.toFixed(4) + orb.toFixed(4) + lay.toFixed(4) + (orb > 0.001 ? t.toFixed(3) : "");
+    if (key !== lastKey) {
+      lastKey = key;
+      for (const p of parts) {
+        const q = Math.max(0, Math.min(1, bld * 1.9 - p.rank * 0.9)), e = 1 - Math.pow(1 - q, 3), ie = 1 - e;
+        let ox = 0, oy = 0, oz = 0, s = 1, rx = 0, rz = 0;
+        if (STORY.build === "drop") { oy = ie * (3.4 + p.rank * 1.8); ox = ie * (p.r - 0.5) * 0.6; rx = ie * p.rx; rz = ie * p.rz; s = q > 0 ? 0.5 + 0.5 * e : 0; }
+        else if (STORY.build === "spiral") { const a = p.a + ie * 5, R = ie * 3; ox = Math.cos(a) * R; oz = Math.sin(a) * R; oy = ie * (p.r - 0.35) * 2.2; rx = ie * p.rx * 2; rz = ie * p.rz; s = q > 0 ? 0.35 + 0.65 * e : 0; }
+        else { tmp.copy(p.cm).multiplyScalar(-ie / U); ox = tmp.x; oy = tmp.y; oz = tmp.z; s = e; rz = ie * p.rz; }
+        if (exp > 0) { const L = p.cm.length() || 1, f = exp * (0.38 + p.r * 0.32); ox += p.cm.x / L * f; oy += p.cm.y / L * f * 0.9 + exp * (p.cm.y > 0 ? 0.12 : -0.12); oz += p.cm.z / L * f; rx += exp * p.rx * 0.25; rz += exp * p.rz * 0.25; }
+        /* Orbit: potongan berputar mengelilingi pusat seperti korsel. */
+        if (orb > 0) { const a = p.oa + t * 0.45, R = 2.2 + p.r * 0.5; ox += orb * (Math.cos(a) * R - p.cm.x / U); oy += orb * ((p.r - 0.5) * 0.7 + Math.sin(a * 2) * 0.18 - p.cm.y / U); oz += orb * (Math.sin(a) * R - p.cm.z / U); rx += orb * a * 0.5; s *= 1 - orb * 0.3; }
+        /* Lapisan berpilin: potongan terpisah per ketinggian lalu tiap lapis diputar. */
+        let ry = 0;
+        if (lay > 0) { const ly = (p.cm.y - minY) / spanY - 0.5; oy += lay * ly * 2.4; ox += lay * (p.r - 0.5) * 0.35; ry = lay * ly * 2.2; }
+        if (dis > 0) s *= 1 - sm(0.02 + p.r * 0.18, 0.2 + p.r * 0.18, dis);
+        tmp.set(ox * U, oy * U, oz * U).applyMatrix3(p.A3);
+        p.w1.position.copy(p.cl).add(tmp);
+        p.w1.rotation.set(rx, ry, rz);
+        p.w1.scale.setScalar(Math.max(1e-4, s));
+        p.w1.visible = s > 0.002;
+      }
+    }
+    /* Benih: diam di hero, lalu beraksi dan menghilang. */
+    const sk = Math.min(1, bld / 0.42), seedVis = 1 - sm(0.28, 0.5, bld);
+    seedSpin.visible = seedVis > 0.002;
+    if (seedSpin.visible) {
+      if (STORY.act === "strike") { seedSpin.rotation.set(0, 0, sk > 0 ? Math.sin(sk * Math.PI * 5) * 0.9 : 0); seedSpin.position.set(-0.6 * sk, 0.3 * sk, 0.4 * sk); seedSpin.scale.setScalar(Math.max(1e-4, seedVis)); }
+      else { const pop = 1 + sm(0, 0.55, sk) * 0.45; seedSpin.rotation.set(0, sk * 4, 0); seedSpin.position.set(0, 0, 0); seedSpin.scale.setScalar(Math.max(1e-4, pop * seedVis)); }
+      /* Benih selalu menghadap layar (tidak ikut putar otomatis), tetap bisa digeser. */
+      seedFit.rotation.y = -(spin.rotation.y - user.ry) + (dt ? Math.sin(t * 0.8) * 0.55 : 0.35);
+    }
+    /* Partikel nama usaha. */
+    points.visible = dis > 0.01;
+    if (points.visible) {
+      pmat.opacity = sm(0.02, 0.22, dis) * (0.85 + 0.15 * Math.sin(t * 3));
+      ev.set(spin.rotation.x, spin.rotation.y, spin.rotation.z); qv.setFromEuler(ev);
+      const fs = 1, puff = sm(0, 0.35, dis);
+      for (let i = 0; i < NP; i++) {
+        tmp.set(base[i * 3], base[i * 3 + 1], base[i * 3 + 2]).applyQuaternion(qv).multiplyScalar(fs * (1 + puff * 0.35));
+        const tr = sm(0.3 + del[i] * 0.25, 0.75 + del[i] * 0.25, dis), w = Math.sin(tr * Math.PI) * 0.7;
+        pos[i * 3] = tmp.x + (txt[i * 3] - tmp.x) * tr + Math.sin(t * 1.7 + i) * w * 0.4;
+        pos[i * 3 + 1] = tmp.y + (txt[i * 3 + 1] - tmp.y) * tr + Math.cos(t * 1.3 + i * 0.7) * w * 0.4;
+        pos[i * 3 + 2] = tmp.z + (txt[i * 3 + 2] - tmp.z) * tr + Math.sin(t + i * 1.3) * w * 0.6;
+      }
+      pgeo.attributes.position.needsUpdate = true;
+    }
+    /* Menyelam: kamera masuk ke objek, lalu lorong cahaya. */
+    const wv = sm(0.45, 0.85, C.dive);
+    world.visible = wv > 0.01;
+    if (world.visible) { W3.tick(dt || 0, t); for (const m of wm) m.opacity = wv * m.userData.o; }
+    spin.visible = C.dive < 0.72;
+  }
+
+  const tris = (() => { let n = 0; scene.traverse((o) => { if (o.isMesh) { const gg = o.geometry; n += (gg.index ? gg.index.count : gg.attributes.position.count) / 3; } }); return Math.round(n); })();
+  window.__OWD_STATS = { triangles: tris, budget: 120000, contexts: 1 };
+
+  /* Warna varian: m1/m2 + bahan turunan (m1b, m2b) bergeser halus ke warna tujuan. */
+  const v1 = [M.m1, M.m1b].filter(Boolean), v2 = [M.m2, M.m2b].filter(Boolean);
+  const want = { a: new THREE.Color(VAR[0].warna1), b: new THREE.Color(VAR[0].warna2) };
+  function paintVariant(v, instant) {
+    want.a.set(v.warna1); want.b.set(v.warna2);
+    if (instant) { v1.forEach((m) => m.color.copy(want.a)); v2.forEach((m) => m.color.copy(want.b)); }
+  }
+  let current = 0;
+  document.addEventListener("owd:varian", (e) => { current = e.detail % VAR.length; paintVariant(VAR[current], reduce); spinKick(); });
+
+  /* Putar dengan geser (hero). */
+  const stage = document.querySelector(".stage");
+  const user = { ry: 0, rx: 0, vy: 0, drag: false, lx: 0, ly: 0 };
+  function spinKick() { if (!reduce) user.vy += 0.12; }
+  if (stage) {
+    stage.addEventListener("pointerdown", (e) => { user.drag = true; user.lx = e.clientX; user.ly = e.clientY; stage.classList.add("grab"); try { stage.setPointerCapture(e.pointerId); } catch (x) {} });
+    stage.addEventListener("pointermove", (e) => { if (!user.drag) return; const dx = e.clientX - user.lx, dy = e.clientY - user.ly; user.lx = e.clientX; user.ly = e.clientY; user.ry += dx * 0.012; user.vy = dx * 0.004; user.rx = Math.max(-0.6, Math.min(0.6, user.rx + dy * 0.006)); });
+    const up = () => { user.drag = false; stage.classList.remove("grab"); };
+    stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+    stage.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") { user.ry -= 0.3; e.preventDefault(); } if (e.key === "ArrowRight") { user.ry += 0.3; e.preventDefault(); } if (e.key === "ArrowUp") user.rx = Math.max(-0.6, user.rx - 0.15); if (e.key === "ArrowDown") user.rx = Math.min(0.6, user.rx + 0.15); });
+  }
+
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (!reduce && matchMedia("(pointer: fine)").matches) addEventListener("pointermove", (e) => { pointer.tx = e.clientX / innerWidth - 0.5; pointer.ty = e.clientY / innerHeight - 0.5; }, { passive: true });
+  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener("resize", resize); resize();
+  let visible = true;
+  const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
+  io.observe(canvas);
+
+  let auto = 0;
+  function applyPose(t) {
+    const narrow = camera.aspect < 0.9;
+    const halfW = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z * camera.aspect;
+    const dv = reduce ? 0 : S.dive || 0, dz = 1 + dv * dv * 9; /* menyelam: objek membesar menembus kamera */
+    const x = (narrow ? 0 : S.x * halfW) * (1 - dv), y = (narrow ? S.ny : S.y) * (1 - dv), s = (narrow ? S.ns : S.s) * dz;
+    pivot.position.set(x, y + (reduce ? 0 : Math.sin(t * 1.1) * 0.05), 0);
+    pivot.scale.setScalar(s);
+    spin.rotation.set(S.rx + user.rx, S.ry + user.ry + auto, 0);
+    camera.position.x = pointer.x * 0.35; camera.position.y = -pointer.y * 0.25; camera.lookAt(0, 0, 0);
+    canvas.style.opacity = String(narrow ? S.no : S.o);
+  }
+
+  /* Galeri: setiap foto dirender dari objek yang sama (sudut & varian berbeda). */
+  let shotsDone = false;
+  function shots() {
+    if (shotsDone) return; shotsDone = true;
+    const tiles = Array.prototype.slice.call(document.querySelectorAll("[data-shot]"));
+    if (!tiles.length) return;
+    const W = 720, H = 540, keepZ = camera.position.clone();
+    renderer.setPixelRatio(1); renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+    story(FIXED, 0, 0); lastKey = "";
+    world.visible = false; points.visible = false; seedSpin.visible = false; spin.visible = true;
+    floaters.visible = false; pivot.position.set(0, 0, 0); pivot.scale.setScalar(1);
+    tiles.forEach((el, i) => {
+      const sh = SHOTS[i % SHOTS.length];
+      paintVariant(VAR[sh.v % VAR.length], true);
+      scene.background = new THREE.Color(i % 2 ? COL.surface : COL.bg);
+      spin.rotation.set(sh.rx, sh.ry, 0);
+      camera.position.set(0, sh.y, sh.z); camera.lookAt(0, 0, 0);
+      if (K.tick) K.tick(1.2 + i * 0.7, 0.016);
+      renderer.render(scene, camera);
+      try { el.style.backgroundImage = "url(" + canvas.toDataURL("image/jpeg", 0.86) + ")"; el.classList.add("shot"); } catch (e) {}
+    });
+    scene.background = null; floaters.visible = true; camera.position.copy(keepZ); camera.position.z = 8;
+    paintVariant(VAR[current], true);
+    renderer.setPixelRatio(dpr); resize();
+  }
+  const gal = document.getElementById("galeri");
+  if (gal && !window.OWD_THUMB) { const gio = new IntersectionObserver((en) => { if (en[0].isIntersecting) { gio.disconnect(); requestAnimationFrame(shots); } }, { rootMargin: "900px 0px" }); gio.observe(gal); }
+
+  const clock = new THREE.Clock();
+  let raf = 0, first = true, frames = 0, slow = 0;
+  function frame() {
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(clock.getDelta(), 0.1), t = clock.elapsedTime;
+    if (!visible || document.hidden) return;
+    pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * 3); pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * 3);
+    if (!user.drag) { user.ry += user.vy; user.vy *= 0.94; if (CONFIG.putarOtomatis !== false && !reduce) auto += dt * 0.22; }
+    v1.forEach((m) => m.color.lerp(want.a, Math.min(1, dt * 5))); v2.forEach((m) => m.color.lerp(want.b, Math.min(1, dt * 5)));
+    applyPose(t);
+    if (K.tick && !reduce) K.tick(t, dt);
+    story(reduce ? FIXED : S, t, reduce ? 0 : dt);
+    const sy = window.scrollY || 0;
+    floaters.children.forEach((f, i) => { f.rotation.x += dt * f.userData.v; f.rotation.y += dt * f.userData.v * 0.7; f.position.y = ((f.userData.y + sy * 0.0012 * f.userData.v * 3 + 4) % 8 + 8) % 8 - 4; });
+    renderer.render(scene, camera);
+    if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
+    frames++; if (dt > 0.022) slow++;
+    if (frames === 90) { if (slow > 45 && dpr > 1) { dpr = Math.max(1, dpr - 0.5); renderer.setPixelRatio(dpr); resize(); } frames = 0; slow = 0; }
+  }
+  if (window.OWD_THUMB) { Object.assign(S, POSES[0]); if (K.tick) K.tick(1.5, 0.016); applyPose(0); story(FIXED, 0, 0); renderer.render(scene, camera); root.classList.add("webgl"); root.classList.remove("loading"); return; }
+  raf = requestAnimationFrame(frame);
+
+  function dispose() {
+    cancelAnimationFrame(raf);
+    io.disconnect();
+    if (hasG) ST.getAll().forEach((s) => s.kill());
+    if (lenis) lenis.destroy();
+    disposables.forEach((x) => x.dispose());
+    textures.forEach((x) => x.dispose());
+    renderer.dispose();
+    renderer.forceContextLoss();
+  }
+  addEventListener("pagehide", dispose, { once: true });
+}
+
+</script>
+</body>
+</html>

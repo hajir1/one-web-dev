@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Raka Aditya · Data Visualization Engineer</title>
+<meta name="description" content="Portofolio 3D data visualization engineer bernuansa terang: awan partikel yang berubah bentuk dan menghindar dari kursor, kartu proyek miring, detail proyek. Three.js + Lenis.">
+<script>
+/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#eef1f7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;600&display=swap"></noscript>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.mjs">
+<script>
+document.documentElement.classList.add("js", "loading");
+setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
+</script>
+<style id="owd-theme">
+/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+:root {
+  --bg: #eef1f7; /* Latar halaman */
+  --surface: #ffffff; /* Latar kartu */
+  --ink: #121a2e; /* Teks utama */
+  --ink-soft: #4d5872; /* Teks sekunder */
+  --accent: #2f5bff; /* Warna aksen */
+  --accent-2: #ff5d8f; /* Warna aksen kedua */
+  --line: #d9dfec; /* Garis */
+  --on-accent: #ffffff; /* Teks di tombol aksen */
+}
+</style>
+<style>
+:root {
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-text: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --pad: clamp(16px, 5vw, 72px);
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; color: var(--ink); font: 17px/1.65 var(--font-text); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+img, svg { max-width: 100%; display: block; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 50; padding: 10px 14px; background: var(--accent); color: var(--on-accent); border-radius: 8px; }
+.skip:focus { left: 8px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px; padding: 14px var(--pad); background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav .brand { font-family: var(--font-display); font-weight: 700; text-decoration: none; font-size: 18px; }
+.nav ul { display: flex; gap: 2px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav ul a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink-soft); font-size: 15px; }
+.nav ul a:hover { color: var(--ink); background: var(--surface); }
+
+/* Hero */
+.hero { position: relative; display: grid; gap: 24px; align-items: center; min-height: calc(100vh - 73px); padding: 40px var(--pad) 64px; }
+.hero.split { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+.hero.stacked { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+.hero .kicker { color: var(--accent); }
+.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(44px, 8vw, 104px); line-height: .98; letter-spacing: -.035em; }
+.hero p.lead { max-width: 46ch; margin: 22px 0 0; font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-soft); }
+.hero.stacked p.lead { margin-left: auto; margin-right: auto; }
+.stage { position: relative; aspect-ratio: 1; width: 100%; max-width: 640px; justify-self: center; border-radius: 28px; overflow: hidden; touch-action: pan-y; background: radial-gradient(60% 60% at 50% 45%, color-mix(in srgb, var(--accent) 45%, transparent), transparent 70%), radial-gradient(40% 40% at 65% 65%, color-mix(in srgb, var(--accent-2) 55%, transparent), transparent 70%); }
+.hero.stacked .stage { order: -1; max-width: 520px; aspect-ratio: 16 / 10; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .8s; cursor: grab; }
+html.webgl .stage canvas { opacity: 1; }
+.stage .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 70%, transparent); font-size: 13px; color: var(--ink-soft); white-space: nowrap; opacity: 0; transition: opacity .6s; }
+html.webgl .stage .hint { opacity: 1; }
+.stage .spin { position: absolute; inset: 0; display: none; place-items: center; }
+html.loading .stage .spin { display: grid; }
+.spin i { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); animation: rot .9s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+.kicker { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 600; text-decoration: none; border: 0; transition: transform .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.hero.stacked .ctas { justify-content: center; }
+
+section.block { padding: clamp(72px, 10vw, 128px) var(--pad); border-top: 1px solid var(--line); }
+h2 { margin: 0 0 28px; font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: -.03em; }
+
+/* Tentang */
+.about { display: grid; gap: 40px; }
+@media (min-width: 900px) { .about { grid-template-columns: 1.2fr 1fr; } }
+.about p { margin: 0 0 16px; max-width: 60ch; color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding: 0; list-style: none; }
+.chips li, .tags span { display: inline-flex; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 14px; color: var(--ink-soft); }
+.timeline { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.timeline li { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.timeline b { display: block; }
+.timeline span { color: var(--ink-soft); font-size: 15px; }
+
+/* Proyek */
+.cards { display: grid; gap: 22px; margin: 0; padding: 0; list-style: none; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); perspective: 1000px; }
+.card { position: relative; display: flex; flex-direction: column; height: 100%; border-radius: 22px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); text-decoration: none; transform-style: preserve-3d; transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; will-change: transform; }
+.card:hover { box-shadow: 0 30px 50px -30px rgba(0,0,0,.55); }
+.card .art { width: 100%; height: auto; aspect-ratio: 400 / 260; }
+.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,.22), transparent 45%); opacity: 0; transition: opacity .3s; }
+.card:hover::after { opacity: 1; }
+.card-body { display: grid; gap: 6px; padding: 20px 22px 24px; transform: translateZ(30px); }
+.card-body strong { font-family: var(--font-display); font-size: 24px; line-height: 1.15; }
+.card-body > span:not(.tags):not(.card-year) { color: var(--ink-soft); }
+.card-year { font-size: 13px; color: var(--accent); font-weight: 600; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+/* Detail proyek: dengan JS hanya yang dituju (#proyek-…) yang tampil; tanpa JS semua tampil berurutan. */
+.details { margin-top: 48px; display: grid; gap: 40px; }
+.detail { padding: clamp(20px, 3vw, 36px); border-radius: 26px; background: var(--surface); border: 1px solid var(--line); scroll-margin-top: 90px; }
+.detail .art { border-radius: 18px; width: 100%; height: auto; }
+.detail h3 { margin: 0 0 12px; font-family: var(--font-display); font-size: clamp(28px, 4vw, 44px); line-height: 1.05; }
+.detail p { color: var(--ink-soft); }
+.detail-grid { display: grid; gap: 28px; margin-top: 16px; }
+@media (min-width: 900px) { .detail-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+.back { display: inline-flex; min-height: 44px; align-items: center; font-weight: 600; color: var(--accent); }
+html.js .detail { display: none; }
+.detail:focus:not(:focus-visible) { outline: none; }
+html.js .detail:target { display: block; animation: rise .5s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* Kontak */
+.contact { text-align: center; }
+.contact h2 { max-width: 14ch; margin-left: auto; margin-right: auto; }
+.contact p { color: var(--ink-soft); }
+.contact .mail { display: inline-block; margin-top: 8px; font-family: var(--font-display); font-size: clamp(24px, 4vw, 44px); color: var(--accent); text-underline-offset: 8px; word-break: break-word; }
+.contact .ctas { justify-content: center; }
+footer { padding: 28px var(--pad) 40px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); }
+
+@media (max-width: 860px) {
+  .hero.split { grid-template-columns: 1fr; }
+  .hero.split .stage { order: -1; max-width: 460px; }
+  .nav ul { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .stage canvas { transition: none; }
+  html.js .detail:target { animation: none; }
+  .spin i { animation: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#konten">Lewati ke konten</a>
+<header class="nav">
+  <a class="brand" href="#beranda" data-owd-text="nama" data-owd-label="Nama">Raka Aditya</a>
+  <nav aria-label="Navigasi utama"><ul><li><a href="#tentang" data-owd-text="menu1" data-owd-label="Menu 1">Tentang</a></li><li><a href="#proyek" data-owd-text="menu2" data-owd-label="Menu 2">Proyek</a></li><li><a href="#kontak" data-owd-text="menu3" data-owd-label="Menu 3">Kontak</a></li></ul></nav>
+</header>
+<main id="konten">
+<section class="hero stacked" id="beranda" aria-labelledby="hero-t">
+  <div>
+    <p class="kicker" data-owd-text="peran" data-owd-label="Peran / profesi">Data Visualization Engineer · Medan</p>
+    <h1 id="hero-t" data-owd-text="nama" data-owd-label="Nama">Raka Aditya</h1>
+    <p class="lead" data-owd-text="intro" data-owd-label="Kalimat perkenalan" data-owd-multi>Saya mengubah data yang rumit menjadi gambar yang jujur, jelas, dan enak dijelajahi.</p>
+    <div class="ctas"><a class="btn" href="#proyek" data-owd-text="tombolProyek" data-owd-label="Tombol lihat proyek">Lihat proyek</a><a class="btn ghost" href="#kontak" data-owd-text="tombolKontak" data-owd-label="Tombol hubungi">Hubungi saya</a></div>
+  </div>
+  <div class="stage" id="stage" aria-hidden="true">
+    <canvas></canvas>
+    <div class="spin"><i></i></div>
+    <p class="hint" data-owd-text="petunjuk" data-owd-label="Petunjuk objek 3D">Gerakkan kursor atau seret objek</p>
+  </div>
+</section>
+<section class="block" id="tentang" aria-labelledby="tentang-t">
+  <h2 id="tentang-t" data-owd-text="tentangJudul" data-owd-label="Tentang: judul">Tentang</h2>
+  <div class="about">
+    <div><p data-owd-text="tentang1" data-owd-label="Tentang: paragraf 1" data-owd-multi>Saya memulai sebagai analis data, lalu sadar bahwa temuan yang bagus sering hilang karena grafiknya sulit dibaca.</p><p data-owd-text="tentang2" data-owd-label="Tentang: paragraf 2" data-owd-multi>Sekarang saya membangun dasbor, cerita data, dan visualisasi interaktif untuk media, lembaga riset, dan tim produk.</p>
+      <ul class="chips" aria-label="Keahlian"><li data-owd-text="keahlian1" data-owd-label="Keahlian 1">D3.js</li><li data-owd-text="keahlian2" data-owd-label="Keahlian 2">Three.js</li><li data-owd-text="keahlian3" data-owd-label="Keahlian 3">Statistika</li><li data-owd-text="keahlian4" data-owd-label="Keahlian 4">Desain informasi</li><li data-owd-text="keahlian5" data-owd-label="Keahlian 5">SQL</li><li data-owd-text="keahlian6" data-owd-label="Keahlian 6">Penulisan data</li></ul>
+    </div>
+    <ol class="timeline" aria-label="Pengalaman"><li><span data-owd-text="pengalaman1Tahun" data-owd-label="Pengalaman 1: tahun">2024 sampai kini</span><div><b data-owd-text="pengalaman1Posisi" data-owd-label="Pengalaman 1: posisi">Data visualization engineer</b><span data-owd-text="pengalaman1Tempat" data-owd-label="Pengalaman 1: tempat">Lembaga riset kebijakan</span></div></li><li><span data-owd-text="pengalaman2Tahun" data-owd-label="Pengalaman 2: tahun">2021 sampai 2024</span><div><b data-owd-text="pengalaman2Posisi" data-owd-label="Pengalaman 2: posisi">Pengembang grafis interaktif</b><span data-owd-text="pengalaman2Tempat" data-owd-label="Pengalaman 2: tempat">Redaksi media daring</span></div></li><li><span data-owd-text="pengalaman3Tahun" data-owd-label="Pengalaman 3: tahun">2019 sampai 2021</span><div><b data-owd-text="pengalaman3Posisi" data-owd-label="Pengalaman 3: posisi">Analis data</b><span data-owd-text="pengalaman3Tempat" data-owd-label="Pengalaman 3: tempat">Perusahaan ritel</span></div></li></ol>
+  </div>
+</section>
+<section class="block" id="proyek" aria-labelledby="proyek-t">
+  <h2 id="proyek-t" data-owd-text="proyekJudul" data-owd-label="Proyek: judul">Proyek pilihan</h2>
+  <ul class="cards" id="daftar-proyek"><!--owd:render name="cards"--><li><a class="card" href="#proyek-jejak-hujan" data-tilt><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Jejak Hujan"><rect width="400" height="260" fill="#2f5bff"/><circle cx="90" cy="70" r="40" fill="#ff5d8f" fill-opacity=".85"/><rect x="250" y="120" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 200 Q 200 150 400 210 V260 H0Z" fill="#000" fill-opacity=".14"/></svg><span class="card-body"><span class="card-year">2026</span><strong>Jejak Hujan</strong><span>Peta interaktif curah hujan 30 tahun di Sumatra.</span><span class="tags"><span>Peta</span><span>Iklim</span></span></span></a></li><li><a class="card" href="#proyek-harga-pasar" data-tilt><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Harga Pasar"><rect width="400" height="260" fill="#2f5bff"/><circle cx="143" cy="99" r="77" fill="#ff5d8f" fill-opacity=".85"/><rect x="209" y="137" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 187 Q 200 181 400 203 V260 H0Z" fill="#000" fill-opacity=".14"/></svg><span class="card-body"><span class="card-year">2025</span><strong>Harga Pasar</strong><span>Dasbor harga bahan pokok untuk pembaca umum.</span><span class="tags"><span>Dasbor</span><span>Ekonomi</span></span></span></a></li><li><a class="card" href="#proyek-suara-kota" data-tilt><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Suara Kota"><rect width="400" height="260" fill="#2f5bff"/><circle cx="196" cy="128" r="54" fill="#ff5d8f" fill-opacity=".85"/><rect x="168" y="154" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 174 Q 200 152 400 196 V260 H0Z" fill="#000" fill-opacity=".14"/></svg><span class="card-body"><span class="card-year">2024</span><strong>Suara Kota</strong><span>Cerita data tentang kebisingan di lima kota.</span><span class="tags"><span>Cerita data</span><span>Audio</span></span></span></a></li><li><a class="card" href="#proyek-arus-mudik" data-tilt><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Arus Mudik"><rect width="400" height="260" fill="#2f5bff"/><circle cx="249" cy="157" r="91" fill="#ff5d8f" fill-opacity=".85"/><rect x="247" y="121" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 161 Q 200 183 400 189 V260 H0Z" fill="#000" fill-opacity=".14"/></svg><span class="card-body"><span class="card-year">2023</span><strong>Arus Mudik</strong><span>Animasi pergerakan pemudik dari data agregat.</span><span class="tags"><span>Animasi</span><span>Transportasi</span></span></span></a></li><!--owd:end--></ul>
+  <div class="details" id="detail-proyek"><!--owd:render name="details"--><article class="detail" id="proyek-jejak-hujan" tabindex="-1" aria-labelledby="proyek-jejak-hujan-t"><a class="back" href="#proyek">Kembali ke daftar proyek</a><div class="detail-grid"><div><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Jejak Hujan"><rect width="400" height="260" fill="#2f5bff"/><circle cx="90" cy="70" r="40" fill="#ff5d8f" fill-opacity=".85"/><rect x="250" y="120" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 200 Q 200 150 400 210 V260 H0Z" fill="#000" fill-opacity=".14"/></svg></div><div><p class="kicker">2026 · Riset &amp; pengembangan</p><h3 id="proyek-jejak-hujan-t">Jejak Hujan</h3><p>Pembaca bisa membandingkan musim hujan antartahun dengan menggeser lini waktu.</p><p>Data diringkas di perangkat sehingga peta tetap cepat di ponsel.</p><p class="tags"><span>Peta</span><span>Iklim</span></p><a class="btn" href="https://example.com/jejak-hujan" target="_blank" rel="noopener">Lihat proyek</a></div></div></article><article class="detail" id="proyek-harga-pasar" tabindex="-1" aria-labelledby="proyek-harga-pasar-t"><a class="back" href="#proyek">Kembali ke daftar proyek</a><div class="detail-grid"><div><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Harga Pasar"><rect width="400" height="260" fill="#2f5bff"/><circle cx="143" cy="99" r="77" fill="#ff5d8f" fill-opacity=".85"/><rect x="209" y="137" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 187 Q 200 181 400 203 V260 H0Z" fill="#000" fill-opacity=".14"/></svg></div><div><p class="kicker">2025 · Visualisasi data</p><h3 id="proyek-harga-pasar-t">Harga Pasar</h3><p>Grafik dibuat sederhana dengan penjelasan satu kalimat di tiap panel.</p><p>Diperbarui otomatis setiap pagi dari data terbuka.</p><p class="tags"><span>Dasbor</span><span>Ekonomi</span></p><a class="btn" href="https://example.com/harga-pasar" target="_blank" rel="noopener">Lihat proyek</a></div></div></article><article class="detail" id="proyek-suara-kota" tabindex="-1" aria-labelledby="proyek-suara-kota-t"><a class="back" href="#proyek">Kembali ke daftar proyek</a><div class="detail-grid"><div><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Suara Kota"><rect width="400" height="260" fill="#2f5bff"/><circle cx="196" cy="128" r="54" fill="#ff5d8f" fill-opacity=".85"/><rect x="168" y="154" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 174 Q 200 152 400 196 V260 H0Z" fill="#000" fill-opacity=".14"/></svg></div><div><p class="kicker">2024 · Cerita data</p><h3 id="proyek-suara-kota-t">Suara Kota</h3><p>Gabungan peta, grafik, dan rekaman suara singkat dari tiap lokasi.</p><p>Semua grafik punya tabel alternatif untuk pembaca layar.</p><p class="tags"><span>Cerita data</span><span>Audio</span></p><a class="btn" href="https://example.com/suara-kota" target="_blank" rel="noopener">Lihat proyek</a></div></div></article><article class="detail" id="proyek-arus-mudik" tabindex="-1" aria-labelledby="proyek-arus-mudik-t"><a class="back" href="#proyek">Kembali ke daftar proyek</a><div class="detail-grid"><div><svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek Arus Mudik"><rect width="400" height="260" fill="#2f5bff"/><circle cx="249" cy="157" r="91" fill="#ff5d8f" fill-opacity=".85"/><rect x="247" y="121" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/><path d="M0 161 Q 200 183 400 189 V260 H0Z" fill="#000" fill-opacity=".14"/></svg></div><div><p class="kicker">2023 · Grafik interaktif</p><h3 id="proyek-arus-mudik-t">Arus Mudik</h3><p>Ribuan titik bergerak menunjukkan puncak arus mudik dari jam ke jam.</p><p>Data agregat, tanpa informasi pribadi.</p><p class="tags"><span>Animasi</span><span>Transportasi</span></p><a class="btn" href="https://example.com/arus-mudik" target="_blank" rel="noopener">Lihat proyek</a></div></div></article><!--owd:end--></div>
+</section>
+<section class="block contact" id="kontak" aria-labelledby="kontak-t">
+  <p class="kicker" data-owd-text="kontakLabel" data-owd-label="Kontak: label kecil">Kontak</p>
+  <h2 id="kontak-t" data-owd-text="kontakJudul" data-owd-label="Kontak: judul">Punya ide yang ingin diwujudkan?</h2>
+  <p data-owd-text="kontakTeks" data-owd-label="Kontak: teks" data-owd-multi>Saya terbuka untuk proyek lepas dan kolaborasi jangka panjang.</p>
+  <a class="mail" href="mailto:raka@aditya.example" data-owd-href="email" data-owd-href-label="Tautan email (mailto:alamat)" data-owd-text="emailTeks" data-owd-label="Alamat email yang ditampilkan">raka@aditya.example</a>
+  <div class="ctas"><a class="btn" href="mailto:raka@aditya.example" data-owd-href="email" data-owd-href-label="Tautan email (mailto:alamat)" data-owd-text="tombolEmail" data-owd-label="Tombol email">Kirim email</a><a class="btn ghost" href="https://wa.me/6281200000015?text=Halo%20Raka%2C%20saya%20melihat%20portofolio%20Anda%20dan%20ingin%20berdiskusi%20tentang%20proyek." data-owd-href="whatsapp" data-owd-href-label="Tautan WhatsApp (https://wa.me/62…)" target="_blank" rel="noopener" data-owd-text="tombolWa" data-owd-label="Tombol WhatsApp">Chat WhatsApp</a></div>
+</section>
+</main>
+<footer><span><span data-owd-text="nama" data-owd-label="Nama">Raka Aditya</span> · <span data-owd-text="kota" data-owd-label="Kota">Medan</span></span><span data-owd-text="catatanKaki" data-owd-label="Catatan kaki">Nama dan proyek di halaman ini fiktif.</span></footer>
+<script type="module">
+/* ---- Pemuat library: CDN utama + cadangan ---- */
+const CDN = ["https://cdn.jsdelivr.net/npm/","https://unpkg.com/"];
+function race(path, get) {
+  const order = CDN.slice();
+  return new Promise((ok, no) => {
+    let i = 0, fails = 0, done = false;
+    const next = () => {
+      const cdn = order[i++], url = cdn + path;
+      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
+      if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
+    };
+    next();
+  });
+}
+const esm = (path) => race(path, (u) => import(u));
+const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
+const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
+const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
+
+/* ==== DATA PROYEK: ubah di sini (judul, deskripsi, tautan, tag, gambar) ==== */
+const PROJECTS = /*owd:data name="PROJECTS" label="Daftar proyek" hide="slug"*/[
+  {
+    "slug": "jejak-hujan",
+    "judul": "Jejak Hujan",
+    "ringkas": "Peta interaktif curah hujan 30 tahun di Sumatra.",
+    "deskripsi": [
+      "Pembaca bisa membandingkan musim hujan antartahun dengan menggeser lini waktu.",
+      "Data diringkas di perangkat sehingga peta tetap cepat di ponsel."
+    ],
+    "peran": "Riset & pengembangan",
+    "tahun": "2026",
+    "tag": [
+      "Peta",
+      "Iklim"
+    ],
+    "tautan": "https://example.com/jejak-hujan",
+    "gambar": ""
+  },
+  {
+    "slug": "harga-pasar",
+    "judul": "Harga Pasar",
+    "ringkas": "Dasbor harga bahan pokok untuk pembaca umum.",
+    "deskripsi": [
+      "Grafik dibuat sederhana dengan penjelasan satu kalimat di tiap panel.",
+      "Diperbarui otomatis setiap pagi dari data terbuka."
+    ],
+    "peran": "Visualisasi data",
+    "tahun": "2025",
+    "tag": [
+      "Dasbor",
+      "Ekonomi"
+    ],
+    "tautan": "https://example.com/harga-pasar",
+    "gambar": ""
+  },
+  {
+    "slug": "suara-kota",
+    "judul": "Suara Kota",
+    "ringkas": "Cerita data tentang kebisingan di lima kota.",
+    "deskripsi": [
+      "Gabungan peta, grafik, dan rekaman suara singkat dari tiap lokasi.",
+      "Semua grafik punya tabel alternatif untuk pembaca layar."
+    ],
+    "peran": "Cerita data",
+    "tahun": "2024",
+    "tag": [
+      "Cerita data",
+      "Audio"
+    ],
+    "tautan": "https://example.com/suara-kota",
+    "gambar": ""
+  },
+  {
+    "slug": "arus-mudik",
+    "judul": "Arus Mudik",
+    "ringkas": "Animasi pergerakan pemudik dari data agregat.",
+    "deskripsi": [
+      "Ribuan titik bergerak menunjukkan puncak arus mudik dari jam ke jam.",
+      "Data agregat, tanpa informasi pribadi."
+    ],
+    "peran": "Grafik interaktif",
+    "tahun": "2023",
+    "tag": [
+      "Animasi",
+      "Transportasi"
+    ],
+    "tautan": "https://example.com/arus-mudik",
+    "gambar": ""
+  }
+]/*owd:end*/;
+/* ========================================================================== */
+function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+/* Gambar proyek: placeholder SVG (ganti dengan <img> bila punya gambar). */
+function safeImg(u) { u = String(u || "").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);)/i.test(u) ? u : ""; }
+function projectArt(p, i, c1, c2) {
+  if (safeImg(p.gambar)) return '<img class="art" src="' + escHtml(safeImg(p.gambar)) + '" alt="Gambar proyek ' + escHtml(p.judul) + '" loading="lazy">';
+  var r = 40 + (i * 37) % 60, x = 90 + (i * 53) % 220, y = 70 + (i * 29) % 90;
+  return '<svg class="art" viewBox="0 0 400 260" role="img" aria-label="Gambar contoh proyek ' + escHtml(p.judul) + '">' +
+    '<rect width="400" height="260" fill="' + c1 + '"/>' +
+    '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + c2 + '" fill-opacity=".85"/>' +
+    '<rect x="' + (250 - (i * 41) % 120) + '" y="' + (120 + (i * 17) % 50) + '" width="140" height="90" rx="14" fill="#fff" fill-opacity=".18"/>' +
+    '<path d="M0 ' + (200 - (i * 13) % 40) + ' Q 200 ' + (150 + (i * 31) % 60) + ' 400 ' + (210 - (i * 7) % 30) + ' V260 H0Z" fill="#000" fill-opacity=".14"/>' +
+    '</svg>';
+}
+/* Kunci jangkar proyek: slug, atau dibuat dari judul (proyek baru dari editor). */
+function slugOf(p, i) { var s = String(p.slug || p.judul || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); return (s || "proyek") + (p.slug ? "" : "-" + (i + 1)); }
+function listOf(v) { return Array.isArray(v) ? v : []; }
+function renderCards(list, c1, c2) {
+  return list.map(function (p, i) {
+    return '<li><a class="card" href="#proyek-' + escHtml(slugOf(p, i)) + '" data-tilt>' + projectArt(p, i, c1, c2) +
+      '<span class="card-body"><span class="card-year">' + escHtml(p.tahun) + '</span><strong>' + escHtml(p.judul) + '</strong><span>' + escHtml(p.ringkas) + '</span>' +
+      '<span class="tags">' + listOf(p.tag).map(function (t) { return '<span>' + escHtml(t) + '</span>'; }).join("") + '</span></span></a></li>';
+  }).join("");
+}
+function renderDetails(list, c1, c2) {
+  return list.map(function (p, i) {
+    return '<article class="detail" id="proyek-' + escHtml(slugOf(p, i)) + '" tabindex="-1" aria-labelledby="proyek-' + escHtml(slugOf(p, i)) + '-t">' +
+      '<a class="back" href="#proyek">Kembali ke daftar proyek</a>' +
+      '<div class="detail-grid"><div>' + projectArt(p, i, c1, c2) + '</div><div>' +
+      '<p class="kicker">' + escHtml(p.tahun) + ' · ' + escHtml(p.peran) + '</p>' +
+      '<h3 id="proyek-' + escHtml(slugOf(p, i)) + '-t">' + escHtml(p.judul) + '</h3>' +
+      listOf(p.deskripsi).map(function (d) { return '<p>' + escHtml(d) + '</p>'; }).join("") +
+      '<p class="tags">' + listOf(p.tag).map(function (t) { return '<span>' + escHtml(t) + '</span>'; }).join("") + '</p>' +
+      '<a class="btn" href="' + escHtml(/^(https?:|mailto:|#)/i.test(String(p.tautan || "")) ? p.tautan : "#") + '" target="_blank" rel="noopener">Lihat proyek</a>' +
+      '</div></div></article>';
+  }).join("");
+}
+
+/* Objek 3D hero (prosedural). */
+function buildHero({ THREE, scene, camera, A1, A2 }) {
+  const N = 3600, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  const shapes = [new Float32Array(N * 3), new Float32Array(N * 3), new Float32Array(N * 3)];
+  const ca = new THREE.Color(A1), cb = new THREE.Color(A2), c = new THREE.Color();
+  for (let i = 0; i < N; i++) {
+    const u = i / N, phi = Math.acos(1 - 2 * ((i + 0.5) / N)), th = Math.PI * (1 + Math.sqrt(5)) * i;
+    shapes[0].set([2.3 * Math.sin(phi) * Math.cos(th), 2.3 * Math.cos(phi), 2.3 * Math.sin(phi) * Math.sin(th)], i * 3);
+    const sk = u * Math.PI * 2, k = 1.75 + 0.7 * Math.cos(3 * sk), w = ((i % 9) / 9 - 0.5) * 0.45;
+    shapes[1].set([(k + w * Math.cos(th)) * Math.cos(2 * sk), 0.7 * Math.sin(3 * sk) * 1.3 + w * Math.sin(th), (k + w * Math.sin(th)) * Math.sin(2 * sk)], i * 3);
+    const a = u * Math.PI * 14, r = 0.3 + u * 2.4;
+    shapes[2].set([Math.cos(a) * r, (u - 0.5) * 4.2 + Math.sin(th) * 0.08, Math.sin(a) * r], i * 3);
+    c.copy(ca).lerp(cb, (Math.sin(th) + 1) / 2);
+    col.set([c.r, c.g, c.b], i * 3);
+  }
+  pos.set(shapes[0]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  const dot = document.createElement("canvas"); dot.width = dot.height = 32;
+  const g = dot.getContext("2d"), grad = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  grad.addColorStop(0, "rgba(255,255,255,1)"); grad.addColorStop(0.5, "rgba(255,255,255,.6)"); grad.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = grad; g.fillRect(0, 0, 32, 32);
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.12, vertexColors: true, map: new THREE.CanvasTexture(dot), transparent: true, depthWrite: false }));
+  scene.add(pts);
+  camera.position.set(0, 0, 9.5);
+  const hit = new THREE.Vector3(), tmp = new THREE.Vector3(), inv = new THREE.Matrix4();
+  let from = 0, to = 0, mix = 1, hold = 0;
+  return {
+    pulse() { if (mix >= 1) { from = to; to = (to + 1) % 3; mix = 0; hold = 0; } },
+    update(t, dt, p) {
+      hold += dt;
+      if (mix >= 1 && hold > 5) this.pulse();
+      mix = Math.min(1, mix + dt * 0.6);
+      const e = mix < 0.5 ? 4 * mix * mix * mix : 1 - Math.pow(-2 * mix + 2, 3) / 2;
+      pts.rotation.y = t * 0.12 + p.x * 0.5 + p.drag;
+      pts.rotation.x = -p.y * 0.35;
+      pts.updateMatrixWorld();
+      inv.copy(pts.matrixWorld).invert();
+      hit.set(p.x * 3.6, p.y * 2.8, 2).applyMatrix4(inv);
+      const A = shapes[from], B = shapes[to];
+      for (let i = 0; i < N * 3; i += 3) {
+        let x = A[i] + (B[i] - A[i]) * e, y = A[i + 1] + (B[i + 1] - A[i + 1]) * e, z = A[i + 2] + (B[i + 2] - A[i + 2]) * e;
+        const br = 1 + Math.sin(t * 1.3 + i * 0.002) * 0.03;
+        x *= br; y *= br; z *= br;
+        if (p.active) {
+          tmp.set(x - hit.x, y - hit.y, z - hit.z);
+          const d = tmp.length();
+          if (d < 1.6) { const f = (1.6 - d) * 0.55 / (d || 1); x += tmp.x * f; y += tmp.y * f; z += tmp.z * f; }
+        }
+        pos[i] = x; pos[i + 1] = y; pos[i + 2] = z;
+      }
+      geo.attributes.position.needsUpdate = true;
+    },
+  };
+}
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const root = document.documentElement;
+
+/* 1) Proyek: render ulang dari PROJECTS (HTML statis tetap ada bila JS mati). */
+const css = getComputedStyle(root);
+const A1 = css.getPropertyValue("--accent").trim(), A2 = css.getPropertyValue("--accent-2").trim();
+document.getElementById("daftar-proyek").innerHTML = renderCards(PROJECTS, A1, A2);
+document.getElementById("detail-proyek").innerHTML = renderDetails(PROJECTS, A1, A2);
+function focusTarget() { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t && t.classList.contains("detail")) t.focus({ preventScroll: true }); }
+addEventListener("hashchange", focusTarget);
+
+/* 2) Kartu miring mengikuti kursor (hanya pointer halus, tanpa kurangi-gerak). */
+if (!reduce && matchMedia("(pointer: fine)").matches) {
+  document.addEventListener("pointermove", (e) => {
+    const card = e.target.closest && e.target.closest("[data-tilt]");
+    document.querySelectorAll("[data-tilt].tilting").forEach((c) => { if (c !== card) { c.classList.remove("tilting"); c.style.transform = ""; } });
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    card.classList.add("tilting");
+    card.style.transform = "rotateX(" + ((0.5 - y) * 12).toFixed(2) + "deg) rotateY(" + ((x - 0.5) * 14).toFixed(2) + "deg) translateZ(0)";
+    card.style.setProperty("--gx", (x * 100).toFixed(1) + "%");
+    card.style.setProperty("--gy", (y * 100).toFixed(1) + "%");
+  }, { passive: true });
+}
+
+/* 3) Gulir halus. */
+let lenis = null;
+if (!reduce) {
+  lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  const loop = (t) => { lenis.raf(t); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute("href").slice(1);
+    const el = id && document.getElementById(id);
+    if (!el) return;
+    requestAnimationFrame(() => lenis.scrollTo(el, { offset: -80 }));
+  });
+}
+
+/* 4) Hero 3D */
+function fail(reason) { root.classList.add("no-webgl"); root.classList.remove("loading"); console.warn("[owd] Hero 3D tidak aktif:", reason); }
+function hasWebGL() { try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; } }
+const stage = document.getElementById("stage");
+const canvas = stage.querySelector("canvas");
+if (!hasWebGL()) fail("WebGL tidak tersedia");
+else { try { startHero(); } catch (e) { fail(e && e.message ? e.message : String(e)); } }
+
+function startHero() {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(0, 0, 9);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1.3));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(4, 6, 5); scene.add(key);
+  const rim = new THREE.DirectionalLight(A2 || 0xffffff, 1.6); rim.position.set(-5, -2, -4); scene.add(rim);
+
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0, down: false, drag: 0, active: false };
+  const hero = buildHero({ THREE, scene, camera, A1, A2, reduce });
+
+  const tris = (() => { let n = 0; scene.traverse((o) => { if (o.isMesh) { const g = o.geometry; n += ((g.index ? g.index.count : g.attributes.position.count) / 3) * (o.isInstancedMesh ? o.count : 1); } }); return Math.round(n); })();
+  window.__OWD_STATS = { triangles: tris, budget: 50000, contexts: 1 };
+
+  /* Pointer: desktop mengikuti kursor; sentuh: seret memutar, ketuk berdenyut. */
+  const rect = () => stage.getBoundingClientRect();
+  stage.addEventListener("pointermove", (e) => {
+    const r = rect();
+    const nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = -(((e.clientY - r.top) / r.height) * 2 - 1);
+    if (e.pointerType === "mouse") { pointer.tx = nx; pointer.ty = ny; pointer.active = true; }
+    else if (pointer.down) { pointer.drag += e.movementX * 0.01; pointer.tx = Math.max(-1, Math.min(1, pointer.tx + e.movementX * 0.004)); pointer.ty = Math.max(-1, Math.min(1, pointer.ty - e.movementY * 0.004)); }
+  });
+  stage.addEventListener("pointerleave", () => { pointer.tx = 0; pointer.ty = 0; pointer.active = false; });
+  stage.addEventListener("pointerdown", (e) => { pointer.down = true; pointer.active = true; if (hero.pulse) hero.pulse(); });
+  addEventListener("pointerup", () => { pointer.down = false; });
+
+  function resize() {
+    const r = rect();
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  let visible = true;
+  const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
+  io.observe(stage);
+
+  const clock = new THREE.Clock();
+  let raf = 0, first = true, frames = 0, slow = 0;
+  function frame() {
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(clock.getDelta(), 0.1);
+    if (!visible || document.hidden) return;
+    pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * 4);
+    pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * 4);
+    hero.update(reduce ? 0 : clock.elapsedTime, reduce ? 0 : dt, pointer);
+    renderer.render(scene, camera);
+    if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
+    frames++; if (dt > 0.022) slow++;
+    if (frames === 90) { if (slow > 45 && dpr > 1) { dpr = Math.max(1, dpr - 0.5); renderer.setPixelRatio(dpr); resize(); } frames = 0; slow = 0; }
+  }
+  if (window.OWD_THUMB) { hero.update(1.2, 0.016, pointer); renderer.render(scene, camera); root.classList.add("webgl"); root.classList.remove("loading"); return; }
+  raf = requestAnimationFrame(frame);
+
+  function dispose() {
+    cancelAnimationFrame(raf);
+    io.disconnect();
+    if (lenis) lenis.destroy();
+    scene.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const m = o.material;
+      if (m) (Array.isArray(m) ? m : [m]).forEach((mat) => { for (const k in mat) { const v = mat[k]; if (v && v.isTexture) v.dispose(); } mat.dispose(); });
+    });
+    renderer.dispose();
+    renderer.forceContextLoss();
+  }
+  addEventListener("pagehide", dispose, { once: true });
+  window.__OWD_DISPOSE = dispose;
+}
+</script>
+</body>
+</html>

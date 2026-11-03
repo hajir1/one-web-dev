@@ -1,0 +1,11 @@
+# OneWebDev: halaman publik boleh diindeks, area akun/editor tidak.
+User-agent: *
+Allow: /
+Disallow: /id/admin
+Disallow: /en/admin
+Disallow: /id/account
+Disallow: /en/account
+Disallow: /id/studio/
+Disallow: /en/studio/
+Disallow: /id/invoice/
+Disallow: /en/invoice/

@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Arus Biru · Konservasi Laut</title>
+<meta name="description" content="Website 3D scroll-driven bawah laut: permukaan ombak, terumbu karang, ubur-ubur, kawanan ikan, dan cincin cahaya di laut dalam. Three.js prosedural + Lenis.">
+<script>
+/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#021a2b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Manrope:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Manrope:wght@400;600&display=swap"></noscript>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.mjs">
+<script>
+document.documentElement.classList.add("js", "loading");
+setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
+</script>
+<style id="owd-theme">
+/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+:root {
+  --accent: #39d0c3; /* Warna aksen (tombol, objek 3D) */
+  --accent-2: #ffd38a; /* Warna aksen kedua (objek 3D) */
+  --bg: #021a2b; /* Latar halaman dan adegan 3D */
+  --ink: #e8fbff; /* Warna teks */
+  --ink-soft: #a9d6df; /* Warna teks sekunder */
+}
+</style>
+<style>
+:root {
+  --panel: rgba(2,26,43,.6); --fallback: linear-gradient(180deg, #0b6e8a 0%, #04405e 40%, #021a2b 100%);
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-text: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; color: var(--ink); font: 17px/1.65 var(--font-text); background: var(--fallback); background-attachment: fixed; -webkit-font-smoothing: antialiased; }
+html.webgl body { background: var(--bg); }
+a { color: inherit; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; opacity: 0; transition: opacity 1s; }
+html.webgl #gl { opacity: 1; }
+html.no-webgl #gl { display: none; }
+
+/* Loading: penanda kecil di bawah, konten tetap terbaca selama adegan 3D dimuat. */
+.loader { position: fixed; left: 50%; bottom: 20px; z-index: 30; display: none; transform: translateX(-50%); padding: 10px 16px 12px; border-radius: 999px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--ink); pointer-events: none; }
+html.loading .loader { display: block; }
+.loader p { margin: 8px 0 0; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
+.loader .bar { width: 140px; height: 2px; background: color-mix(in srgb, var(--ink) 15%, transparent); overflow: hidden; border-radius: 2px; }
+.loader .bar i { display: block; width: 40%; height: 100%; background: var(--accent); animation: load 1.1s ease-in-out infinite; }
+@keyframes load { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+
+/* Navigasi */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 24px; padding: 16px clamp(16px, 4vw, 48px); background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 88%, transparent), transparent); }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 20px; text-decoration: none; letter-spacing: -.01em; }
+.nav ul { display: flex; gap: 4px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav ul a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; text-decoration: none; font-size: 15px; color: var(--ink-soft); }
+.nav ul a:hover, .nav ul a:focus-visible { color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+@media (max-width: 760px) { .nav ul { display: none; } }
+
+/* Section */
+main { position: relative; z-index: 1; }
+.sec { min-height: 120vh; display: flex; align-items: center; padding: 120px clamp(16px, 6vw, 96px); }
+.sec.hero { min-height: 100vh; }
+.sec.right { justify-content: flex-end; }
+.sec.center { justify-content: center; text-align: center; }
+.panel { max-width: 520px; padding: clamp(22px, 3vw, 34px); border-radius: 22px; background: var(--panel); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+.hero .panel { background: none; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0; max-width: 680px; }
+.kicker { margin: 0 0 14px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1, h2 { margin: 0; font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+h1 { font-size: clamp(42px, 7.5vw, 92px); }
+h2 { font-size: clamp(30px, 4.4vw, 52px); }
+.panel p { margin: 16px 0 0; color: var(--ink-soft); }
+.panel strong { color: var(--ink); }
+.panel ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.panel li { display: flex; gap: 10px; align-items: baseline; }
+.panel li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); transform: translateY(-1px) rotate(45deg); }
+.center .panel li { justify-content: center; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.center .ctas { justify-content: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 999px; background: var(--accent); color: #0b0b14; font-weight: 600; text-decoration: none; transition: transform .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent); }
+.btn:focus-visible, .brand:focus-visible, .nav a:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+
+/* Kontak (penutup, menutupi canvas: render berhenti di sini) */
+.contact { position: relative; z-index: 1; padding: clamp(80px, 12vw, 140px) clamp(16px, 6vw, 96px) 48px; background: var(--bg); border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+.contact h2 { max-width: 16ch; }
+.contact p { max-width: 52ch; color: var(--ink-soft); }
+.contact .mail { display: inline-block; margin-top: 18px; font-family: var(--font-display); font-size: clamp(22px, 3.4vw, 38px); color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.contact footer { margin-top: 64px; font-size: 14px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 640px) {
+  .sec { min-height: 110vh; padding: 96px 16px; align-items: flex-end; }
+  .sec.right, .sec.center { justify-content: flex-start; text-align: left; }
+  .center .ctas, .center .panel li { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { #gl, .loader { transition: none; } .loader .bar i { animation: none; } }
+</style>
+</head>
+<body>
+<div class="loader" role="status" aria-live="polite"><div><div class="bar"><i></i></div><p>Memuat adegan 3D</p></div></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+<header class="nav">
+  <a class="brand" href="#beranda" data-owd-text="merek" data-owd-label="Nama merek">Arus Biru</a>
+  <nav aria-label="Navigasi utama"><ul><li><a href="#terumbu" data-owd-text="menu1" data-owd-label="Menu 1">Terumbu</a></li><li><a href="#satwa" data-owd-text="menu2" data-owd-label="Menu 2">Satwa</a></li><li><a href="#nelayan" data-owd-text="menu3" data-owd-label="Menu 3">Nelayan</a></li><li><a href="#bergabung" data-owd-text="menu4" data-owd-label="Menu 4">Bergabung</a></li><li><a href="#kontak" data-owd-text="menu5" data-owd-label="Menu 5">Kontak</a></li></ul></nav>
+</header>
+<main>
+<section id="beranda" class="sec left hero" data-adegan="0" aria-labelledby="beranda-t">
+  <div class="panel">
+    <p class="kicker" data-owd-text="s1Label" data-owd-label="Bagian 1: label kecil">Arus Biru</p>
+    <h1 id="beranda-t" data-owd-text="s1Judul" data-owd-label="Bagian 1: judul">Menjaga laut tetap biru, satu terumbu setiap kali.</h1>
+    <p data-owd-text="s1Teks1" data-owd-label="Bagian 1: paragraf 1" data-owd-multi>Gerakan konservasi pesisir yang menanam ulang terumbu karang, memantau satwa laut, dan mengajak nelayan lokal menjadi penjaga laut.</p>
+    <div class="ctas"><a class="btn" href="#kontak" data-owd-text="s1Tombol1" data-owd-label="Bagian 1: tombol 1">Ikut berdonasi</a><a class="btn ghost" href="#terumbu" data-owd-text="s1Tombol2" data-owd-label="Bagian 1: tombol 2">Program kami</a></div>
+  </div>
+</section>
+<section id="terumbu" class="sec right" data-adegan="1" aria-labelledby="terumbu-t">
+  <div class="panel">
+    <p class="kicker" data-owd-text="s2Label" data-owd-label="Bagian 2: label kecil">Terumbu</p>
+    <h2 id="terumbu-t" data-owd-text="s2Judul" data-owd-label="Bagian 2: judul">Karang tumbuh pelan. Kami menunggu dengan sabar.</h2>
+    <p data-owd-text="s2Teks1" data-owd-label="Bagian 2: paragraf 1" data-owd-multi>Fragmen karang ditanam di rangka baja ramah laut, lalu dipantau setiap bulan oleh penyelam relawan dan kelompok nelayan setempat.</p>
+    
+  </div>
+</section>
+<section id="satwa" class="sec left" data-adegan="2" aria-labelledby="satwa-t">
+  <div class="panel">
+    <p class="kicker" data-owd-text="s3Label" data-owd-label="Bagian 3: label kecil">Satwa</p>
+    <h2 id="satwa-t" data-owd-text="s3Judul" data-owd-label="Bagian 3: judul">Mencatat yang datang kembali.</h2>
+    <p data-owd-text="s3Teks1" data-owd-label="Bagian 3: paragraf 1" data-owd-multi>Ubur-ubur, penyu, dan kawanan ikan adalah tanda laut yang pulih.</p>
+    <ul><li data-owd-text="s3Poin1" data-owd-label="Bagian 3: poin 1">Survei bawah laut bulanan</li><li data-owd-text="s3Poin2" data-owd-label="Bagian 3: poin 2">Data terbuka untuk peneliti</li><li data-owd-text="s3Poin3" data-owd-label="Bagian 3: poin 3">Pelatihan pemandu wisata selam</li></ul>
+  </div>
+</section>
+<section id="nelayan" class="sec right" data-adegan="3" aria-labelledby="nelayan-t">
+  <div class="panel">
+    <p class="kicker" data-owd-text="s4Label" data-owd-label="Bagian 4: label kecil">Nelayan</p>
+    <h2 id="nelayan-t" data-owd-text="s4Judul" data-owd-label="Bagian 4: judul">Penjaga terbaik laut adalah yang hidup darinya.</h2>
+    <p data-owd-text="s4Teks1" data-owd-label="Bagian 4: paragraf 1" data-owd-multi>Kami bekerja dengan kelompok nelayan untuk zona tangkap bergilir, sehingga ikan punya waktu berkembang biak dan hasil tangkapan tetap terjaga.</p>
+    
+  </div>
+</section>
+<section id="bergabung" class="sec center" data-adegan="4" aria-labelledby="bergabung-t">
+  <div class="panel">
+    <p class="kicker" data-owd-text="s5Label" data-owd-label="Bagian 5: label kecil">Bergabung</p>
+    <h2 id="bergabung-t" data-owd-text="s5Judul" data-owd-label="Bagian 5: judul">Laut menunggu bantuan Anda.</h2>
+    <p data-owd-text="s5Teks1" data-owd-label="Bagian 5: paragraf 1" data-owd-multi>Satu donasi membantu satu fragmen karang tumbuh selama setahun penuh.</p>
+    <div class="ctas"><a class="btn" href="#kontak" data-owd-text="s5Tombol1" data-owd-label="Bagian 5: tombol 1">Donasi sekarang</a></div>
+  </div>
+</section>
+</main>
+<section class="contact" id="kontak" aria-labelledby="kontak-t">
+  <h2 id="kontak-t" data-owd-text="kontakJudul" data-owd-label="Kontak: judul">Jadi bagian dari laut yang pulih.</h2>
+  <p data-owd-text="kontakTeks" data-owd-label="Kontak: teks" data-owd-multi>Donasi, jadi relawan penyelam, atau ajak perusahaan Anda menanam terumbu bersama kami.</p>
+  <a class="mail" href="mailto:halo@arusbiru.example" data-owd-href="email" data-owd-href-label="Tautan email (mailto:)" data-owd-text="emailTeks" data-owd-label="Alamat email yang ditampilkan">halo@arusbiru.example</a>
+  <div class="ctas"><a class="btn" href="mailto:halo@arusbiru.example" data-owd-href="email" data-owd-href-label="Tautan email (mailto:)" data-owd-text="kontakTombol" data-owd-label="Kontak: tulisan tombol">Bergabung dengan Arus Biru</a></div>
+  <footer><span data-owd-text="merek" data-owd-label="Nama merek">Arus Biru</span><span data-owd-text="alamat" data-owd-label="Alamat / kota">Labuan Bajo, Nusa Tenggara Timur</span><span data-owd-text="catatanKaki" data-owd-label="Catatan kaki">Konten dan nama di halaman ini fiktif.</span></footer>
+</section>
+<script type="module">
+/* ---- Pemuat library: CDN utama + cadangan ---- */
+const CDN = ["https://cdn.jsdelivr.net/npm/","https://unpkg.com/"];
+function race(path, get) {
+  const order = CDN.slice();
+  return new Promise((ok, no) => {
+    let i = 0, fails = 0, done = false;
+    const next = () => {
+      const cdn = order[i++], url = cdn + path;
+      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
+      if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
+    };
+    next();
+  });
+}
+const esm = (path) => race(path, (u) => import(u));
+const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
+const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
+const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
+
+/* ==== KONFIGURASI: warna 3D, anggaran, dan jalur kamera per section ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan 3D" hide="maksPixelRatio,maksSegitiga,jarakAktif,benih,adegan"*/{
+  "maksPixelRatio": 2,
+  "maksSegitiga": 50000,
+  "jarakAktif": 95,
+  "benih": 7,
+  "kepadatanKabut": 0.03,
+  "warna": {
+    "kabut": "#03304a",
+    "langit": "#9be8ff",
+    "tanah": "#021a2b",
+    "cahaya": "#ffffff"
+  },
+  "adegan": [
+    {
+      "id": "beranda",
+      "pusat": [
+        0,
+        0,
+        0
+      ],
+      "kamera": [
+        0,
+        0,
+        16
+      ],
+      "lihat": [
+        0,
+        4,
+        -4
+      ],
+      "geser": [
+        -1,
+        0
+      ]
+    },
+    {
+      "id": "terumbu",
+      "pusat": [
+        20,
+        0,
+        -44
+      ],
+      "kamera": [
+        10,
+        -1,
+        -26
+      ],
+      "lihat": [
+        20,
+        -4,
+        -44
+      ],
+      "geser": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "satwa",
+      "pusat": [
+        -18,
+        0,
+        -84
+      ],
+      "kamera": [
+        -6,
+        1,
+        -70
+      ],
+      "lihat": [
+        -18,
+        0,
+        -84
+      ],
+      "geser": [
+        -1,
+        0
+      ]
+    },
+    {
+      "id": "nelayan",
+      "pusat": [
+        8,
+        0,
+        -124
+      ],
+      "kamera": [
+        12,
+        2,
+        -108
+      ],
+      "lihat": [
+        8,
+        0,
+        -124
+      ],
+      "geser": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "bergabung",
+      "pusat": [
+        0,
+        0,
+        -166
+      ],
+      "kamera": [
+        0,
+        0,
+        -150
+      ],
+      "lihat": [
+        0,
+        0,
+        -168
+      ],
+      "geser": [
+        0,
+        -1
+      ]
+    }
+  ]
+}/*owd:end*/;
+/* ==================================================================== */
+
+/* Adegan per section (urutan = urutan section). Semua bentuk prosedural. */
+const GLOBAL = (ctx) => {
+  const { THREE, rand } = ctx;
+  /* Partikel plankton di seluruh jalur. */
+  const n = 1400, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { pos[i * 3] = (rand() - 0.5) * 160; pos[i * 3 + 1] = (rand() - 0.5) * 60; pos[i * 3 + 2] = 20 - rand() * 220; }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  ctx.scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x9ff5ec, size: 1.8, sizeAttenuation: false, transparent: true, opacity: 0.6 })));
+};
+const SCENES = [
+  /* 0. Permukaan laut dilihat dari bawah + berkas cahaya */
+  (ctx, g) => {
+    const { THREE } = ctx;
+    const geo = new THREE.PlaneGeometry(90, 90, 80, 80);
+    const base = geo.attributes.position.array.slice();
+    const sea = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x3fb7c9, emissive: 0x0d4f63, roughness: 0.35, metalness: 0.1, side: THREE.DoubleSide, flatShading: true }));
+    sea.rotation.x = Math.PI / 2; sea.position.y = 9;
+    g.add(sea);
+    const beams = [];
+    for (let i = 0; i < 6; i++) {
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 2.4, 22, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0xbff7ff, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+      b.position.set(-12 + i * 5, -1, -6 - (i % 3) * 4); b.rotation.z = 0.25; g.add(b); beams.push(b);
+    }
+    const arr = geo.attributes.position.array;
+    return { update: (t) => {
+      for (let i = 0; i < arr.length; i += 3) { const x = base[i], y = base[i + 1]; arr[i + 2] = Math.sin(x * 0.18 + t * 1.1) * 0.7 + Math.cos(y * 0.22 + t * 0.8) * 0.6; }
+      geo.attributes.position.needsUpdate = true;
+      beams.forEach((b, i) => { b.material.opacity = 0.06 + Math.sin(t * 0.7 + i) * 0.03; });
+    } };
+  },
+  /* 1. Terumbu karang bercabang (instanced, rekursif) */
+  (ctx, g) => {
+    const { THREE, rand } = ctx;
+    const segs = [];
+    function branch(p, dir, len, depth) {
+      const end = p.clone().addScaledVector(dir, len);
+      segs.push({ a: p, b: end, r: 0.06 + depth * 0.05 });
+      if (depth === 0) return;
+      const k = depth > 2 ? 2 : 3;
+      for (let i = 0; i < k; i++) { const d = dir.clone().add(new THREE.Vector3((rand() - 0.5) * 1.1, 0.4 + rand() * 0.3, (rand() - 0.5) * 1.1)).normalize(); branch(end, d, len * (0.65 + rand() * 0.15), depth - 1); }
+    }
+    for (let c = 0; c < 9; c++) branch(new THREE.Vector3((rand() - 0.5) * 18, -6, (rand() - 0.5) * 12), new THREE.Vector3(0, 1, 0), 1.8 + rand(), 3);
+    const mesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.7, 1, 1, 6, 1), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, flatShading: true }), segs.length);
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), mid = new THREE.Vector3(), dir = new THREE.Vector3(), s = new THREE.Vector3(), c = new THREE.Color();
+    const tones = [0xff7a59, 0xff9f80, 0xf25c8a, 0xffc36b];
+    segs.forEach((sg, i) => { dir.subVectors(sg.b, sg.a); const L = dir.length(); q.setFromUnitVectors(up, dir.normalize()); mid.addVectors(sg.a, sg.b).multiplyScalar(0.5); s.set(sg.r, L, sg.r); m.compose(mid, q, s); mesh.setMatrixAt(i, m); mesh.setColorAt(i, c.setHex(tones[i % tones.length])); });
+    const bed = new THREE.Mesh(new THREE.CircleGeometry(16, 40), new THREE.MeshStandardMaterial({ color: 0x0f5561, roughness: 1 }));
+    bed.rotation.x = -Math.PI / 2; bed.position.y = -6;
+    g.add(mesh, bed);
+    return { update: (t) => { mesh.rotation.y = Math.sin(t * 0.2) * 0.05; } };
+  },
+  /* 2. Ubur-ubur berdenyut */
+  (ctx, g) => {
+    const { THREE, rand } = ctx;
+    const bellGeo = new THREE.SphereGeometry(1.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+    const jellies = [];
+    for (let i = 0; i < 7; i++) {
+      const j = new THREE.Group();
+      const bell = new THREE.Mesh(bellGeo, new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a4dff, emissiveIntensity: 0.6, transparent: true, opacity: 0.7, side: THREE.DoubleSide }));
+      j.add(bell);
+      const pts = [];
+      for (let k = 0; k < 8; k++) { const a = (k / 8) * Math.PI * 2; for (let y = 0; y < 6; y++) pts.push(Math.cos(a) * 0.8, -y * 0.5, Math.sin(a) * 0.8, Math.cos(a) * 0.8, -(y + 1) * 0.5, Math.sin(a) * 0.8); }
+      const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      j.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0xe6d6ff, transparent: true, opacity: 0.5 })));
+      j.position.set((rand() - 0.5) * 16, (rand() - 0.5) * 8, (rand() - 0.5) * 10);
+      j.userData = { k: rand() * 6, s: 0.7 + rand() * 0.7 };
+      j.scale.setScalar(j.userData.s);
+      g.add(j); jellies.push(j);
+    }
+    g.add(new THREE.PointLight(0xb08cff, 40, 30));
+    return { update: (t, dt) => { jellies.forEach((j) => { const p = Math.sin(t * 2 + j.userData.k); j.children[0].scale.set(1 + p * 0.08, 1 - p * 0.12, 1 + p * 0.08); j.position.y += (0.35 + p * 0.25) * dt; if (j.position.y > 7) j.position.y = -7; }); } };
+  },
+  /* 3. Kawanan ikan berputar */
+  (ctx, g) => {
+    const { THREE, rand } = ctx;
+    const count = 240;
+    const geo = new THREE.ConeGeometry(0.22, 0.9, 6); geo.rotateZ(-Math.PI / 2);
+    const mesh = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ color: 0xdff8ff, metalness: 0.6, roughness: 0.3 }), count);
+    const data = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(1, 1, 1), p = new THREE.Vector3();
+    for (let i = 0; i < count; i++) data.push({ a: rand() * Math.PI * 2, r: 4 + rand() * 4, y: (rand() - 0.5) * 4, w: 0.5 + rand() * 0.3, k: rand() * 6 });
+    g.add(mesh);
+    const place = (t) => { data.forEach((d, i) => { const a = d.a + t * d.w; p.set(Math.cos(a) * d.r, d.y + Math.sin(t + d.k) * 0.6, Math.sin(a) * d.r); e.set(0, -a - Math.PI / 2, Math.sin(t * 3 + d.k) * 0.15); q.setFromEuler(e); m.compose(p, q, s); mesh.setMatrixAt(i, m); }); mesh.instanceMatrix.needsUpdate = true; };
+    place(0);
+    return { update: place };
+  },
+  /* 4. Cincin cahaya di laut dalam */
+  (ctx, g) => {
+    const { THREE } = ctx;
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(5, 0.12, 10, 96), new THREE.MeshBasicMaterial({ color: 0x5ff2df }));
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.06, 8, 96), new THREE.MeshBasicMaterial({ color: 0xffd38a }));
+    const glow = new THREE.Mesh(new THREE.CircleGeometry(4.6, 64), new THREE.MeshBasicMaterial({ color: 0x0aa3a3, transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false }));
+    g.add(ring, ring2, glow);
+    return { update: (t) => { ring.rotation.y = Math.sin(t * 0.4) * 0.4; ring2.rotation.x = t * 0.3; glow.material.opacity = 0.14 + Math.sin(t) * 0.05; } };
+  },
+];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const root = document.documentElement;
+const canvas = document.getElementById("gl");
+const sections = [...document.querySelectorAll("[data-adegan]")];
+
+function fail(reason) {
+  root.classList.add("no-webgl");
+  root.classList.remove("loading", "webgl");
+  console.warn("[owd] Mode 3D tidak aktif, memakai latar gradasi:", reason);
+}
+function hasWebGL() {
+  try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; }
+}
+
+/* RNG deterministik supaya adegan sama di setiap kunjungan. */
+function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+function triangles(obj) {
+  let n = 0;
+  obj.traverse((o) => {
+    if (!o.isMesh || !o.geometry) return;
+    const g = o.geometry;
+    const per = (g.index ? g.index.count : g.attributes.position.count) / 3;
+    n += per * (o.isInstancedMesh ? o.count : 1);
+  });
+  return Math.round(n);
+}
+
+/* Warna latar & aksen diambil dari variabel CSS (satu tempat untuk diubah). */
+const cssv = getComputedStyle(root);
+const cv = (name, fallback) => cssv.getPropertyValue(name).trim() || fallback;
+const WARNA = Object.assign({}, CONFIG.warna, { latar: cv("--bg", "#000000"), aksen: cv("--accent", "#ffffff"), aksen2: cv("--accent-2", "#ffffff") });
+
+if (!hasWebGL()) fail("WebGL tidak tersedia di perangkat ini");
+else {
+  try { start(); } catch (e) { fail(e && e.message ? e.message : String(e)); }
+}
+
+function start() {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  let dpr = Math.min(window.devicePixelRatio || 1, CONFIG.maksPixelRatio);
+  renderer.setPixelRatio(dpr);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(WARNA.latar);
+  scene.fog = new THREE.FogExp2(WARNA.kabut, CONFIG.kepadatanKabut);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 400);
+  scene.add(new THREE.HemisphereLight(WARNA.langit, WARNA.tanah, 1.4));
+  const sun = new THREE.DirectionalLight(WARNA.cahaya, 2.2);
+  sun.position.set(12, 20, 10);
+  scene.add(sun);
+
+  const ctx = { THREE, scene, camera, rand: seeded(CONFIG.benih), warna: WARNA, reduce };
+  const parts = SCENES.map((build, i) => {
+    const group = new THREE.Group();
+    group.position.fromArray(CONFIG.adegan[i].pusat);
+    scene.add(group);
+    const api = build(ctx, group, i) || {};
+    return { group, update: api.update, center: group.position.clone() };
+  });
+  if (GLOBAL) GLOBAL(ctx);
+
+  /* Anggaran segitiga */
+  const tris = triangles(scene);
+  window.__OWD_STATS = { triangles: tris, budget: CONFIG.maksSegitiga, contexts: 1 };
+  if (tris > CONFIG.maksSegitiga) console.warn("[owd] Melebihi anggaran segitiga:", tris);
+
+  /* Jalur kamera: satu titik per section, dihaluskan dengan CatmullRom. */
+  const v = (a) => new THREE.Vector3(a[0], a[1], a[2]);
+  const camPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.kamera)), false, "centripetal");
+  const lookPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.lihat)), false, "centripetal");
+  const N = CONFIG.adegan.length;
+
+  /* Progres scroll: kamera "berhenti" sejenak di tiap adegan (dwell), lalu pindah. */
+  let stops = [];
+  function measure() {
+    const y0 = window.scrollY;
+    stops = sections.map((s) => { const r = s.getBoundingClientRect(); return r.top + y0 + r.height / 2 - innerHeight / 2; });
+  }
+  const smooth = (x) => x * x * (3 - 2 * x);
+  function targetU() {
+    const y = window.scrollY;
+    if (y <= stops[0]) return 0;
+    for (let i = 0; i < stops.length - 1; i++) {
+      if (y < stops[i + 1]) {
+        const f = (y - stops[i]) / (stops[i + 1] - stops[i]);
+        const d = Math.min(1, Math.max(0, (f - 0.18) / 0.64));
+        return (i + smooth(d)) / (N - 1);
+      }
+    }
+    return 1;
+  }
+
+  /* Pointer: kamera bergeser sedikit (desktop). */
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  const finePointer = matchMedia("(pointer: fine)").matches;
+  if (finePointer && !reduce) addEventListener("pointermove", (e) => { pointer.tx = (e.clientX / innerWidth - 0.5) * 2; pointer.ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
+
+  /* Komposisi: objek digeser ke sisi yang berlawanan dengan teks (setViewOffset).
+     Di layar tegak teks ada di bawah, jadi objek digeser ke atas. */
+  function frameView(uu) {
+    const w = innerWidth, h = innerHeight;
+    const k = uu * (N - 1), i = Math.min(N - 2, Math.floor(k)), f = k - i;
+    const a = CONFIG.adegan[i].geser, b = CONFIG.adegan[i + 1].geser;
+    const gx = a[0] + (b[0] - a[0]) * f, gy = a[1] + (b[1] - a[1]) * f;
+    if (w < h) camera.setViewOffset(w, h, 0, h * 0.16, w, h);
+    else camera.setViewOffset(w, h, gx * w * 0.2, gy * h * 0.16, w, h);
+  }
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.fov = w < h ? 68 : 55;
+    camera.updateProjectionMatrix();
+    measure();
+  }
+  addEventListener("resize", resize);
+  resize();
+
+  /* Lenis: gulir halus (dimatikan bila pengguna memilih kurangi gerak). */
+  let lenis = null;
+  if (!reduce) lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+  document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+    const t = document.querySelector(a.getAttribute("href"));
+    if (!t) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(t, { offset: 0 }); else t.scrollIntoView();
+    t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true });
+  }));
+
+  /* Render hanya saat ada section 3D yang terlihat dan tab aktif. */
+  let visible = true;
+  const seen = new Set();
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => (en.isIntersecting ? seen.add(en.target) : seen.delete(en.target)));
+    visible = seen.size > 0;
+  });
+  sections.forEach((s) => io.observe(s));
+
+  let u = targetU();
+  const camPos = new THREE.Vector3(), lookAt = new THREE.Vector3();
+  const clock = new THREE.Clock();
+  let raf = 0, frames = 0, slow = 0, first = true;
+
+  function frame(time) {
+    raf = requestAnimationFrame(frame);
+    if (lenis) lenis.raf(time);
+    const dt = Math.min(clock.getDelta(), 0.1);
+    if (!visible || document.hidden) return;
+    const tu = targetU();
+    u = reduce ? tu : u + (tu - u) * Math.min(1, dt * 4);
+    camPath.getPointAt(u, camPos);
+    lookPath.getPointAt(u, lookAt);
+    pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * 3);
+    pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * 3);
+    camera.position.copy(camPos).add(new THREE.Vector3(pointer.x * 1.2, -pointer.y * 0.7, 0));
+    camera.lookAt(lookAt);
+    frameView(u);
+    const t = clock.elapsedTime;
+    for (const p of parts) {
+      const near = p.center.distanceTo(camPos) < CONFIG.jarakAktif;
+      p.group.visible = near;
+      if (near && p.update && !reduce) p.update(t, dt);
+    }
+    renderer.render(scene, camera);
+    if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
+    /* Turunkan pixel ratio bila rata-rata frame > 22 ms (target 60 fps). */
+    frames++;
+    if (dt > 0.022) slow++;
+    if (frames === 90) {
+      if (slow > 45 && dpr > 1) { dpr = Math.max(1, dpr - 0.5); renderer.setPixelRatio(dpr); resize(); }
+      frames = 0; slow = 0;
+    }
+  }
+
+  if (window.OWD_THUMB) {
+    camPath.getPointAt(0, camPos); lookPath.getPointAt(0, lookAt);
+    camera.position.copy(camPos); camera.lookAt(lookAt); frameView(0);
+    parts.forEach((p) => p.update && p.update(1.5, 0.016));
+    renderer.render(scene, camera);
+    root.classList.add("webgl"); root.classList.remove("loading");
+    return;
+  }
+  raf = requestAnimationFrame(frame);
+
+  /* Bersihkan semuanya saat halaman ditinggalkan. */
+  function dispose() {
+    cancelAnimationFrame(raf);
+    io.disconnect();
+    if (lenis) lenis.destroy();
+    scene.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const m = o.material;
+      if (m) (Array.isArray(m) ? m : [m]).forEach((mat) => { for (const k in mat) { const val = mat[k]; if (val && val.isTexture) val.dispose(); } mat.dispose(); });
+    });
+    renderer.dispose();
+    renderer.forceContextLoss();
+  }
+  addEventListener("pagehide", dispose, { once: true });
+  window.__OWD_DISPOSE = dispose;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+node_modules
+dist
+
+# Hasil pemeriksaan template (npm run templates:gen)
+.template-sites/
+
+# Rahasia lokal: jangan ikut di-push
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Lain-lain
+*.log
+.DS_Store
+coverage
