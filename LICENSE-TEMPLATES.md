@@ -14,20 +14,11 @@ Websites, pages, or code that you create or export with OneWebDev, including tho
 
 Anyone may download and use every template in the app, free of charge, including as the starting point for client websites that you build as a paid service.
 
-## 3. One restriction: templates may not be resold as templates
-
-You **may not** sell, rent, or redistribute OneWebDev templates (original or lightly modified) **as a template product**, for example:
-
-- selling them on theme or template marketplaces (ThemeForest, Creative Market, Gumroad, and similar);
-- bundling them as a template pack or collection, free or paid, that competes with the OneWebDev collection.
-
-Selling the **service** of building websites for clients with these templates is allowed; what is not allowed is selling the **templates themselves** as goods.
-
-## 4. Images, icons, and fonts inside templates
+## 3. Images, icons, and fonts inside templates
 
 Sample images, icons, and 3D objects in the templates are made in-house by OneWebDev and follow the terms in this file. Fonts (Google Fonts, SIL OFL / Apache 2.0) and JavaScript libraries (MIT/ISC) follow their own licenses (see `THIRD_PARTY_NOTICES.md`). Business names, people, partners, and testimonials in the templates are fictional examples: replace them with your real data before publishing the website.
 
-## 5. Scope
+## 4. Scope
 
 The terms in this file apply to the contents of the `src/pages/webTemplates/` folder and to every exported website. The rest of the repository remains under the MIT license.
 
