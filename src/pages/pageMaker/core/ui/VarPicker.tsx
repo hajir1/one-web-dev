@@ -4,11 +4,11 @@ import i18n from "../../../../i18n";
 import { refName, sizeToPx, varRef, type CssVar, type VarType } from "../helpers/cssVars";
 
 /* ================================================================== */
-/* Pemilih variabel global (v7) untuk field warna, ukuran, dan font.     */
+/* Global variable picker (v7) for color, size, and font fields.        */
 /*                                                                    */
-/* Aktif hanya di dalam <VarPickerProvider> (panel elemen Page Maker),  */
-/* karena compose baru memetakan var(--x) untuk state elemen. Nilai     */
-/* yang disimpan adalah string `var(--x)`.                              */
+/* Active only inside <VarPickerProvider> (the Page Maker element panel), */
+/* because compose only maps var(--x) for element state. The stored     */
+/* value is the string `var(--x)`.                                      */
 /* ================================================================== */
 
 const VarPickerContext = createContext<readonly CssVar[] | null>(null);
@@ -19,12 +19,12 @@ export function useVarPicker(): readonly CssVar[] | null {
   return useContext(VarPickerContext);
 }
 
-/** Teks contoh nilai variabel untuk daftar & chip. */
+/** Sample text of a variable value for the list & chip. */
 function preview(v: CssVar): string {
   return v.type === "font" ? v.value.split(",")[0].replace(/["']/g, "") : v.value;
 }
 
-/** Chip "nilai dari variabel" + tombol lepas (kembali ke nilai manual). */
+/** A "value from variable" chip + a detach button (back to a manual value). */
 export function VarChip({ value, onDetach }: { value: string; onDetach: () => void }) {
   const vars = useVarPicker() ?? [];
   const name = refName(value) ?? "";
@@ -44,7 +44,7 @@ export function VarChip({ value, onDetach }: { value: string; onDetach: () => vo
   );
 }
 
-/** Tombol {} yang membuka daftar variabel bertipe `type`. */
+/** The {} button that opens the list of variables of type `type`. */
 export function VarButton({ type, onPick }: { type: VarType; onPick: (ref: string) => void }) {
   const vars = useVarPicker();
   const [open, setOpen] = useState(false);
@@ -105,13 +105,13 @@ export function VarButton({ type, onPick }: { type: VarType; onPick: (ref: strin
   );
 }
 
-/** Nilai angka saat referensi variabel ukuran dilepas. */
+/** Numeric value when a size variable reference is detached. */
 export function detachNumber(value: string, vars: readonly CssVar[] | null): number {
   const v = vars?.find((x) => x.name === refName(value));
   return v ? sizeToPx(v.value) : 0;
 }
 
-/** Nilai warna saat referensi variabel warna dilepas. */
+/** Color value when a color variable reference is detached. */
 export function detachColor(value: string, vars: readonly CssVar[] | null): string {
   return vars?.find((x) => x.name === refName(value))?.value ?? "#000000";
 }

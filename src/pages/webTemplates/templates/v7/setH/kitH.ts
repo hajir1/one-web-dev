@@ -13,20 +13,20 @@ import { animate, aos, installLibs } from "../../v3/libs";
 import type { CardStyle, Domain, HBlock, HChart, HSpec, PageKind, X } from "./spec";
 
 /* ================================================================== */
-/* Mesin template v7 bagian H: HSpec (dashboard) → TemplateContent.     */
+/* v7 template engine part H: HSpec (dashboard) → TemplateContent.      */
 /*                                                                    */
-/* Setiap halaman aplikasi = 3 section:                                 */
-/*   header  bilah atas (logo, cari, notifikasi, avatar / menu atas)    */
+/* Each app page = 3 sections:                                          */
+/*   header  top bar (logo, search, notifications, avatar / top menu)   */
 /*   section "Aplikasi": Row grid [sidebar | konten] (topnav: konten)   */
 /*   footer  hak cipta + status sistem                                  */
-/* Halaman Masuk memakai header/footer ringkas + kartu formulir.        */
-/* Responsif: sidebar jadi menu geser horizontal di HP, grid KPI 2      */
-/* kolom, tabel bergulir horizontal, grafik menyesuaikan lebar.         */
-/* Template Free hanya memakai elemen gratis (target = daftar, KPI      */
-/* tanpa penghitung animasi) dan tanpa library efek.                    */
+/* The Sign-in page uses a compact header/footer + a form card.         */
+/* Responsive: the sidebar becomes a horizontal swipe menu on phones, the KPI grid 2 */
+/* columns, horizontally scrolling tables, charts adapt to the width.   */
+/* Free templates only use free elements (target = a list, KPIs         */
+/* without animated counters) and no effect libraries.                  */
 /* ================================================================== */
 
-/* ------------------------------ teks ------------------------------- */
+/* ------------------------------ text ------------------------------- */
 
 type T = (s: X) => string;
 const split1 = (s: string): [string, string] => {
@@ -37,7 +37,7 @@ const tOf = (tr: Tr): T => (s) => {
   const [a, b] = split1(s);
   return tr(a.trim(), b.trim());
 };
-/** Bagian dipisah ";" (tiap bagian boleh dwibahasa). */
+/** Parts separated by ";" (each part may be bilingual). */
 const parts = (t: T, s: string) => s.split(";").map((x) => t(x.trim()));
 
 /* ------------------------------ tampilan --------------------------- */
@@ -51,16 +51,16 @@ interface Look {
   surface: string;
   dark: boolean;
   card: CardStyle;
-  /** Teks kuat & redup di atas kartu. */
+  /** Strong & muted text on cards. */
   ink: string;
   muted: string;
   line: string;
-  /** Warna teks di atas warna utama (gelap bila warna utama terang). */
+  /** Text color on the primary color (dark when the primary color is light). */
   onPrimary: string;
   onPrimaryDark: string;
 }
 
-/** Luminans relatif WCAG warna hex. */
+/** WCAG relative luminance of a hex color. */
 export function luminance(hex: string): number {
   const [r, g, b] = [1, 3, 5].map((i) => {
     const c = parseInt(hex.slice(i, i + 2), 16) / 255;
@@ -90,7 +90,7 @@ function lookOf(s: HSpec): Look {
   };
 }
 
-/** Tambah Custom CSS ke node (deklarasi biasa atau blok `& {…}` / @media). */
+/** Adds Custom CSS to a node (plain declarations or `& {…}` / @media blocks). */
 function css(n: ElementNode | BoxNode, decl: string): void {
   let cur = n.advanced?.customCss ?? "";
   if (!cur.includes("{") && !decl.includes("{")) {
@@ -120,7 +120,7 @@ function cardCss(L: Look): string {
   }
 }
 
-/** Kartu (kolom bergaya). */
+/** Card (styled column). */
 function card(L: Look, kids: (ElementNode | BoxNode)[], name = "Kartu", o: { gap?: number; pad?: number; tone?: "tint" | "accent" } = {}): BoxNode {
   const c = col(kids, { gap: o.gap ?? 14, name, align: "stretch" });
   c.padding = o.pad ?? 20;
@@ -132,7 +132,7 @@ function card(L: Look, kids: (ElementNode | BoxNode)[], name = "Kartu", o: { gap
   return c;
 }
 
-/** Grid di dalam kolom (bukan Row). */
+/** Grid inside a column (not a Row). */
 function gbox(cells: BoxNode[], columns: string, o: { gap?: number; name?: string; mobile?: "one" | "two" | "scroll" } = {}): BoxNode {
   return createBox("grid", {
     name: o.name ?? "Grid",
@@ -170,9 +170,9 @@ function delta(L: Look, text: string, up: boolean): ElementNode {
   return badge(`${up ? "▲" : "▼"} ${text}`, bg, fg);
 }
 
-/* ------------------------------ elemen ----------------------------- */
+/* ------------------------------ elements ----------------------------- */
 
-/** Rona (0–360) warna hex. */
+/** Hue (0–360) of a hex color. */
 function hueOf(hex: string): number {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
   const max = Math.max(r, g, b);
@@ -182,7 +182,7 @@ function hueOf(hex: string): number {
   return (h * 60 + 360) % 360;
 }
 
-/** Warna seri kedua yang kontras dengan warna utama: aksen hangat → biru, selain itu → amber. */
+/** A second series color that contrasts with the primary: warm accent → blue, otherwise → amber. */
 function secondColor(L: Look): string {
   const h = hueOf(L.p.primary);
   const warm = h < 100 || h >= 330;
@@ -306,7 +306,7 @@ interface Ctx {
   t: T;
   href: (key: string) => string;
   premium: boolean;
-  /** Halaman yang ada (untuk tautan). */
+  /** Existing pages (for links). */
   keys: Set<string>;
 }
 
@@ -595,7 +595,7 @@ function block(c: Ctx, b: HBlock, i: number): BoxNode {
   }
 }
 
-/** Isi tiap jenis halaman (beranda dari spesifikasi). */
+/** Content of each page kind (home from the spec). */
 const PAGE_BLOCKS: Record<PageKind, HBlock[]> = {
   records: ["alerts", "table", "split-goal"],
   analytics: ["kpis", "duo", "wide", "tabs"],
@@ -750,9 +750,9 @@ function footer(c: Ctx): BoxNode {
   return sec;
 }
 
-/* ------------------------------ masuk ------------------------------ */
+/* ------------------------------ sign in ------------------------------ */
 
-/** Ilustrasi dashboard (SVG set H) di halaman Masuk. */
+/** Dashboard illustration (set H SVG) on the Sign-in page. */
 function loginArt(c: Ctx, radius: number): ElementNode {
   const img = image(asset(loginArtKey(c.s.id)), c.t("Ilustrasi dashboard|Dashboard illustration"), { ratio: "10 / 7", radius: Math.min(radius, 16) });
   img.state = { ...img.state, lazyLoad: false };
@@ -814,7 +814,7 @@ function loginPage(c: Ctx): BoxNode[] {
   return [head, body, footer(c)];
 }
 
-/* ------------------------------ halaman ---------------------------- */
+/* ------------------------------ pages ---------------------------- */
 
 function pagesOf(s: HSpec): TemplatePageDef[] {
   const d = s.domain;
@@ -842,7 +842,7 @@ function buildPage(s: HSpec, key: string, tr: Tr, href: (k: string) => string): 
   }
   const doc = pageWith(sections, L.font, L.bg);
   if (c.premium && s.fx) {
-    // Efek per blok konten (judul halaman tidak ikut).
+    // Effects per content block (the page title is excluded).
     const row = sections[1].children[0] as BoxNode | undefined;
     const content = row?.children.at(-1);
     const targets = content && "children" in content ? (content as BoxNode).children.slice(1) : [sections[1]];

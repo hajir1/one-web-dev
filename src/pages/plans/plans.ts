@@ -1,15 +1,15 @@
 // ─── plans/plans.ts ──────────────────────────────────────────────────────────
-// v11: Paket langganan Media & Data (bulanan/tahunan, kuota per bulan).
+// v11: Media & Data subscription plans (monthly/yearly, quota per month).
 //
-// Angka di sini = cadangan tampilan dan SAMA dengan backend
-// (src/billing/catalog/plans.ts). Backend yang menagih dan memotong kuota;
-// frontend tidak pernah mengubah paket/kuota sendiri.
+// The numbers here = display fallbacks and MATCH the backend
+// (src/billing/catalog/plans.ts). The backend bills and deducts quota;
+// the frontend never changes plans/quotas itself.
 //
 // ┌─ BACKEND ────────────────────────────────────────────────────────────┐
-// │ GET  /billing/plans                → katalog paket + add-on (publik)
+// │ GET  /billing/plans                → plan catalog + add-ons (public)
 // │ GET  /billing/subscription         → { current, personal, team }
-// │ POST /billing/subscription/quote   { plan, interval, forTeam? } → harga & potongan
-// │ POST /billing/subscription/buy     + Idempotency-Key → bayar dengan saldo kredit
+// │ POST /billing/subscription/quote   { plan, interval, forTeam? } → price & discount
+// │ POST /billing/subscription/buy     + Idempotency-Key → pay with the credit balance
 // │ POST /billing/subscription/checkout { …, returnUrl } + Idempotency-Key → URL Midtrans
 // │ POST /billing/subscription/addon   { addon: "units" | "video" } + Idempotency-Key
 // └───────────────────────────────────────────────────────────────────────┘
@@ -68,7 +68,7 @@ export const subscriptionQuery = {
   staleTime: STALE.short,
 };
 
-/** Simpan hasil transaksi paket dari respons server (akun + ringkasan paket). */
+/** Stores a plan transaction result from the server response (account + plan summary). */
 function record(body: Record<string, unknown>) {
   if (body.account) useBilling.getState().setAccountFromServer({ ...(body.account as object), subscription: (body.subscription as { current?: unknown } | undefined)?.current });
   const s = sanitizeSummary(body.subscription);
@@ -92,12 +92,12 @@ export async function quotePlan(plan: PaidPlanId, interval: PlanInterval, forTea
   };
 }
 
-/** Bayar paket dengan saldo kredit. */
+/** Pay for a plan with the credit balance. */
 export async function buyPlanWithCredits(plan: PaidPlanId, interval: PlanInterval, forTeam: boolean) {
   return record(await post("/billing/subscription/buy", { plan, interval, ...(forTeam ? { forTeam } : {}) }, true));
 }
 
-/** Bayar paket lewat Midtrans → URL checkout (paket aktif setelah webhook lunas). */
+/** Pay for a plan via Midtrans → checkout URL (the plan activates after the paid webhook). */
 export async function startPlanCheckout(plan: PaidPlanId, interval: PlanInterval, forTeam: boolean, returnUrl: string): Promise<string> {
   const b = await post("/billing/subscription/checkout", { plan, interval, returnUrl, ...(forTeam ? { forTeam } : {}) }, true);
   const url = safeCheckoutUrl(b.checkoutUrl);
@@ -105,7 +105,7 @@ export async function startPlanCheckout(plan: PaidPlanId, interval: PlanInterval
   return url;
 }
 
-/** Tambahan kuota bulan berjalan (dibayar kredit). */
+/** Extra quota for the current month (paid with credits). */
 export async function buyAddon(addon: AddonId) {
   return record(await post("/billing/subscription/addon", { addon }, true));
 }

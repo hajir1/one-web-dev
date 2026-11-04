@@ -1,19 +1,19 @@
 /* ================================================================== */
-/* Variabel global (v7) — logika murni, tanpa React                     */
+/* Global variables (v7) — pure logic, no React                         */
 /*                                                                    */
-/* Pengguna membuat variabel di Pengaturan Global (nama, tipe, nilai).  */
-/* Variabel ditulis sebagai CSS custom property di `:root`:             */
+/* Users create variables in Global Settings (name, type, value).       */
+/* Variables are written as CSS custom properties on `:root`:           */
 /*   x = #000000   →   :root { --x: #000000; }                          */
-/* Field elemen yang memakai variabel menyimpan string `var(--x)`       */
-/* (referensi, bukan salinan nilai), jadi mengubah nilai variabel       */
-/* langsung mengubah semua elemen yang memakainya.                      */
+/* Element fields that use a variable store the string `var(--x)`       */
+/* (a reference, not a copy of the value), so changing the variable value */
+/* immediately changes every element that uses it.                      */
 /*                                                                    */
-/* Generator CSS elemen ditulis untuk angka/hex. Supaya tidak perlu     */
-/* mengubah puluhan generator, compose memakai "sentinel": field yang   */
-/* berisi var(--x) diganti nilai penanda unik, CSS dibuat, lalu penanda */
-/* diganti kembali dengan var(--x). Bila generator mengolah nilainya    */
-/* (mis. dikali 0,6), hasilnya tidak bisa dipetakan dan compose memakai */
-/* nilai variabel saat ini sebagai gantinya (dengan peringatan).        */
+/* Element CSS generators are written for numbers/hex. To avoid         */
+/* changing dozens of generators, compose uses a "sentinel": fields     */
+/* holding var(--x) are replaced with a unique marker value, the CSS is built, then the marker */
+/* is replaced back with var(--x). When a generator transforms the value */
+/* (e.g. multiplies it by 0.6), the result cannot be mapped and compose uses */
+/* the variable's current value instead (with a warning).               */
 /* ================================================================== */
 
 export type VarType = "color" | "size" | "font" | "text";
@@ -22,15 +22,15 @@ export const VAR_TYPES: VarType[] = ["color", "size", "font", "text"];
 
 export interface CssVar {
   id: string;
-  /** Nama tanpa awalan `--`, sudah dinormalisasi (huruf, angka, -, _). */
+  /** Name without the `--` prefix, already normalized (letters, digits, -, _). */
   name: string;
   type: VarType;
   value: string;
-  /** Variabel bawaan: tidak bisa dihapus/diganti nama, nilai bisa diubah & direset. */
+  /** Built-in variable: cannot be deleted/renamed; its value can be changed & reset. */
   builtin?: boolean;
 }
 
-/** Variabel bawaan (warna utama, font, dst). Nilai bawaan dipakai juga untuk tombol reset. */
+/** Built-in variables (primary color, font, etc.). The default values are also used by the reset button. */
 export const BUILTIN_VARS: CssVar[] = [
   { id: "builtin-color-primary", name: "color-primary", type: "color", value: "#3b68f0", builtin: true },
   { id: "builtin-color-secondary", name: "color-secondary", type: "color", value: "#0f172a", builtin: true },
@@ -49,7 +49,7 @@ export const builtinDefault = (name: string): CssVar | undefined => BUILTIN_VARS
 
 const NAME_RE = /^[A-Za-z0-9_-]{1,40}$/;
 
-/** "  --Warna Utama " → "warna-utama". Huruf kecil, spasi jadi "-". */
+/** "  --Warna Utama " → "warna-utama". Lowercase, spaces become "-". */
 export function normalizeVarName(input: string): string {
   return input
     .trim()
@@ -68,7 +68,7 @@ export function validateVarName(raw: string, existing: readonly CssVar[], selfId
   return null;
 }
 
-/* ------------------------------ nilai ------------------------------ */
+/* ------------------------------ values ------------------------------ */
 
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const COLOR_FN = /^(rgb|rgba|hsl|hsla)\(\s*[0-9.,%\s/-]+\)$/i;
@@ -91,7 +91,7 @@ export function isValidVarValue(type: VarType, raw: string): boolean {
   }
 }
 
-/** Nilai bawaan saat membuat variabel baru per tipe. */
+/** Default value when creating a new variable, per type. */
 export const DEFAULT_VALUE: Record<VarType, string> = {
   color: "#000000",
   size: "16px",
@@ -108,32 +108,32 @@ export const varRef = (name: string) => `var(--${name})`;
 export const isVarRef = (v: unknown): boolean => typeof v === "string" && VAR_REF_RE.test(v.trim());
 export const refName = (v: string): string | null => VAR_REF_RE.exec(v.trim())?.[1] ?? null;
 
-/** Gabung variabel: urutan belakang menang (mis. [bawaan desain, global]). */
+/** Merge variables: later ones win (e.g. [design defaults, global]). */
 export function mergeVars(...lists: (readonly CssVar[] | undefined)[]): CssVar[] {
   const map = new Map<string, CssVar>();
   for (const l of lists) for (const v of l ?? []) if (v && NAME_RE.test(v.name) && isValidVarValue(v.type, v.value)) map.set(v.name, v);
   return [...map.values()];
 }
 
-/** Blok `:root { --x: nilai; }` ("" bila tidak ada variabel). */
+/** A `:root { --x: value; }` block ("" when there are no variables). */
 export function rootVarsCss(vars: readonly CssVar[], selector = ":root"): string {
   const ok = vars.filter((v) => NAME_RE.test(v.name) && isValidVarValue(v.type, v.value));
   if (!ok.length) return "";
   return `/* Variabel global */\n${selector} {\n${ok.map((v) => `  --${v.name}: ${v.value.trim()};`).join("\n")}\n}\n`;
 }
 
-/** Ganti semua var(--x) yang dikenal dengan nilainya (untuk mendeteksi font yang dipakai). */
+/** Replaces every known var(--x) with its value (to detect fonts in use). */
 export function expandVarRefs(css: string, vars: readonly CssVar[]): string {
   const map = new Map(vars.map((v) => [v.name, v.value]));
   return css.replace(VAR_REF_G, (m, n: string) => map.get(n) ?? m);
 }
 
-/** Nama variabel yang dirujuk di sebuah teks (CSS atau JSON state). */
+/** Variable names referenced in a text (CSS or JSON state). */
 export function varNamesIn(text: string): string[] {
   return [...new Set([...text.matchAll(VAR_REF_G)].map((m) => m[1]))];
 }
 
-/** Nilai px perkiraan dari ukuran (rem/em ×16). Dipakai saat nilai harus angka. */
+/** Approximate px value of a size (rem/em ×16). Used when the value must be a number. */
 export function sizeToPx(value: string): number {
   const m = /^(-?\d+(?:\.\d+)?)(px|rem|em|%|vw|vh)?$/.exec(value.trim());
   if (!m) return 0;
@@ -141,14 +141,14 @@ export function sizeToPx(value: string): number {
   return m[2] === "rem" || m[2] === "em" ? Math.round(n * 16 * 100) / 100 : n;
 }
 
-/** Nilai variabel saat referensinya dilepas: ukuran → angka px, lainnya → teks nilai. */
+/** Variable value when its reference is detached: sizes → px number, others → value text. */
 function detachedValue(v: CssVar): string | number {
   return v.type === "size" ? sizeToPx(v.value) : v.value;
 }
 
-/* ------------------------- pemakaian di desain ------------------------- */
+/* ------------------------- usage in designs ------------------------- */
 
-/** Jumlah referensi var(--name) di sebuah nilai (objek state, pohon desain). */
+/** Number of var(--name) references in a value (state object, design tree). */
 export function countRefs(obj: unknown, name: string): number {
   const ref = varRef(name);
   let n = 0;
@@ -162,7 +162,7 @@ export function countRefs(obj: unknown, name: string): number {
   return n;
 }
 
-/** Salinan `obj` dengan setiap string diubah lewat `fn` (null = tidak berubah). */
+/** A copy of `obj` with every string transformed by `fn` (null = unchanged). */
 function mapStrings(obj: unknown, fn: (s: string) => string | number | null): { value: unknown; changed: boolean } {
   let changed = false;
   const walk = (o: unknown): unknown => {
@@ -180,7 +180,7 @@ function mapStrings(obj: unknown, fn: (s: string) => string | number | null): { 
   return { value, changed };
 }
 
-/** Ganti nama referensi var(--from) → var(--to). */
+/** Rename references var(--from) → var(--to). */
 export function renameRefs<T>(obj: T, from: string, to: string): { value: T; changed: boolean } {
   const a = varRef(from);
   const b = varRef(to);
@@ -189,9 +189,9 @@ export function renameRefs<T>(obj: T, from: string, to: string): { value: T; cha
 }
 
 /**
- * Lepas referensi var(--name): field yang isinya persis var(--name) diganti
- * nilai terakhir variabel (ukuran → angka px), referensi di dalam teks lain
- * (mis. Custom CSS) diganti nilainya apa adanya.
+ * Detaches var(--name) references: fields whose content is exactly var(--name) are replaced
+ * with the variable's last value (sizes → px number); references inside other text
+ * (e.g. Custom CSS) are replaced with the value as is.
  */
 export function detachRefs<T>(obj: T, v: CssVar): { value: T; changed: boolean } {
   const ref = varRef(v.name);
@@ -211,9 +211,9 @@ export interface VarBinding {
   key: string;
   name: string;
   kind: BindKind;
-  /** Nilai sentinel (dipakai pass CSS). */
+  /** Sentinel value (used by the CSS pass). */
   sentinel: string | number;
-  /** Nilai konkret saat ini (dipakai pass pembanding & markup). */
+  /** The current concrete value (used by the comparison & markup passes). */
   resolved: string | number;
 }
 
@@ -231,21 +231,21 @@ const hexRgb = (hex: string) => {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 };
 
-/** Nilai konkret untuk field yang terikat variabel. */
+/** Concrete value for fields bound to a variable. */
 function resolvedFor(kind: BindKind, v: CssVar | undefined, fallback: unknown): string | number {
   if (kind === "number") return v ? sizeToPx(v.value) : typeof fallback === "number" ? fallback : 0;
   if (kind === "color") {
     if (v && HEX.test(v.value.trim())) return v.value.trim();
-    // Pembanding butuh hex; warna non-hex (rgb/transparent) diwakili hex netral.
+    // The comparison needs hex; non-hex colors (rgb/transparent) are represented by a neutral hex.
     return v ? "#808080" : typeof fallback === "string" ? fallback : "#000000";
   }
   return v ? v.value : typeof fallback === "string" ? fallback : "";
 }
 
 /**
- * Siapkan dua salinan state: `css` (field ber-var(--x) diganti sentinel)
- * dan `plain` (diganti nilai variabel saat ini). Tanpa referensi →
- * `bindings` kosong dan keduanya = state asli.
+ * Prepares two copies of the state: `css` (var(--x) fields replaced with sentinels)
+ * and `plain` (replaced with the variable's current value). No references →
+ * `bindings` is empty and both = the original state.
  */
 export function bindVars(
   defaults: Record<string, unknown>,
@@ -281,9 +281,9 @@ export function bindVars(
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
- * Petakan sentinel di `cssSentinel` kembali ke var(--x). `cssPlain` = CSS
- * dari state berisi nilai konkret: dipakai untuk memastikan generator tidak
- * mengolah nilainya. Mengembalikan null bila pemetaan tidak aman.
+ * Maps the sentinels in `cssSentinel` back to var(--x). `cssPlain` = CSS
+ * from the state with concrete values: used to make sure the generator does not
+ * transform the value. Returns null when the mapping is not safe.
  */
 export function restoreVars(cssSentinel: string, cssPlain: string, bindings: readonly VarBinding[]): string | null {
   if (!bindings.length) return cssSentinel;
@@ -293,7 +293,7 @@ export function restoreVars(cssSentinel: string, cssPlain: string, bindings: rea
     const ref = varRef(b.name);
     if (b.kind === "number") {
       const s = String(b.sentinel);
-      // Sentinel dengan satuan selain px (%, ms, …) atau dalam ekspresi → tidak aman.
+      // Sentinels with units other than px (%, ms, …) or inside expressions → not safe.
       if (new RegExp(`${esc(s)}(?!px\\b)[a-z%]`, "i").test(out) || new RegExp(`[\\d.]${esc(s)}|${esc(s)}\\.\\d`).test(out)) return null;
       const bare = new RegExp(`(?<![\\d.])${esc(s)}(?![\\d.])`, "g");
       out = out.replace(new RegExp(`${esc(s)}px\\b`, "g"), ref).replace(bare, ref);
@@ -307,7 +307,7 @@ export function restoreVars(cssSentinel: string, cssPlain: string, bindings: rea
         .replace(rgba, (_m, a?: string) => (a === undefined || Number(a) >= 1 ? ref : `color-mix(in srgb, ${ref} ${Math.round(Number(a) * 1000) / 10}%, transparent)`));
       const [pr, pg, pb] = hexRgb(toHex6Plain(String(b.resolved)));
       check = check.replace(new RegExp(esc(hex), "gi"), String(b.resolved)).replace(rgba, (_m, a?: string) => (a === undefined ? `rgb(${pr}, ${pg}, ${pb})` : `rgba(${pr}, ${pg}, ${pb}, ${a})`));
-      // Bandingkan bentuk rgb() yang sama di cssPlain.
+      // Compare the same rgb() form in cssPlain.
       cssPlain = cssPlain.replace(new RegExp(`rgb\\(\\s*${pr}\\s*,\\s*${pg}\\s*,\\s*${pb}\\s*\\)`, "g"), `rgb(${pr}, ${pg}, ${pb})`);
     } else {
       const s = String(b.sentinel);
@@ -326,8 +326,8 @@ function toHex6Plain(v: string): string {
   return "#808080";
 }
 
-/** Bersihkan daftar variabel dari penyimpanan (localStorage / data desain). */
-/** Variabel bawaan selalu ada (nilai tersimpan yang valid menang), lalu variabel buatan pengguna. */
+/** Clean the variable list from storage (localStorage / design data). */
+/** Built-in variables always exist (valid stored values win), followed by user-created variables. */
 export function withBuiltinVars(saved: readonly CssVar[]): CssVar[] {
   const builtins = BUILTIN_VARS.map((b) => {
     const s = saved.find((v) => v.name === b.name);

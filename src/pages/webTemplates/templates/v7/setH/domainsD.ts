@@ -1,8 +1,8 @@
 import type { Domain } from "./spec";
 
 /* ================================================================== */
-/* Isi domain dashboard (bagian 4): kursus online (LMS), klinik,        */
-/* armada & pengiriman, hotel, kasir restoran. Semua data adalah contoh.*/
+/* Dashboard domain content (part 4): online courses (LMS), clinic,     */
+/* fleet & delivery, hotel, restaurant POS. All data is sample data.*/
 /* ================================================================== */
 
 const M6 = ["Jan|Jan", "Feb|Feb", "Mar|Mar", "Apr|Apr", "Mei|May", "Jun|Jun"];

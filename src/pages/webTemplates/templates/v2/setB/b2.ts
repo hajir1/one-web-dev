@@ -43,7 +43,7 @@ import {
 } from "./kitB";
 
 /* ================================================================== */
-/* Set B · bagian 2: Yayasan, Wedding Organizer, Sekolah Musik,         */
+/* Set B · part 2: Foundation, Wedding Organizer, Music School,         */
 /* Konstruksi & Interior, Vila.                                          */
 /* ================================================================== */
 

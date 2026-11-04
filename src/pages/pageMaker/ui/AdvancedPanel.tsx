@@ -26,7 +26,7 @@ const Err = ({ children }: { children: string }) => (
   </p>
 );
 
-/** Grup "Lanjutan": CSS ID, CSS Class, Custom CSS, Custom JS (gratis). */
+/** "Advanced" group: CSS ID, CSS Class, Custom CSS, Custom JS (free). */
 export default function AdvancedPanel({ node, root, onChange }: Props) {
   const { t } = useTranslation();
   const a = node.advanced ?? {};

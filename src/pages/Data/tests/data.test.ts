@@ -187,7 +187,7 @@ test("JS Object → JSON: kode berbahaya/ekspresi ditolak (tanpa eval)", () => {
   assert.equal(code(() => parseJsObject("{ a: 1 b: 2 }")), "jsExpectedComma");
   assert.equal(code(() => parseJsObject("[1,,2]")), "jsHole");
   const p = parseJsObject('{ "__proto__": { "x": 1 } }').value as Record<string, unknown>;
-  assert.equal(({} as Record<string, unknown>).x, undefined); // tidak mencemari prototype
+  assert.equal(({} as Record<string, unknown>).x, undefined); // does not pollute the prototype
   assert.deepEqual(Object.keys(p), ["__proto__"]);
 });
 

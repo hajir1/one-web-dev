@@ -8,26 +8,26 @@ import { currentDrag, endDrag, getDragSnapshot, startDrag, subscribeDrag, type D
 import { resolveDrop, type DropResolution, type Rect, type RectMap } from "../helpers/dropTarget";
 import { isInnerRow, isRow, isSection } from "../helpers/pageDoc";
 
-/** Row atau Row dalam (kolom spesial) — keduanya punya (+) "Row di bawah". */
+/** A Row or an inner Row (special column); both have a (+) "Row below". */
 const isRowLike = (n: Parameters<typeof isRow>[0]) => isRow(n) || isInnerRow(n);
 import PageFrame from "./PageFrame";
 
 /* ================================================================== */
-/* Canvas builder: iframe halaman + overlay di induk                    */
+/* Builder canvas: the page iframe + overlays in the parent             */
 /*                                                                    */
-/* Overlay (outline, toolbar, tombol +, penanda drop) digambar di DOM    */
-/* induk berdasarkan kotak yang dilaporkan iframe, jadi tidak ada elemen  */
-/* tambahan di dalam halaman (kode hasil = persis isi pratinjau).        */
+/* Overlays (outline, toolbar, + buttons, drop markers) are drawn in the parent */
+/* DOM based on the boxes the iframe reports, so there are no extra     */
+/* elements inside the page (the output code = exactly the preview content). */
 /* ================================================================== */
 
 interface CanvasActions {
   onSelect: (id: NodeId) => void;
   onOpenSettings: (id: NodeId) => void;
-  /** (+) di dalam kontainer: tambah elemen / component ke dalamnya. */
+  /** (+) inside a container: adds an element / component into it. */
   onAddTo: (boxId: NodeId) => void;
-  /** (+) pada elemen / grup: tambah konten TEPAT di bawahnya (saudara berikutnya). */
+  /** (+) on an element / group: adds content RIGHT below it (the next sibling). */
   onAddAfter: (id: NodeId) => void;
-  /** (+) pada Row: tambah Row baru tepat di bawahnya. Pada section: tambah Row di akhir section. */
+  /** (+) on a Row: adds a new Row right below it. On a section: adds a Row at the end of the section. */
   onAddRowAfter: (id: NodeId) => void;
   onAddSection: (index: number) => void;
   onMove: (id: NodeId, delta: -1 | 1) => void;
@@ -39,16 +39,16 @@ interface CanvasActions {
 interface BuilderCanvasProps extends CanvasActions {
   root: BoxNode;
   selectedId: NodeId;
-  /** Lebar viewport simulasi (px); null = selebar canvas. */
+  /** Simulated viewport width (px); null = canvas width. */
   viewportWidth: number | null;
   css: string;
   body: string;
   script: string;
-  /** Library desain; di canvas hanya yang aman di mode edit (Chart.js) dimuat. */
+  /** Design libraries; on the canvas only the edit-mode-safe ones (Chart.js) load. */
   libraries?: readonly LibraryId[];
-  /** Pintasan keyboard yang berasal dari dalam iframe. */
+  /** Keyboard shortcuts coming from inside the iframe. */
   onKey: (key: string, mod: boolean, shift: boolean) => void;
-  /** Gulir ke node ini (mis. "Lihat di halaman" dari dashboard Data); `n` naik tiap permintaan. */
+  /** Scrolls to this node (e.g. "View on page" from the Data dashboard); `n` increments per request. */
   reveal?: { id: NodeId; n: number } | null;
 }
 
@@ -93,7 +93,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
   const [drop, setDrop] = useState<DropResolution | null>(null);
   const dragging = useSyncExternalStore(subscribeDrag, getDragSnapshot);
 
-  /* ---- ukuran area ---- */
+  /* ---- area size ---- */
   useLayoutEffect(() => {
     const sc = scrollRef.current;
     const wr = wrapRef.current;
@@ -113,7 +113,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
     if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
   }, []);
 
-  /* ---- gulir ke node (sekali per permintaan, setelah posisinya diketahui) ---- */
+  /* ---- scroll to the node (once per request, after its position is known) ---- */
   const revealed = useRef(0);
   useEffect(() => {
     if (!reveal || revealed.current === reveal.n) return;
@@ -126,7 +126,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
     sc.scrollTo({ top: Math.max(0, top - 96), behavior: "smooth" });
   }, [reveal, rects]);
 
-  /** Hover dilepas dengan jeda supaya pointer sempat berpindah ke toolbar. */
+  /** Hover is released with a delay so the pointer has time to move to the toolbar. */
   const setHover = useCallback((id: NodeId | null) => {
     if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
     if (id) setHoverId(id);
@@ -183,7 +183,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
     const tone = toneOf(root, selectedId);
     const isSec = isSection(selNode);
     const isRowSel = isRowLike(selNode);
-    const flip = selRect.x + 320 > wrapW; // dekat tepi kanan → ratakan kanan
+    const flip = selRect.x + 320 > wrapW; // near the right edge → align right
     const above = selRect.y >= 30;
     return (
       <div
@@ -263,7 +263,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
     );
   })();
 
-  /** Tombol + di tengah kontainer kosong. */
+  /** The + button in the middle of an empty container. */
   const emptyPlus: ReactNode[] = [];
   const visit = (n: BoxNode) => {
     for (const c of n.children) if (isBox(c)) visit(c);
@@ -297,8 +297,8 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
   visit(root);
 
   /**
-   * (+) mengambang di tepi bawah elemen / grup / Row yang dipilih atau di-hover:
-   * elemen → konten baru tepat di bawahnya; Row → Row baru tepat di bawahnya.
+   * (+) floating at the bottom edge of the selected or hovered element / group / Row:
+   * element → new content right below it; Row → a new Row right below it.
    */
   const floating: ReactNode[] = [];
   if (!dragging) {
@@ -333,7 +333,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
     }
   }
 
-  /** Tombol + antar section (menambah section baru di posisi itu). */
+  /** The + button between sections (adds a new section at that position). */
   const sectionAdders: ReactNode[] = [];
   if (!empty) {
     const secs = root.children.filter((c) => rects[c.id]);
@@ -416,7 +416,7 @@ export default function BuilderCanvas(props: BuilderCanvasProps) {
             )}
           </div>
 
-          {/* penangkap drop — hanya ada selama ada seretan */}
+          {/* drop catcher — only present while a drag is in progress */}
           {dragging && (
             <div className="absolute inset-0 z-30" onDragOver={onDragOver} onDragLeave={(e) => e.currentTarget === e.target && setDrop(null)} onDrop={onDropHere} data-testid="drop-cover">
               {drop && (

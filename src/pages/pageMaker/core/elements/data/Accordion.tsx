@@ -25,13 +25,13 @@ interface AccordionItemData extends Record<string, string> {
 
 export interface AccordionState {
   items: AccordionItemData[];
-  /** Hanya satu item terbuka (atribut name pada <details>). */
+  /** Only one item open at a time (the name attribute on <details>). */
   exclusive: boolean;
   firstOpen: boolean;
 
   widthMode: "auto" | "fixed" | "full";
   width: number;
-  /** 0 = item menyatu dengan garis pemisah; >0 = kartu terpisah. */
+  /** 0 = items merge with divider lines; >0 = separate cards. */
   itemGap: number;
 
   borderWidth: number;
@@ -59,7 +59,7 @@ export interface AccordionState {
   openHeaderBgColor: string;
   openTextColor: string;
 
-  /* Isi */
+  /* Content */
   contentPaddingX: number;
   contentPaddingY: number;
   contentFontSize: number;
@@ -68,7 +68,7 @@ export interface AccordionState {
   contentBgColor: string;
   contentDivider: boolean;
 
-  /* Ikon */
+  /* Icon */
   iconStyle: "chevron" | "plus" | "arrow";
   iconPosition: "left" | "right";
   iconColor: string;
@@ -417,7 +417,7 @@ function accordionSections(s: AccordionState, update: Updater<AccordionState>): 
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const accordionElement = defineElement<AccordionState>({

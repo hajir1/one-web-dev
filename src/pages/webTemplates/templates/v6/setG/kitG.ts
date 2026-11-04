@@ -8,16 +8,16 @@ import { artKey } from "./keys";
 import type { B, Biz, BlockId, BlockRef, GChart, GPage, GSpec } from "./spec";
 
 /* ================================================================== */
-/* Mesin template v6 bagian G: GSpec (data) → TemplateContent.          */
+/* v6 template engine part G: GSpec (data) → TemplateContent.           */
 /*                                                                    */
-/* Setiap blok memanggil satu fungsi kit bersama, jadi section yang     */
-/* dihasilkan sama persis dengan section buatan tangan di set D–F dan   */
-/* bisa diedit di Desain Halaman. Template Free memakai padanan gratis  */
-/* untuk setiap blok Premium (FREE_SWAP) dan tanpa elemen chrome        */
-/* Premium (mega menu, kembali ke atas, teks mengetik).                 */
+/* Each block calls one shared kit function, so the resulting sections  */
+/* are exactly the same as the handmade sections in sets D–F and        */
+/* are editable in Page Design. Free templates use the free equivalent  */
+/* of every Premium block (FREE_SWAP) and no Premium chrome elements    */
+/* (mega menu, back to top, typing text).                               */
 /* ================================================================== */
 
-/** Blok Premium → padanan gratis untuk template Free. */
+/** Premium block → free equivalent for Free templates. */
 export const FREE_SWAP: Partial<Record<BlockId, BlockId>> = {
   counter: "stats",
   quotes: "pull",
@@ -33,7 +33,7 @@ export const FREE_SWAP: Partial<Record<BlockId, BlockId>> = {
   offer: "cta-soft",
 };
 
-/** Nama section (tampil di panel Struktur Page Maker). */
+/** Section name (shown in the Page Maker Structure panel). */
 export const NAMES: Record<BlockId, string> = {
   svc: "Layanan",
   "svc-inv": "Layanan Kontras",
@@ -92,7 +92,7 @@ export const NAMES: Record<BlockId, string> = {
 
 const PREMIUM_BLOCKS = Object.keys(FREE_SWAP) as BlockId[];
 
-/** Judul bawaan tiap blok (bisa diganti per template lewat BlockRef). */
+/** Default title of each block (can be replaced per template through BlockRef). */
 const TITLES: Partial<Record<BlockId, B>> = {
   svc: ["Yang kami kerjakan", "What we do"],
   "svc-inv": ["Layanan unggulan", "Signature services"],
@@ -145,7 +145,7 @@ export interface Ctx {
   img: (i: number) => string;
   face: (i: number) => string;
   alt: (i: number) => string;
-  /** Latar selang-seling untuk section berikutnya. */
+  /** Alternating background for the next section. */
   bg: () => string;
 }
 
@@ -175,7 +175,7 @@ export const chartOf = (c: Ctx, g: GChart): ChartC => ({
 
 export const mainAct = (c: Ctx, style?: Act[2]): Act => [c.t(c.b.cta), c.href(c.b.ctaPage), ...(style ? [style] : [])] as Act;
 
-/** Fitur paket → baris tabel perbandingan (✓ / –). */
+/** Plan features → comparison table rows (✓ / –). */
 function compareRows(c: Ctx): string[] {
   const plans = need(c.b.plans, "plans", c);
   const feats = plans.map((p) => c.t(p[3]).split(";").map((x) => x.trim()));
@@ -183,7 +183,7 @@ function compareRows(c: Ctx): string[] {
   return [`${c.tr("Harga", "Price")} | ${plans.map((p) => p[1]).join(" | ")}`, ...all.map((f) => `${f} | ${feats.map((fs) => (fs.includes(f) ? "✓" : "–")).join(" | ")}`)];
 }
 
-/** Bangun satu blok menjadi section. */
+/** Build one block into a section. */
 export function block(c: Ctx, ref: BlockRef, name: string): BoxNode {
   const [id0, title0, text0] = typeof ref === "string" ? [ref] : ref;
   const id = c.free && FREE_SWAP[id0] ? FREE_SWAP[id0]! : id0;
@@ -399,13 +399,13 @@ export function block(c: Ctx, ref: BlockRef, name: string): BoxNode {
   }
 }
 
-/** Hero beranda sesuai jenisnya. */
+/** Home hero for its type. */
 export function hero(c: Ctx, pages: GPage[]): BoxNode {
   const { L, b, t } = c;
   const second = pages[0];
   const onColor = c.s.hero === "glass" || c.s.hero === "dash" || c.s.hero === "split" || c.s.hero === "full";
   const typer = !c.free && c.s.chrome?.includes("typer") && b.typer ? K.typerD(L, t(b.typer[0]), words(c, b.typer[1]), { size: 52, color: onColor ? "#ffffff" : undefined }) : undefined;
-  // Di latar berwarna, kata yang berganti memakai warna terang agar tetap terbaca.
+  // On colored backgrounds, the rotating words use a light color so they stay readable.
   if (typer && onColor) typer.state = { ...typer.state, wordColor: L.dark ? L.p.primary : "#fde68a" };
   const hc = {
     eyebrow: t(b.eyebrow),
@@ -506,7 +506,7 @@ export function buildContent(s: GSpec): TemplateContent {
       const nav = !free && s.chrome?.includes("mega") ? K.megaD(L, menu.slice(0, 5), t(b.cta), href(b.ctaPage)) : undefined;
       const head = K.headerD(s.short ?? s.brand, L, {
         variant: s.header,
-        // Mega menu sudah punya tombol ajakan sendiri.
+        // The mega menu already has its own call-to-action button.
         ...(nav ? { nav } : { cta: [t(b.cta), href(b.ctaPage)] as Act }),
         ...(s.header === "split" ? { info: [b.phone, t(b.hours), b.email] } : {}),
         sticky: s.header === "pill" || s.header === "ink",
@@ -544,5 +544,5 @@ export function buildContent(s: GSpec): TemplateContent {
   };
 }
 
-/** Item & library yang dipakai blok (untuk dokumentasi/uji). */
+/** Items & libraries used by a block (for documentation/tests). */
 export const isPremiumBlock = (r: BlockRef) => PREMIUM_BLOCKS.includes(typeof r === "string" ? r : r[0]);

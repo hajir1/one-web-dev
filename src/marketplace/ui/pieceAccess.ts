@@ -3,13 +3,13 @@ import type { AccessReason, ItemId, Tier } from "../types";
 import { isDemoMode } from "../../demo/demoMode";
 
 /* ================================================================== */
-/* Konteks akses untuk pustaka elemen & pemilih section di Page Maker.   */
-/* Tanpa provider: perilaku lama (Premium = terkunci, tanpa harga).      */
+/* Access context for the element library & section picker in Page Maker. */
+/* Without a provider: the old behavior (Premium = locked, no price).    */
 /* ================================================================== */
 
 export interface PieceAccess {
   reason: (itemId: ItemId, tier: Tier) => AccessReason;
-  /** Harga kredit item Premium (null = tidak diketahui). */
+  /** Credit price of a Premium item (null = unknown). */
   priceOf: (itemId: ItemId) => number | null;
 }
 

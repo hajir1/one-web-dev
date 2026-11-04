@@ -1,37 +1,37 @@
 /* ================================================================== */
-/* KONFIGURASI HARGA TERPUSAT                                           */
+/* CENTRAL PRICING CONFIGURATION                                        */
 /*                                                                    */
-/*  1. Paket kredit (harga bertingkat: makin banyak, makin murah)        */
-/*  2. Biaya kredit fitur non-server (template premium, slot website…)  */
-/*  3. Tarif fitur server (Media & Data) ada di                          */
+/*  1. Credit packs (tiered pricing: the more you buy, the cheaper)      */
+/*  2. Credit costs of non-server features (premium templates, website slots…) */
+/*  3. Server feature rates (Media & Data) live in                       */
 /*     pages/media/processing/pricing.ts → DEFAULT_PRICING               */
 /*                                                                    */
-/* Komponen UI TIDAK menulis angka harga sendiri; semuanya membaca dari  */
-/* file ini (atau dari harga yang dikirim backend dan sudah divalidasi). */
-/* Harga di sini hanya untuk TAMPILAN. Harga yang ditagih, saldo, dan    */
-/* pemotongan kredit SELALU ditentukan & divalidasi backend.             */
+/* UI components NEVER hardcode prices; everything reads from            */
+/* this file (or from prices sent by the backend and already validated). */
+/* Prices here are for DISPLAY only. Charged prices, balances, and       */
+/* credit deductions are ALWAYS decided & validated by the backend.      */
 /* ================================================================== */
 
-/* Semua harga dalam RUPIAH (IDR, bilangan bulat). Pembayaran lewat     */
-/* Midtrans yang hanya memproses IDR; tidak ada harga/konversi dolar.   */
+/* All prices are in RUPIAH (IDR, integers). Payments go through        */
+/* Midtrans, which only processes IDR; there are no dollar prices/conversions. */
 
 export interface CreditPackage {
   id: string;
   credits: number;
-  /** Harga total paket (rupiah bulat). */
+  /** Total pack price (whole rupiah). */
   priceIdr: number;
-  /** Ditandai "Paling hemat"/"Populer". */
+  /** Marked "Best value"/"Popular". */
   highlight?: boolean;
 }
 
-/** Harga dasar 1 kredit (paket terkecil). */
+/** Base price of 1 credit (smallest pack). */
 export const BASE_IDR_PER_CREDIT = 1000;
 
 /**
- * Paket bawaan (sama dengan migrasi backend v3). Harga per kredit turun:
- *   20 → Rp1.000 · 50 → Rp950 · 100 → Rp900 · 250 → Rp850 · 500 → Rp800
- * Paket terkecil Rp20.000 agar biaya transaksi Midtrans (mis. VA ±Rp4.000)
- * tidak memakan sebagian besar nilai pembelian.
+ * Default packs (same as backend migration v3). The price per credit drops:
+ *   20 → Rp1,000 · 50 → Rp950 · 100 → Rp900 · 250 → Rp850 · 500 → Rp800
+ * The smallest pack is Rp20,000 so Midtrans transaction fees (e.g. VA about Rp4,000)
+ * do not eat most of the purchase value.
  */
 export const DEFAULT_CREDIT_PACKAGES: CreditPackage[] = [
   { id: "credits-20", credits: 20, priceIdr: 20000 },
@@ -41,20 +41,20 @@ export const DEFAULT_CREDIT_PACKAGES: CreditPackage[] = [
   { id: "credits-500", credits: 500, priceIdr: 400000 },
 ];
 
-/** Harga per kredit sebuah paket (rupiah, dibulatkan). */
+/** Price per credit of a pack (rupiah, rounded). */
 export const pricePerCredit = (p: CreditPackage) => Math.round(p.priceIdr / p.credits);
 
-/** Harga dasar = harga per kredit TERTINGGI (paket terkecil). Dipakai untuk menghitung hemat. */
+/** Base price = the HIGHEST price per credit (smallest pack). Used to compute savings. */
 export function baseRate(packages: CreditPackage[] = DEFAULT_CREDIT_PACKAGES): number {
   return packages.length ? Math.max(...packages.map((p) => p.priceIdr / p.credits)) : BASE_IDR_PER_CREDIT;
 }
 
-/** Harga per kredit terendah (paket terbesar). */
+/** Lowest price per credit (largest pack). */
 export function bestRate(packages: CreditPackage[] = DEFAULT_CREDIT_PACKAGES): number {
   return packages.length ? Math.min(...packages.map((p) => p.priceIdr / p.credits)) : BASE_IDR_PER_CREDIT;
 }
 
-/** Penghematan dibanding membeli di harga dasar: { listIdr, idr, percent } (rupiah bulat, transparan). */
+/** Savings compared to buying at the base price: { listIdr, idr, percent } (whole rupiah, transparent). */
 export function packageSavings(p: CreditPackage, packages: CreditPackage[] = DEFAULT_CREDIT_PACKAGES) {
   const list = Math.round(baseRate(packages) * p.credits);
   const idr = Math.max(0, list - p.priceIdr);
@@ -62,18 +62,18 @@ export function packageSavings(p: CreditPackage, packages: CreditPackage[] = DEF
   return { listIdr: list, idr, percent };
 }
 
-/** Format Rupiah tanpa desimal, mis. 47500 → "Rp47.500". */
+/** Rupiah format without decimals, e.g. 47500 → "Rp47.500". */
 export function formatIdr(amount: number): string {
   return `Rp${Math.round(amount).toLocaleString("id-ID")}`;
 }
 
-/** Nilai rupiah dari sejumlah kredit pada harga dasar (untuk keterangan "≈ RpX"). */
+/** Rupiah value of a number of credits at the base price (for the "≈ RpX" note). */
 export const creditsToIdr = (credits: number) => Math.round(credits * BASE_IDR_PER_CREDIT);
 
 /**
- * Validasi daftar paket (dari backend atau konfigurasi): id unik, angka
- * positif, harga rupiah bilangan bulat, dan harga per kredit TIDAK naik
- * ketika jumlah kredit naik. Mengembalikan daftar terurut, atau null.
+ * Validates a pack list (from the backend or config): unique ids, positive
+ * numbers, integer rupiah prices, and the price per credit does NOT rise
+ * as the credit amount rises. Returns the sorted list, or null.
  */
 export function sanitizePackages(raw: unknown): CreditPackage[] | null {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > 12) return null;
@@ -95,8 +95,8 @@ export function sanitizePackages(raw: unknown): CreditPackage[] | null {
 }
 
 /* ------------------------------------------------------------------ */
-/* Biaya kredit untuk fitur non-server (Web Maker).                     */
-/* Satu tempat — dipakai dialog kredit, halaman Credits, dan template.  */
+/* Credit costs for non-server features (Web Maker).                    */
+/* One place, used by the credit dialog, the Credits page, and templates. */
 /* ------------------------------------------------------------------ */
 
 export type CreditFeature =
@@ -111,8 +111,8 @@ export type CreditFeature =
   | "data-server";
 
 /**
- * Biaya (kredit; 1 kredit = Rp1.000) per pembelian/akses. `null` = mengikuti
- * tarif fitur server. Nilai tampilan; harga yang ditagih dari backend.
+ * Cost (credits; 1 credit = Rp1,000) per purchase/access. `null` = follows the
+ * server feature rate. Display values; charged prices come from the backend.
  */
 export const CREDIT_COST: Record<CreditFeature, number | null> = {
   export: 5,

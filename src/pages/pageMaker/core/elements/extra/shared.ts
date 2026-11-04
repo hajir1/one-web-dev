@@ -2,20 +2,20 @@ import { safeColor } from "../../helpers/background";
 import { brandIconKey, brandIconKeyFromUrl } from "./brandIcons";
 
 /* ================================================================== */
-/* Utilitas kecil untuk elemen tambahan (banner, video, rating, …).     */
-/* Fungsi murni → mudah diuji.                                          */
+/* Small utilities for extra elements (banner, video, rating, …).       */
+/* Pure functions → easy to test.                                       */
 /* ================================================================== */
 
 export const color = (c: string, d: string) => safeColor(c) ?? d;
 export const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, Number.isFinite(n) ? n : a));
 
-/** Pecah "a | b | c" menjadi bagian yang sudah di-trim. */
+/** Splits "a | b | c" into trimmed parts. */
 export const cells = (line: string) => line.split("|").map((p) => p.trim());
 
-/** Baris yang tidak kosong. */
+/** Non-empty lines. */
 export const nonEmpty = (lines: string[]) => lines.map((l) => l.trim()).filter(Boolean);
 
-/** ID video YouTube dari URL umum (watch, youtu.be, shorts, embed) atau ID polos. */
+/** YouTube video ID from common URLs (watch, youtu.be, shorts, embed) or a plain ID. */
 export function youtubeId(url: string): string | null {
   const u = url.trim();
   if (/^[\w-]{11}$/.test(u)) return u;
@@ -23,7 +23,7 @@ export function youtubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-/** ID video Vimeo dari URL (vimeo.com/123, player.vimeo.com/video/123) atau angka polos. */
+/** Vimeo video ID from a URL (vimeo.com/123, player.vimeo.com/video/123) or a plain number. */
 export function vimeoId(url: string): string | null {
   const u = url.trim();
   if (/^\d{4,12}$/.test(u)) return u;
@@ -31,22 +31,22 @@ export function vimeoId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-/** URL berkas video http(s) atau relatif yang aman (tanpa javascript:/data:). */
+/** A safe http(s) or relative video file URL (no javascript:/data:). */
 export function safeVideoFile(url: string): string | null {
   const u = url.trim();
   if (!u) return null;
-  // Buang spasi & karakter kontrol (kode < 32) sebelum memeriksa skema berbahaya.
+  // Strip spaces & control characters (code < 32) before checking for dangerous schemes.
   const bare = [...u].filter((c) => c.charCodeAt(0) > 32).join("");
   if (/^(javascript|vbscript|data):/i.test(bare)) return null;
   return /^(https?:\/\/|\/|\.\/|[\w-]+\/)/i.test(u) || /^[\w.-]+\.(mp4|webm|ogg)$/i.test(u) ? u : null;
 }
 
-/** "12.500+" → { prefix: "", value: 12500, suffix: "+", decimals: 0 }. Null bila tidak ada angka. */
+/** "12.500+" → { prefix: "", value: 12500, suffix: "+", decimals: 0 }. Null when there is no number. */
 export function parseStat(raw: string): { prefix: string; value: number; suffix: string; decimals: number } | null {
   const m = raw.trim().match(/^([^\d-]*)(-?[\d.,]+)(.*)$/);
   if (!m) return null;
   let num = m[2];
-  // Satu koma/titik diikuti 1–2 digit di akhir = desimal; sisanya pemisah ribuan.
+  // A single comma/dot followed by 1–2 digits at the end = decimal; the rest are thousands separators.
   const dec = num.match(/[.,](\d{1,2})$/);
   let decimals = 0;
   if (dec && !/[.,]\d{3}$/.test(num)) {
@@ -58,7 +58,7 @@ export function parseStat(raw: string): { prefix: string; value: number; suffix:
   return { prefix: m[1].trim(), value, suffix: m[3].trim(), decimals };
 }
 
-/** Format angka sesuai locale tanpa Intl yang berbeda antar-mesin: pemisah ribuan "." (id) atau "," (en). */
+/** Formats numbers per locale without Intl differences between engines: thousands separator "." (id) or "," (en). */
 export function formatStat(value: number, decimals: number, locale: "id" | "en"): string {
   const fixed = Math.abs(value).toFixed(decimals);
   const [int, frac] = fixed.split(".");
@@ -68,7 +68,7 @@ export function formatStat(value: number, decimals: number, locale: "id" | "en")
   return (value < 0 ? "-" : "") + grouped + (frac ? dot + frac : "");
 }
 
-/** Nilai sel tabel perbandingan: true/false untuk ya/tidak, selain itu teks apa adanya. */
+/** Comparison table cell value: true/false for yes/no, otherwise the text as is. */
 export function comparisonCell(v: string): boolean | string {
   const t = v.trim().toLowerCase();
   if (["ya", "yes", "✓", "v", "true", "1"].includes(t)) return true;
@@ -83,9 +83,9 @@ export interface MegaMenuItem {
 }
 
 /**
- * Format baris mega menu:
- *   Produk | #produk            ← menu utama
- *   - Analitik | Dasbor real-time | #analitik   ← tautan di panel menu di atasnya
+ * Mega menu line format:
+ *   Products | #products            ← main menu
+ *   - Analytics | Real-time dashboard | #analytics   ← link in the menu panel above it
  */
 export function parseMegaMenu(lines: string[]): MegaMenuItem[] {
   const out: MegaMenuItem[] = [];
@@ -109,7 +109,7 @@ export interface PricingPlan {
   cta: string;
 }
 
-/** "Nama | harga bulanan | harga tahunan | fitur; fitur | Teks tombol" */
+/** "Name | monthly price | yearly price | feature; feature | Button text" */
 export function parsePlans(lines: string[]): PricingPlan[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -120,24 +120,24 @@ export function parsePlans(lines: string[]): PricingPlan[] {
     .slice(0, 4);
 }
 
-/** Durasi CSS dari detik (dibatasi). */
+/** CSS duration from seconds (clamped). */
 export const seconds = (n: number, min: number, max: number) => `${clamp(n, min, max)}s`;
 
 /* ------------------------------------------------------------------ */
-/* Parser elemen v2 (divider, radio, sosial, timeline, galeri, marquee) */
+/* v2 element parsers (divider, radio, social, timeline, gallery, marquee) */
 /* ------------------------------------------------------------------ */
 
 /**
- * URL gambar aman: seperti safeLink, ditambah data URI SVG. SVG hanya
- * dipakai sebagai <img>/background, konteks yang tidak menjalankan skrip,
- * jadi ilustrasi template (data:image/svg+xml) tetap tampil.
+ * Safe image URL: like safeLink, plus SVG data URIs. SVG is only
+ * used as <img>/background, contexts that do not run scripts,
+ * so template illustrations (data:image/svg+xml) still show.
  */
 export function safeImage(url: string): string {
   const u = String(url ?? "").trim();
   return /^data:image\/svg\+xml[;,]/i.test(u) ? u : safeLink(u);
 }
 
-/** URL aman untuk href/src: skema berbahaya (javascript:, vbscript:, data: non-gambar) → "". */
+/** Safe URL for href/src: dangerous schemes (javascript:, vbscript:, non-image data:) → "". */
 export function safeLink(url: string): string {
   const u = String(url ?? "").trim();
   if (!u) return "";
@@ -146,7 +146,7 @@ export function safeLink(url: string): string {
   return u;
 }
 
-/** Opsi radio: satu per baris, maksimal 12, tanpa duplikat. */
+/** Radio options: one per line, at most 12, no duplicates. */
 export function parseOptions(lines: string[]): string[] {
   return [...new Set(nonEmpty(lines))].slice(0, 12);
 }
@@ -154,9 +154,9 @@ export function parseOptions(lines: string[]): string[] {
 export interface SocialLink {
   name: string;
   href: string;
-  /** Teks cadangan bila jaringan tidak punya logo. */
+  /** Fallback text when the network has no logo. */
   glyph: string;
-  /** Kunci logo di BRAND_ICONS (null = pakai glyph). */
+  /** Logo key in BRAND_ICONS (null = use a glyph). */
   icon: string | null;
 }
 
@@ -180,7 +180,7 @@ const SOCIAL_GLYPH: Record<string, string> = {
   website: "www",
 };
 
-/** Teks ikon singkat untuk nama jaringan ("LinkedIn" → "in", "Mastodon" → "M"). */
+/** Short icon text for a network name ("LinkedIn" → "in", "Mastodon" → "M"). */
 export function socialGlyph(name: string): string {
   const k = name.trim().toLowerCase().replace(/[^a-z]/g, "");
   if (SOCIAL_GLYPH[k]) return SOCIAL_GLYPH[k];
@@ -188,7 +188,7 @@ export function socialGlyph(name: string): string {
   return first.toUpperCase();
 }
 
-/** "Nama | url" → tautan sosial; URL berbahaya dibuang (baris dilewati). Maksimal 12. */
+/** "Name | url" → social link; dangerous URLs are dropped (line skipped). At most 12. */
 export function parseSocialLinks(lines: string[]): SocialLink[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -206,7 +206,7 @@ export interface TimelineEntry {
   text: string;
 }
 
-/** "tanggal | judul | teks" → entri timeline (judul wajib). Maksimal 20. */
+/** "date | title | text" → timeline entry (title required). At most 20. */
 export function parseTimeline(lines: string[]): TimelineEntry[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -222,7 +222,7 @@ export interface GalleryImage {
   caption: string;
 }
 
-/** "url | keterangan" → gambar galeri; URL kosong/berbahaya dibuang. Maksimal 24. */
+/** "url | caption" → gallery image; empty/dangerous URLs are dropped. Max 24. */
 export function parseGallery(lines: string[]): GalleryImage[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -238,7 +238,7 @@ export interface MarqueeItem {
   src: string;
 }
 
-/** "Label" atau "Label | url logo" → item marquee (src kosong = tampil sebagai teks). Maksimal 20. */
+/** "Label" or "Label | logo url" → marquee item (empty src = shown as text). Max 20. */
 export function parseMarquee(lines: string[]): MarqueeItem[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -249,14 +249,14 @@ export function parseMarquee(lines: string[]): MarqueeItem[] {
     .slice(0, 20);
 }
 
-/** Nama atribut `name` form yang aman (huruf, angka, _ dan -). */
+/** A safe form `name` attribute (letters, digits, _ and -). */
 export const fieldName = (n: string, d: string) => n.replace(/[^\w-]/g, "") || d;
 
 /* ------------------------------------------------------------------ */
-/* Parser elemen v3 (avatar, paginasi, langkah, hotspot, wizard, …)     */
+/* v3 element parsers (avatar, pagination, steps, hotspot, wizard, …)   */
 /* ------------------------------------------------------------------ */
 
-/** Inisial dari nama (maks. 2 huruf), mis. "Sari Dewi" → "SD". */
+/** Initials from a name (max. 2 letters), e.g. "Sari Dewi" → "SD". */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return "?";
@@ -270,7 +270,7 @@ export interface Person {
   photo: string;
 }
 
-/** "Nama | URL foto (opsional)" — maksimal 12 orang. */
+/** "Name | photo URL (optional)" — at most 12 people. */
 export function parsePeople(lines: string[]): Person[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -281,7 +281,7 @@ export function parsePeople(lines: string[]): Person[] {
     .slice(0, 12);
 }
 
-/** "Label | href" — maksimal 12 tautan. */
+/** "Label | href" — at most 12 links. */
 export function parseLinks(lines: string[]): { label: string; href: string }[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -293,14 +293,14 @@ export function parseLinks(lines: string[]): { label: string; href: string }[] {
 }
 
 /**
- * Nomor halaman yang ditampilkan paginasi: halaman pertama, terakhir, dan
- * sekitar halaman aktif; celah ditandai "…". Mis. (10, 5) → 1 … 4 5 6 … 10.
+ * Page numbers shown by the pagination: the first page, the last, and
+ * those around the active page; gaps are marked "…". E.g. (10, 5) → 1 … 4 5 6 … 10.
  */
 export function paginationItems(total: number, current: number): (number | "…")[] {
   const n = Math.round(clamp(total, 1, 999));
   const c = Math.round(clamp(current, 1, n));
   const keep = new Set([1, n, c - 1, c, c + 1].filter((p) => p >= 1 && p <= n));
-  // Celah satu halaman tidak perlu "…": tampilkan saja halamannya.
+  // A one-page gap does not need "…": just show the page.
   if (keep.has(3) || c <= 3) keep.add(2);
   if (keep.has(n - 2) || c >= n - 2) keep.add(n - 1);
   const pages = [...keep].filter((p) => p >= 1 && p <= n).sort((a, b) => a - b);
@@ -312,7 +312,7 @@ export function paginationItems(total: number, current: number): (number | "…"
   return out;
 }
 
-/** URL halaman dari pola, mis. "?page={n}" → "?page=3". Skema berbahaya → "#". */
+/** Page URL from a pattern, e.g. "?page={n}" → "?page=3". Dangerous schemes → "#". */
 export const pageHref = (pattern: string, n: number) => safeLink((pattern || "?page={n}").split("{n}").join(String(n))) || "#";
 
 export interface StepItem {
@@ -320,7 +320,7 @@ export interface StepItem {
   text: string;
 }
 
-/** "Judul | keterangan (opsional)" — maksimal 8 langkah. */
+/** "Title | description (optional)" — at most 8 steps. */
 export function parseSteps(lines: string[]): StepItem[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -338,7 +338,7 @@ export interface Hotspot {
   text: string;
 }
 
-/** "x% | y% | Judul | Keterangan" — posisi dibatasi 0–100, maksimal 10 titik. */
+/** "x% | y% | Title | Description" — positions clamped to 0–100, at most 10 points. */
 export function parseHotspots(lines: string[]): Hotspot[] {
   return nonEmpty(lines)
     .map((l) => {
@@ -360,7 +360,7 @@ export interface WizardStep {
   fields: WizardField[];
 }
 
-/** Jenis input ditebak dari label (email, telepon, tanggal, angka, pesan). */
+/** Input type guessed from the label (email, phone, date, number, message). */
 export function guessFieldType(label: string): WizardField["type"] {
   const l = label.toLowerCase();
   if (/e-?mail/.test(l)) return "email";
@@ -371,7 +371,7 @@ export function guessFieldType(label: string): WizardField["type"] {
   return "text";
 }
 
-/** Nama field aman dari label, mis. "Nama lengkap*" → "nama_lengkap". */
+/** Safe field name from a label, e.g. "Nama lengkap*" → "nama_lengkap". */
 const slugField = (label: string, i: number) =>
   label
     .toLowerCase()
@@ -382,7 +382,7 @@ const slugField = (label: string, i: number) =>
     .replace(/[\s-]+/g, "_")
     .slice(0, 40) || `field_${i + 1}`;
 
-/** "Judul langkah | Label 1*; Label 2; …" (* = wajib) — maks. 5 langkah × 6 field. */
+/** "Step title | Label 1*; Label 2; …" (* = required) — max. 5 steps × 6 fields. */
 export function parseWizard(lines: string[]): WizardStep[] {
   let n = 0;
   return nonEmpty(lines)
@@ -403,7 +403,7 @@ export function parseWizard(lines: string[]): WizardStep[] {
     .slice(0, 5);
 }
 
-/** URL sematan Google Maps dari alamat/kata kunci (tanpa API key). */
+/** Google Maps embed URL from an address/keyword (no API key). */
 export function mapsEmbedUrl(query: string, zoom: number): string {
   const q = encodeURIComponent(query.trim() || "Monas, Jakarta");
   return `https://maps.google.com/maps?q=${q}&z=${Math.round(clamp(zoom, 3, 20))}&output=embed`;

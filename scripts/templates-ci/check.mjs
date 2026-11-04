@@ -1,19 +1,19 @@
 /* ================================================================== */
-/* Pemeriksaan otomatis semua template (no. 12).                        */
+/* Automated check of all templates (no. 12).                           */
 /*                                                                    */
 /*   npm run templates:check -- [folder-situs] [opsi]                  */
 /*                                                                    */
-/* Untuk setiap template hasil `templates:gen`:                         */
-/*   1. Overflow horizontal di lebar 375, 768, 1280 (semua halaman).    */
-/*   2. Error JavaScript di halaman (pageerror).                        */
-/*   3. axe-core WCAG 2 A/AA di beranda (1280 px).                      */
-/* Opsi --lighthouse=N: Lighthouse (mobile) pada N template contoh dan  */
-/* dibandingkan dengan anggaran skor di bawah.                          */
+/* For every template produced by `templates:gen`:                      */
+/*   1. Horizontal overflow at widths 375, 768, 1280 (every page).      */
+/*   2. JavaScript errors on the page (pageerror).                      */
+/*   3. axe-core WCAG 2 A/AA on the home page (1280 px).                */
+/* The --lighthouse=N option: Lighthouse (mobile) on N sample templates and */
+/* compared with the score budget below.                                */
 /*                                                                    */
-/* Template lama mungkin masih punya catatan; yang tercatat ada di      */
-/* baseline.json. CI GAGAL hanya bila ada masalah BARU (aturan axe baru, */
-/* jumlah node naik, overflow baru, error JS baru). Bila sebuah template */
-/* membaik, jalankan --update-baseline agar batasnya ikut mengetat.     */
+/* Old templates may still have findings; those recorded are in         */
+/* baseline.json. CI FAILS only on NEW problems (new axe rules,         */
+/* a higher node count, new overflow, new JS errors). When a template  */
+/* improves, run --update-baseline so the limits tighten as well.       */
 /*                                                                    */
 /* Opsi lain: --only=id1,id2  --jobs=4  --update-baseline               */
 /*            --report=file.json                                       */
@@ -40,7 +40,7 @@ const REPORT = opt("report", path.join(ROOT, "report.json"));
 const WIDTHS = [375, 768, 1280];
 /** Anggaran Lighthouse (mobile, skor 0-100). */
 const BUDGET = { performance: 70, accessibility: 90, "best-practices": 90, seo: 90 };
-/** Template contoh Lighthouse: campuran Free, Premium, katalog, dan 3D. */
+/** Lighthouse sample templates: a mix of Free, Premium, catalog, and 3D. */
 const LH_SAMPLE = ["company-starter", "shop-starter", "shop-boutique", "cafe-kopi-senja", "hotel-resort-pantai", "automotive-dealer", "fitness-gym-pulse", "realty-rumah-kita", "x3d-rimba-roastery", "x3d-velo-listrik"];
 
 const { chromium } = require("playwright");
@@ -61,7 +61,7 @@ function serve() {
   return new Promise((ok) => srv.listen(0, "127.0.0.1", () => ok(srv)));
 }
 
-/* ---------- pemeriksaan satu template ---------- */
+/* ---------- check one template ---------- */
 async function checkTemplate(page, base, tpl) {
   const r = { overflow: [], errors: [], axe: {} };
   const errs = [];
@@ -75,8 +75,8 @@ async function checkTemplate(page, base, tpl) {
       await page.waitForTimeout(120);
       const over = await page.evaluate(() => {
         const de = document.documentElement;
-        // Yang dihitung: halaman benar-benar bisa digeser ke samping (overflow yang dipotong
-        // dengan overflow-x: clip/hidden tidak mengganggu pengunjung).
+        // What counts: the page can really be scrolled sideways (overflow clipped
+        // with overflow-x: clip/hidden does not bother visitors).
         window.scrollTo(99999, window.scrollY);
         const d = Math.round(window.scrollX);
         window.scrollTo(0, window.scrollY);
@@ -101,7 +101,7 @@ async function checkTemplate(page, base, tpl) {
   return r;
 }
 
-/* ---------- bandingkan dengan baseline ---------- */
+/* ---------- compare with the baseline ---------- */
 const keyOf = (o) => o.split(" ")[0]; // "about.html@375"
 function compare(id, now, base = { overflow: [], errors: [], axe: {} }) {
   const worse = [];
@@ -121,7 +121,7 @@ function compare(id, now, base = { overflow: [], errors: [], axe: {} }) {
 }
 
 /* ---------- Lighthouse ---------- */
-/** Jalankan satu proses dalam grup sendiri; bila lewat batas waktu, seluruh grup (termasuk Chrome) dimatikan. */
+/** Runs one process in its own group; when it exceeds the time limit, the whole group (including Chrome) is killed. */
 function runGroup(cmd, argv, ms) {
   return new Promise((ok) => {
     const child = spawn(cmd, argv, { stdio: "ignore", detached: true });
@@ -129,7 +129,7 @@ function runGroup(cmd, argv, ms) {
       try {
         process.kill(-child.pid, "SIGKILL");
       } catch {
-        /* sudah selesai */
+        /* already done */
       }
     }, ms);
     child.on("exit", (code) => {

@@ -2,16 +2,16 @@ import { LIBRARY_BY_ID } from "../pageMaker/engine/helpers/libraries";
 import { MEDIA_EXT, MEDIA_MIME, type Tour, type VrMediaKind } from "./model";
 
 /* ================================================================== */
-/* Tur 360° → halaman HTML A-Frame                                      */
+/* 360° tour → A-Frame HTML page                                        */
 /*                                                                    */
-/* SATU runtime (RUNTIME_JS) dipakai pratinjau editor dan hasil ekspor, */
-/* jadi yang dilihat di editor = yang diunduh. A-Frame dimuat dari CDN  */
-/* (versi dikunci) lewat <script> di <head>, dipasang otomatis.         */
+/* ONE runtime (RUNTIME_JS) is used by the editor preview and the export, */
+/* so what you see in the editor = what you download. A-Frame loads from a CDN */
+/* (pinned version) through a <script> in <head>, added automatically.  */
 /* ================================================================== */
 
 export const AFRAME = LIBRARY_BY_ID.aframe;
 
-/** Data tur yang dibaca runtime (tanpa id internal yang tidak perlu). */
+/** Tour data read by the runtime (without unneeded internal ids). */
 export interface RuntimeTour {
   name: string;
   start: string;
@@ -35,7 +35,7 @@ export function runtimeTour(tour: Tour): RuntimeTour {
   };
 }
 
-/** JSON aman di dalam <script> (tidak bisa menutup tag). */
+/** JSON that is safe inside a <script> (cannot close the tag). */
 export const scriptJson = (v: unknown) => JSON.stringify(v).replace(/</g, "\\u003c").replace(/[\u2028\u2029]/g, (c) => (c === "\u2028" ? "\\u2028" : "\\u2029"));
 const escHtml = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -63,8 +63,8 @@ a-scene{position:absolute;inset:0}
 .vr-edit a-scene{cursor:crosshair}`;
 
 /**
- * Runtime tur (JavaScript biasa). `window.__VR_BOOT` = { tour, media, mode }
- * untuk ekspor; di pratinjau editor data datang lewat postMessage.
+ * Tour runtime (plain JavaScript). `window.__VR_BOOT` = { tour, media, mode }
+ * for exports; in the editor preview the data arrives through postMessage.
  */
 export const RUNTIME_JS = `(function () {
   var tour = null, urls = {}, mode = "view", current = null, rotating = false, lastShown = null;
@@ -130,7 +130,7 @@ export const RUNTIME_JS = `(function () {
       });
     });
   }
-  // Raycaster A-Frame tidak selalu melihat entitas baru; segarkan daftar objeknya.
+  // The A-Frame raycaster doesn't always see new entities; refresh its object list.
   function refreshRays() {
     var list = document.querySelectorAll("[raycaster]");
     for (var i = 0; i < list.length; i++) { var rc = list[i].components && list[i].components.raycaster; if (rc && rc.refreshObjects) rc.refreshObjects(); }
@@ -165,14 +165,14 @@ export const RUNTIME_JS = `(function () {
       if (!src) { sky.removeAttribute("src"); sky.setAttribute("color", "#1f2937"); return done(); }
       asImage(src, function (ref) {
         if (lastShown !== src) return;
-        // Warna material mewarnai tekstur; putih = foto tampil apa adanya.
+        // Material color tints the texture; white = the photo shows as is.
         sky.setAttribute("color", "#ffffff"); sky.setAttribute("src", ref); done();
       });
     }, mode === "edit" ? 0 : 250);
   }
-  // A-Frame menebak jenis URL tanpa ekstensi lewat permintaan HEAD, yang
-  // gagal untuk URL blob (pratinjau di aplikasi) sehingga panorama tidak
-  // pernah tampil. URL blob dipasang ke <img> dulu, lalu sky memakai "#id".
+  // A-Frame guesses the type of an extensionless URL with a HEAD request, which
+  // fails for blob URLs (in-app preview), so the panorama would never
+  // show. The blob URL goes into an <img> first, then the sky uses "#id".
   var imgs = {}, imgSeq = 0;
   function asImage(src, cb) {
     if (String(src).indexOf("blob:") !== 0) return cb(src);
@@ -212,8 +212,8 @@ export const RUNTIME_JS = `(function () {
       var r = toYawPitch(p);
       post({ type: "vr:place", yaw: r.yaw, pitch: r.pitch });
     });
-    // Kursor tatapan (fuse) hanya aktif di mode headset; di layar biasa ia akan
-    // "mengeklik" hotspot yang kebetulan berada di tengah pandangan.
+    // The gaze cursor (fuse) is only active in headset mode; on a normal screen it would
+    // "click" whatever hotspot happens to be in the middle of the view.
     sceneEl.addEventListener("enter-vr", function () {
       var g = $("vr-gaze");
       g.setAttribute("raycaster", "objects: .hsp");
@@ -247,7 +247,7 @@ export const RUNTIME_JS = `(function () {
   if (location.protocol === "file:" && !(window.__VR_BOOT && window.__VR_BOOT.inline)) { var n = $("vr-note"); n.style.display = "block"; n.textContent = "Tur 360° perlu dibuka lewat server web (hosting atau server lokal) agar foto panorama tampil. Untuk dicoba langsung dengan klik ganda, unduh \u201cPratinjau 1 berkas\u201d dari menu VR. Lihat README.md."; }
 })();`;
 
-/** Halaman HTML lengkap. `boot` diisi untuk ekspor; kosong untuk pratinjau editor. */
+/** A complete HTML page. `boot` is set for exports; empty for the editor preview. */
 export function buildTourHtml(opts: { title: string; lang: string; boot?: { tour: RuntimeTour; media: Record<string, string>; mode: "view"; inline?: true } }): string {
   return `<!DOCTYPE html>
 <html lang="${opts.lang === "en" ? "en" : "id"}">
@@ -291,7 +291,7 @@ export interface TourMediaFile {
   blob: Blob;
 }
 
-/** Nama berkas aset hasil ekspor (urut, tanpa nama asli pengguna). */
+/** Exported asset file names (sequential, without the user's original names). */
 export function assetNames(tour: Tour, media: TourMediaFile[]): Record<string, string> {
   const kindOf = Object.fromEntries(media.map((m) => [m.id, m.kind]));
   const out: Record<string, string> = {};
@@ -351,7 +351,7 @@ Just want to try it on your own computer? The VR menu has a **One-file preview**
 `;
 }
 
-/** Blob → data URL (base64) dengan tipe MIME yang ditentukan. */
+/** Blob → data URL (base64) with the given MIME type. */
 export async function blobToDataUrl(blob: Blob, mime: string): Promise<string> {
   const bytes = new Uint8Array(await blob.arrayBuffer());
   let bin = "";
@@ -360,10 +360,10 @@ export async function blobToDataUrl(blob: Blob, mime: string): Promise<string> {
 }
 
 /**
- * Pratinjau 1 berkas: semua foto & audio ditanam sebagai data URL di dalam
- * satu HTML, jadi bisa dibuka dengan klik ganda (file://) tanpa server.
- * Gambar data URL tidak dianggap lintas-origin, sehingga tekstur WebGL tetap
- * boleh dipakai. A-Frame tetap dari CDN (perlu internet).
+ * Single-file preview: every photo & audio is embedded as a data URL inside
+ * one HTML file, so it can be opened by double-clicking (file://) without a server.
+ * Data URL images are not considered cross-origin, so WebGL textures can still
+ * be used. A-Frame still comes from a CDN (needs internet).
  */
 export async function buildTourSingleHtml(tour: Tour, media: TourMediaFile[], lang: string): Promise<string> {
   const used = assetNames(tour, media);
@@ -372,7 +372,7 @@ export async function buildTourSingleHtml(tour: Tour, media: TourMediaFile[], la
   return buildTourHtml({ title: tour.name, lang, boot: { tour: runtimeTour(tour), media: inline, mode: "view", inline: true } });
 }
 
-/** Berkas ekspor: index.html + README.md + assets/*. */
+/** Export files: index.html + README.md + assets/*. */
 export function buildTourFiles(tour: Tour, media: TourMediaFile[], lang: string): { name: string; blob: Blob }[] {
   const names = assetNames(tour, media);
   const html = buildTourHtml({ title: tour.name, lang, boot: { tour: runtimeTour(tour), media: names, mode: "view" } });

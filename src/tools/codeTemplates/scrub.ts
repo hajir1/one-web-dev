@@ -1,22 +1,22 @@
 /* ================================================================== */
-/* OWD Scrub: mesin animasi terikat scroll milik OneWebDev.              */
+/* OWD Scrub: OneWebDev's scroll-linked animation engine.                */
 /*                                                                    */
-/* Pengganti GSAP + ScrollTrigger di template kode. Lisensi GSAP        */
-/* melarang pemakaian di builder visual seperti OneWebDev, jadi bagian  */
-/* yang kami pakai ditulis ulang di sini (tanpa kode GSAP).             */
+/* Replaces GSAP + ScrollTrigger in code templates. The GSAP license    */
+/* forbids use in visual builders such as OneWebDev, so the parts      */
+/* we use are rewritten here (no GSAP code).                            */
 /*                                                                    */
-/* API sengaja dibuat mirip bagian kecil GSAP yang dipakai template:    */
+/* The API is deliberately similar to the small part of GSAP the templates use: */
 /*   S.to(target, vars) · S.fromTo(target, from, to) ·                 */
 /*   S.timeline({ scrollTrigger }).fromTo(...) ·                       */
 /*   S.ticker.add(fn) · S.ScrollTrigger.create({ … onUpdate, onToggle })*/
 /*   · S.ScrollTrigger.update() · S.ScrollTrigger.getAll()              */
 /* vars.scrollTrigger = { trigger, start, end, scrub }:                 */
 /*   start/end  "top bottom", "top 20%", "center 50%", "bottom 55%",   */
-/*              angka piksel, atau end: "max" (akhir halaman).         */
-/*   scrub      true = langsung; angka = detik untuk menyusul.         */
-/* Target: objek biasa (angka di-interpolasi, teks berganti di tengah) */
-/* atau elemen/selector/daftar elemen (opacity, x, y, scale, scaleX,   */
-/* scaleY, rotate, clipPath, dan properti CSS angka lain).             */
+/*              pixel numbers, or end: "max" (the end of the page).     */
+/*   scrub      true = immediate; a number = seconds to catch up.       */
+/* Targets: plain objects (numbers interpolated, text switching midway) */
+/* or elements/selectors/element lists (opacity, x, y, scale, scaleX,  */
+/* scaleY, rotate, clipPath, and other numeric CSS properties).        */
 /* Ease: none, power1–4 (.in/.out/.inOut), sine. Stagger: angka.       */
 /* ================================================================== */
 
@@ -34,7 +34,7 @@ window.OWDScrub = (function () {
   }
   function easeOf(name) {
     if (typeof name === "function") return name;
-    if (!name) return power(2, "out"); /* bawaan = power1.out (n=2 di sini setara kuadrat) */
+    if (!name) return power(2, "out"); /* default = power1.out (n=2 here equals quadratic) */
     if (name === "none" || name === "linear") return function (t) { return t; };
     var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
     if (!m) return power(2, "out");
@@ -53,13 +53,13 @@ window.OWDScrub = (function () {
   var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
   function isEl(o) { return o && o.nodeType === 1; }
 
-  /* Ambil angka-angka di dalam teks (mis. clipPath "inset(0 100% 0 0)") agar bisa di-interpolasi. */
+  /* Pull the numbers out of the text (e.g. clipPath "inset(0 100% 0 0)") so they can be interpolated. */
   function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
   function mixStr(a, b, k) {
     var na = nums(a), i = 0;
     return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
   }
-  /* Nilai transform awal diambil dari CSS (mis. scaleX(0) pada garis progres). */
+  /* Initial transform values are read from CSS (e.g. scaleX(0) on the progress bar). */
   function stateOf(el) {
     if (el.__owds) return el.__owds;
     var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
@@ -86,7 +86,7 @@ window.OWDScrub = (function () {
     } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
   }
 
-  /* Satu tween = satu target, nilai awal & akhir, posisi dalam rentang 0..1. */
+  /* One tween = one target, start & end values, position within the 0..1 range. */
   function makeTween(target, from, to, offset, span) {
     var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
     var el = isEl(target);
@@ -109,7 +109,7 @@ window.OWDScrub = (function () {
     };
   }
 
-  /* Posisi "<tepi elemen> <tepi layar>" → piksel scroll. */
+  /* Position "<element edge> <screen edge>" → scroll pixels. */
   function edge(word, size) {
     if (word === "top" || word === undefined) return 0;
     if (word === "center") return size / 2;
@@ -154,7 +154,7 @@ window.OWDScrub = (function () {
     var active = y >= this.start && y <= this.end;
     if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
   };
-  /* Majukan progres (scrub angka = menyusul pelan). Hasil: true bila berubah. */
+  /* Advance progress (numeric scrub = catches up slowly). Returns true when it changed. */
   ST.prototype.advance = function (dt, force) {
     if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
     else this.progress = this.target;
@@ -165,7 +165,7 @@ window.OWDScrub = (function () {
   };
   ST.prototype.render = function () {
     var first = this.shown < 0;
-    /* Seperti GSAP: tween yang belum pernah dimulai (progres 0) tidak menimpa nilai awal halaman. */
+    /* Like GSAP: a tween that has never started (progress 0) does not overwrite the page's initial values. */
     if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
     this.shown = this.progress;
     this.tweens.forEach(function (t) { t.render(this.progress); }, this);
@@ -189,10 +189,10 @@ window.OWDScrub = (function () {
     return st;
   }
 
-  /* Beberapa trigger boleh menggerakkan objek yang sama (pose per bab). Agar hasilnya   */
-  /* selalu "bab yang sedang dibaca", urutan gambar dibuat pasti: trigger yang kembali ke */
-  /* 0 digambar dari belakang ke depan, lalu semua yang sedang/sudah jalan (progres > 0)  */
-  /* digambar dari depan ke belakang, sehingga bab paling akhir yang aktif menang.         */
+  /* Several triggers may move the same object (a pose per chapter). So the result is    */
+  /* always "the chapter being read", the draw order is fixed: triggers that are back at  */
+  /* 0 are drawn from last to first, then all running/finished ones (progress > 0)       */
+  /* are drawn from first to last, so the latest active chapter wins.                     */
   function frame(now) {
     var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
@@ -237,5 +237,5 @@ window.OWDScrub = (function () {
 })();
 `;
 
-/** Ukuran kira-kira untuk catatan pustaka. */
+/** Approximate size for the library notes. */
 export const SCRUB_NAME = "OWD Scrub (bawaan, tanpa CDN)";

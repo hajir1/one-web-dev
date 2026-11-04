@@ -9,7 +9,7 @@ import { makeId } from "../helpers/makeId";
 export interface GlobalIcon {
   id: string;
   name: string;
-  /** Kode SVG mentah persis seperti yang ditempel user (belum diwarnai/diresize). */
+  /** Raw SVG code exactly as the user pasted it (not yet colored/resized). */
   svg: string;
   createdAt: number;
 }
@@ -23,9 +23,9 @@ interface IconStore {
 }
 
 /**
- * Pustaka ikon global — persist ke localStorage, jadi ikon yang ditambahkan
- * user tetap ada lintas sesi/hari, dan bisa dipakai oleh elemen maker manapun
- * (Button, Card, Badge, dst) selama mereka import store yang sama ini.
+ * Global icon library: persisted to localStorage, so icons the user adds
+ * survive across sessions/days and can be used by any element maker
+ * (Button, Card, Badge, etc.) as long as they import this same store.
  */
 export const useIconStore = create<IconStore>()(
   persist(
@@ -65,12 +65,12 @@ export const useIconStore = create<IconStore>()(
 );
 
 /* ------------------------------------------------------------------ */
-/* Utilitas SVG (dipakai bareng oleh IconPicker & elemen mana pun)      */
+/* SVG utilities (shared by IconPicker & any element)                   */
 /* ------------------------------------------------------------------ */
 
 /**
- * Buang deklarasi XML, DOCTYPE, dan komentar yang sering ikut tertempel
- * saat user menyalin isi file .svg (sebelumnya ditolak sebagai "tidak valid").
+ * Strips XML declarations, DOCTYPEs, and comments that often get pasted along
+ * when the user copies the content of an .svg file (previously rejected as "invalid").
  */
 export function normalizeSvg(raw: string): string {
   return raw
@@ -84,10 +84,10 @@ export function normalizeSvg(raw: string): string {
 const DANGEROUS_TAGS = ["script", "foreignObject", "iframe", "object", "embed", "style"];
 
 /**
- * Sanitasi SVG sebelum dirender via dangerouslySetInnerHTML: buang tag
- * berbahaya, semua atribut event handler (on*, termasuk yang tanpa kutip),
- * dan href/xlink:href yang mengarah ke javascript:. Memakai DOMParser kalau
- * tersedia (lebih andal), dengan fallback regex.
+ * Sanitizes SVG before rendering via dangerouslySetInnerHTML: drops dangerous
+ * tags, every event handler attribute (on*, including unquoted ones),
+ * and href/xlink:href pointing to javascript:. Uses DOMParser when
+ * available (more reliable), with a regex fallback.
  */
 export function sanitizeSvg(raw: string): string {
   const input = normalizeSvg(raw);
@@ -103,7 +103,7 @@ export function sanitizeSvg(raw: string): string {
         all.forEach((el) => {
           Array.from(el.attributes).forEach((a) => {
             const name = a.name.toLowerCase();
-            // eslint-disable-next-line no-control-regex -- karakter kontrol sengaja dibuang agar "java\x00script:" tidak lolos
+            // eslint-disable-next-line no-control-regex -- control characters are stripped on purpose so "java\x00script:" cannot slip through
             const val = a.value.replace(/[\s\u0000-\u001f]/g, "").toLowerCase();
             if (name.startsWith("on")) el.removeAttribute(a.name);
             else if ((name === "href" || name === "xlink:href") && val.startsWith("javascript:"))
@@ -113,7 +113,7 @@ export function sanitizeSvg(raw: string): string {
         return new XMLSerializer().serializeToString(root);
       }
     } catch {
-      /* jatuh ke fallback */
+      /* fall back */
     }
   }
   let svg = input;
@@ -126,14 +126,14 @@ export function sanitizeSvg(raw: string): string {
   return svg;
 }
 
-/** Cek apakah teks yang ditempel memang kode SVG yang valid secara bentuk. */
+/** Checks whether the pasted text is SVG code with a valid shape. */
 export function isValidSvg(raw: string): boolean {
   return /^<svg[\s>][\s\S]*<\/svg>$/i.test(normalizeSvg(raw));
 }
 
 /**
- * Ganti semua fill/stroke (kecuali "none") jadi currentColor, supaya ikon
- * otomatis ikut warna teks di elemen tempat ia dipasang.
+ * Replaces every fill/stroke (except "none") with currentColor, so the icon
+ * automatically follows the text color of the element it is placed in.
  */
 function applyCurrentColor(svg: string): string {
   return svg
@@ -144,10 +144,10 @@ function applyCurrentColor(svg: string): string {
 }
 
 /**
- * Set width/height eksplisit HANYA pada tag <svg> pembuka. Sebelumnya regex
- * menghapus width/height dari SEMUA elemen (mis. <rect width="18">), sehingga
- * ikon yang memakai <rect>/<image> rusak. Kalau SVG tidak punya viewBox,
- * viewBox dibuat dari width/height aslinya supaya tetap bisa diskalakan.
+ * Sets an explicit width/height ONLY on the opening <svg> tag. Previously a regex
+ * removed width/height from EVERY element (e.g. <rect width="18">), which broke
+ * icons using <rect>/<image>. When the SVG has no viewBox,
+ * one is created from its original width/height so it can still scale.
  */
 export function resizeSvg(svg: string, size: number): string {
   return svg.replace(/<svg\b[^>]*>/i, (tag) => {
@@ -162,9 +162,9 @@ export function resizeSvg(svg: string, size: number): string {
 }
 
 /**
- * Fungsi utama: dari SVG mentah di pustaka -> markup siap pakai (sudah
- * disanitasi, diwarnai sesuai mode, dan diresize), dipakai baik untuk
- * preview di app maupun untuk kode yang di-export ke file.
+ * The main function: raw SVG from the library → ready-to-use markup (already
+ * sanitized, colored per mode, and resized), used both for the
+ * in-app preview and for the code exported to files.
  */
 export function renderIconMarkup(
   rawSvg: string,

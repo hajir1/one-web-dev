@@ -55,7 +55,7 @@ import {
 /* Perhiasan handmade, Rekrutmen eksekutif.                              */
 /* ================================================================== */
 
-/* ---------- 6. Layar Kenari Pictures — rumah produksi (6 hlm) --------- */
+/* ---------- 6. Layar Kenari Pictures — production house (6 pages) --------- */
 // Premium: pro-portfolio-mosaic, typewriter, logo-marquee. Library: Animate. Tema gelap, tipografi raksasa.
 
 const FP: Palette = { ink: "#f5f5f4", muted: "#a8a29e", primary: "#dc2626", primaryDark: "#991b1b", soft: "#292524", line: "#44403c" };

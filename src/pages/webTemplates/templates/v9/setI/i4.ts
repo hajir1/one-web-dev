@@ -2,8 +2,8 @@ import { page, tb } from "./dsl";
 import type { ISpec } from "./spec";
 
 /* ================================================================== */
-/* Set I batch 4 (I31–I40): batik, bengkel motor, toko buku, hotel,      */
-/* studio game, sekolah bahasa, cokelat, konstruksi baja, podcast,       */
+/* Set I batch 4 (I31–I40): batik, motorcycle workshop, bookstore, hotel, */
+/* game studio, language school, chocolate, steel construction, podcast, */
 /* asuransi keluarga.                                                   */
 /* ================================================================== */
 
@@ -194,7 +194,7 @@ export const I4: ISpec[] = [
     },
   },
 
-  /* ---------------- I33. Senja Kata — toko buku ---------------- */
+  /* ---------------- I33. Senja Kata — bookstore ---------------- */
   {
     id: "x3d-senja-kata",
     brand: "Toko Buku Senja Kata",
@@ -502,7 +502,7 @@ export const I4: ISpec[] = [
     },
   },
 
-  /* ---------------- I36. Linguaria — sekolah bahasa ---------------- */
+  /* ---------------- I36. Linguaria — language school ---------------- */
   {
     id: "x3d-linguaria",
     brand: "Sekolah Bahasa Linguaria",

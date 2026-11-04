@@ -73,7 +73,7 @@ export default function VideoToFrames() {
 
   const revokeFrames = (list: Frame[]) => list.forEach((f) => URL.revokeObjectURL(f.url));
 
-  // Tinggalkan halaman: hentikan ekstraksi, cabut semua URL.
+  // Leaving the page: stop extraction, revoke every URL.
   useEffect(
     () => () => {
       ctrlRef.current?.abort();
@@ -146,7 +146,7 @@ export default function VideoToFrames() {
         const blob = await capture(v, canvas, time, ctrl.signal);
         if (ctrl.signal.aborted) break;
         const fr: Frame = { id: makeId(), index: i + 1, time, blob, url: URL.createObjectURL(blob) };
-        setFrames((prev) => [...prev, fr]); // tampil bertahap
+        setFrames((prev) => [...prev, fr]); // shown progressively
         done = i + 1;
         setProgress({ done, total: plan.times.length });
       }
@@ -228,7 +228,7 @@ export default function VideoToFrames() {
 
   return (
     <MediaShell tool="video-to-frames" icon={Clapperboard} accent="amber">
-      {/* Video pekerja: tersembunyi tapi tetap di DOM (Safari tidak men-decode video yang display:none). */}
+      {/* Worker video: hidden but kept in the DOM (Safari does not decode display:none videos). */}
       <video ref={workerVideoRef} muted playsInline aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px opacity-0" />
 
       {intake.rejectionText && (

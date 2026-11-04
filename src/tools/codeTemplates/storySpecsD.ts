@@ -4,7 +4,7 @@ import { SCENE_BOTOL, SCENE_GIGI, SCENE_PETA, SCENE_RUBIK } from "./storyScenesD
 const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
 
 export const STORY_SPECS_D: StorySpec[] = [
-  /* Kapal dalam botol → gabus lepas → kamera masuk lewat leher botol → botol lenyap, laut kecil meluas jadi samudra → kapal berlayar di antara pulau. */
+  /* A ship in a bottle → the cork comes off → the camera enters through the bottle neck → the bottle vanishes, the little sea expands into an ocean → the ship sails between islands. */
   {
     id: "story-kapal-botol",
     title: "Layar Nusa · Trip Kapal Pinisi",
@@ -28,7 +28,7 @@ export const STORY_SPECS_D: StorySpec[] = [
     wa: "6281200001010",
     scene: SCENE_BOTOL,
   },
-  /* Kubus rubik teracak → diselesaikan putaran demi putaran mengikuti scroll → meledak jadi keping → rapat lagi dan berhenti berputar. */
+  /* A scrambled Rubik's cube → solved turn by turn with the scroll → explodes into pieces → snaps back together and stops spinning. */
   {
     id: "story-kubus-rubik",
     title: "Sudut Solusi · Konsultan Bisnis",
@@ -53,7 +53,7 @@ export const STORY_SPECS_D: StorySpec[] = [
     wa: "6281200001011",
     scene: SCENE_RUBIK,
   },
-  /* Satu roda gigi → roda lain datang dan saling mengunci → mesin berputar → ban berjalan mengeluarkan paket. */
+  /* One gear → other gears arrive and mesh → the machine turns → the conveyor belt delivers parcels. */
   {
     id: "story-roda-gigi",
     title: "Rakit Presisi · Manufaktur Kontrak",
@@ -78,7 +78,7 @@ export const STORY_SPECS_D: StorySpec[] = [
     wa: "6281200001012",
     scene: SCENE_GIGI,
   },
-  /* Peta kertas datar → kontur terangkat jadi gunung (relief kertas) → awan → jalur pendakian tergambar → pendaki naik → bendera di puncak. */
+  /* A flat paper map → contours rise into mountains (paper relief) → clouds → a hiking trail is drawn → a hiker climbs → a flag at the summit. */
   {
     id: "story-peta-gunung",
     title: "Jejak Rinjani · Trekking & Pendakian",

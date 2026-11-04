@@ -116,7 +116,7 @@ const DEFAULT_CLASS_NAME = "custom-switch";
 /* CSS & markup                                                        */
 /* ------------------------------------------------------------------ */
 
-/** Ukuran thumb & jarak gesernya dihitung dari ukuran track. */
+/** Thumb size & travel distance are computed from the track size. */
 function switchGeometry(s: SwitchState) {
   const innerH = s.trackHeight - 2 * s.borderWidth;
   const innerW = s.trackWidth - 2 * s.borderWidth;
@@ -336,7 +336,7 @@ function switchSections(s: SwitchState, update: Updater<SwitchState>): PanelSect
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const switchElement = defineElement<SwitchState>({

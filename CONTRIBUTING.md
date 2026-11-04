@@ -1,16 +1,16 @@
-# Berkontribusi
+# Contributing
 
-Terima kasih sudah mau membantu. Issue dan pull request boleh dalam bahasa Indonesia atau Inggris.
+Thank you for helping out. Issues and pull requests are welcome in English or Indonesian.
 
-## Menyiapkan proyek
+## Setting up the project
 
 ```bash
 npm ci
-cp .env.demo .env.local   # menjalankan frontend-only, tanpa backend
+cp .env.demo .env.local   # runs frontend-only, without a backend
 npm run dev
 ```
 
-## Sebelum membuka pull request
+## Before opening a pull request
 
 ```bash
 npm run typecheck
@@ -18,21 +18,22 @@ npm run lint
 npm test
 ```
 
-Bila mengubah template atau elemen Desain Halaman, jalankan juga pemeriksaan template (butuh Playwright dan axe-core):
+If you change templates or Page Design elements, also run the template checks (requires Playwright and axe-core):
 
 ```bash
 npm i --no-save playwright@1.63.0 axe-core@4.10.3 && npx playwright install chromium
 npm run templates:gen && npm run templates:check
 ```
 
-CI gagal bila ada masalah **baru** (overflow di HP, error JavaScript, pelanggaran aksesibilitas). Bila perubahan Anda memperbaiki template, perbarui baseline dengan `npm run templates:baseline` dan sertakan `scripts/templates-ci/baseline.json` di PR.
+CI fails when there are **new** problems (overflow on phones, JavaScript errors, accessibility violations). If your change fixes a template, update the baseline with `npm run templates:baseline` and include `scripts/templates-ci/baseline.json` in the PR.
 
-## Gaya
+## Style
 
-- Teks antarmuka selalu lewat `src/locales/id.json` dan `en.json` (keduanya diisi).
-- Satu komponen per berkas; berkas di atas ±600 baris sebaiknya dipecah.
-- Template baru: ikuti pola di `src/pages/webTemplates/templates/`, uji di lebar 375, 768, dan 1280.
+- Interface text always goes through `src/locales/id.json` and `en.json` (fill in both).
+- Code comments are written in English.
+- One component per file; files over about 600 lines should be split.
+- New templates: follow the patterns in `src/pages/webTemplates/templates/` and test at widths 375, 768, and 1280.
 
-## Lisensi kontribusi
+## Contribution license
 
-Dengan mengirim kontribusi, Anda setuju kontribusi itu dirilis di bawah lisensi yang sama dengan proyek (AGPL-3.0; untuk template berlaku juga `LICENSE-TEMPLATES.md`).
+By submitting a contribution, you agree that it is released under the same license as the project (AGPL-3.0; templates are also covered by `LICENSE-TEMPLATES.md`).

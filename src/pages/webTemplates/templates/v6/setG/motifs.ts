@@ -1,20 +1,20 @@
 /* ================================================================== */
-/* Motif ilustrasi set G (SVG buatan sendiri, ASCII, tanpa URL luar).    */
-/* Setiap motif menggambar satu adegan 1200x700 dengan warna dari palet  */
-/* template, jadi satu motif bisa tampil berbeda di template lain.       */
-/* Objek digambar di x 520-1100 lalu digeser ke tengah (lihat scene) agar */
-/* tetap utuh saat dipotong rasio potret/persegi.                         */
+/* Set G illustration motifs (in-house SVG, ASCII, no external URLs).   */
+/* Each motif draws one 1200x700 scene with colors from the template    */
+/* palette, so one motif can look different in another template.       */
+/* Objects are drawn at x 520-1100 then shifted to the center (see scene) so */
+/* they stay whole when cropped to portrait/square ratios.              */
 /* ================================================================== */
 
 export interface Ink {
-  /** Gradien latar. */
+  /** Background gradient. */
   a: string;
   b: string;
-  /** Warna utama objek. */
+  /** Main object color. */
   m: string;
   /** Aksen. */
   c: string;
-  /** Garis/gelap. */
+  /** Lines/dark. */
   d: string;
   /** Terang. */
   l: string;
@@ -27,7 +27,7 @@ const s = (d: string, st: string, w: number, extra = "") => `<path d="${d}" fill
 const e = (x: number, y: number, rx: number, ry: number, f: string, o = 1) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${f}"${o < 1 ? ` opacity="${o}"` : ""}/>`;
 const shadow = (x: number, y: number, w: number) => e(x, y, w, w * 0.12, "#000000", 0.12);
 
-/** Bulatan dekoratif di latar. */
+/** Decorative circles in the background. */
 const deco = (k: Ink) => c(1060, 120, 160, k.l, 0.25) + c(140, 620, 200, k.c, 0.14) + c(980, 640, 60, k.c, 0.3);
 
 const MOTIFS = {
@@ -501,14 +501,14 @@ const MOTIFS = {
 
 export type Motif = keyof typeof MOTIFS;
 
-/** Bungkus adegan menjadi SVG lengkap 1200x700 (opsional dicerminkan). */
+/** Wrap a scene into a full 1200x700 SVG (optionally mirrored). */
 export function scene(motif: Motif, k: Ink, mirror = false): string {
   const body = MOTIFS[motif](k);
   const bgDef = `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${k.a}"/><stop offset="1" stop-color="${k.b}"/></linearGradient></defs><rect width="1200" height="700" fill="url(#g)"/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">${bgDef}<g transform="${mirror ? "translate(1380 0) scale(-1 1)" : "translate(-180 0)"}">${body}</g></svg>`;
 }
 
-/** Avatar sederhana untuk testimoni & tim. */
+/** Simple avatar for testimonials & team. */
 export function face(bg: string, skin: string, hair: string, shirt: string, style: 0 | 1 | 2 | 3): string {
   const hairBack = style === 1 ? `<path d="M118 200 Q118 86 200 86 Q282 86 282 200 V310 H118Z" fill="${hair}"/>` : style === 3 ? `<path d="M128 150 Q200 40 272 150 Q290 100 250 80 Q200 50 150 80 Q110 100 128 150Z" fill="${hair}"/>` : "";
   const hairTop =

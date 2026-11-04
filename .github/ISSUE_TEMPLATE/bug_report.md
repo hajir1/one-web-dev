@@ -1,20 +1,20 @@
 ---
-name: Laporan bug
-about: Ada yang tidak berjalan semestinya
+name: Bug report
+about: Something is not working as expected
 labels: bug
 ---
 
-**Apa yang terjadi?**
+**What happened?**
 
-**Langkah mereproduksi**
+**Steps to reproduce**
 1.
 2.
 
-**Yang seharusnya terjadi**
+**Expected behavior**
 
-**Lingkungan**
-- Browser & versi:
-- Perangkat (desktop/HP):
-- Halaman atau template (id):
+**Environment**
+- Browser and version:
+- Device (desktop/phone):
+- Page or template (id):
 
-**Tangkapan layar / pesan konsol** (opsional)
+**Screenshot / console message** (optional)

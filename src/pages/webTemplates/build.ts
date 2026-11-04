@@ -4,16 +4,16 @@ import { createPageRoot, type PageDoc } from "../pageMaker/helpers/pageDoc";
 import { col, el, grid, heading, para, section, stack, type Palette } from "../pageMaker/helpers/blocks";
 
 /* ================================================================== */
-/* Penyusun pohon halaman untuk template                                 */
+/* Page tree builder for templates                                      */
 /*                                                                    */
-/* Blok dasar (el, heading, section, grid, …) ada di                     */
-/* pageMaker/helpers/blocks.ts dan dipakai juga oleh preset section.     */
-/* Berkas ini menambah header/footer situs dan `page()`.                 */
+/* Basic blocks (el, heading, section, grid, …) live in                  */
+/* pageMaker/helpers/blocks.ts and is also used by the section presets. */
+/* This file adds the site header/footer and `page()`.                  */
 /* ================================================================== */
 
 export * from "../pageMaker/helpers/blocks";
 
-/** Header situs: logo teks + Menu Element (otomatis mengambil halaman folder website). */
+/** Site header: a text logo + Menu Element (automatically picks up the website folder pages). */
 export function siteHeader(brand: string, p: Palette, cta?: ElementNode): BoxNode {
   const menu = el("menu", { siteId: "", pageIds: [], textColor: "#334155", hoverColor: p.primary, activeColor: p.primary, gap: 22, align: "end", stackOnMobile: false }, "Menu");
   return section(
@@ -35,7 +35,7 @@ export function siteHeader(brand: string, p: Palette, cta?: ElementNode): BoxNod
   );
 }
 
-/** Footer sederhana: kolom merek, tautan, kontak. */
+/** Simple footer: brand column, links, contact. */
 export function siteFooter(brand: string, about: string, columns: { title: string; items: string[] }[], copyright: string, dark = "#0f172a"): BoxNode {
   const listOf = (items: string[]) =>
     el("list", {
@@ -72,7 +72,7 @@ export function siteFooter(brand: string, about: string, columns: { title: strin
   );
 }
 
-/** Font sistem untuk seluruh halaman (Custom CSS root — tetap terbawa saat diedit & diekspor dari Page Maker). */
+/** System font for the whole page (root Custom CSS; carried along when edited & exported from Page Maker). */
 const PAGE_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export function page(sections: BoxNode[]): PageDoc {

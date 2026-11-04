@@ -1,11 +1,11 @@
 /* ================================================================== */
-/* Ilustrasi set J (SVG buatan sendiri, ASCII, tanpa lisensi pihak       */
-/* ketiga). Kunci: v10j-<id template>-<nama>.                            */
+/* Set J illustrations (in-house SVG, ASCII, no third-party licenses)   */
+/* third). Key: v10j-<template id>-<name>.                               */
 /* ================================================================== */
 
 export const svg = (w: number, h: number, body: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${body}</svg>`;
 
-/** Biji/titik acak tetapi tetap (deterministik) untuk tekstur. */
+/** Random but fixed (deterministic) seeds/dots for texture. */
 export function specks(n: number, w: number, h: number, color: string, seed = 1, r = 2): string {
   let s = seed;
   const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);

@@ -1,12 +1,12 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, sec, shape3, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 08 · Roda Lawas: bengkel restorasi sepeda onthel. Ide besar: situs = papan enamel + katalog suku cadang bernomor. */
+/* 08 · Roda Lawas: an onthel bicycle restoration workshop. Big idea: the site = an enamel sign + a numbered parts catalog. */
 
 const C = { hijau: "#1E4D3B", krem: "#F1E6C8", merah: "#A3282B", krom: "#B9BCB8", karat: "#8A4B2A", tinta: "#1b2a22" };
 export const L08 = lookJ({ ink: C.tinta, muted: "#3f4a42", primary: C.merah, primaryDark: "#7e1d20", soft: "#e6d8b2", line: C.hijau, bg: C.krem, head: "Bodoni Moda", body: "Epilogue", r: 18 });
 const L = L08;
 
-/** Papan enamel: sudut membulat, bingkai ganda krem, "baut" di empat sudut lewat bayangan dalam. */
+/** Enamel sign: rounded corners, a double cream frame, "bolts" in the four corners via inset shadows. */
 const ENAMEL = `border-radius: 22px; border: 3px solid ${C.krem}; outline: 10px solid ${C.hijau}; outline-offset: 0; box-shadow: 0 0 0 13px ${C.tinta}, 0 18px 40px -12px rgba(0,0,0,.35);`;
 
 const PARTS: { no: string; name: B; note: B }[] = [
@@ -69,7 +69,7 @@ function homePage(j: J): BoxNode[] {
     ],
     { bg: C.krem, padY: 72 },
   );
-  // Katalog suku cadang: gambar teknik bernomor + daftar bernomor yang naik bergiliran.
+  // Spare parts catalog: a numbered technical drawing + a numbered list that rises in turn.
   const partRow = (p: (typeof PARTS)[number], i: number) =>
     fx(
       line(

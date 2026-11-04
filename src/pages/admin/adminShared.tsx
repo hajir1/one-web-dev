@@ -7,13 +7,13 @@ import {
 } from "lucide-react";
 import { Chip, INPUT, Notice,  btn } from "../../components/app/ui";
 
-/* Util & komponen kecil bersama panel admin (dipisah dari AdminPage.tsx, no. 15). */
+/* Small shared utilities & components for the admin panel (split from AdminPage.tsx, no. 15). */
 
-/** GET sederhana dengan status muat/galat + reload. */
+/** Simple GET with loading/error state + reload. */
 
-/** Jalankan aksi admin: toast sukses/galat, lalu callback. */
+/** Run an admin action: success/error toast, then the callback. */
 
-/** Setelah katalog/template diubah admin: buang cache klien agar harga & daftar terbaru dipakai. */
+/** After an admin changes the catalog/templates: drop the client cache so the latest prices & lists are used. */
 
 export function Spinner() {
   return (
@@ -132,7 +132,7 @@ export function PythonChip({ h }: { h: { configured: boolean; ok: boolean | null
   return <Chip tone={h.ok ? "green" : "rose"}>{h.ok ? t("admin.python.ok") : t("admin.python.down")}</Chip>;
 }
 
-/** Bentuk halaman hasil paginasi dari /admin/*. */
+/** Shape of a paginated page from /admin/*. */
 
 export function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (

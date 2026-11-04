@@ -4,18 +4,18 @@ import { asset } from "../../webTemplates/assets";
 import { badge, col, el, eyebrow, grid, heading, image, inline, linkButton, para, section, stack, type Palette } from "./blocks";
 
 /* ================================================================== */
-/* 10 preset section "Pro" — berisi konten & gaya, bukan kerangka kosong */
+/* 10 "Pro" section presets: with content & styles, not empty skeletons */
 /*                                                                    */
-/*   Free    : Hero Sorotan, Fitur Ikon, FAQ Akordeon, CTA Pita          */
-/*   Premium : Layanan Terbagi, Dinding Testimoni, Harga 3 Paket,         */
-/*             Portofolio Mozaik, Kartu Tim, Pita Statistik             */
+/*   Free    : Spotlight Hero, Icon Features, Accordion FAQ, Ribbon CTA  */
+/*   Premium : Split Services, Testimonial Wall, 3-Plan Pricing,          */
+/*             Mosaic Portfolio, Team Cards, Stats Ribbon               */
 /*                                                                    */
-/* Setiap preset = fungsi (tema, bahasa, isi) → section. Page Maker      */
-/* memakai tema & isi bawaan; template website memakai fungsi yang sama  */
-/* dengan tema & isi sendiri, jadi section di template = preset katalog. */
-/* Semua isi dibangun dari elemen GRATIS supaya membeli section tidak    */
-/* memerlukan pembelian elemen lain. Responsif: Row grid otomatis jadi   */
-/* satu kolom di layar kecil (stackOnMobile) + ukuran judul mengecil.    */
+/* Each preset = a function (theme, language, content) → section. Page Maker */
+/* uses the default theme & content; website templates use the same function */
+/* with their own theme & content, so template sections = catalog presets. */
+/* All content is built from FREE elements so buying a section does not */
+/* require buying other elements. Responsive: grid Rows automatically become */
+/* one column on small screens (stackOnMobile) + heading sizes shrink.  */
 /* ================================================================== */
 
 export type Tr = (id: string, en: string) => string;
@@ -24,15 +24,15 @@ const currentTr = (): Tr => trFor(i18n.language);
 
 export interface ProTheme {
   p: Palette;
-  /** Latar section terang. */
+  /** Light section background. */
   bg: string;
-  /** Latar section selang-seling. */
+  /** Alternating section background. */
   alt: string;
-  /** Latar section gelap. */
+  /** Dark section background. */
   dark: string;
-  /** Sudut kartu (px). */
+  /** Card corner radius (px). */
   radius: number;
-  /** font-family judul (opsional). */
+  /** Heading font-family (optional). */
   headFont?: string;
 }
 
@@ -51,21 +51,21 @@ export interface Link {
 
 /* ------------------------------ util ------------------------------- */
 
-/** Tambah deklarasi CSS ke node (menghormati Custom CSS yang sudah ada). */
+/** Adds CSS declarations to a node (respecting existing Custom CSS). */
 function addCss(node: ElementNode | BoxNode, decl: string): void {
   const cur = node.advanced?.customCss ?? "";
   const next = cur.includes("{") ? `${cur}\n& { ${decl} }` : `${cur}${cur ? "\n" : ""}${decl}`;
   node.advanced = { ...node.advanced, customCss: next };
 }
 
-/** Judul dengan font tema. */
+/** Heading with the theme font. */
 function h(t: ProTheme, text: string, tag: "h1" | "h2" | "h3" | "h4", o: Parameters<typeof heading>[2] = {}): ElementNode {
   const n = heading(text, tag, { color: t.p.ink, ...o });
   if (t.headFont) addCss(n, `font-family: ${t.headFont};`);
   return n;
 }
 
-/** Tandai section sebagai hasil preset (dipakai katalog & daftar isi template). */
+/** Marks a section as preset output (used by the catalog & template content list). */
 export function stamp(id: string, node: BoxNode): BoxNode {
   if (node.section) node.section = { ...node.section, presetId: id };
   return node;
@@ -85,7 +85,7 @@ function intro(t: ProTheme, o: { eyebrow?: string; title: string; text?: string;
   );
 }
 
-/** Kotak ikon (emoji/teks) — elemen Text biasa sehingga bisa diganti bebas. */
+/** Icon box (emoji/text): a regular Text element so it can be replaced freely. */
 function iconTile(t: ProTheme, glyph: string): ElementNode {
   const n = el("text", { text: glyph, tag: "p", fontSize: 22, fontWeight: 700, textColor: t.p.primary, textAlign: "center", widthMode: "auto" }, "Ikon");
   n.advanced = { customCss: `display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 14px; background: ${t.p.soft};` };
@@ -109,7 +109,7 @@ export interface HeroSpotlightContent {
   note: string;
 }
 
-/** Hero Sorotan (Free): teks rata tengah + 2 tombol + gambar produk lebar di bawah. */
+/** Spotlight Hero (Free): centered text + 2 buttons + a wide product image below. */
 export function heroSpotlight(t: ProTheme = DEFAULT_PRO_THEME, tr: Tr = currentTr(), c: Partial<HeroSpotlightContent> = {}): BoxNode {
   const x: HeroSpotlightContent = {
     badge: tr("Baru · Versi 2.0", "New · Version 2.0"),
@@ -150,7 +150,7 @@ export interface FeatureItem {
   text: string;
 }
 
-/** Fitur Ikon (Free): judul + 3/4/6 kartu fitur ber-ikon. */
+/** Icon Features (Free): heading + 3/4/6 feature cards with icons. */
 export function featuresIcons(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -179,7 +179,7 @@ export function featuresIcons(
   );
 }
 
-/** FAQ Akordeon (Free): judul kiri, akordeon kanan. */
+/** Accordion FAQ (Free): heading on the left, accordion on the right. */
 export function faqAccordion(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -224,7 +224,7 @@ export function faqAccordion(
   return stamp("pro-faq-accordion", section("FAQ Akordeon", [grid([left, col([acc], { name: "Pertanyaan" })], "minmax(0, 1fr) minmax(0, 1.6fr)", { gap: 48 })], { bg: t.alt, padY: 88 }));
 }
 
-/** CTA Pita (Free): pita gradient dengan ajakan dan dua tombol. */
+/** Ribbon CTA (Free): a gradient ribbon with a call to action and two buttons. */
 export function ctaBand(t: ProTheme = DEFAULT_PRO_THEME, tr: Tr = currentTr(), c: Partial<{ title: string; text: string; primary: Link; secondary: Link | null }> = {}): BoxNode {
   const secondary = c.secondary === undefined ? { label: tr("Hubungi kami", "Contact us"), href: "#kontak" } : c.secondary;
   const box = col(
@@ -251,7 +251,7 @@ export function ctaBand(t: ProTheme = DEFAULT_PRO_THEME, tr: Tr = currentTr(), c
 /* PREMIUM                                                              */
 /* ================================================================== */
 
-/** Layanan Terbagi (Premium): gambar besar + daftar layanan ber-ikon. */
+/** Split Services (Premium): a large image + a list of services with icons. */
 export function servicesSplit(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -286,7 +286,7 @@ export interface Quote {
   avatar: string;
 }
 
-/** Dinding Testimoni (Premium): skor rating + 3 kartu kutipan. */
+/** Testimonial Wall (Premium): rating score + 3 quote cards. */
 export function testimonialsWall(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -334,7 +334,7 @@ export interface Plan {
   featured?: boolean;
 }
 
-/** Harga 3 Paket (Premium): kartu paket, paket unggulan gelap. */
+/** 3-Plan Pricing (Premium): plan cards, featured plan in dark. */
 export function pricingCards(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -378,7 +378,7 @@ export interface Work {
   image: string;
 }
 
-/** Portofolio Mozaik (Premium): 2 karya besar + 3 karya kecil. */
+/** Mosaic Portfolio (Premium): 2 large works + 3 small works. */
 export function portfolioMosaic(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -422,7 +422,7 @@ export interface Member {
   links?: Link[];
 }
 
-/** Kartu Tim (Premium): 4 profil dengan foto, jabatan, tautan sosial. */
+/** Team Cards (Premium): 4 profiles with photo, role, social links. */
 export function teamCards(t: ProTheme = DEFAULT_PRO_THEME, tr: Tr = currentTr(), c: Partial<{ eyebrow: string; title: string; text: string; members: Member[] }> = {}): BoxNode {
   const members = c.members ?? [
     { name: "Andi Wijaya", role: "CEO", photo: asset("pro-team-1") },
@@ -458,7 +458,7 @@ export function teamCards(t: ProTheme = DEFAULT_PRO_THEME, tr: Tr = currentTr(),
   );
 }
 
-/** Pita Statistik (Premium): latar gelap, judul di atas, 4 kartu angka. */
+/** Stats Ribbon (Premium): dark background, heading on top, 4 number cards. */
 export function statsBand(
   t: ProTheme = DEFAULT_PRO_THEME,
   tr: Tr = currentTr(),
@@ -503,12 +503,12 @@ export interface ProPresetDef {
   description: string;
   descriptionEn: string;
   family: "stack" | "row" | "grid";
-  /** Kategori katalog (hero, features, faq, …). */
+  /** Catalog category (hero, features, faq, …). */
   category: string;
   build: () => BoxNode;
 }
 
-/** Urutan tampil; tier ditentukan PRO_FREE_IDS. */
+/** Display order; tier is set by PRO_FREE_IDS. */
 export const PRO_PRESETS: ProPresetDef[] = [
   { id: "pro-hero-spotlight", name: "Hero Sorotan", nameEn: "Spotlight Hero", description: "Judul besar rata tengah, dua tombol, dan gambar produk lebar.", descriptionEn: "Centered headline, two buttons, and a wide product image.", family: "stack", category: "hero", build: () => heroSpotlight() },
   { id: "pro-features-icons", name: "Fitur Ikon", nameEn: "Icon Features", description: "Judul section dan tiga kartu fitur ber-ikon.", descriptionEn: "Section title and three icon feature cards.", family: "grid", category: "features", build: () => featuresIcons() },
@@ -522,5 +522,5 @@ export const PRO_PRESETS: ProPresetDef[] = [
   { id: "pro-stats-band", name: "Pita Statistik", nameEn: "Statistics Band", description: "Latar gelap, judul di atas, empat kartu angka.", descriptionEn: "Dark background, heading on top, four figure cards.", family: "grid", category: "statistics", build: () => statsBand() },
 ];
 
-/** 4 preset Pro gratis (lihat NEW_SECTION_SPLIT di config/marketplace.ts). */
+/** 4 free Pro presets (see NEW_SECTION_SPLIT in config/marketplace.ts). */
 export const PRO_FREE_IDS = ["pro-hero-spotlight", "pro-features-icons", "pro-faq-accordion", "pro-cta-band"];

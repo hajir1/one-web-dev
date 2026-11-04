@@ -1,10 +1,10 @@
 /* ================================================================== */
 /* Model Component Maker — POHON node                                   */
 /*                                                                    */
-/* Sebuah komponen = satu pohon:                                       */
-/*   - BoxNode     : kontainer layout (stack / baris / grid), bisa      */
-/*                   berisi box lain → komposisi bersarang.             */
-/*   - ElementNode : daun; salinan state sebuah elemen Element Maker.   */
+/* A component = one tree:                                             */
+/*   - BoxNode     : layout container (stack / row / grid), may         */
+/*                   contain other boxes → nested composition.          */
+/*   - ElementNode : leaf; a copy of an Element Maker element's state.  */
 /* Root selalu sebuah BoxNode.                                          */
 /* ================================================================== */
 
@@ -20,7 +20,7 @@ import type { BindField, ItemOf, RelatedOf } from "../../helpers/itemPage";
 export type NodeId = string;
 export type RowWidth = "content" | "80" | "full" | "custom";
 
-/** "block" = tata letak normal (display:block), dipakai section Page Maker. */
+/** "block" = normal flow layout (display:block), used by Page Maker sections. */
 export type BoxLayout = "stack" | "row" | "grid" | "block";
 export type Align = "start" | "center" | "end" | "stretch";
 type Justify = "start" | "center" | "end" | "between";
@@ -28,45 +28,45 @@ export type ShadowPreset = "none" | "sm" | "md" | "lg";
 /** full = 100% · auto = ikut aturan layout induk · fit = fit-content · fixed = px */
 export type WidthMode = "full" | "auto" | "fit" | "fixed";
 
-/** Penempatan sebuah node di dalam induknya (kosong = ikut default). */
+/** Placement of a node inside its parent (empty = follow the default). */
 export interface Place {
-  /** Di baris flex: ambil sisa ruang (`flex: 1 1 …`). */
+  /** In a flex row: take the remaining space (`flex: 1 1 …`). */
   grow?: boolean;
-  /** Di baris flex: lebar dasar (px) sebelum tumbuh/menyusut. */
+  /** In a flex row: base width (px) before growing/shrinking. */
   basis?: number;
-  /** Di grid: posisi awal & rentang kolom / baris (1 = pertama). */
+  /** In a grid: start position & span of columns / rows (1 = first). */
   colStart?: number;
   colSpan?: number;
   rowStart?: number;
   rowSpan?: number;
-  /** Di grid ber-area: nama `grid-area`. */
+  /** In a grid with areas: the `grid-area` name. */
   area?: string;
-  /** Posisi sendiri; arti sumbu mengikuti layout induk. */
+  /** Own position; axis meaning follows the parent layout. */
   selfH?: Align;
   selfV?: Align;
 }
 
-/** Tag HTML semantik yang boleh dipakai sebuah kontainer. */
+/** Semantic HTML tags a container may use. */
 export const BOX_TAGS = ["div", "section", "header", "footer", "nav", "main", "aside", "article"] as const;
 export type BoxTag = (typeof BOX_TAGS)[number];
 
 /**
- * Pengaturan khusus SECTION (dipakai Page Maker). Box yang punya `section`
- * dirender sebagai pita selebar halaman; isinya dibatasi `contentWidth`
- * lewat padding (tanpa elemen pembungkus tambahan).
+ * SECTION-specific settings (used by Page Maker). Boxes with a `section`
+ * render as a full-page-width band; their content is limited by `contentWidth`
+ * through padding (no extra wrapper element).
  */
 export interface SectionProps {
-  /** Lebar maksimum isi (px). 0 = selebar halaman. */
+  /** Maximum content width (px). 0 = page width. */
   contentWidth: number;
   padY: number;
   padX: number;
-  /** Tinggi minimum (px). 0 = ikut isi. */
+  /** Minimum height (px). 0 = follow the content. */
   minHeight: number;
-  /** URL gambar latar (kosong = tanpa gambar). */
+  /** Background image URL (empty = no image). */
   bgImage: string;
-  /** ID preset asal section (katalog section). Opsional; tidak memengaruhi tampilan. */
+  /** ID of the section's source preset (section catalog). Optional; does not affect rendering. */
   presetId?: string;
-  /** Tipe section ala Divi (tanpa tanda = reguler). Hanya penanda; tampilan diatur field lain. */
+  /** Divi-style section type (no marker = regular). Only a marker; the look is set by other fields. */
   sectionType?: SectionKind;
 }
 
@@ -74,39 +74,39 @@ export type SectionKind = "regular" | "specialty" | "fullwidth";
 
 interface BaseNode {
   id: NodeId;
-  /** Nama tampilan di pohon struktur. */
+  /** Display name in the structure tree. */
   name: string;
   place: Place;
-  /** Pengaturan lanjutan: CSS ID, class, Custom CSS & JS (gratis). */
+  /** Advanced settings: CSS ID, class, Custom CSS & JS (free). */
   advanced?: AdvancedProps;
-  /** Efek library CDN (AOS, Animate.css, Vanilla Tilt) untuk node ini. */
+  /** CDN library effects (AOS, Animate.css, Vanilla Tilt) for this node. */
   libs?: NodeLibs;
-  /** v9: animasi CSS tanpa library (panel Styling → Animasi). */
+  /** v9: CSS animation without a library (Styling panel → Animation). */
   anim?: NodeAnim;
-  /** Uji coba CRUD: kategori item (kartu koleksi) → atribut data-category untuk chip filter. */
+  /** CRUD trial: item category (collection card) → data-category attribute for filter chips. */
   itemCategory?: string;
 }
 
 export interface BoxNode extends BaseNode {
   kind: "box";
-  /** Hanya root: library CDN yang dipasang ke desain (menu Library). */
+  /** Root only: CDN libraries installed in the design (Library menu). */
   libraries?: LibraryId[];
-  /** v7, hanya root: salinan variabel global yang dirujuk desain (lihat cssVars.ts). */
+  /** v7, root only: a copy of the global variables the design references (see cssVars.ts). */
   vars?: CssVar[];
   layout: BoxLayout;
   gap: number;
   padding: number;
-  /** Baris: boleh turun baris. */
+  /** Row: may wrap. */
   wrap: boolean;
-  /** Grid: nilai `grid-template-columns`. */
+  /** Grid: `grid-template-columns` value. */
   columns: string;
-  /** Grid: nilai `grid-template-areas` (opsional). */
+  /** Grid: `grid-template-areas` value (optional). */
   areas: string;
-  /** Sumbu silang (stack: horizontal, baris: vertikal, grid: vertikal). */
+  /** Cross axis (stack: horizontal, row: vertical, grid: vertical). */
   align: Align;
-  /** Sumbu utama (baris: justify-content, grid: justify-items, stack: tidak dipakai). */
+  /** Main axis (row: justify-content, grid: justify-items, stack: unused). */
   justify: Justify | "stretch";
-  /** Di layar kecil: baris → kolom, grid → satu kolom. */
+  /** On small screens: row → column, grid → one column. */
   stackOnMobile: boolean;
 
   bgEnabled: boolean;
@@ -120,8 +120,8 @@ export interface BoxNode extends BaseNode {
   width: number;
 
   /**
-   * Background lengkap (opsional; data lama memakai bgEnabled/bgColor dan
-   * section.bgImage — lihat `boxBackground`).
+   * Full background (optional; old data uses bgEnabled/bgColor and
+   * section.bgImage; see `boxBackground`).
    */
   bgType?: BgKind;
   gradientFrom?: string;
@@ -137,44 +137,44 @@ export interface BoxNode extends BaseNode {
   bgOverlayColor?: string;
   bgOverlayOpacity?: number;
 
-  /** Tag HTML (kosong = div). */
+  /** HTML tag (empty = div). */
   tag?: BoxTag;
-  /** Ada = box ini sebuah section Page Maker. */
+  /** Present = this box is a Page Maker section. */
   section?: SectionProps;
-  /** Ada (true) = box ini sebuah ROW Page Maker (Section → Row → Element). */
+  /** Present (true) = this box is a Page Maker ROW (Section → Row → Element). */
   row?: boolean;
   /**
-   * Lebar Row di dalam section:
-   *  content = ikut "lebar isi" section (bawaan, mis. 1120px di tengah)
-   *  80 = 80% · full = 100% selebar section · custom = rowCustomWidth + unit
+   * Row width inside a section:
+   *  content = follow the section's "content width" (default, e.g. 1120px centered)
+   *  80 = 80% · full = 100% of the section width · custom = rowCustomWidth + unit
    */
   rowWidth?: RowWidth;
   /**
-   * Ada (true) = ROW DALAM di kolom spesial section Spesialisasi (ala Divi).
-   * Secara struktur hanya grup grid (Row tidak boleh bersarang), tapi di
-   * editor diperlakukan seperti Row: (+) di bawahnya menambah Row dalam baru
-   * dengan pilihan struktur kolom, dan salinannya tepat di bawahnya.
+   * Present (true) = an INNER ROW in a Specialty section's special column (Divi style).
+   * Structurally just a grid group (Rows may not nest), but in the
+   * editor it is treated like a Row: (+) below it adds a new inner Row
+   * with column structure options, and its copy goes right below it.
    */
   innerRow?: boolean;
   rowCustomWidth?: number;
   rowCustomUnit?: "px" | "%";
 
   /**
-   * Grid di HP (bila `stackOnMobile`): kosong = satu kolom, "two" = dua
-   * kolom (mis. angka statistik), "scroll" = baris geser (scroll-snap).
+   * Grid on phones (when `stackOnMobile`): empty = one column, "two" = two
+   * columns (e.g. stat numbers), "scroll" = a swipeable row (scroll-snap).
    */
   mobileGrid?: "two" | "scroll";
-  /** Grid di desktop: kartu selang-seling diturunkan sedikit (tidak sejajar kaku). */
+  /** Grid on desktop: alternate cards are offset slightly (not rigidly aligned). */
   stagger?: boolean;
-  /** Kotak terangkat halus + bayangan saat di-hover. */
+  /** The box lifts slightly + a shadow on hover. */
   hoverLift?: boolean;
-  /** Uji coba CRUD: box ini koleksi data; kartu anaknya disusun dari `collection.items`. */
+  /** CRUD preview: this box is a data collection; its child cards are built from `collection.items`. */
   collection?: CollectionDef;
-  /** Uji coba halaman item: box ini menampilkan SATU item koleksi (halaman detail). */
+  /** Item page preview: this box shows ONE collection item (detail page). */
   itemOf?: ItemOf;
-  /** Uji coba halaman item: kartu "Mungkin Anda suka" dari koleksi lain (label sama). */
+  /** Item page preview: "You may also like" cards from another collection (same label). */
   related?: RelatedOf;
-  /** Uji coba CRUD: grup chip filter kategori untuk koleksi (slug) ini. */
+  /** CRUD preview: a category filter chip group for this collection (slug). */
   filterOf?: string;
 
   children: ComponentNode[];
@@ -183,40 +183,40 @@ export interface BoxNode extends BaseNode {
 export interface ElementNode extends BaseNode {
   kind: "element";
   elementType: string;
-  /** Salinan state elemen milik node ini (selalu lengkap, sudah di-merge dengan default). */
+  /** A copy of this node's element state (always complete, already merged with defaults). */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: any;
   /**
-   * Asal dari desain tersimpan di Element Maker.
-   *  - tidak `detached`: state yang dipakai = versi terbaru desain itu.
-   *  - `detached`: pengguna mengubah elemen di sini → pakai salinan (`state`),
-   *    desain asal tetap diingat supaya bisa disinkronkan lagi.
-   * Kalau desainnya sudah dihapus, node memakai `state` terakhir.
+   * Origin from a saved design in Element Maker.
+   *  - not `detached`: the state used = the latest version of that design.
+   *  - `detached`: the user changed the element here → use the copy (`state`),
+   *    the original design is still remembered so it can be synced again.
+   * If the design was deleted, the node uses its last `state`.
    */
   link?: { designId: string; detached?: boolean };
   /** Event JavaScript (Page Maker). */
   events?: ElementEvent[];
-  /** Uji coba halaman item: isi elemen ini diambil dari kolom item. */
+  /** Item page preview: this element's content is taken from an item field. */
   bind?: BindField;
-  /** Nilai kolom terikat kosong → elemen disembunyikan. */
+  /** Empty bound field value → the element is hidden. */
   bindEmpty?: boolean;
-  /** Chip filter kategori: nilai kategori ("" = Semua). Hanya di dalam box `filterOf`. */
+  /** Category filter chip: the category value ("" = All). Only inside a `filterOf` box. */
   chip?: string;
 }
 
 export type ComponentNode = BoxNode | ElementNode;
 
-/** Asal desain (mis. dibuat dari template katalog). Menentukan akses item bawaan template. */
+/** Design origin (e.g. created from a catalog template). Determines access to the template's built-in items. */
 export interface DocSource {
   templateId: string;
   version?: number;
 }
 
-/** State yang disimpan lewat "Desain Saya". */
+/** State saved through "My Designs". */
 export interface ComponentDoc {
   version: 2;
   root: BoxNode;
-  /** Hanya pada desain halaman yang dibuat dari template. */
+  /** Only on page designs created from a template. */
   source?: DocSource;
 }
 
@@ -236,7 +236,7 @@ export function isElement(n: ComponentNode): n is ElementNode {
   return n.kind === "element";
 }
 
-/** Field background efektif sebuah kontainer (termasuk data lama). */
+/** Effective background fields of a container (including old data). */
 export function boxBackground(b: BoxNode): Partial<BgFields> & { bgType: BgKind } {
   const legacyImage = b.section?.bgImage ?? "";
   const bgType: BgKind = b.bgType ?? (legacyImage ? "image" : b.bgEnabled ? "solid" : "none");

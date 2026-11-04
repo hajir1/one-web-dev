@@ -3,11 +3,11 @@ import { persist } from "zustand/middleware";
 import { VR_LIMITS, vrCap, createTour, mediaIdsOf, sanitizeTour, type MediaMeta, type Tour } from "./model";
 
 /* ================================================================== */
-/* Penyimpanan tur 360° di browser ini                                  */
+/* 360° tour storage in this browser                                    */
 /*                                                                    */
-/* Struktur tur (kecil) → localStorage lewat zustand persist.            */
-/* Foto & audio (besar) → IndexedDB "onewebdev-vr" store "media".       */
-/* Belum ada sinkronisasi ke server (frontend saja).                    */
+/* Tour structure (small) → localStorage through zustand persist.       */
+/* Photos & audio (large) → IndexedDB "onewebdev-vr", store "media".    */
+/* No server sync yet (frontend only).                                  */
 /* ================================================================== */
 
 interface TourState {
@@ -54,7 +54,7 @@ export const useTourStore = create<TourState>()(
   ),
 );
 
-/** Media yang tidak dipakai tur mana pun (aman dihapus). */
+/** Media not used by any tour (safe to delete). */
 export function orphanMedia(tours: Tour[], media: Record<string, MediaMeta>): string[] {
   const used = new Set(tours.flatMap(mediaIdsOf));
   return Object.keys(media).filter((id) => !used.has(id));
@@ -97,7 +97,7 @@ export const putMedia = (id: string, blob: Blob) => tx("readwrite", (s) => s.put
 const getMedia = (id: string) => tx<Blob | undefined>("readonly", (s) => s.get(id) as IDBRequest<Blob | undefined>);
 export const deleteMedia = (id: string) => tx("readwrite", (s) => s.delete(id)).then(() => undefined);
 
-/** Ambil banyak media sekaligus (yang hilang dilewati). */
+/** Fetch many media at once (missing ones are skipped). */
 export async function getMediaMap(ids: string[]): Promise<Record<string, Blob>> {
   const out: Record<string, Blob> = {};
   await Promise.all(

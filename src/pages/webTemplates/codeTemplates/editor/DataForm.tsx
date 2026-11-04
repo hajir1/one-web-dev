@@ -7,19 +7,19 @@ import GalleryEditor from "../../../../assetLibrary/GalleryEditor";
 import { blankLike, pathKey, setAt, type Path } from "../editModel";
 
 /* ================================================================== */
-/* Form otomatis untuk blok data JSON template kode (CONFIG/PROJECTS).   */
-/*   teks → input/textarea, angka → input angka, ya/tidak → kotak centang,*/
-/*   tanggal ISO → tanggal & jam, warna HEX → pemilih warna,              */
-/*   gambar/foto → URL atau unggah (dikecilkan jadi JPEG),               */
-/*   daftar → tambah/hapus/urutkan item, objek → kelompok bertingkat.    */
-/* Kunci di daftar `hidden` (mis. "id", "adegan") tidak ditampilkan.     */
+/* Automatic form for code template JSON data blocks (CONFIG/PROJECTS).  */
+/*   text → input/textarea, number → number input, yes/no → checkbox,    */
+/*   ISO date → date & time, HEX color → color picker,                  */
+/*   image/photo → URL or upload (shrunk to JPEG),                      */
+/*   lists → add/remove/reorder items, objects → nested groups.          */
+/* Keys in the `hidden` list (e.g. "id", "adegan") are not shown.       */
 /* ================================================================== */
 
 const LABEL_CLS = "mb-1 block text-xs font-semibold text-gray-600 dark:text-gray-300";
 const ISO_RE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/;
 const HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
 const IMAGE_KEY = /^(gambar|foto|image|img|logo|sampul)$/i;
-/** "judulHitungMundur" → "Judul hitung mundur". Label khusus dari locales bila ada. */
+/** "judulHitungMundur" → "Judul hitung mundur". A custom label from the locales when present. */
 function useLabel() {
   const { t, i18n } = useTranslation();
   return (key: string) => {
@@ -31,12 +31,12 @@ function useLabel() {
 }
 
 
-/** v21: kolom gambar = pemilih Pustaka Aset (Aset saya / Unggah / URL). */
+/** v21: image fields = Asset Library picker (My assets / Upload / URL). */
 export function ImageInput({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) {
   return <ImageValueInput id={id} value={value} onChange={onChange} />;
 }
 
-/** Daftar objek berbentuk galeri: tepat satu kunci gambar + satu kunci teks (mis. { judul, gambar }). */
+/** A gallery-shaped object list: exactly one image key + one text key (e.g. { judul, gambar }). */
 function galleryShape(value: unknown[]): { img: string; cap: string } | null {
   if (!value.length) return null;
   let shape: { img: string; cap: string } | null = null;
@@ -97,7 +97,7 @@ function Leaf({ k, value, onChange }: { k: string; value: unknown; onChange: (v:
 }
 
 const TITLE_KEYS = ["judul", "nama", "panggilan", "title", "name", "label"];
-/** Judul ringkas item daftar: judul/nama bila ada, selain itu nilai teks pertama yang tidak kosong. */
+/** A short list item title: the title/name when present, otherwise the first non-empty text value. */
 function itemTitle(v: unknown, i: number): string {
   if (v && typeof v === "object" && !Array.isArray(v)) {
     const o = v as Record<string, unknown>;
@@ -221,7 +221,7 @@ function Node({ value, path, hidden, onChange, k }: { value: unknown; path: Path
         ))}
       </div>
     );
-    // Objek di dalam objek (mis. "kutipan", "musik") → kelompok berbingkai; item daftar & akar tanpa bingkai.
+    // Objects inside objects (e.g. "kutipan", "musik") → framed groups; list items & the root have no frame.
     return k && typeof path[path.length - 1] === "string" && path.length > 0 ? (
       <fieldset className="min-w-0 rounded-xl border border-gray-200 p-3 dark:border-gray-800">
         <legend className="px-1 text-xs font-semibold text-gray-700 dark:text-gray-200">{label(k)}</legend>
@@ -234,7 +234,7 @@ function Node({ value, path, hidden, onChange, k }: { value: unknown; path: Path
   return <Leaf k={k ?? ""} value={value} onChange={onChange} />;
 }
 
-/** Form untuk satu blok data. */
+/** Form for one data block. */
 export default function DataForm({ label, value, hidden, onChange }: { label: string; value: unknown; hidden: string[]; onChange: (v: unknown) => void }) {
   return <Node k={Array.isArray(value) ? label : undefined} value={value} path={[]} hidden={new Set(hidden)} onChange={onChange} />;
 }

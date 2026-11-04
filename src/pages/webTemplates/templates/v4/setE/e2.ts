@@ -53,7 +53,7 @@ import {
 } from "./kitE";
 
 /* ================================================================== */
-/* Template v4 E6–E10: Furnitur minimalis, Kursus bahasa, Les privat,    */
+/* v4 templates E6–E10: Minimalist furniture, Language course, Private tutoring, */
 /* Trip diving, Pelayaran penumpang.                                     */
 /* ================================================================== */
 
@@ -120,7 +120,7 @@ export const furnitureMinimalis: TemplateContent = {
     }),
 };
 
-/* ------ 7. Lingua Pelangi — kursus bahasa (7 hlm, Premium) ---------- */
+/* ------ 7. Lingua Pelangi — language course (7 pages, Premium) ---------- */
 // Premium: pricing, stats-counter, pro-testimonials-wall, countdown. Library: AOS + Animate.
 
 const LP: Palette = { ink: "#2a0a0a", muted: "#6b3b3b", primary: "#dc2626", primaryDark: "#991b1b", soft: "#fee2e2", line: "#fecaca" };
@@ -390,7 +390,7 @@ export const maritimePelayaran: TemplateContent = {
     }),
 };
 
-/** Pengumuman cuaca (halaman jadwal pelayaran). */
+/** Weather notice (sailing schedule page). */
 function noticeSection(tr: Tr, href: (k: string) => string) {
   return ctaD(S, { title: tr("Info cuaca & penundaan", "Weather & delay info"), text: tr("Status terbaru diumumkan 2 jam sebelum keberangkatan lewat SMS dan media sosial.", "Latest status is announced 2 hours before departure by SMS and social media."), actions: [[tr("Hubungi layanan", "Contact service"), href("contact"), "light"]], tone: "inv" });
 }

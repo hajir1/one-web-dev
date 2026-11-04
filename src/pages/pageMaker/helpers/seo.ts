@@ -1,56 +1,56 @@
 import type { Framework } from "../core/helpers/generatorCss";
 
 /* ================================================================== */
-/* SEO hasil ekspor website (v10)                                        */
+/* Website export SEO (v10)                                              */
 /*                                                                    */
-/*   Folder website menyimpan SEO situs (URL, deskripsi & gambar OG     */
-/*   bawaan, boleh diindeks) dan SEO per halaman (judul, deskripsi,     */
-/*   gambar OG, noindex). Saat ekspor:                                   */
-/*     HTML/Blade      <meta> di <head> tiap halaman                    */
-/*     React/Vue/      meta bawaan di index.html + src/seo.(js|ts) yang */
-/*     Svelte/Angular  mengganti judul & meta setiap pindah rute         */
-/*     semua format    robots.txt, sitemap.xml (bila URL situs diisi)    */
+/*   The website folder stores the site SEO (URL, description & OG image */
+/*   defaults, indexable) and per-page SEO (title, description,         */
+/*   OG image, noindex). On export:                                      */
+/*     HTML/Blade      <meta> in each page's <head>                     */
+/*     React/Vue/      default meta in index.html + src/seo.(js|ts) which */
+/*     Svelte/Angular  replace the title & meta on every route change    */
+/*     every format    robots.txt, sitemap.xml (when the site URL is set) */
 /* ================================================================== */
 
 export interface SiteSeo {
-  /** URL publik situs, mis. https://tokokue.id (tanpa garis miring akhir). */
+  /** Public site URL, e.g. https://tokokue.id (no trailing slash). */
   siteUrl?: string;
-  /** Deskripsi bawaan untuk halaman tanpa deskripsi sendiri. */
+  /** Default description for pages without their own description. */
   description?: string;
-  /** Gambar bagikan bawaan (URL absolut http/https). */
+  /** Default share image (absolute http/https URL). */
   ogImage?: string;
-  /** false = seluruh situs tidak boleh diindeks (mis. situs uji coba). */
+  /** false = the whole site must not be indexed (e.g. a test site). */
   indexable?: boolean;
 }
 
 export interface PageSeo {
-  /** Judul untuk mesin pencari; kosong = "<nama halaman> — <nama situs>". */
+  /** Title for search engines; empty = "<page name> — <site name>". */
   title?: string;
   description?: string;
   ogImage?: string;
-  /** Sembunyikan halaman ini dari mesin pencari. */
+  /** Hides this page from search engines. */
   noindex?: boolean;
 }
 
-/** SEO final satu halaman, siap ditulis ke berkas. */
+/** The final SEO of one page, ready to be written to files. */
 export interface ResolvedSeo {
   title: string;
   description: string;
   ogImage: string;
   noindex: boolean;
-  /** URL kanonik absolut; kosong bila URL situs belum diisi. */
+  /** Absolute canonical URL; empty when the site URL is not set. */
   url: string;
-  /** Path rute ("/", "/tentang") untuk SPA. */
+  /** Route path ("/", "/tentang") for the SPA. */
   path: string;
 }
 
 export const SEO_LIMITS = { title: 70, description: 300, url: 300 } as const;
-/** Panjang yang biasanya tampil utuh di hasil pencarian Google. */
+/** The length usually shown in full in Google search results. */
 export const SEO_IDEAL = { title: 60, descriptionMin: 50, description: 160 } as const;
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
 
-/** URL http/https absolut yang valid, tanpa garis miring akhir; selain itu "". */
+/** A valid absolute http/https URL without a trailing slash; otherwise "". */
 export function cleanUrl(v: unknown): string {
   const s = clean(v, SEO_LIMITS.url);
   if (!s) return "";
@@ -100,7 +100,7 @@ export interface SeoPageInput {
   seo?: PageSeo;
 }
 
-/** Path publik halaman per format (HTML memakai berkas .html, Svelte memakai hash). */
+/** A page's public path per format (HTML uses .html files, Svelte uses hashes). */
 export function pagePath(p: Pick<SeoPageInput, "isHome" | "slug" | "file">, fw: Framework): string {
   if (p.isHome) return "/";
   if (fw === "html") return `/${p.file}.html`;
@@ -130,7 +130,7 @@ const plain = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-/** Potong di batas kata, maksimal `max` karakter (… bila dipotong). */
+/** Cuts at a word boundary, at most `max` characters (… when cut). */
 function clip(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max - 1);
@@ -139,9 +139,9 @@ function clip(text: string, max: number): string {
 }
 
 /**
- * Deskripsi otomatis dari isi halaman (dipakai bila pengguna belum mengisi
- * deskripsi SEO): paragraf pertama yang cukup panjang; bila tidak ada,
- * gabungan judul + paragraf pertama. "" bila halaman tanpa teks.
+ * Automatic description from the page content (used when the user has not filled in
+ * an SEO description): the first long-enough paragraph; when there is none,
+ * the heading + the first paragraph. "" when the page has no text.
  */
 export function autoDescription(html: string, max: number = SEO_IDEAL.description): string {
   const paras = [...html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => plain(m[1])).filter(Boolean);
@@ -154,7 +154,7 @@ export function autoDescription(html: string, max: number = SEO_IDEAL.descriptio
 
 const attr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** Tag meta SEO + Open Graph + Twitter untuk <head> (tanpa <title>). */
+/** SEO + Open Graph + Twitter meta tags for <head> (without <title>). */
 export function seoMetaTags(r: ResolvedSeo, siteName: string, lang: "id" | "en" = "id"): string {
   const tags: string[] = [];
   if (r.description) tags.push(`<meta name="description" content="${attr(r.description)}" />`);
@@ -171,11 +171,11 @@ export function seoMetaTags(r: ResolvedSeo, siteName: string, lang: "id" | "en" 
   return tags.join("\n");
 }
 
-/** JSON-LD WebSite untuk beranda (hanya bila URL situs diisi). */
+/** WebSite JSON-LD for the home page (only when the site URL is set). */
 export function websiteJsonLd(siteName: string, site: SiteSeo | undefined): string {
   if (!site?.siteUrl) return "";
   const data = { "@context": "https://schema.org", "@type": "WebSite", name: siteName, url: `${site.siteUrl}/`, ...(site.description ? { description: site.description } : {}) };
-  // "<" di-escape supaya teks tidak bisa menutup tag <script>.
+  // "<" is escaped so the text cannot close the <script> tag.
   return `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
 }
 
@@ -187,7 +187,7 @@ export function robotsTxt(site: SiteSeo | undefined): string {
 
 const xml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** sitemap.xml halaman yang boleh diindeks; "" bila URL situs kosong atau semua noindex. */
+/** sitemap.xml of indexable pages; "" when the site URL is empty or everything is noindex. */
 export function sitemapXml(pages: readonly ResolvedSeo[], lastmod?: string): string {
   const urls = pages.filter((p) => p.url && !p.noindex && !p.url.includes("#"));
   if (!urls.length) return "";
@@ -200,9 +200,9 @@ ${urls.map((p) => `  <url>\n    <loc>${xml(p.url)}</loc>${mod}\n  </url>`).join(
 }
 
 /**
- * Modul SPA: ganti <title>, description, robots, canonical, dan og:* setiap
- * pindah rute. Mesin pencari modern menjalankan JavaScript, jadi meta ini
- * ikut terbaca; meta bawaan di index.html tetap jadi cadangan.
+ * SPA module: replaces <title>, description, robots, canonical, and og:* on every
+ * route change. Modern search engines run JavaScript, so these meta tags
+ * are read too; the default meta in index.html stays as a fallback.
  */
 export function seoRuntimeModule(pages: readonly ResolvedSeo[], ts: boolean): string {
   const data = Object.fromEntries(pages.map((p) => [p.path, { title: p.title, description: p.description, image: p.ogImage, noindex: p.noindex, url: p.url }]));
@@ -240,7 +240,7 @@ function setCanonical${link} {
   el.setAttribute("href", value);
 }
 
-/** Pasang judul & meta untuk path rute ("/", "/tentang"). */
+/** Set the title & meta for a route path ("/", "/tentang"). */
 export function applySeo${sig} {
   const p = PAGES[path] || PAGES["/"];
   if (!p) return;
@@ -258,7 +258,7 @@ export function applySeo${sig} {
 
 export type SeoIssue = { level: "warn" | "info"; code: string; page?: string };
 
-/** Pemeriksaan SEO ringan untuk ditampilkan di panel Website. */
+/** Light SEO checks to show in the Website panel. */
 export function seoAudit(siteName: string, site: SiteSeo | undefined, pages: readonly SeoPageInput[]): SeoIssue[] {
   const out: SeoIssue[] = [];
   if (!site?.siteUrl) out.push({ level: "info", code: "noSiteUrl" });

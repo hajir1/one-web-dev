@@ -11,9 +11,9 @@ import { downloadAsZip } from "../../lib/download";
 import { ICON_SPECS, ICO_SIZES, buildIco, faviconHtml, webManifest, type IconSpec } from "../../lib/webIcons";
 
 /* ================================================================== */
-/* Favicon Generator (v10): dari gambar/logo atau teks/emoji →          */
-/* favicon.ico + PNG semua ukuran + apple-touch-icon + manifest + HTML.  */
-/* 100% di browser.                                                      */
+/* Favicon Generator (v10): from an image/logo or text/emoji →          */
+/* favicon.ico + PNGs in every size + apple-touch-icon + manifest + HTML. */
+/* 100% in the browser.                                                  */
 /* ================================================================== */
 
 const RULES: FileRules = { kinds: ["png", "jpeg", "webp", "svg", "gif", "avif", "bmp"], maxBytes: 20 * 1024 * 1024, maxFiles: 1 };
@@ -25,7 +25,7 @@ interface Opts {
   textColor: string;
   bg: string;
   shape: Shape;
-  /** Jarak tepi dalam persen sisi (0–30). */
+  /** Inner padding as a percent of the side (0–30). */
   padding: number;
   transparent: boolean;
 }
@@ -37,7 +37,7 @@ function shapePath(ctx: CanvasRenderingContext2D, s: number, shape: Shape) {
   else ctx.rect(0, 0, s, s);
 }
 
-/** Gambar satu ikon ukuran `spec.size`. */
+/** Draws one icon at `spec.size`. */
 function drawIcon(spec: Pick<IconSpec, "size" | "opaque" | "maskable">, o: Opts, img: DecodedImage | null): HTMLCanvasElement {
   const s = spec.size;
   const c = document.createElement("canvas");
@@ -47,14 +47,14 @@ function drawIcon(spec: Pick<IconSpec, "size" | "opaque" | "maskable">, o: Opts,
   const fill = spec.opaque || !o.transparent || o.source === "text";
   if (fill) {
     ctx.fillStyle = o.bg;
-    // Ikon opaque/maskable selalu kotak penuh (OS yang memotong bentuknya).
+    // Opaque/maskable icons are always a full square (the OS crops the shape).
     if (spec.opaque) ctx.fillRect(0, 0, s, s);
     else {
       shapePath(ctx, s, o.shape);
       ctx.fill();
     }
   }
-  // Maskable: isi di dalam lingkaran aman 80%.
+  // Maskable: content inside the 80% safe circle.
   const pad = s * (spec.maskable ? Math.max(o.padding / 100, 0.1) + 0.1 : o.padding / 100);
   const box = s - pad * 2;
   if (o.source === "text") {

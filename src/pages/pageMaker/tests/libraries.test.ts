@@ -35,7 +35,7 @@ const ALL_LIBS = { aos: { ...DEFAULT_LIBS.aos, delay: 200 }, animate: { ...DEFAU
 
 test("library: daftar CDN memakai versi tetap (bukan @latest) dan lisensi MIT; AOS/Animate/Tilt tanpa CDN", () => {
   assert.deepEqual(LIBRARIES.map((l) => l.id), ["aos", "animate", "tilt", "scroll", "chartjs", "aframe", "three"]);
-  // v25: efek dijalankan runtime OWD Motion yang ditanam di HTML.
+  // v25: effects run by the OWD Motion runtime embedded in the HTML.
   for (const id of ["aos", "animate", "tilt"]) {
     const l = LIBRARIES.find((x) => x.id === id);
     assert.ok(l.builtin && !l.css && !l.js, id);
@@ -96,7 +96,7 @@ test("library: atribut & class sampai ke kode ekspor di 5 framework", () => {
     assert.match(all, /data-tilt-max="10"/, fw);
   }
   const index = out.files("html").find((f) => /index\.html$/.test(f.name)).content;
-  // Runtime OWD Motion: CSS + penanda JS di <head>, skrip di akhir <body>, tanpa CDN.
+  // OWD Motion runtime: CSS + a JS marker in <head>, a script at the end of <body>, no CDN.
   assert.doesNotMatch(index, /cdn\.jsdelivr|aos\.css|vanilla-tilt\.min/);
   assert.match(index, /classList\.add\("owd-motion"\)/);
   assert.match(index, /html\.owd-motion \[data-aos\]/);

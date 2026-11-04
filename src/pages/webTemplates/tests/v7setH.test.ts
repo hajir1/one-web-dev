@@ -23,7 +23,7 @@ import { templateFiles } from "../exportTemplate";
 import { WEB_TEMPLATES, buildTemplatePages, getTemplate, type WebTemplate } from "../registry";
 import type { TplLang } from "../types";
 
-/* Katalog v7 bagian H: template Dashboard dari spesifikasi (setH/h*.ts), dibangun kitH. */
+/* v7 catalog part H: Dashboard templates from specs (setH/h*.ts), built by kitH. */
 
 type SectionBox = { tag?: string; name: string };
 
@@ -42,7 +42,7 @@ function premiumItems(tpl: WebTemplate): string[] {
   return [...sectionIds.filter((id) => isPremiumPreset(id.replace("preset:", ""))), ...elementIds.filter((id: string) => ELEMENT_DEFINITION_BY_TYPE[id.replace("element:", "")]?.premium)];
 }
 
-/** Section/Row bersarang dilarang: root → section → Row → isi. */
+/** Nested Sections/Rows are forbidden: root → section → Row → content. */
 function nestedRows(n: ComponentNode, inRow = false): number {
   if (!isBox(n)) return 0;
   const row = Boolean((n as { row?: unknown }).row);
@@ -98,7 +98,7 @@ test("desain berbeda: kombinasi shell/kartu/KPI/palet unik, aksen & pasangan fon
     assert.ok(!combos.has(k), `${s.id}: kombinasi ${k} sudah dipakai`);
     combos.add(k);
     assert.ok(!accents.has(s.pal[2].toLowerCase()), `${s.id}: aksen ${s.pal[2]} kembar`);
-    // Aksen dipakai sebagai teks/menu aktif di atas latar: kontras minimal 3:1.
+    // The accent is used as active text/menu on the background: contrast at least 3:1.
     const ratio = (a: string, b: string) => { const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
     assert.ok(ratio(s.pal[2], s.look.surface) >= 3, `${s.id}: kontras aksen ${s.pal[2]} di ${s.look.surface} = ${ratio(s.pal[2], s.look.surface).toFixed(2)}`);
     assert.ok(ratio(s.pal[0], s.look.surface) >= 7, `${s.id}: kontras teks`);

@@ -1,6 +1,6 @@
 import { svg } from "./art";
 
-/* Ilustrasi 06 Angin Timur: pantai dengan banyak layangan, gaya poster (bidang warna rata, diagonal). */
+/* Illustration 06 Angin Timur: a beach with many kites, poster style (flat color fields, diagonals). */
 
 function pantai(): string {
   const kites = [
@@ -14,7 +14,7 @@ function pantai(): string {
   );
 }
 
-/** Isi paket layangan kertas tiga hari: kertas, bambu, benang, lem, tertata rata. */
+/** Contents of the three-day paper kite kit: paper, bamboo, string, glue, laid out flat. */
 function paket(): string {
   return svg(
     1200,

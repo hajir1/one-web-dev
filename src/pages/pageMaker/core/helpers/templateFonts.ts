@@ -1,12 +1,12 @@
 import type { FontFallback, GlobalFont } from "./fontCss";
 
 /* ================================================================== */
-/* Font Google bawaan template                                          */
+/* The template's built-in Google Fonts                                 */
 /*                                                                    */
-/* Template katalog v3 memakai font yang berbeda-beda. Font ini tidak    */
-/* perlu ditambahkan pengguna ke Global Setting: compose otomatis        */
-/* menambahkan @import Google Fonts HANYA bila font-family-nya dipakai   */
-/* di CSS halaman. Semua berlisensi SIL Open Font License.               */
+/* Catalog v3 templates use different fonts. Users do not need to       */
+/* add these fonts to Global Setting: compose automatically             */
+/* adds a Google Fonts @import ONLY when that font-family is used        */
+/* in the page CSS. All are licensed under the SIL Open Font License.   */
 /* ================================================================== */
 
 const g = (name: string, fallback: FontFallback, weights: number[]): GlobalFont => ({
@@ -47,7 +47,7 @@ const TEMPLATE_FONTS: GlobalFont[] = [
   g("Pacifico", "cursive", [400]),
   g("Space Mono", "monospace", [400, 700]),
   g("JetBrains Mono", "monospace", [400, 700]),
-  // v26: font Batch template 3D + efek scroll (semua SIL OFL).
+  // v26: fonts for the 3D + scroll effect template batch (all SIL OFL).
   g("Young Serif", "serif", [400]),
   g("Hanken Grotesk", "sans-serif", [400, 600, 800]),
   g("Archivo", "sans-serif", [400, 600, 800]),
@@ -70,16 +70,16 @@ const TEMPLATE_FONTS: GlobalFont[] = [
   g("Rethink Sans", "sans-serif", [400, 600]),
 ];
 
-/** `font-family` siap pakai, mis. TF["Playfair Display"] → `"Playfair Display", serif`. */
+/** Ready-to-use `font-family`, e.g. TF["Playfair Display"] → `"Playfair Display", serif`. */
 export const TF: Record<string, string> = Object.fromEntries(TEMPLATE_FONTS.map((f) => [f.name, `"${f.name}", ${f.fallback}`]));
 
-/** Font pengguna + font template (font pengguna menang bila namanya sama). */
+/** User fonts + template fonts (the user font wins when the names match). */
 export function withTemplateFonts(fonts: GlobalFont[]): GlobalFont[] {
   const names = new Set(fonts.map((f) => f.name.trim().toLowerCase()));
   return [...fonts, ...TEMPLATE_FONTS.filter((f) => !names.has(f.name.toLowerCase()))];
 }
 
-/** Font template yang disebut di teks (CSS biasa atau JSON hasil stringify). */
+/** Template fonts mentioned in the text (plain CSS or stringified JSON). */
 export function templateFontsIn(text: string): string[] {
   return TEMPLATE_FONTS.filter((f) => text.includes(`"${f.name}"`) || text.includes(`\\"${f.name}\\"`)).map((f) => f.name);
 }

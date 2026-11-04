@@ -1,8 +1,8 @@
-// Memecah src/locales/{id,en}.json menjadi dua bundle:
-//   split/<lang>.core.json  : teks shell, beranda, auth, akun (ikut bundle awal)
-//   split/<lang>.rest.json  : teks fitur besar (dimuat saat halaman fitur dibuka)
-// Sumber yang diedit tetap src/locales/<lang>.json. Jalan otomatis lewat
-// predev / prebuild / pretest; test app.test.ts memastikan hasilnya tidak basi.
+// Splits src/locales/{id,en}.json into two bundles:
+//   split/<lang>.core.json  : shell, home, auth, account text (in the initial bundle)
+//   split/<lang>.rest.json  : large feature text (loaded when a feature page opens)
+// The edited source stays src/locales/<lang>.json. Runs automatically through
+// predev / prebuild / pretest; the app.test.ts test makes sure the output is not stale.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

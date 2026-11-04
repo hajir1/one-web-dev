@@ -63,18 +63,18 @@ import { collectionDisplayCss, displayOf } from "../../helpers/collections";
 /* ================================================================== */
 /* Komposisi: pohon node → CSS + markup + file per framework            */
 /*                                                                    */
-/* SATU alur untuk pratinjau dan kode export: pratinjau = target HTML   */
-/* dari hasil yang sama (ditambah penanda `data-cm-*` khusus preview),  */
-/* jadi apa yang terlihat di Live Preview sama dengan kode yang diunduh.*/
+/* ONE pipeline for the preview and the export code: preview = the HTML target */
+/* of the same output (plus preview-only `data-cm-*` markers),         */
+/* so what shows in Live Preview is the same as the downloaded code.   */
 /* ================================================================== */
 
 const MOBILE_BREAKPOINT = 640;
-/** Batas atas tablet: grid 3+ kolom menjadi 2 kolom di 641–1024px. */
+/** Tablet upper bound: 3+ column grids become 2 columns at 641–1024px. */
 const TABLET_BREAKPOINT = 1024;
 
 /**
- * Ukuran cair (clamp) antara layar 360px dan 1280px: `max` di desktop,
- * `min` di HP, linear di antaranya. Satuan px; untuk teks pakai `fluidRem`.
+ * Fluid size (clamp) between 360px and 1280px screens: `max` on desktop,
+ * `min` on phones, linear in between. Unit px; for text use `fluidRem`.
  */
 export function fluidPx(max: number, min: number): string {
   if (max <= min) return `${max}px`;
@@ -83,7 +83,7 @@ export function fluidPx(max: number, min: number): string {
   return `clamp(${min}px, ${base}px + ${Math.round(slope * 10000) / 100}vw, ${max}px)`;
 }
 
-/** Jumlah kolom grid dari `grid-template-columns` (repeat(N, …) atau daftar track). */
+/** Grid column count from `grid-template-columns` (repeat(N, …) or a track list). */
 export function gridTrackCount(columns: string): number {
   const c = columns.trim();
   const rep = /^repeat\(\s*(\d+)\s*,/.exec(c);
@@ -104,36 +104,36 @@ export function gridTrackCount(columns: string): number {
 }
 
 /**
- * Izin fitur premium: boolean untuk semua, atau fungsi per kunci (nama event /
- * tipe elemen) — mis. hanya item yang sudah dibuka server untuk akun ini.
+ * Premium feature permission: a boolean for everything, or a function per key (event name /
+ * element type), e.g. only items the server has unlocked for this account.
  */
 export type PremiumAllow = boolean | ((key: string) => boolean);
 const allows = (a: PremiumAllow | undefined, key: string) => (typeof a === "function" ? a(key) : !!a);
 
 export interface ComposeOptions {
-  /** Class root komponen (sudah valid). */
+  /** Component root class (already valid). */
   rootClass: string;
   icons: IconLookup;
-  /** Tambahkan penanda `data-cm-*` agar pratinjau bisa memilih node. Jangan untuk export. */
+  /** Adds `data-cm-*` markers so the preview can select nodes. Not for export. */
   preview?: boolean;
-  /** Pustaka font global: font yang dipakai CSS otomatis dimuat (@import / @font-face). */
+  /** Global font library: fonts used by the CSS are loaded automatically (@import / @font-face). */
   fonts?: GlobalFont[];
-  /** `font-family` untuk root (font dasar halaman). Kosong = tidak ditulis. */
+  /** `font-family` for the root (the base page font). Empty = not written. */
   baseFont?: string | null;
-  /** Event selain onClick ikut di-generate (fitur kredit). Default false. */
+  /** Events other than onClick are generated too (credit feature). Default false. */
   allowPremiumEvents?: PremiumAllow;
-  /** Elemen premium (Slider, Countdown, …) ikut di hasil (fitur kredit). Default false. */
+  /** Premium elements (Slider, Countdown, …) are included in the output (credit feature). Default false. */
   allowPremiumElements?: PremiumAllow;
-  /** Konteks website (Menu Element): folder, halaman, mode routing. */
+  /** Website context (Menu Element): folder, pages, routing mode. */
   site?: SiteContext;
   /**
-   * v7: variabel global (bawaan + buatan pengguna + font pustaka). Ditulis
-   * di `:root` dan dipakai untuk memetakan field `var(--x)` elemen.
+   * v7: global variables (built-in + user-created + library fonts). Written
+   * on `:root` and used to map element `var(--x)` fields.
    */
   vars?: CssVar[];
 }
 
-/** v9: variabel Animasi & 3D hanya ditulis di :root bila desain memakainya. */
+/** v9: Animation & 3D variables are only written on :root when the design uses them. */
 const isMotionVar = (name: string) => name.startsWith("owd-anim-");
 const is3dVar = (name: string) => name.startsWith("owd-3d-");
 
@@ -185,7 +185,7 @@ const JUSTIFY_GRID: Record<string, string> = {
   stretch: "stretch",
 };
 
-/** `"a a" "b c"` → `"a" "b" "c"` (satu baris per area, urutan kemunculan). */
+/** `"a a" "b c"` → `"a" "b" "c"` (one line per area, in order of appearance). */
 export function stackedAreas(areas: string): string {
   const names: string[] = [];
   for (const m of areas.matchAll(/[A-Za-z_][\w-]*|\./g)) {
@@ -199,18 +199,18 @@ interface Rules {
   mobile: Decls;
 }
 
-/** URL gambar latar yang aman dimasukkan ke `url("…")`. */
+/** A background image URL that is safe to put in `url("…")`. */
 export function safeCssUrl(u: string): boolean {
   return /^(https?:\/\/|data:image\/(png|jpe?g|gif|webp|avif);|\/|\.\/)/i.test(u) && !/["'()\\\s<>]/.test(u);
 }
 
-/** Aturan CSS sebuah box (gaya sendiri + susunan anak-anaknya). */
+/** CSS rules of a box (its own style + its children's arrangement). */
 export function boxRules(b: BoxNode): Rules {
   const base: Decls = { boxSizing: "border-box" };
   const mobile: Decls = {};
 
   if (b.layout === "block") {
-    // Tata letak normal: anak-anak mengalir ke bawah seperti elemen biasa.
+    // Normal layout: children flow downward like regular elements.
     base.display = "block";
   } else if (b.layout === "grid") {
     base.display = "grid";
@@ -221,7 +221,7 @@ export function boxRules(b: BoxNode): Rules {
     base.justifyItems = JUSTIFY_GRID[b.justify] ?? "stretch";
     if (b.stackOnMobile) {
       if (b.mobileGrid === "scroll") {
-        // Baris geser: kartu berikutnya terlihat sebagian sebagai petunjuk.
+        // Scroll row: the next card is partly visible as a hint.
         mobile.gridTemplateColumns = "none";
         mobile.gridAutoFlow = "column";
         mobile.gridAutoColumns = "minmax(78%, 1fr)";
@@ -248,9 +248,9 @@ export function boxRules(b: BoxNode): Rules {
 
   if (b.section) {
     const sec = b.section;
-    // Lebar isi (contentWidth) kini diterapkan pada Row (lihat rowWidthRules),
-    // supaya Row bisa memilih ikut lebar isi, 80%, 100%, atau kustom.
-    // Jarak cair: lega di desktop, lebih rapat di HP (tanpa breakpoint kaku).
+    // The content width (contentWidth) is now applied to the Row (see rowWidthRules),
+    // so a Row can choose to follow the content width, 80%, 100%, or custom.
+    // Fluid spacing: roomy on desktop, tighter on phones (no rigid breakpoints).
     const py = sec.padY > 40 ? fluidPx(sec.padY, Math.max(32, Math.round(sec.padY * 0.55))) : `${sec.padY}px`;
     const px = sec.padX > 24 ? fluidPx(sec.padX, 20) : `${sec.padX}px`;
     base.padding = `${py} ${px}`;
@@ -272,7 +272,7 @@ export function boxRules(b: BoxNode): Rules {
   return { base, mobile };
 }
 
-/** Lebar Row di dalam section (lihat BoxNode.rowWidth). */
+/** Row width inside a section (see BoxNode.rowWidth). */
 export function rowWidthRules(row: BoxNode, sec: { contentWidth: number }): Decls {
   const mode = row.rowWidth ?? "content";
   const center = { marginLeft: "auto", marginRight: "auto" };
@@ -283,11 +283,11 @@ export function rowWidthRules(row: BoxNode, sec: { contentWidth: number }): Decl
     const n = Math.max(1, Math.min(unit === "%" ? 100 : 4000, Math.round(row.rowCustomWidth ?? (unit === "%" ? 80 : 960))));
     return { width: `${n}${unit}`, maxWidth: "100%", ...center };
   }
-  // "content": lebar tetap mengikuti pengaturan Row, dibatasi lebar isi section.
+  // "content": the width still follows the Row setting, capped at the section content width.
   return sec.contentWidth > 0 ? { maxWidth: `${sec.contentWidth}px`, ...center } : {};
 }
 
-/** Aturan penempatan sebuah node di dalam induknya. */
+/** Placement rules of a node inside its parent. */
 export function placeRules(place: Place, parent: BoxNode | null): Rules {
   const base: Decls = {};
   const mobile: Decls = {};
@@ -334,7 +334,7 @@ interface PBox {
   node: BoxNode;
   cls: string;
   children: PNode[];
-  /** CSS ID final (sudah unik) & class tambahan dari pengaturan Lanjutan. */
+  /** Final CSS ID (already unique) & extra classes from the Advanced settings. */
   cssId?: string;
   classes?: string[];
   /** Atribut library (data-aos, data-tilt, …). */
@@ -347,21 +347,21 @@ interface PElement {
   cls: string;
   def?: AnyElementDefinition;
   spec?: ElementSpec;
-  /** Class paling luar di markup elemen (tempat aturan penempatan ditaruh). */
+  /** The outermost class in the element markup (where placement rules go). */
   rootCls: string;
   place: Rules;
-  /** Punya logika per framework (state/event) → jadi komponen anak di non-HTML. */
+  /** Has per-framework logic (state/events) → becomes a child component outside HTML. */
   stateful: boolean;
   compName?: string;
   error?: string;
   cssId?: string;
   classes?: string[];
-  /** State efektif elemen (sudah di-merge default). */
+  /** The element's effective state (already merged with defaults). */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state?: any;
-  /** Event yang di-generate untuk elemen ini. */
+  /** Events generated for this element. */
   events: PlannedEvent[];
-  /** Markup dengan atribut event per target framework. */
+  /** Markup with event attributes per target framework. */
   eventMarkup?: (target: RenderTarget) => MNode | MNode[] | undefined;
 }
 
@@ -369,7 +369,7 @@ interface PlannedEvent {
   info: EventInfo;
   code: string;
   handler: string;
-  /** Selector untuk export HTML (addEventListener). */
+  /** Selector for the HTML export (addEventListener). */
   selector: string;
 }
 
@@ -390,7 +390,7 @@ export function toPascal(cls: string): string {
 interface ChildComponent {
   name: string;
   nodeId: NodeId;
-  /** Spec elemen + CSS penempatan (sudah digabung). */
+  /** Element spec + placement CSS (already merged). */
   spec: ElementSpec;
 }
 
@@ -398,17 +398,17 @@ export interface Composed {
   rootClass: string;
   rootName: string;
   warnings: ComposeWarning[];
-  /** Jumlah elemen yang berhasil dirender. */
+  /** Number of elements rendered successfully. */
   elementCount: number;
-  /** Hasil target HTML (juga dipakai pratinjau). */
+  /** The HTML target output (also used by the preview). */
   html: { css: string; body: string; script: string };
-  /** Library CDN yang dipasang di desain (dimuat di <head>/akhir <body> hasil ekspor). */
+  /** CDN libraries installed in the design (loaded in the exported <head>/end of <body>). */
   libraries: LibraryId[];
   /** File per framework. */
   files: (framework: Framework) => GeneratedFile[];
-  /** v7: blok `:root { --x: … }` (juga sudah termasuk di `html.css`). */
+  /** v7: the `:root { --x: … }` block (also already included in `html.css`). */
   varsCss: string;
-  /** v7: pemuat font (@import/@font-face) untuk seluruh halaman, termasuk font variabel. */
+  /** v7: font loaders (@import/@font-face) for the whole page, including variable fonts. */
   fontLoaders: string;
 }
 
@@ -424,7 +424,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     site,
   } = opts;
   const allFonts = withTemplateFonts(fonts);
-  // Variabel: salinan di desain (cadangan) ditimpa variabel global terkini.
+  // Variables: the copy in the design (fallback) is overridden by the current global variables.
   const vars = mergeVars(root.vars, opts.vars);
   const withFonts = (css: string) => withFontCss(css, allFonts, vars);
   const customized = (name: string) => {
@@ -433,14 +433,14 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     return !!v && !!d && v.value.trim() !== d.value;
   };
   const installedLibs: LibraryId[] = sanitizeLibraryList(root.libraries) ?? [];
-  /* v9: animasi CSS per node (tidak dirender di canvas desain agar overlay tetap stabil). */
+  /* v9: per-node CSS animation (not rendered on the design canvas so overlays stay stable). */
   const animPresets = new Set<AnimPreset>();
   const animNodeRules: string[] = [];
   let animScroll = false;
   let hasFilter = false;
   const planAnim = (n: BoxNode | ElementNode, selector: string) => {
     if (preview || !n.anim) return { classes: [] as string[], attrs: {} as Record<string, string> };
-    // Pemicu disimpan di node saat animasi dipilih (bawaan global saat itu); data tanpa pemicu = scroll.
+    // The trigger is stored on the node when an animation is picked (the global default at that time); data without a trigger = scroll.
     const a = animAttrs(n.anim);
     animPresets.add(n.anim.preset);
     if (a.attrs["data-owd-trigger"] === "scroll") animScroll = true;
@@ -509,7 +509,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     isBox(n)
       ? `${n.section ? "Section" : n.row ? "Row" : "Grup"} “${n.name}”`
       : `${def?.label ?? "Elemen"} “${n.name}”`;
-  /** Versi `labelOf` untuk pesan peringatan (mengikuti bahasa aktif). */
+  /** `labelOf` version for warning messages (follows the active language). */
   const warnLabelOf = (n: BoxNode | ElementNode, def?: AnyElementDefinition) =>
     isBox(n)
       ? `${n.section ? "Section" : n.row ? "Row" : i18n.t("el.compose.group")} “${n.name}”`
@@ -554,7 +554,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     }
   };
 
-  /** Tempel id & class Lanjutan ke elemen paling luar spec (markup + semua template override). */
+  /** Attaches the Advanced id & class to the spec's outermost element (markup + every template override). */
   const withRootAttrs = (spec: ElementSpec, id: string | undefined, classes: string[], extra: Record<string, string> = {}): ElementSpec => {
     if (!id && !classes.length && !Object.keys(extra).length) return spec;
     const next: ElementSpec = { ...spec };
@@ -590,14 +590,14 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     if (isBox(node)) {
       const cls = isRoot ? rootClass : `${rootClass}__box-${count("box")}`;
       const box: PBox = { kind: "box", node, cls, children: [] };
-      // Uji coba CRUD: tampilan koleksi "geser horizontal" = CSS tambahan box.
+      // CRUD trial: the "horizontal scroll" collection view = extra box CSS.
       const colCss = node.collection ? collectionDisplayCss(node.collection) : "";
       planAdvanced(box, `.${cls}`, colCss ? { css: colCss } : undefined);
       const lib = libraryAttrs(node.libs, installedLibs);
       const an = planAnim(node, `.${cls}`);
       if (lib.classes.length || an.classes.length) box.classes = [...(box.classes ?? []), ...lib.classes, ...an.classes];
       if (Object.keys(lib.attrs).length || Object.keys(an.attrs).length) box.attrs = { ...lib.attrs, ...an.attrs };
-      // Uji coba CRUD: penanda koleksi untuk skrip pemuat data di kode backend.
+      // CRUD preview: a collection marker for the data loader script in the backend code.
       if (node.collection) {
         const d = displayOf(node.collection);
         box.attrs = {
@@ -642,7 +642,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       return el;
     }
     try {
-      // v7: field berisi var(--x) → CSS memakai referensi variabel (lihat cssVars.ts).
+      // v7: fields holding var(--x) → the CSS uses the variable reference (see cssVars.ts).
       const b = bindVars(r.def.defaults as Record<string, unknown>, r.state, vars);
       const state = b.plain;
       el.spec = r.def.spec(state, cls, icons, { site });
@@ -653,14 +653,14 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       }
       for (const m of b.missing) warnings.push({ nodeId: node.id, message: i18n.t("el.compose.varMissing", { name: node.name, v: `--${m}` }) });
       el.rootCls = r.def.rootClass ? r.def.rootClass(cls) : cls;
-      // v7: font umum untuk elemen yang generator-nya tidak menulis font-family.
+      // v7: a general font for elements whose generator does not write font-family.
       const ff = typeof r.state.fontFamily === "string" ? r.state.fontFamily.trim() : "";
       if (ff && GENERIC_FONT_TYPES.has(node.elementType) && /^[A-Za-z0-9 ,"'_()-]{1,200}$/.test(ff))
         el.spec = { ...el.spec, css: `${el.spec.css.trimEnd()}\n.${el.rootCls} {\n  font-family: ${ff};\n}\n.${el.rootCls} :where(input, select, textarea, button) {\n  font-family: inherit;\n}\n` };
       el.stateful = isStateful(el.spec);
       el.state = state;
       const code = r.def.customCode?.(state);
-      // Uji coba halaman item: elemen terikat kolom kosong → disembunyikan (skrip publik membuka lagi bila terisi).
+      // Item page preview: elements bound to an empty field → hidden (the public script reveals them again when filled).
       const bindCss = node.bind
         ? "&[data-empty] {\n  display: none !important;\n}"
         : node.chip !== undefined && parent?.filterOf
@@ -671,7 +671,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       const an = planAnim(node, `.${el.rootCls}`);
       const bindAttrs: Record<string, string> = node.bind ? { "data-field": node.bind, ...(node.bindEmpty ? { "data-empty": "" } : {}) } : {};
       if (node.itemCategory) bindAttrs["data-category"] = node.itemCategory;
-      // Chip filter kategori (di dalam grup `filterOf`).
+      // Category filter chips (inside the `filterOf` group).
       if (node.chip !== undefined && parent?.filterOf) {
         bindAttrs["data-chip"] = node.chip;
         bindAttrs["aria-pressed"] = node.chip === "" ? "true" : "false";
@@ -693,7 +693,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     return el;
   };
   const tree = plan(root, null, true) as PBox;
-  // v9: pemicu "saat terlihat" memakai runtime Custom JS (ikut dibersihkan saat komponen dilepas).
+  // v9: the "when visible" trigger uses the Custom JS runtime (cleaned up when the component unmounts).
   if (animScroll) customScripts.push({ nodeId: root.id, label: "Animasi CSS", selector: `.${rootClass}`, code: MOTION_OBSERVER_JS });
   const hasCustomJs = customScripts.length > 0;
   const animCss = (flavor: CssFlavor) => {
@@ -730,9 +730,9 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
   walkPlan(tree, (p, parent) => {
     if (p.kind !== "box") return;
     const own = boxRules(p.node);
-    // Font dasar hanya di root; elemen lain mewarisinya.
+    // The base font only on the root; other elements inherit it.
     if (!parent && baseFont) own.base = { fontFamily: baseFont, ...own.base };
-    // v7: font body global diubah pengguna → root mengikuti var(--font-body).
+    // v7: the user changed the global body font → root follows var(--font-body).
     else if (!parent && customized("font-body")) own.base = { fontFamily: "var(--font-body)", ...own.base };
     const place = parent ? placeRules(p.node.place, parent.node) : { base: {}, mobile: {} };
     const rowW = p.node.row && parent?.node.section ? rowWidthRules(p.node, parent.node.section) : {};
@@ -744,8 +744,8 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     if (b.layout === "grid") {
       const cols = gridTrackCount(b.columns || "minmax(0, 1fr)");
       const spans = p.children.some((c) => c.node.place.colSpan || c.node.place.colStart);
-      // Tablet: 4+ kolom terlalu sempit → 2 kolom. Tiga kolom tetap tiga, kecuali
-      // jumlah kartunya genap dan tidak habis dibagi tiga (agar tidak ada kartu yatim).
+      // Tablet: 4+ columns are too narrow → 2 columns. Three columns stay three, unless
+      // its card count is even and not divisible by three (so there are no orphan cards).
       const tablet2 = cols >= 4 || (cols === 3 && n % 2 === 0 && n % 3 !== 0);
       if (b.stackOnMobile && tablet2 && !b.areas.trim() && !spans) tabletRules.push(rule(`.${p.cls}`, { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }));
       if (b.stackOnMobile && b.mobileGrid === "scroll") mobileRules.push(rule(`.${p.cls} > *`, { scrollSnapAlign: "start" }));
@@ -767,8 +767,8 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
           .join("\n")
           .trimEnd()}\n}\n`
       : "";
-  // v7: judul (h1–h6) tanpa font sendiri mengikuti var(--font-heading) bila diubah pengguna.
-  // :where() = spesifisitas 0, jadi font yang dipilih per elemen tetap menang.
+  // v7: headings (h1–h6) without their own font follow var(--font-heading) when the user changes it.
+  // :where() = specificity 0, so a font chosen per element still wins.
   const headingRule = customized("font-heading") ? `\n:where(.${rootClass}) :where(h1, h2, h3, h4, h5, h6) {\n  font-family: var(--font-heading);\n}\n` : "";
   const layoutCss =
     `/* Layout */\n${layoutRules.join("\n")}${headingRule}` +
@@ -777,7 +777,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     media(`(min-width: ${MOBILE_BREAKPOINT + 1}px) and (max-width: ${TABLET_BREAKPOINT}px)`, tabletRules) +
     media(`(max-width: ${MOBILE_BREAKPOINT}px)`, mobileRules);
 
-  // Aturan di dalam @media diberi indentasi dua spasi.
+  // Rules inside @media are indented by two spaces.
   const placeBlock = (p: PElement): string => {
     let css = rule(`.${p.rootCls}`, p.place.base);
     if (Object.keys(p.place.mobile).length) {
@@ -796,9 +796,9 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     if (p.kind === "element") elements.push(p);
   });
   const okElements = elements.filter((e) => e.spec && !e.error);
-  // Library terpasang + library yang dibutuhkan elemen (otomatis, mis. Chart.js).
+  // Installed libraries + libraries the elements need (automatic, e.g. Chart.js).
   const neededLibs = new Set<LibraryId>(okElements.flatMap((e) => e.def?.libraries ?? []));
-  // v9: variabel :root — Animasi & 3D hanya bila dipakai desain ini.
+  // v9: :root variables; Animation & 3D only when this design uses them.
   const uses3d = okElements.some((e) => e.def?.uses3dSettings);
   const varsCss = rootVarsCss(vars.filter((v) => (isMotionVar(v.name) ? animPresets.size > 0 : is3dVar(v.name) ? uses3d : true)));
   const exportLibs: LibraryId[] = sanitizeLibraryList([...installedLibs, ...neededLibs]) ?? [];
@@ -827,7 +827,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       if (!spec.markup) return null;
       const nodes = (Array.isArray(spec.markup) ? spec.markup : [spec.markup]).filter(Boolean) as MNode[];
       if (!preview) return wrap ? raw(wrap(renderFor("static", nodes))) : nodes;
-      // Preview: tandai elemen paling luar.
+      // Preview: mark the outermost element.
       let marked = false;
       return nodes.map((n) => {
         if (!marked && n && n.kind === "el") {
@@ -857,7 +857,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
         ...(p.cssId ? { id: p.cssId } : {}),
         ...(p.attrs ?? {}),
       };
-      // Root mendapat ref supaya Custom JS bisa diinisialisasi saat komponen di-mount.
+      // The root gets a ref so Custom JS can initialize when the component mounts.
       if (p === tree && hasCustomJs) {
         Object.assign(attrs, {
           "jsx:ref": { expr: "rootRef" },
@@ -875,7 +875,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       return h(p.node.tag ?? "div", attrs, p.children.map((c) => nodesFor(c, target)).flat() as MNode[]);
     }
     if (p.error || !p.spec) {
-      // Placeholder hanya di pratinjau; kode export melewati elemen yang gagal.
+      // Placeholders only in the preview; the export code skips elements that failed.
       return preview && target === "static" ? staticElement(p) : null;
     }
     if (target === "static") return staticElement(p);
@@ -884,15 +884,15 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     return nodes ?? null;
   };
 
-  /* ---- 4. keluaran HTML (pratinjau + export HTML) ---- */
-  // v9: blok bersama (/* owd-shared:id */ … /* /owd-shared:id */) cukup ditulis sekali.
+  /* ---- 4. HTML output (preview + HTML export) ---- */
+  // v9: shared blocks (/* owd-shared:id */ … /* /owd-shared:id */) only need to be written once.
   const sharedSeen = new Set<string>();
   const scripts = okElements
     .map((e) => e.spec!.html?.script?.trim())
     .filter((s): s is string => !!s)
     .map((s) => s.replace(/\/\* owd-shared:([\w-]+) \*\/[\s\S]*?\/\* \/owd-shared:\1 \*\/\n?/g, (m, id: string) => (sharedSeen.has(id) ? "" : (sharedSeen.add(id), m))));
   const allEvents = okElements.flatMap((e) => e.events);
-  // Di canvas desain (preview) event tidak dijalankan: klik dipakai untuk memilih.
+  // On the design canvas (preview) events do not run: clicks are used for selection.
   if (allEvents.length && !preview) {
     scripts.push(
       allEvents
@@ -910,9 +910,9 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
     .map((e) => `${e.handler}(event: any): void {\n${indentCode(e.code, "  ")}\n}`)
     .join("\n\n");
   const joinParts = (...parts: (string | undefined)[]) => parts.filter((x) => x && x.trim()).join("\n\n") || undefined;
-  // Custom JS hanya jalan di Pratinjau & hasil export — tidak di canvas desain.
+  // Custom JS only runs in Preview & the exported output, not on the design canvas.
   if (hasCustomJs && !preview) scripts.push(`${runtime}\n\ninitCustomCode(document);`);
-  // Uji coba CRUD: chip filter kategori di situs statis.
+  // CRUD trial: category filter chips on a static site.
   if (hasFilter && !preview) scripts.push(FILTER_JS);
   const fontLoaders = fontLoadCss([layoutCss, ...okElements.map(elementCss), customCss("plain")].join("\n"), allFonts, vars);
   const html = {
@@ -925,7 +925,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
   const children: ChildComponent[] = okElements
     .filter((e) => e.stateful)
     .map((e) => {
-      // CSS penempatan ikut ke komponen anak (class-nya ada di template anak).
+      // Placement CSS goes along to child components (their class is in the child template).
       const extra = (placeBlock(e) ? "\n" + placeBlock(e) : "") + "";
       return {
         name: e.compName!,
@@ -934,8 +934,8 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       };
     });
 
-  // Pemuat font juga memindai Custom CSS (mis. font template di root), karena
-  // Custom CSS framework ditulis terpisah dari CSS induk.
+  // The font loader also scans Custom CSS (e.g. template fonts on the root), because
+  // Framework custom CSS is written separately from the parent CSS.
   const parentBase = [layoutCss, ...okElements.filter((e) => !e.stateful).map(elementCss)].join("\n");
   const parentLoad = fontLoadCss(`${parentBase}\n${customCss("plain")}`, allFonts, vars);
   const parentCss = parentLoad ? `${parentLoad}\n\n${parentBase}` : parentBase;
@@ -1031,7 +1031,7 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
       generateFrameworkFiles(framework, {
         name: c.name,
         ...c.spec,
-        // Host komponen Angular transparan supaya aturan layout induk tetap berlaku.
+        // The Angular component host is transparent so the parent layout rules still apply.
         css:
           framework === "angular"
             ? withFonts(`:host {\n  display: contents;\n}\n\n${c.spec.css}`)
@@ -1047,12 +1047,12 @@ export function compose(root: BoxNode, opts: ComposeOptions): Composed {
         : [{ name: "customCode.js", lang: "js", content: `export ${runtime}\n` }]
       : [];
     const libFile: GeneratedFile[] = exportLibs.length ? [{ name: "LIBRARIES.md", lang: "md", content: libraryReadme(exportLibs) }] : [];
-    // v25: runtime efek (pengganti AOS/Animate.css/Tilt) sebagai berkas sendiri untuk komponen framework.
+    // v25: the effects runtime (replacing AOS/Animate.css/Tilt) as its own file for framework components.
     if (usesMotion(exportLibs))
       libFile.push({ name: "owd-motion.css", lang: "css", content: MOTION_CSS + "\n" }, { name: "owd-motion.js", lang: "js", content: MOTION_JS + "\n" });
     if (usesScroll(exportLibs))
       libFile.push({ name: "owd-scroll.css", lang: "css", content: SCROLL_CSS + "\n" }, { name: "owd-scroll.js", lang: "js", content: SCROLL_JS + "\n" });
-    // v9: berkas pendukung elemen (mis. runtime 3D), satu salinan per nama berkas.
+    // v9: element support files (e.g. the 3D runtime), one copy per file name.
     const extra = new Map<string, GeneratedFile>();
     for (const e of okElements) for (const f of e.def?.extraFiles?.(framework) ?? []) if (!extra.has(f.name)) extra.set(f.name, f);
     return [...parent, ...childFiles, ...runtimeFile, ...extra.values(), ...libFile];

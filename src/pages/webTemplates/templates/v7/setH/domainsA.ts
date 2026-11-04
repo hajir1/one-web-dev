@@ -1,9 +1,9 @@
 import type { Domain } from "./spec";
 
 /* ================================================================== */
-/* Isi domain dashboard (bagian 1): admin umum, analitik web,           */
+/* Dashboard domain content (part 1): general admin, web analytics,     */
 /* admin e-commerce, CRM, keuangan, manajemen proyek, metrik SaaS.      */
-/* Semua angka & nama adalah data contoh. Format string: lihat spec.ts. */
+/* All numbers & names are sample data. String format: see spec.ts. */
 /* ================================================================== */
 
 const M6 = ["Jan|Jan", "Feb|Feb", "Mar|Mar", "Apr|Apr", "Mei|May", "Jun|Jun"];

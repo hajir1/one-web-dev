@@ -1,14 +1,14 @@
 import { DataError } from "../../shared/errors";
 
 /* ================================================================== */
-/* Konverter timestamp: Unix (detik/milidetik/mikro/nano) ↔ tanggal.      */
+/* Timestamp converter: Unix (seconds/milliseconds/micro/nano) ↔ date.    */
 /* ================================================================== */
 
 export type EpochUnit = "s" | "ms" | "us" | "ns";
 
 export interface TimestampResult {
   date: Date;
-  /** Satuan yang dipakai/terdeteksi untuk input angka; null untuk input tanggal. */
+  /** Unit used/detected for numeric input; null for date input. */
   unit: EpochUnit | null;
   seconds: number;
   millis: number;
@@ -16,7 +16,7 @@ export interface TimestampResult {
   utc: string;
 }
 
-/** Tebak satuan dari jumlah digit: ≤11 detik, ≤14 ms, ≤17 µs, selebihnya ns. */
+/** Guess the unit from the digit count: ≤11 seconds, ≤14 ms, ≤17 µs, otherwise ns. */
 export function guessUnit(digits: string): EpochUnit {
   const n = digits.replace(/^-/, "").split(".")[0].length;
   if (n <= 11) return "s";
@@ -36,7 +36,7 @@ export function parseTimestamp(input: string, unit: EpochUnit | "auto" = "auto")
     used = unit === "auto" ? guessUnit(s) : unit;
     date = new Date(Number(s) / DIV[used]);
   } else {
-    // Hanya format tanggal yang jelas: ISO 8601 / RFC 2822. Bentuk ambigu ditolak.
+    // Only unambiguous date formats: ISO 8601 / RFC 2822. Ambiguous forms are rejected.
     if (!/^\d{4}-\d{2}-\d{2}([T ][\d:.]+(Z|[+-]\d{2}:?\d{2})?)?$/.test(s) && !/^[A-Za-z]{3},? /.test(s)) throw new DataError("timestampFormat");
     date = new Date(/^\d{4}-\d{2}-\d{2} /.test(s) ? s.replace(" ", "T") : s);
   }
@@ -45,7 +45,7 @@ export function parseTimestamp(input: string, unit: EpochUnit | "auto" = "auto")
   return { date, unit: used, seconds: Math.floor(millis / 1000), millis, iso: date.toISOString(), utc: date.toUTCString() };
 }
 
-/** "3 jam lalu" / "in 2 days" sesuai locale. */
+/** "3 jam lalu" / "in 2 days" depending on the locale. */
 export function relativeTime(millis: number, locale: string, now = Date.now()): string {
   const diff = (millis - now) / 1000;
   const abs = Math.abs(diff);

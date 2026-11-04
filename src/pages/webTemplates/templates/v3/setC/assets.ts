@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ilustrasi SVG untuk template v3 bagian C                             */
-/* (buatan sendiri, ASCII, tanpa URL eksternal; nama berawalan "v3c-").  */
-/* Bentuk datar sederhana + warna per tema, jadi satu bentuk punya       */
+/* SVG illustrations for v3 templates part C                            */
+/* (in-house, ASCII, no external URLs; names prefixed "v3c-").          */
+/* Simple flat shapes + colors per theme, so one shape has              */
 /* beberapa varian.                                                      */
 /* ================================================================== */
 
@@ -58,7 +58,7 @@ function pitch(a: string, b: string, line: string, ball: string): string {
   );
 }
 
-/** Pelari + garis jalan. */
+/** Runner + road lines. */
 function runner(a: string, b: string, body: string, road: string): string {
   return svg(
     800,
@@ -71,7 +71,7 @@ function runner(a: string, b: string, body: string, road: string): string {
   );
 }
 
-/** Kubah masjid & bulan sabit. */
+/** Mosque dome & crescent moon. */
 function mosque(a: string, b: string, dome: string, accent: string): string {
   return svg(
     800,
@@ -97,7 +97,7 @@ function geometric(a: string, c1: string, c2: string): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${a}"/>${s}`);
 }
 
-/** Gereja dengan jendela kaca. */
+/** Church with stained glass windows. */
 function chapel(a: string, b: string, wall: string, glass: string): string {
   return svg(
     800,
@@ -213,7 +213,7 @@ function arch(a: string, b: string, frame: string, bloom: string): string {
   return svg(800, 600, bg(a, b) + `<path d="M200 540 L200 330 Q200 130 400 130 Q600 130 600 330 L600 540" stroke="${frame}" stroke-width="14" fill="none"/>${f}<rect x="300" y="470" width="200" height="16" rx="8" fill="${frame}"/><rect x="0" y="540" width="800" height="60" fill="${frame}" opacity="0.25"/>`);
 }
 
-/** Ponsel & gawai. */
+/** Phones & gadgets. */
 function gadget(a: string, b: string, body: string, screen: string): string {
   return svg(
     800,
@@ -253,7 +253,7 @@ function ramen(a: string, b: string, bowl: string, broth: string): string {
   );
 }
 
-/** Dua kursi & daun (ruang konseling). */
+/** Two chairs & leaves (counseling room). */
 function calm(a: string, b: string, chair: string, leaf: string): string {
   return svg(
     800,
@@ -336,7 +336,7 @@ function capsule(a: string, b: string, pod: string, light: string): string {
   return svg(800, 600, bg(a, b) + s + `<rect x="80" y="540" width="640" height="14" rx="7" fill="${light}" opacity="0.6"/>`);
 }
 
-/** Aplikasi belajar di ponsel. */
+/** Learning app on a phone. */
 function appUi(a: string, b: string, brand: string, accent: string): string {
   return svg(
     800,
@@ -374,7 +374,7 @@ function face(bgc: string, skin: string, hair: string, shirt: string, hijab = fa
   return svg(600, 600, `<rect width="600" height="600" fill="${bgc}"/><path d="M140 600 Q140 400 300 400 Q460 400 460 600Z" fill="${shirt}"/>${head}<circle cx="276" cy="250" r="6" fill="#1f2937"/><circle cx="324" cy="250" r="6" fill="#1f2937"/><path d="M280 285 Q300 300 320 285" stroke="#1f2937" stroke-width="5" fill="none" stroke-linecap="round"/>`);
 }
 
-/** Gelombang suara mentah vs bersih (sebelum–sesudah mixing). */
+/** Raw vs clean sound waves (before–after mixing). */
 function waveform(a: string, line: string, clean: boolean): string {
   let d = "M40 300";
   for (let x = 60; x <= 760; x += 20) {
@@ -384,7 +384,7 @@ function waveform(a: string, line: string, clean: boolean): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${a}"/><line x1="40" y1="300" x2="760" y2="300" stroke="${line}" stroke-width="2" opacity="0.4"/><path d="${d}" stroke="${line}" stroke-width="5" fill="none" stroke-linejoin="round"/>`);
 }
 
-/** Ruangan polos vs didekorasi (sebelum–sesudah). */
+/** Plain vs decorated room (before–after). */
 function venue(a: string, floor: string, decorated: boolean, bloom: string): string {
   const deco = decorated
     ? `<path d="M120 120 Q400 220 680 120" stroke="${bloom}" stroke-width="10" fill="none"/>${[160, 260, 360, 460, 560, 640].map((x) => `<circle cx="${x}" cy="${150 + (x % 3) * 10}" r="18" fill="${bloom}"/>`).join("")}<rect x="300" y="300" width="200" height="140" rx="10" fill="#ffffff"/><path d="M300 300 Q400 240 500 300" fill="${bloom}" opacity="0.7"/><circle cx="220" cy="420" r="30" fill="${bloom}"/><circle cx="580" cy="420" r="30" fill="${bloom}"/>`
@@ -392,7 +392,7 @@ function venue(a: string, floor: string, decorated: boolean, bloom: string): str
   return svg(800, 600, `<rect width="800" height="600" fill="${a}"/><path d="M0 440 L800 440 L800 600 L0 600Z" fill="${floor}"/>${deco}`);
 }
 
-/** Desain tato sebelum (pudar) & sesudah (cover-up). */
+/** Tattoo design before (faded) & after (cover-up). */
 function tattooArm(skin: string, ink: string, fresh: boolean, red: string): string {
   const art = fresh
     ? `<circle cx="400" cy="300" r="80" fill="${red}" stroke="${ink}" stroke-width="7"/><path d="M350 300 Q400 240 450 300 Q400 350 350 300Z" stroke="${ink}" stroke-width="6" fill="none"/><path d="M320 380 Q360 360 400 390 M480 380 Q440 360 400 390" stroke="${ink}" stroke-width="7" fill="none"/>`

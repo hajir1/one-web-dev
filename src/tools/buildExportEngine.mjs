@@ -1,10 +1,10 @@
-// Bundel mesin ekspor (src/exportEngine/engine.ts) menjadi satu modul ESM
-// untuk backend Nest: <backend>/src/export-engine/engine.bundle.mjs
+// Bundle the export engine (src/exportEngine/engine.ts) into one ESM module
+// for the Nest backend: <backend>/src/export-engine/engine.bundle.mjs
 //
 //   node src/tools/buildExportEngine.mjs ../onewebdev-backend
 //
-// Jalankan ulang setiap kali elemen, section, atau generator kode berubah,
-// lalu salin hasilnya bersama rilis backend.
+// Run again whenever elements, sections, or the code generator change,
+// then copy the output along with the backend release.
 import { build } from "esbuild";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

@@ -6,7 +6,7 @@ import { h } from "../../../helpers/markup";
 import { clamp, color,   parseLinks } from "../shared";
 import { tr, f, btnCss, outsideEsc } from "./kit";
 
-/* -------------------------- Tombol Dropdown ------------------------- */
+/* -------------------------- Dropdown Button ------------------------- */
 
 export interface DropdownState {
   buttonText: string;

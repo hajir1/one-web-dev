@@ -3,14 +3,14 @@ import { badge, col, el, eyebrow, grid, inline, para, section, stack } from "../
 import { acts, addCss, card, fxBlock, fxCard, fxHero, fxImg, intro, introEls, P, picture, T, type HeroC, type Intro, type LookD } from "../../v3/setD/kitD";
 
 /* ================================================================== */
-/* Perangkat template v4 bagian E                                        */
+/* Template kit v4 part E                                                */
 /*                                                                    */
-/* Dasar (Look, header, footer, kartu bentuk tema, efek library) memakai */
-/* kitD; file ini menambah section BARU khas set E: hero dasbor (grafik  */
-/* dalam kartu kaca), hero tumpuk (tipografi bergaris luar), hero tiket, */
-/* panel grafik & grafik ganda (elemen Chart), pita KPI dengan delta,     */
-/* papan jadwal ala bandara, catatan tempel pastel, swatch material,      */
-/* rel langkah horizontal, polaroid miring, dan pita belah dua warna.     */
+/* The basics (Look, header, footer, theme shape cards, library effects) use */
+/* kitD; this file adds NEW sections typical of set E: a dashboard hero (chart */
+/* inside a glass card), stacked hero (outlined typography), ticket hero, */
+/* chart panels & double charts (Chart element), KPI ribbons with deltas, */
+/* airport-style schedule board, pastel sticky notes, material swatches,  */
+/* a horizontal step rail, tilted polaroids, and a two-color split ribbon. */
 /* ================================================================== */
 
 export * from "../../v3/setD/kitD";
@@ -22,14 +22,14 @@ export interface ChartC {
   title: string;
   /** Nama seri dipisah koma (maks. 2). */
   series: string;
-  /** "Label, nilai1, nilai2" — angka tanpa pemisah ribuan. */
+  /** "Label, value1, value2" — numbers without thousands separators. */
   rows: string[];
   c2?: string;
   height?: number;
   legend?: boolean;
 }
 
-/** Elemen Chart (Chart.js otomatis dipasang compose saat ekspor). */
+/** Chart element (Chart.js is added automatically by compose on export). */
 function chartEl(L: LookD, c: ChartC, dark = L.dark): ElementNode {
   return el(
     "chart",
@@ -50,7 +50,7 @@ function chartEl(L: LookD, c: ChartC, dark = L.dark): ElementNode {
   );
 }
 
-/** Panel grafik: teks + KPI kecil di satu sisi, kartu grafik di sisi lain. */
+/** Chart panel: text + small KPIs on one side, a chart card on the other. */
 export function chartPanel(L: LookD, c: Intro & { chart: ChartC; kpis?: [string, string][]; bullets?: string[]; reverse?: boolean; name?: string; bg?: string }): BoxNode {
   const kpis = c.kpis
     ? [
@@ -66,7 +66,7 @@ export function chartPanel(L: LookD, c: Intro & { chart: ChartC; kpis?: [string,
   return section(c.name ?? "Panel Grafik", [grid(c.reverse ? [chart, text] : [text, chart], "minmax(0, 1fr) minmax(0, 1.35fr)", { gap: 40, align: "center" })], { bg: c.bg ?? L.bg, padY: 80 });
 }
 
-/** Grafik ganda: dua (atau tiga) kartu grafik berdampingan + catatan. */
+/** Double chart: two (or three) chart cards side by side + a note. */
 export function chartDuo(L: LookD, c: Intro & { charts: ChartC[]; notes?: string[]; name?: string; bg?: string }): BoxNode {
   const cells = c.charts.map((ch, i) => fxCard(L, card(L, [chartEl(L, ch), ...(c.notes?.[i] ? [P(L, c.notes[i], { size: 13 })] : [])], { name: "Kartu grafik", pad: 20 }), i));
   return section(c.name ?? "Grafik Ganda", [intro(L, c), grid(cells, `repeat(${c.charts.length}, minmax(0, 1fr))`, { gap: 22, align: "stretch" })], { bg: c.bg ?? L.alt, padY: 80 });
@@ -74,7 +74,7 @@ export function chartDuo(L: LookD, c: Intro & { charts: ChartC[]; notes?: string
 
 /* ------------------------------- hero ------------------------------ */
 
-/** Hero Dasbor: latar gradien, teks terang, kartu kaca berisi grafik + chip KPI. */
+/** Dashboard Hero: gradient background, light text, a glass card with a chart + KPI chips. */
 export function heroDash(L: LookD, c: HeroC & { chart: ChartC; kpis: [string, string][]; gradient: [string, string] }): BoxNode {
   const text = col(
     [...(c.eyebrow ? [badge(c.eyebrow, "#ffffff1f", "#ffffff", "#ffffff55")] : []), fxHero(L, c.titleNode ?? T(L, c.title, "h1", { size: c.size ?? 56, color: "#ffffff" })), P(L, c.text, { size: 18, color: "#e2e8f0" }), ...(c.actions ? [acts(L, c.actions)] : [])],
@@ -94,7 +94,7 @@ export function heroDash(L: LookD, c: HeroC & { chart: ChartC; kpis: [string, st
   return section("Hero Dasbor", [grid([text, fxImg(L, panel)], "minmax(0, 1fr) minmax(0, 1.2fr)", { gap: 48, align: "center" })], { gradient: [c.gradient[0], c.gradient[1], 135], padY: 96 });
 }
 
-/** Hero Tumpuk: tiga baris judul raksasa — padat, bergaris luar, berwarna. */
+/** Stacked hero: three lines of giant heading — solid, outlined, colored. */
 export function heroStacked(L: LookD, c: HeroC & { lines: [string, string, string] }): BoxNode {
   const [a, b, d] = c.lines;
   const size = c.size ?? 96;
@@ -103,7 +103,7 @@ export function heroStacked(L: LookD, c: HeroC & { lines: [string, string, strin
   addCss(l2, `-webkit-text-stroke: 2px ${L.p.ink}; line-height: 0.95;`);
   const l3 = T(L, d, "h2", { size, weight: 800, spacing: -3, color: L.p.primary });
   [l1, l3].forEach((n) => addCss(n, "line-height: 0.95;"));
-  // Teks mengetik (opsional) tampil sebagai sub-judul di kolom samping.
+  // Typing text (optional) shows as a subheading in the side column.
   const sub = c.titleNode ? [Object.assign(c.titleNode, { state: { ...c.titleNode.state, tag: "p", fontSize: 30 } })] : [];
   const side = col([...(c.eyebrow ? [eyebrow(c.eyebrow, L.p.primary)] : []), ...sub, P(L, c.text, { size: 18 }), ...(c.actions ? [acts(L, c.actions)] : [])], { gap: 16, name: "Teks samping" });
   const pic = c.image ? fxImg(L, col([picture(L, c.image, c.alt ?? c.title, "3 / 4")], { name: "Gambar" })) : null;
@@ -114,7 +114,7 @@ export function heroStacked(L: LookD, c: HeroC & { lines: [string, string, strin
   );
 }
 
-/** Hero Tiket: kartu tiket dengan sobekan putus-putus dan potongan info di kanan. */
+/** Ticket Hero: a ticket card with a dashed tear line and info stubs on the right. */
 export function heroTicket(L: LookD, c: HeroC & { stubs: [string, string][] }): BoxNode {
   const main = col([...(c.eyebrow ? [eyebrow(c.eyebrow, L.p.primary)] : []), fxHero(L, T(L, c.title, "h1", { size: c.size ?? 52 })), P(L, c.text, { size: 17 }), ...(c.actions ? [acts(L, c.actions)] : [])], { gap: 16, name: "Badan tiket" });
   main.padding = 40;
@@ -132,7 +132,7 @@ export function heroTicket(L: LookD, c: HeroC & { stubs: [string, string][] }): 
 
 /* ----------------------------- konten ------------------------------ */
 
-/** Pita KPI: angka besar + label + chip delta, di latar kontras. */
+/** KPI ribbon: large numbers + labels + delta chips, on a contrasting background. */
 export function kpiStrip(L: LookD, c: { items: [string, string, string][]; name?: string; inv?: boolean }): BoxNode {
   const inv = c.inv ?? true;
   const cells = c.items.map(([v, l, d], i) => {
@@ -144,11 +144,11 @@ export function kpiStrip(L: LookD, c: { items: [string, string, string][]; name?
   return section(c.name ?? "Pita KPI", [g], { bg: inv ? L.inv : L.alt, padY: 56 });
 }
 
-/** Papan jadwal ala bandara: baris monospace gelap. */
+/** Airport-style schedule board: dark monospace rows. */
 export function board(L: LookD, c: Intro & { head: [string, string, string, string]; rows: [string, string, string, string][]; name?: string }): BoxNode {
   const mono = '"JetBrains Mono", monospace';
   const line = (r: string[], headRow = false, i = 0) => {
-    // Kolom (bukan Row) bergaya grid agar tidak ada Row bersarang di dalam papan.
+    // A Column (not a Row) styled as a grid so there are no nested Rows inside the board.
     const g = col(
       r.map((x, j) => {
         const t = para(x, { size: headRow ? 12 : 16, weight: headRow ? 700 : 600, color: headRow ? "#94a3b8" : j === 3 ? "#fbbf24" : "#f8fafc", transform: headRow ? "uppercase" : "none", spacing: headRow ? 2 : 0 });
@@ -167,7 +167,7 @@ export function board(L: LookD, c: Intro & { head: [string, string, string, stri
   return section(c.name ?? "Papan Jadwal", [intro(L, c), stack([fxBlock(L, panel)], { align: "stretch" })], { bg: L.bg, padY: 80 });
 }
 
-/** Catatan tempel: kartu pastel miring bergantian. */
+/** Sticky notes: alternately tilted pastel cards. */
 export function notes(L: LookD, c: Intro & { items: [string, string][]; colors: string[]; name?: string; bg?: string }): BoxNode {
   const cells = c.items.map(([t, x], i) => {
     const n = col([T(L, t, "h3", { size: 22 }), P(L, x, { size: 15, color: L.p.ink })], { gap: 8, name: "Catatan" });
@@ -178,7 +178,7 @@ export function notes(L: LookD, c: Intro & { items: [string, string][]; colors: 
   return section(c.name ?? "Catatan Tempel", [intro(L, c), grid(cells, `repeat(${Math.min(4, c.items.length)}, minmax(0, 1fr))`, { gap: 26 })], { bg: c.bg ?? L.bg, padY: 80 });
 }
 
-/** Swatch material: lingkaran warna + nama + keterangan. */
+/** Material swatches: color circle + name + description. */
 export function swatches(L: LookD, c: Intro & { items: [string, string, string][]; name?: string; bg?: string }): BoxNode {
   const cells = c.items.map(([color, t, x], i) => {
     const dot = para(" ", { size: 12 });
@@ -188,7 +188,7 @@ export function swatches(L: LookD, c: Intro & { items: [string, string, string][
   return section(c.name ?? "Swatch Material", [intro(L, { ...c, align: c.align ?? "center" }), grid(cells, `repeat(${Math.min(5, c.items.length)}, minmax(0, 1fr))`, { gap: 24 })], { bg: c.bg ?? L.alt, padY: 80 });
 }
 
-/** Rel langkah horizontal: nomor dalam lingkaran di atas garis. */
+/** Horizontal step rail: numbers in circles above a line. */
 export function rail(L: LookD, c: Intro & { steps: [string, string][]; name?: string; bg?: string }): BoxNode {
   const cells = c.steps.map(([t, x], i) => {
     const num = para(String(i + 1).padStart(2, "0"), { size: 16, weight: 800, color: "#ffffff", align: "center" });
@@ -200,7 +200,7 @@ export function rail(L: LookD, c: Intro & { steps: [string, string][]; name?: st
   return section(c.name ?? "Rel Langkah", [intro(L, c), grid(cells, `repeat(${c.steps.length}, minmax(0, 1fr))`, { gap: 20 })], { bg: c.bg ?? L.bg, padY: 80 });
 }
 
-/** Polaroid: foto berbingkai putih, miring bergantian, keterangan tulisan tangan. */
+/** Polaroid: white-framed photos, alternately tilted, handwritten captions. */
 export function polaroids(L: LookD, c: Intro & { items: [string, string][]; name?: string; bg?: string }): BoxNode {
   const cells = c.items.map(([src, cap], i) => {
     const capEl = para(cap, { size: 16, weight: 600, color: "#1f2937", align: "center" });
@@ -213,7 +213,7 @@ export function polaroids(L: LookD, c: Intro & { items: [string, string][]; name
   return section(c.name ?? "Polaroid", [intro(L, { ...c, align: c.align ?? "center" }), grid(cells, `repeat(${Math.min(4, c.items.length)}, minmax(0, 1fr))`, { gap: 30 })], { bg: c.bg ?? L.alt, padY: 88 });
 }
 
-/** Pita belah: dua panel warna berbeda berdampingan (layar terbagi). */
+/** Split band: two panels of different colors side by side (split screen). */
 export function splitBand(L: LookD, c: { left: Intro & { actions?: [string, string, ("primary" | "outline" | "light" | "dark")?][] }; right: Intro & { actions?: [string, string, ("primary" | "outline" | "light" | "dark")?][] }; name?: string }): BoxNode {
   const half = (x: typeof c.left, bgc: string, light: boolean) => {
     const h = fxBlock(L, col([...introEls(L, { ...x, light }), ...(x.actions ? [acts(L, x.actions)] : [])], { gap: 14, name: "Panel" }));

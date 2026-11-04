@@ -2,11 +2,11 @@ import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata 10 template katalog v5 (bagian F). Konten: ./setF/.
- * 1 Free + 9 Premium, 4–6 halaman. Setiap template memakai section
- * bertipe Lebar Penuh (header beranda) dan Spesialisasi (sidebar + baris
- * dalam), sama dengan tipe section ala Divi di Page Maker. Harga Premium
- * mengikuti rumus `templatePrice` (marketplace/templatePricing.ts).
+ * Metadata for the 10 catalog v5 templates (part F). Content: ./setF/.
+ * 1 Free + 9 Premium, 4–6 pages. Every template uses a
+ * Full Width section (home header) and a Specialty section (sidebar + inner
+ * rows), the same as the Divi-style section types in Page Maker. Premium prices
+ * follow the `templatePrice` formula (marketplace/templatePricing.ts).
  */
 export const V5F_CATALOG: TemplateMeta[] = [
   { id: "catering-dapur-rasa", version: 1, category: "catering", tier: "free", price: TEMPLATE_PRICE.free, accent: "#c2410c", tags: ["katering", "nasi kotak", "prasmanan"], isNew: true },

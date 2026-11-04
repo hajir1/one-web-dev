@@ -1,9 +1,9 @@
-## Ringkasan
+## Summary
 
-## Cara menguji
+## How to test
 
 ## Checklist
 
-- [ ] `npm run typecheck`, `npm run lint`, `npm test` lolos
-- [ ] Teks baru ada di `id.json` dan `en.json`
-- [ ] Bila menyentuh template/elemen: `npm run templates:check` lolos (atau baseline diperbarui dengan alasan)
+- [ ] `npm run typecheck`, `npm run lint`, `npm test` pass
+- [ ] New UI text is in both `id.json` and `en.json`
+- [ ] If templates/elements changed: `npm run templates:check` passes (or the baseline was updated with a reason)

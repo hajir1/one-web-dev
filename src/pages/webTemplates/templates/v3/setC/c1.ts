@@ -41,7 +41,7 @@ import {
 /* ================================================================== */
 
 /* ---------------- 1. Roti Hangat (FREE, 4 hlm) — pastel lembut -------- */
-// Hanya elemen & section gratis; library: AOS saja.
+// Only free elements & sections; library: AOS only.
 
 const RH: Palette = { ink: "#3b2410", muted: "#7a5a3c", primary: "#b45309", primaryDark: "#92400e", soft: "#fef3c7", line: "#fde68a" };
 const rh = lookC(RH, { head: "Fraunces", body: "Nunito", skin: "soft", radius: 22, bg: "#fffbf3", alt: "#fdf0dc", dark: "#3b2410", fx: { aos: "fade-up" }, btnR: 999 });

@@ -1,19 +1,19 @@
 import { NO_IMAGE, type CollectionDef, type CollectionField, type ItemValues } from "../collections";
 
 /* ================================================================== */
-/* Bagian bersama generator CRUD (Laravel & Express)                     */
+/* Shared part of the CRUD generators (Laravel & Express)                */
 /* ================================================================== */
 
 export interface CrudNames {
-  /** "produk-kopi" (URL, nama view/berkas). */
+  /** "produk-kopi" (URL, view/file name). */
   slug: string;
   /** "ProdukKopi" (kelas). */
   model: string;
-  /** "produk_kopi" (tabel). */
+  /** "produk_kopi" (table). */
   table: string;
   /** "produkKopi" (variabel JS). */
   camel: string;
-  /** "Produk Kopi" (label UI). */
+  /** "Produk Kopi" (UI label). */
   label: string;
 }
 
@@ -34,7 +34,7 @@ export function crudNames(c: CollectionDef): CrudNames {
 
 export const isNumeric = (f: CollectionField) => f.type === "price" || f.type === "number" || f.type === "rating";
 
-/** Nilai item untuk seed (angka tetap angka, teks kosong → null kecuali wajib). */
+/** Item value for the seed (numbers stay numbers, empty text → null unless required). */
 export function seedRow(c: CollectionDef, v: ItemValues): Record<string, string | number | null> {
   const out: Record<string, string | number | null> = {};
   for (const f of c.fields) {
@@ -50,28 +50,28 @@ export function seedRow(c: CollectionDef, v: ItemValues): Record<string, string 
   return out;
 }
 
-/** Kolom teks yang dicari (nama, deskripsi, label). */
+/** Searchable text columns (name, description, label). */
 export const searchFields = (c: CollectionDef) => c.fields.filter((f) => f.type === "text" || f.type === "textarea" || f.type === "label" || f.type === "category").map((f) => f.key);
 
-/** Kolom yang tampil di tabel dashboard. */
+/** Columns shown in the dashboard table. */
 export const tableFields = (c: CollectionDef) => c.fields.filter((f) => f.type !== "textarea");
 
 /**
- * Skrip halaman publik: mengambil data dari `/api/<slug>` lalu menyusun
- * ulang kartu di elemen `[data-collection]` memakai kartu pertama sebagai
- * pola. Bila API gagal, kartu statis hasil desain tetap tampil.
+ * Public page script: fetches data from `/api/<slug>` and rebuilds the
+ * cards in the `[data-collection]` element using the first card as the
+ * pattern. When the API fails, the static cards from the design still show.
  */
 export function collectionsScript(): string {
-  return `/* Pemuat koleksi data (dibuat OneWebDev).
- * Elemen [data-collection="<slug>"] diisi ulang dari GET /api/<slug>.
- * Halaman item /<slug>/<item>: [data-item] diisi dari GET /api/<slug>/<item>,
- * [data-related] dari GET /api/<slug>/<item>/related.
- * Chip [data-filter="<slug>"] memfilter kartu per kategori (?kategori=),
- * daftar chip mengikuti GET /api/<slug>/kategori.
- * Kartu pertama dipakai sebagai pola; bila API gagal, kartu statis tetap tampil. */
+  return `/* Data collection loader (made by OneWebDev).
+ * Elements [data-collection="<slug>"] are refilled from GET /api/<slug>.
+ * Item page /<slug>/<item>: [data-item] is filled from GET /api/<slug>/<item>,
+ * [data-related] from GET /api/<slug>/<item>/related.
+ * Chips [data-filter="<slug>"] filter cards by category (?kategori=),
+ * and the chip list follows GET /api/<slug>/kategori.
+ * The first card is used as the pattern; if the API fails, the static cards stay visible. */
 (function () {
   "use strict";
-  // Penanda: filter kategori ditangani skrip ini (skrip statis halaman berhenti).
+  // Marker: the category filter is handled by this script (the page's static script stops).
   window.OWD_COLLECTIONS = true;
   var API_BASE = (document.querySelector('meta[name="api-base"]') || {}).content || "";
   var NO_IMAGE = "${NO_IMAGE}";
@@ -134,7 +134,7 @@ export function collectionsScript(): string {
     } else if (was) was.remove();
     var text = part(card, "text");
     if (text) text.textContent = it.description || "";
-    // Halaman item: tombol kartu menuju /<koleksi>/<slug>.
+    // Item page: card buttons go to /<collection>/<slug>.
     var cta = part(card, "cta");
     if (cta && it.url) cta.setAttribute("href", it.url);
     if (it.category) el.setAttribute("data-category", it.category);
@@ -143,7 +143,7 @@ export function collectionsScript(): string {
     return el;
   }
 
-  /* ---------- halaman item (detail) ---------- */
+  /* ---------- item page (detail) ---------- */
 
   function stars(r) {
     var n = Math.round(r);
@@ -180,7 +180,7 @@ export function collectionsScript(): string {
       else el.setAttribute("data-empty", "");
     });
   }
-  /** Slug item dari alamat /<koleksi>/<slug> atau /<koleksi>/<slug>.html; null bila bukan alamat item. */
+  /** Item slug from the address /<collection>/<slug> or /<collection>/<slug>.html; null when it is not an item address. */
   function itemSlug(col) {
     var parts = location.pathname.split("/").filter(Boolean);
     var i = parts.lastIndexOf(col);
@@ -247,7 +247,7 @@ export function collectionsScript(): string {
     document.head.appendChild(st);
   }
 
-  /** Kategori aktif (chip) atau kategori tetap dari desain, plus urutan. */
+  /** Active category (chip) or the fixed category from the design, plus sort order. */
   function query(grid) {
     var cat = grid.__owdCategory != null ? grid.__owdCategory : grid.getAttribute("data-view-category") || "";
     var sort = grid.getAttribute("data-sort") || "";
@@ -284,7 +284,7 @@ export function collectionsScript(): string {
     return b;
   }
 
-  /** Nomor halaman yang tampil: 1 … p-1 p p+1 … last. */
+  /** Page numbers shown: 1 … p-1 p p+1 … last. */
   function pageList(p, last) {
     var out = [];
     for (var i = 1; i <= last; i++) if (i === 1 || i === last || Math.abs(i - p) <= 1) out.push(i);
@@ -360,7 +360,7 @@ export function collectionsScript(): string {
       return;
     }
 
-    // "more" dan "scroll": halaman berikutnya ditambahkan ke belakang.
+    // "more" and "scroll": the next page is appended at the end.
     var more = button(TXT.more, function () { next(); });
     more.hidden = true;
     if (mode === "more") nav.appendChild(more);
@@ -459,7 +459,7 @@ export function collectionsScript(): string {
     }
     chips.forEach(wire);
 
-    // Chip mengikuti kategori terbaru di database (kategori baru dari admin ikut tampil).
+    // Chips follow the latest categories in the database (new categories from the admin show up too).
     if (!allChip) return;
     getJson(API_BASE + "/api/" + encodeURIComponent(slug) + "/kategori")
       .then(function (json) {
@@ -497,7 +497,7 @@ export function collectionsScript(): string {
 `;
 }
 
-/** Sisipkan `<script>` sebelum `</body>` (HTML statis). */
+/** Insert a `<script>` before `</body>` (static HTML). */
 export function injectBeforeBodyEnd(html: string, tag: string): string {
   const i = html.toLowerCase().lastIndexOf("</body>");
   return i < 0 ? `${html}\n${tag}\n` : `${html.slice(0, i)}  ${tag}\n${html.slice(i)}`;

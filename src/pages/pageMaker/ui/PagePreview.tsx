@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import PageFrame from "./PageFrame";
 import type { LibraryId } from "../engine/helpers/libraries";
 
-/** Pratinjau halaman apa adanya (tanpa overlay builder): tampilan yang sama dengan kode hasil. */
+/** The page preview as is (without builder overlays): the same look as the output code. */
 export default function PagePreview({
   css,
   body,

@@ -1,9 +1,9 @@
 // ─── observability.ts ────────────────────────────────────────────────────────
-// v7 (P10): Sentry di browser, OPSIONAL. Aktif hanya bila VITE_SENTRY_DSN diisi
-// saat build; paketnya dimuat terpisah (dynamic import) sehingga tanpa DSN tidak
-// menambah ukuran bundle utama. Request ke backend membawa header `sentry-trace`
-// + `baggage` agar trace browser → Nest → Python tersambung.
-// Tanpa data pribadi: tanpa IP/cookie/isi form, URL dibersihkan dari query string.
+// v7 (P10): Sentry in the browser, OPTIONAL. Active only when VITE_SENTRY_DSN is set
+// at build time; the package loads separately (dynamic import) so without a DSN it does not
+// add to the main bundle size. Requests to the backend carry the `sentry-trace` header
+// + `baggage` so the browser → Nest → Python trace is connected.
+// No personal data: no IP/cookies/form content, and query strings are stripped from URLs.
 
 import { apiConfig } from "./pages/media/processing/apiConfig";
 
@@ -14,7 +14,7 @@ export interface SentryPlan {
   environment: string;
   release?: string;
   tracesSampleRate: number;
-  /** Asal (origin) API yang boleh menerima header trace. */
+  /** API origins allowed to receive trace headers. */
   apiOrigin: string | null;
 }
 
@@ -37,7 +37,7 @@ export function sentryPlan(env: Env, apiBase: string | null): SentryPlan | null 
   };
 }
 
-/** Hapus query string & fragmen (token undangan, tanda tangan URL, dsb.). */
+/** Strip the query string & fragment (invitation tokens, URL signatures, etc.). */
 export const stripQuery = (url: string) => url.replace(/[?#].*$/, "");
 
 export function initObservability(env: Env = import.meta.env as unknown as Env): void {

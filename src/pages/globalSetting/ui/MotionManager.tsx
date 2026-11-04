@@ -6,9 +6,9 @@ import { DEFAULT_THREE, useMotionStore, type ThreeQuality } from "../../pageMake
 
 /* ================================================================== */
 /* Tab "Animasi & 3D" Pengaturan Global (v9).                            */
-/* Nilai bawaan untuk animasi CSS (panel Styling → Animasi) dan elemen  */
-/* 3D. Ditulis sebagai variabel --owd-anim-* / --owd-3d-* di :root hasil */
-/* ekspor, hanya bila desain memakai animasi atau elemen 3D.            */
+/* Default values for CSS animations (Styling panel → Animation) and 3D */
+/* elements. Written as --owd-anim-* / --owd-3d-* variables in the exported */
+/* :root, only when the design uses animations or 3D elements.          */
 /* ================================================================== */
 
 const INPUT = "w-full rounded border border-gray-300 bg-white px-2.5 py-2 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100";

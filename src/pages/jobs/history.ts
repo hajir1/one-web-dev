@@ -1,5 +1,5 @@
 // ─── jobs/history.ts ─────────────────────────────────────────────────────────
-// v7 (P1): bentuk data riwayat pekerjaan dari GET /jobs/history (backend Nest).
+// v7 (P1): shape of the job history data from GET /jobs/history (Nest backend).
 
 export interface HistoryItem {
   id: string;
@@ -11,7 +11,7 @@ export interface HistoryItem {
   inputBytes: number;
   resultName: string | null;
   error: string | null;
-  /** v11: units/videoSeconds = kuota paket yang terpakai (paidBy "plan"). */
+  /** v11: units/videoSeconds = plan quota used (paidBy "plan"). */
   charged: { credits: number; packUses: number; units?: number; videoSeconds?: number };
   paidBy: "personal" | "pack" | "team" | "free" | "plan";
   teamName: string | null;
@@ -26,7 +26,7 @@ export interface HistoryPage {
   nextCursor: string | null;
 }
 
-/** URL query riwayat; filter "all" tidak dikirim. */
+/** History query URL; the "all" filter is not sent. */
 export function historyQuery(o: { group?: string; status?: string; cursor?: string | null; limit?: number }): string {
   const q = new URLSearchParams();
   q.set("limit", String(o.limit ?? 20));

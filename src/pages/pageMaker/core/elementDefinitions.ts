@@ -33,9 +33,9 @@ import { THREE_D_ELEMENTS } from "./elements/three/ThreeElements";
 import { cookieConsentElement, dropdownElement, formWizardElement, imageHotspotElement, offcanvasElement, otpInputElement, popoverElement, toastElement } from "./elements/extra/NewPremium";
 
 /**
- * Semua elemen BAWAAN Page Maker (spec + panel styling + default state).
- * Elemen baru: buat file definisinya di `elements/<kelompok>/`, export
- * `xxxElement`, lalu tambahkan di daftar ini.
+ * Every BUILT-IN Page Maker element (spec + styling panel + default state).
+ * New element: create its definition file in `elements/<group>/`, export
+ * `xxxElement`, then add it to this list.
  */
 const BASE_DEFINITIONS: AnyElementDefinition[] = [
   buttonElement,
@@ -59,7 +59,7 @@ const BASE_DEFINITIONS: AnyElementDefinition[] = [
   tabsElement,
   codeElement,
   menuElement,
-  // Tambahan (gratis)
+  // Extra (free)
   bannerElement,
   videoElement,
   spinnerElement,
@@ -72,7 +72,7 @@ const BASE_DEFINITIONS: AnyElementDefinition[] = [
   radioGroupElement,
   socialLinksElement,
   timelineElement,
-  // Tambahan v3 (gratis)
+  // Extra v3 (free)
   floatingInputElement,
   searchBarElement,
   numberStepperElement,
@@ -84,7 +84,7 @@ const BASE_DEFINITIONS: AnyElementDefinition[] = [
   paginationElement,
   stepsElement,
   mapEmbedElement,
-  // Premium (butuh kredit)
+  // Premium (needs credits)
   sliderElement,
   countdownElement,
   progressElement,
@@ -109,27 +109,27 @@ const BASE_DEFINITIONS: AnyElementDefinition[] = [
   cookieConsentElement,
   imageHotspotElement,
   formWizardElement,
-  // 3D v9 (Premium, Three.js dimuat saat dipakai)
+  // 3D v9 (Premium, Three.js loads when used)
   ...THREE_D_ELEMENTS,
 ];
 
 /**
- * Elemen yang punya `bgType` otomatis mendapat field background lengkap
- * (gradient radial/tengah, gambar, overlay) di state bawaannya, supaya
- * editor background & penyimpanan desain mengenali field itu.
+ * Elements with a `bgType` automatically get the full background fields
+ * (radial/center gradient, image, overlay) in their default state, so the
+ * background editor & design storage recognize those fields.
  */
-/** v7: elemen tanpa teks (gambar, ikon, pemisah, …) — tidak mendapat pengaturan font. */
+/** v7: elements without text (images, icons, dividers, …); they get no font settings. */
 const NO_TEXT_TYPES = new Set(["icon", "image", "video", "spinner", "divider", "skeleton", "map-embed", "before-after", "back-to-top", "chart", "code", "three-product", "three-shape", "three-globe", "three-particles"]);
 
-/** v7: elemen yang generator CSS-nya sudah menulis `font-family` sendiri. */
+/** v7: elements whose CSS generator already writes its own `font-family`. */
 export const NATIVE_FONT_TYPES = new Set(
   BASE_DEFINITIONS.filter((d) => d.defaults && typeof d.defaults === "object" && "fontFamily" in d.defaults).map((d) => d.type),
 );
 
 /**
- * v7: elemen berteks yang font-nya ditulis compose secara umum (aturan
- * `font-family` di class terluar elemen + kontrol form mewarisi). Field
- * `fontFamily` ditambahkan ke default-nya supaya tersimpan di state.
+ * v7: text elements whose font is written by compose in general (a
+ * `font-family` rule on the element's outer class + form controls inherit). The
+ * `fontFamily` field is added to their defaults so it is stored in the state.
  */
 export const GENERIC_FONT_TYPES = new Set(
   BASE_DEFINITIONS.filter((d) => !NO_TEXT_TYPES.has(d.type) && !NATIVE_FONT_TYPES.has(d.type)).map((d) => d.type),

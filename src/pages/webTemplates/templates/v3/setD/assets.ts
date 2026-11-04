@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ilustrasi SVG untuk template v3 bagian D                             */
-/* (buatan sendiri, ASCII, tanpa URL eksternal; nama berawalan "v3d-").  */
-/* Bentuk dasar menerima warna sehingga satu motif punya banyak varian.   */
+/* SVG illustrations for v3 templates part D                            */
+/* (in-house, ASCII, no external URLs; names prefixed "v3d-").          */
+/* Basic shapes take colors so one motif has many variants.               */
 /* ================================================================== */
 
 const svg = (w: number, h: number, body: string) =>
@@ -21,7 +21,7 @@ const dots = (x: number, y: number, c: string, n = 5) => {
 
 /* ------------------------------ motif ------------------------------ */
 
-/** Mangkuk + sendok di atas meja (kuliner). */
+/** A bowl + spoon on a table (culinary). */
 function bowl(a: string, b: string, dish: string, food: string): string {
   return svg(
     800,
@@ -69,7 +69,7 @@ function lake(a: string, b: string, hill: string, water: string): string {
   );
 }
 
-/** Perisai dengan centang (asuransi). */
+/** Shield with a checkmark (insurance). */
 function shield(a: string, b: string, main: string, accent: string): string {
   return svg(
     800,
@@ -115,7 +115,7 @@ function camera(a: string, b: string, body: string, accent: string): string {
   );
 }
 
-/** Layar bioskop + kursi (festival). */
+/** Cinema screen + seats (festival). */
 function cinema(a: string, b: string, screen: string, seat: string): string {
   let seats = "";
   for (let r = 0; r < 3; r++) for (let i = 0; i < 9; i++) seats += `<rect x="${110 + i * 66 + (r % 2) * 20}" y="${400 + r * 56}" width="50" height="40" rx="10" fill="${seat}" opacity="${0.6 + r * 0.15}"/>`;
@@ -173,7 +173,7 @@ function face(bgc: string, skin: string, hair: string, shirt: string, long = fal
   );
 }
 
-/** Koper kerja + kartu kandidat (rekrutmen). */
+/** Briefcase + candidate card (recruitment). */
 function briefcase(a: string, b: string, main: string, card: string): string {
   return svg(
     800,
@@ -394,7 +394,7 @@ function seo(a: string, b: string, main: string, accent: string): string {
   );
 }
 
-/** Peta sederhana dengan penanda. */
+/** Simple map with a marker. */
 function map(a: string, road: string, pin: string): string {
   return svg(
     800,
@@ -406,7 +406,7 @@ function map(a: string, road: string, pin: string): string {
   );
 }
 
-/** Kaos sebelum/sesudah sablon, ruangan kosong/terisi, dll. dipakai sebagai pasangan before-after. */
+/** A T-shirt before/after printing, an empty/furnished room, etc., used as before-after pairs. */
 function roomPlain(a: string, floor: string): string {
   return svg(800, 450, `<rect width="800" height="450" fill="${a}"/><rect y="320" width="800" height="130" fill="${floor}"/><rect x="520" y="90" width="160" height="150" fill="#ffffff" opacity="0.5"/>`);
 }
@@ -421,7 +421,7 @@ function roomFull(a: string, floor: string, sofa: string, art: string): string {
   );
 }
 
-/* ------------------------------ daftar ----------------------------- */
+/* ------------------------------ lists ----------------------------- */
 
 export const V3D_SOURCES: Record<string, () => string> = {
   "v3d-food-hero": () => bowl("#ffedd5", "#fed7aa", "#c2410c", "#fbbf24"),

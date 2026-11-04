@@ -12,17 +12,17 @@ import { OWD3D_MODULE, OWD3D_RUNTIME } from "./runtime";
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* 5 elemen 3D bawaan (v9, semuanya Premium)                            */
+/* 5 built-in 3D elements (v9, all Premium)                             */
 /*                                                                    */
-/*   three-product    Produk berputar (botol/kaleng/jar/gelas atau .glb)*/
+/*   three-product    Spinning product (bottle/can/jar/glass or .glb)*/
 /*   three-shape      Bentuk geometris interaktif (ikut kursor)          */
-/*   three-globe      Globe titik + penanda lokasi + garis lengkung       */
-/*   three-particles  Latar partikel 3D (gelombang/galaksi/bola)          */
-/*   card-3d          Kartu 3D tilt (CSS saja, tanpa WebGL)               */
+/*   three-globe      Dot globe + location markers + arcs                 */
+/*   three-particles  3D particle background (wave/galaxy/sphere)         */
+/*   card-3d          3D tilt card (CSS only, no WebGL)                   */
 /*                                                                    */
-/* Semua memakai runtime yang sama (./runtime.ts). Markup selalu berisi  */
-/* gambar statis (fallback) yang disembunyikan setelah WebGL siap, jadi   */
-/* perangkat tanpa WebGL / tanpa JavaScript tetap melihat sesuatu.        */
+/* All use the same runtime (./runtime.ts). The markup always contains  */
+/* a static image (fallback) that is hidden once WebGL is ready, so      */
+/* devices without WebGL / without JavaScript still see something.      */
 /* ================================================================== */
 
 type Tri = "global" | "on" | "off";
@@ -57,9 +57,9 @@ const COMMON: Common3D = {
 
 const tr = (k: string) => i18n.t(`el.x.three.${k}`);
 const col = (c: string, d: string) => safeColor(c) ?? d;
-/** Warna untuk kode (var(--x) tetap referensi; runtime membacanya dari CSS). */
+/** Color for code (var(--x) stays a reference; the runtime reads it from CSS). */
 const colRef = (c: string, d: string) => (isVarRef(c) ? c.trim() : col(c, d));
-/** Warna untuk gambar statis (SVG di <img> tidak bisa membaca variabel CSS). */
+/** Color for the static image (SVG in <img> cannot read CSS variables). */
 const colHex = (c: string, d: string) => (isVarRef(c) ? d : col(c, d));
 const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, Number.isFinite(n) ? n : a));
 const svgUri = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.replace(/\s+/g, " ").trim())}`;
@@ -76,12 +76,12 @@ function commonCfg(s: Common3D) {
 }
 
 /**
- * Runtime untuk script.js (HTML). Penanda owd-shared membuat compose()
- * menulisnya sekali saja walau ada beberapa elemen 3D di halaman.
+ * Runtime for script.js (HTML). The owd-shared marker makes compose()
+ * write it only once even when the page has several 3D elements.
  */
 const sharedRuntime = () => `/* owd-shared:owd3d */\n${OWD3D_RUNTIME}\n/* /owd-shared:owd3d */`;
 
-/** Berkas runtime untuk proyek framework (dipakai bersama semua elemen 3D di halaman). */
+/** Runtime file for framework projects (shared by every 3D element on the page). */
 export function threeRuntimeFiles(fw: Framework): GeneratedFile[] {
   if (fw === "html" || fw === "blade") return [];
   if (fw === "angular") return [{ name: "owd-3d.ts", lang: "ts", content: `// @ts-nocheck — runtime elemen 3D (JavaScript biasa).\n${OWD3D_MODULE}` }];
@@ -176,7 +176,7 @@ useEffect(() => mount3d(hostRef.current, ${k}, CONFIG), []);`,
       script: `import { ref, onMounted, onBeforeUnmount } from "vue";
 import { mount3d } from "./owd3d.js";
 
-// Three.js dimuat dari CDN saat elemen terlihat (lihat LIBRARIES.md).
+// Three.js is loaded from a CDN when the element becomes visible (see LIBRARIES.md).
 const CONFIG = ${json};
 const hostEl = ref(null);
 let destroy3d = null;
@@ -191,7 +191,7 @@ onBeforeUnmount(() => destroy3d && destroy3d());`,
       script: `import { onMount } from "svelte";
 import { mount3d } from "./owd3d.js";
 
-// Three.js dimuat dari CDN saat elemen terlihat (lihat LIBRARIES.md).
+// Three.js is loaded from a CDN when the element becomes visible (see LIBRARIES.md).
 const CONFIG = ${json};
 let host;
 
@@ -220,7 +220,7 @@ ngOnDestroy(): void {
 }
 
 /* ------------------------------------------------------------------ */
-/* Panel bersama: ukuran, perilaku 3D, gambar statis                    */
+/* Shared panel: size, 3D behavior, static image                        */
 /* ------------------------------------------------------------------ */
 
 function commonSections<S extends Common3D>(s: S, update: (k: keyof S, v: never) => void): PanelSection[] {
@@ -275,7 +275,7 @@ function commonSections<S extends Common3D>(s: S, update: (k: keyof S, v: never)
 }
 
 /* ------------------------------------------------------------------ */
-/* Gambar statis bawaan (SVG buatan sendiri, bebas lisensi)              */
+/* Built-in static images (in-house SVG, license free)                  */
 /* ------------------------------------------------------------------ */
 
 function productPoster(body: string, accent: string, model: string): string {
@@ -326,7 +326,7 @@ function particlesPoster(a: string, b: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* 1. Produk berputar                                                   */
+/* 1. Spinning product                                                  */
 /* ------------------------------------------------------------------ */
 
 interface ProductState extends Common3D {
@@ -339,7 +339,7 @@ interface ProductState extends Common3D {
 
 const PRODUCT_DEFAULTS: ProductState = { ...COMMON, model: "bottle", finish: "glossy", color: "#2563eb", accent: "#f8fafc", glbUrl: "", alt: "Produk 3D berputar" };
 
-/** URL .glb/.gltf: https:// atau path dari root situs (data: dan skema lain ditolak). */
+/** .glb/.gltf URL: https:// or a path from the site root (data: and other schemes are rejected). */
 export const safeModelUrl = (u: string) => {
   const v = String(u ?? "").trim();
   return /^https:\/\/[^\s"'<>]+\.(glb|gltf)(\?[^\s"'<>]*)?$/i.test(v) || /^\/[^/\s"'<>][^\s"'<>]*\.(glb|gltf)(\?[^\s"'<>]*)?$/i.test(v) ? v : "";
@@ -454,7 +454,7 @@ interface GlobeState extends Common3D {
   ocean: string;
   glow: string;
   marker: string;
-  /** Satu baris per penanda: "Nama, lintang, bujur". */
+  /** One line per marker: "Name, latitude, longitude". */
   markers: string[];
   arcs: boolean;
   startLon: number;
@@ -543,7 +543,7 @@ export const globe3dElement = defineElement<GlobeState>({
 });
 
 /* ------------------------------------------------------------------ */
-/* 4. Latar partikel 3D                                                 */
+/* 4. 3D particle background                                            */
 /* ------------------------------------------------------------------ */
 
 interface ParticleState extends Common3D {
@@ -602,7 +602,7 @@ export const particles3dElement = defineElement<ParticleState>({
 });
 
 /* ------------------------------------------------------------------ */
-/* 5. Kartu 3D tilt (CSS + JS kecil, tanpa WebGL)                       */
+/* 5. 3D tilt card (CSS + a little JS, no WebGL)                        */
 /* ------------------------------------------------------------------ */
 
 interface CardState {

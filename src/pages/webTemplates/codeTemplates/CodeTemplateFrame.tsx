@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Loader2 } from "lucide-react";
 import { loadCodeTemplate } from "./catalog";
 
-/** v21: pratinjau Template Kode di mode fullstack (HTML dari bundel frontend, iframe sandbox). */
+/** v21: Code Template preview in fullstack mode (HTML from the frontend bundle, sandboxed iframe). */
 export default function CodeTemplateFrame({ templateId, title, className, style, testId }: { templateId: string; title: string; className?: string; style?: CSSProperties; testId?: string }) {
   const [html, setHtml] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);

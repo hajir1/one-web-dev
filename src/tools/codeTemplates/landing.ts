@@ -3,16 +3,16 @@ import { fontLink } from "./web3d";
 import { ICON_CSS, icon } from "./umkmIcons";
 
 /* ================================================================== */
-/* LANDING PAGE UMKM (v23): satu berkas, tanpa library.                  */
+/* SMALL BUSINESS LANDING PAGE (v23): one file, no library.             */
 /*                                                                    */
-/* Satu halaman jualan lengkap untuk usaha kecil: hero, keunggulan,     */
-/* produk + harga dengan keranjang yang dikirim ke WhatsApp, cara       */
-/* pesan, testimoni, promo, FAQ, lokasi & jam buka (status "buka        */
-/* sekarang" dihitung dari CONFIG), dan tombol WhatsApp mengambang.      */
+/* A complete sales page for a small business: hero, strengths,         */
+/* products + prices with a cart sent to WhatsApp, how to               */
+/* order, testimonials, promos, FAQ, location & opening hours ("open    */
+/* now" computed from CONFIG), and a floating WhatsApp button.          */
 /*                                                                    */
-/* Sepuluh skin dengan tata letak berbeda (bukan sekadar ganti warna):  */
+/* Ten skins with different layouts (not just a color change):          */
 /* pasar, papan, nota, majalah, bento, kontras, pastel, malam, alam,    */
-/* kios. Ilustrasi = ikon SVG (umkmIcons.ts), tanpa gambar eksternal.    */
+/* kiosk. Illustrations = SVG icons (umkmIcons.ts), no external images. */
 /* ================================================================== */
 
 export type Skin = "pasar" | "papan" | "nota" | "majalah" | "bento" | "kontras" | "pastel" | "malam" | "alam" | "kios";
@@ -20,36 +20,36 @@ export type Skin = "pasar" | "papan" | "nota" | "majalah" | "bento" | "kontras" 
 export interface LandingSpec {
   id: string;
   skin: Skin;
-  /** [display, teks] Google Fonts. */
+  /** [display, text] Google Fonts. */
   font: [string, string];
-  /** [latar, permukaan, teks, teks lembut, aksen, aksen kedua] */
+  /** [background, surface, text, soft text, accent, second accent] */
   colors: [string, string, string, string, string, string];
   icon: string;
   name: string;
-  /** Label kecil di hero, mis. "Warung bakso sejak 2009". */
+  /** Small label in the hero, e.g. "Warung bakso sejak 2009". */
   type: string;
   tagline: string;
   intro: string;
   city: string;
   address: string;
-  /** Baris jam buka yang tampil: [hari, jam]. */
+  /** Opening hours rows shown: [day, hours]. */
   hours: [string, string][];
-  /** Jam buka untuk status "buka sekarang": [hari (0 = Minggu), buka, tutup]. */
+  /** Opening hours for the "open now" status: [day (0 = Sunday), open, close]. */
   open: [number[], string, string][];
   wa: string;
   ig: string;
   usp: [string, string, string][];
   menuTitle: string;
-  /** [nama, deskripsi, harga, satuan, ikon, label?] */
+  /** [name, description, price, unit, icon, label?] */
   products: [string, string, number, string, string, string?][];
   steps: [string, string][];
   testi: [string, string, string][];
   faq: [string, string][];
   promo: [string, string];
   stats: [string, string][];
-  /** false = usaha jasa: tanpa keranjang, tiap layanan punya tombol tanya lewat WhatsApp. */
+  /** false = a service business: no cart, each service has an ask-via-WhatsApp button. */
   cart?: false;
-  /** Kategori katalog (TemplateCategory). */
+  /** Catalog category (TemplateCategory). */
   category?: string;
 }
 
@@ -70,7 +70,7 @@ const LAYOUT: Record<Skin, { hero: Hero; list: List; ticker: boolean; label: str
 export const skinLabel = (s: Skin) => LAYOUT[s].label;
 
 export const rupiah = (v: number) => "Rp" + v.toLocaleString("id-ID").replace(/,/g, ".");
-/** Font Google yang hanya punya satu ketebalan (meminta 500–700 membuat CSS Google gagal). */
+/** Google Fonts with only one weight (requesting 500–700 makes the Google CSS fail). */
 const SINGLE_WEIGHT: Record<string, string> = { Anton: "", Shrikhand: "", "Young Serif": "", "Instrument Serif": ":ital@0;1", "Abril Fatface": "", "Bebas Neue": "", Righteous: "", Gloock: "", Italiana: "", "Gilda Display": "", "Archivo Black": "" };
 export const fontHref = (f: [string, string]) =>
   `https://fonts.googleapis.com/css2?${[...new Set(f)].map((x) => `family=${x.replace(/ /g, "+")}${x in SINGLE_WEIGHT ? SINGLE_WEIGHT[x] : x === "Courier Prime" || x === "Space Mono" ? ":ital,wght@0,400;0,700;1,400" : ":wght@400;500;600;700"}`).join("&")}&display=swap`;
@@ -154,7 +154,7 @@ ul.usp, ul.grid, ol.steps, ul.testi, .faq { margin: 0; padding: 0; }
 .stats div b { display: block; font: 700 clamp(28px, 3.4vw, 42px)/1 var(--font-display); color: var(--accent); }
 .stats div span { font-size: 14px; color: var(--soft); }
 
-/* produk */
+/* products */
 .filter { display: flex; flex-wrap: wrap; gap: 8px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
 .item { position: relative; display: flex; flex-direction: column; list-style: none; padding: 20px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
@@ -240,7 +240,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 .fab svg { width: 30px; height: 30px; fill: currentColor; }
 body.has-cart .fab { opacity: 0; pointer-events: none; }
 
-/* muncul saat digulir */
+/* appears on scroll */
 .js [data-rv] { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
 .js [data-rv].in { opacity: 1; transform: none; }
 
@@ -260,7 +260,7 @@ body.has-cart .fab { opacity: 0; pointer-events: none; }
 }
 `;
 
-/* Hero & daftar per tata letak. */
+/* Hero & lists per layout. */
 const LAYOUT_CSS: Record<Hero | List, string> = {
   split: `
 .hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: clamp(24px, 5vw, 70px); }
@@ -569,7 +569,7 @@ ${productHtml(s, L)}
 ${s.cart === false ? "" : `<div class="cart" role="region" aria-label="Keranjang" aria-live="polite"><button class="clear" type="button" aria-label="Kosongkan keranjang">&times;</button><div><b data-total>Rp0</b><span data-count>0 item</span></div><a class="btn" href="${esc(waHref(s))}" target="_blank" rel="noopener" data-order>${WA_SVG}Pesan via WA</a></div>`}
 <a class="fab" href="${esc(waHref(s))}" target="_blank" rel="noopener" data-wa aria-label="Chat WhatsApp">${WA_SVG.replace('class="wa-ico" ', "")}</a>
 <script>
-/* ==== DATA USAHA: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== BUSINESS DATA: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = ${dataBlock("CONFIG", "Pengaturan usaha (WhatsApp, jam buka, pesan)", config)};
 /* ================================================================ */
 ${SCRIPT}
@@ -590,15 +590,15 @@ const SCRIPT = String.raw`(function () {
   var nama = (document.querySelector(".logo span") || {}).textContent || "";
   var wa = String(CONFIG.whatsapp || "").replace(/\D/g, "");
   function waLink(text) { return "https://wa.me/" + wa + "?text=" + encodeURIComponent(text); }
-  /* Semua tautan WhatsApp mengikuti CONFIG.whatsapp. */
+  /* All WhatsApp links follow CONFIG.whatsapp. */
   document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = waLink(a.getAttribute("data-wa-text") || ("Halo " + nama.trim() + ", saya mau tanya.")); });
   var y = document.querySelector("[data-year]"); if (y) y.textContent = new Date().getFullYear();
 
-  /* Menu ponsel. */
+  /* Mobile menu. */
   var nav = document.querySelector(".nav"), mb = document.querySelector(".menu-btn");
   if (mb) { mb.addEventListener("click", function () { var o = nav.classList.toggle("open"); mb.setAttribute("aria-expanded", o); }); nav.querySelectorAll("ul a").forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); mb.setAttribute("aria-expanded", "false"); }); }); }
 
-  /* Status buka sekarang (waktu usaha = UTC + zonaWaktu). */
+  /* Open-now status (business time = UTC + zonaWaktu). */
   function mins(s) { var p = String(s).split(/[.:]/); return (+p[0] || 0) * 60 + (+p[1] || 0); }
   function status() {
     var now = new Date(Date.now() + (Number(CONFIG.zonaWaktu) || 7) * 3600e3), d = now.getUTCDay(), m = now.getUTCHours() * 60 + now.getUTCMinutes();
@@ -607,7 +607,7 @@ const SCRIPT = String.raw`(function () {
   }
   status(); setInterval(status, 60000);
 
-  /* Keranjang: harga dibaca dari teks harga (ikut berubah bila teksnya diedit). */
+  /* Cart: prices are read from the price text (updates when the text is edited). */
   var items = Array.prototype.slice.call(document.querySelectorAll(".item")), cart = document.querySelector(".cart");
   var price = function (el) { return parseInt((el.querySelector("[data-price]").textContent || "").replace(/\D/g, ""), 10) || 0; };
   var rp = function (v) { return "Rp" + v.toLocaleString("id-ID").replace(/,/g, "."); };
@@ -636,12 +636,12 @@ const SCRIPT = String.raw`(function () {
   if (CONFIG.keranjang === false) document.querySelectorAll(".qty").forEach(function (q) { q.style.display = "none"; });
   render();
 
-  /* Muncul saat digulir. */
+  /* Appears on scroll. */
   var rv = document.querySelectorAll("[data-rv]");
   if (window.OWD_THUMB || reduce || !("IntersectionObserver" in window)) rv.forEach(function (el) { el.classList.add("in"); });
   else { var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" }); rv.forEach(function (el) { io.observe(el); }); }
 
-  /* Ilustrasi hero mengikuti kursor sedikit. */
+  /* The hero illustration follows the cursor slightly. */
   var big = document.querySelector(".art .big");
   if (big && !reduce && matchMedia("(pointer: fine)").matches) addEventListener("pointermove", function (e) { var x = e.clientX / innerWidth - .5, yy = e.clientY / innerHeight - .5; big.style.transform = "translate(" + (x * 18).toFixed(1) + "px," + (yy * 14).toFixed(1) + "px) rotate(" + (x * 6).toFixed(1) + "deg)"; }, { passive: true });
 })();`;

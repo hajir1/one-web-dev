@@ -1,8 +1,8 @@
 import i18n from "../../../i18n";
 
 /* ================================================================== */
-/* Error terstruktur untuk alat Data. Logika murni melempar kode;        */
-/* UI menerjemahkannya lewat data.errors.<code> (ID/EN).                 */
+/* Structured errors for the Data tools. Pure logic throws codes;        */
+/* the UI translates them via data.errors.<code> (ID/EN).                */
 /* ================================================================== */
 
 export class DataError extends Error {
@@ -15,7 +15,7 @@ export class DataError extends Error {
   }
 }
 
-/** Pesan error yang sudah diterjemahkan (DataError → data.errors.<code>). */
+/** Translated error message (DataError → data.errors.<code>). */
 export function dataErrorMessage(e: unknown): string {
   if (e instanceof DataError) return i18n.t(`data.errors.${e.code}`, { ...e.params, defaultValue: e.code });
   if (e instanceof Error && e.message) return e.message;

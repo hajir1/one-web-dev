@@ -90,7 +90,7 @@ export default function MetadataRemover() {
           label: "Lossless",
         };
       }
-      // GIF/BMP/AVIF: encode ulang ke PNG lewat Canvas.
+      // GIF/BMP/AVIF: re-encode to PNG via Canvas.
       const img = await decodeImage(item.file, ctx.signal);
       const c = createCanvas(img.width, img.height);
       try {
@@ -104,7 +104,7 @@ export default function MetadataRemover() {
   });
   const intake = useFileIntake(RULES, queue.add);
 
-  // Periksa metadata setiap file baru (sekali per file).
+  // Inspect the metadata of each new file (once per file).
   useEffect(() => {
     const missing = queue.items.filter((it) => !(it.id in reports));
     if (!missing.length) return;

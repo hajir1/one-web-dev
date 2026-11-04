@@ -2,43 +2,43 @@ import { dataBlock, doc, esc, oh, ot, type ThemeVar } from "./shared";
 
 /* ================================================================== */
 /* Kategori WEBSITE FULL 3D (scroll-driven).                            */
-/* Library: three + lenis (versi dipatok), dimuat lewat LIB_LOADER.    */
+/* Libraries: three + lenis (pinned versions), loaded via LIB_LOADER.  */
 /*                                                                    */
-/* - Satu canvas WebGL fixed di latar, satu konteks per halaman.        */
-/* - Kamera bergerak di jalur (CatmullRom) mengikuti progres scroll;   */
-/*   tiap section punya adegan 3D sendiri, semuanya prosedural.          */
-/* - Konten = HTML biasa di atas canvas (terbaca mesin pencari &        */
-/*   pembaca layar).                                                    */
-/* - Konten tampil langsung di atas latar gradasi; adegan 3D muncul    */
-/*   perlahan setelah siap (v19: loader tidak lagi menutupi halaman).   */
+/* - One fixed WebGL canvas in the background, one context per page.   */
+/* - The camera moves along a path (CatmullRom) following scroll progress; */
+/*   each section has its own 3D scene, all procedural.                 */
+/* - Content = regular HTML above the canvas (readable by search engines & */
+/*   screen readers).                                                   */
+/* - Content shows right away over a gradient background; the 3D scene appears */
+/*   gradually once ready (v19: the loader no longer covers the page).  */
 /* - Deteksi WebGL, fallback gradasi CSS.                               */
-/* - Anggaran: pixel ratio maks 2 (turun otomatis bila lambat), maks    */
-/*   50.000 segitiga, render berhenti saat canvas tidak terlihat,       */
-/*   dispose lengkap saat halaman ditinggalkan.                         */
+/* - Budget: pixel ratio max 2 (drops automatically when slow), max     */
+/*   50,000 triangles, rendering stops when the canvas is not visible,  */
+/*   full dispose when leaving the page.                                */
 /* ================================================================== */
 
-/** CDN utama + cadangan (berkas & versi sama). */
+/** Primary + fallback CDN (same files & versions). */
 export const CDNS = ["https://cdn.jsdelivr.net/npm/", "https://unpkg.com/"];
 export const THREE_PATH = "three@0.169.0/build/three.module.min.js";
 export const LENIS_PATH = "lenis@1.1.13/dist/lenis.mjs";
 export const THREE_URL = CDNS[0] + THREE_PATH;
 export const LENIS_URL = CDNS[0] + LENIS_PATH;
-/** CSS bawaan lenis 1.1.13 disisipkan langsung: stylesheet dari CDN menahan tampilan pertama (dan menggantung bila CDN terblokir). */
+/** The default lenis 1.1.13 CSS is inlined: a CDN stylesheet holds up the first paint (and hangs when the CDN is blocked). */
 export const LENIS_STYLE = `<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>`;
 
-/** Font Google tanpa menahan tampilan: teks muncul dengan font sistem dulu, lalu berganti. */
+/** Google Fonts without blocking rendering: text shows in the system font first, then switches. */
 export const fontLink = (href: string) => `<link rel="stylesheet" href="${href}" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="${href}"></noscript>`;
 
-/** Petunjuk di <head>: unduhan library dimulai sejak awal, bukan setelah seluruh HTML terbaca. */
+/** Hint in <head>: library downloads start early, not after the whole HTML is read. */
 export const PRELOAD = `<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="modulepreload" href="${THREE_URL}">
 <link rel="modulepreload" href="${LENIS_URL}">`;
 
 /**
- * Pemuat library (awal skrip modul). Bila CDN utama gagal atau belum
- * selesai dalam 4 detik, CDN cadangan ikut dicoba; yang lebih dulu
- * selesai dipakai. esm() = modul ES, umd() = skrip klasik (sekali jalan).
+ * Library loader (start of the module script). When the primary CDN fails or has not
+ * finished within 4 seconds, the fallback CDN is tried too; whichever
+ * finishes first is used. esm() = an ES module, umd() = a classic script (runs once).
  */
 export const LIB_LOADER = String.raw`/* ---- Pemuat library: CDN utama + cadangan ---- */
 const CDN = ${JSON.stringify(CDNS)};
@@ -48,7 +48,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -59,11 +59,11 @@ const esm = (path) => race(path, (u) => import(u));
 const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };`;
 
-/** Awal skrip modul: THREE & Lenis dari pemuat di atas. */
+/** Start of the module script: THREE & Lenis from the loader above. */
 export const LIB_IMPORTS = `${LIB_LOADER}
 const [THREE, { default: Lenis }] = await Promise.all([esm(${JSON.stringify(THREE_PATH)}), esm(${JSON.stringify(LENIS_PATH)})]).catch(libFail);`;
 
-/** Skrip klasik kecil di <head>: kelas js/loading + batas waktu fallback bila library tidak kunjung termuat. */
+/** A small classic script in <head>: js/loading classes + a fallback time limit when the libraries never load. */
 export const BOOT = `<script>
 document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
@@ -71,7 +71,7 @@ setTimeout(function () { var r = document.documentElement; if (!r.classList.cont
 
 interface Section {
   id: string;
-  /** Posisi teks: kiri, kanan, tengah. */
+  /** Text position: left, right, center. */
   align: "left" | "right" | "center";
   kicker?: string;
   title: string;
@@ -79,10 +79,10 @@ interface Section {
   body: string[];
   list?: string[];
   cta?: { label: string; href: string; ghost?: boolean }[];
-  /** Kamera & titik pandang untuk section ini (koordinat dunia). */
+  /** Camera & look-at point for this section (world coordinates). */
   cam: [number, number, number];
   look: [number, number, number];
-  /** Posisi pusat adegan 3D section ini. */
+  /** Center position of this section's 3D scene. */
   at: [number, number, number];
 }
 
@@ -97,13 +97,13 @@ export interface Web3DSpec {
   fog: number;
   sections: Section[];
   contact: { title: string; text: string; email: string; cta: string; address: string };
-  /** Pembangun adegan (kode JS): array fungsi (ctx, group) => { update?(t, dt) }. */
+  /** Scene builders (JS code): array of functions (ctx, group) => { update?(t, dt) }. */
   scenes: string;
 }
 
 /* ------------------------------- CSS ------------------------------- */
 
-/** Variabel tema (form Warna & gaya). Warna latar & aksen juga dipakai adegan 3D. */
+/** Theme variables (the Colors & style form). The background & accent colors are also used by the 3D scene. */
 export function web3dVars(s: Web3DSpec): ThemeVar[] {
   const c = s.colors;
   return [
@@ -132,7 +132,7 @@ a { color: inherit; }
 html.webgl #gl { opacity: 1; }
 html.no-webgl #gl { display: none; }
 
-/* Loading: penanda kecil di bawah, konten tetap terbaca selama adegan 3D dimuat. */
+/* Loading: a small indicator at the bottom; content stays readable while the 3D scene loads. */
 .loader { position: fixed; left: 50%; bottom: 20px; z-index: 30; display: none; transform: translateX(-50%); padding: 10px 16px 12px; border-radius: 999px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--ink); pointer-events: none; }
 html.loading .loader { display: block; }
 .loader p { margin: 8px 0 0; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
@@ -173,7 +173,7 @@ h2 { font-size: clamp(30px, 4.4vw, 52px); }
 .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent); }
 .btn:focus-visible, .brand:focus-visible, .nav a:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
 
-/* Kontak (penutup, menutupi canvas: render berhenti di sini) */
+/* Contact (closing, covers the canvas: rendering stops here) */
 .contact { position: relative; z-index: 1; padding: clamp(80px, 12vw, 140px) clamp(16px, 6vw, 96px) 48px; background: var(--bg); border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
 .contact h2 { max-width: 16ch; }
 .contact p { max-width: 52ch; color: var(--ink-soft); }
@@ -207,7 +207,7 @@ function hasWebGL() {
   try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; }
 }
 
-/* RNG deterministik supaya adegan sama di setiap kunjungan. */
+/* Deterministic RNG so the scene is the same on every visit. */
 function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 function triangles(obj) {
@@ -221,7 +221,7 @@ function triangles(obj) {
   return Math.round(n);
 }
 
-/* Warna latar & aksen diambil dari variabel CSS (satu tempat untuk diubah). */
+/* Background & accent colors come from CSS variables (one place to change them). */
 const cssv = getComputedStyle(root);
 const cv = (name, fallback) => cssv.getPropertyValue(name).trim() || fallback;
 const WARNA = Object.assign({}, CONFIG.warna, { latar: cv("--bg", "#000000"), aksen: cv("--accent", "#ffffff"), aksen2: cv("--accent-2", "#ffffff") });
@@ -260,13 +260,13 @@ function start() {
   window.__OWD_STATS = { triangles: tris, budget: CONFIG.maksSegitiga, contexts: 1 };
   if (tris > CONFIG.maksSegitiga) console.warn("[owd] Melebihi anggaran segitiga:", tris);
 
-  /* Jalur kamera: satu titik per section, dihaluskan dengan CatmullRom. */
+  /* Camera path: one point per section, smoothed with CatmullRom. */
   const v = (a) => new THREE.Vector3(a[0], a[1], a[2]);
   const camPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.kamera)), false, "centripetal");
   const lookPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.lihat)), false, "centripetal");
   const N = CONFIG.adegan.length;
 
-  /* Progres scroll: kamera "berhenti" sejenak di tiap adegan (dwell), lalu pindah. */
+  /* Scroll progress: the camera "pauses" briefly at each scene (dwell), then moves on. */
   let stops = [];
   function measure() {
     const y0 = window.scrollY;
@@ -286,13 +286,13 @@ function start() {
     return 1;
   }
 
-  /* Pointer: kamera bergeser sedikit (desktop). */
+  /* Pointer: the camera shifts slightly (desktop). */
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   const finePointer = matchMedia("(pointer: fine)").matches;
   if (finePointer && !reduce) addEventListener("pointermove", (e) => { pointer.tx = (e.clientX / innerWidth - 0.5) * 2; pointer.ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
 
-  /* Komposisi: objek digeser ke sisi yang berlawanan dengan teks (setViewOffset).
-     Di layar tegak teks ada di bawah, jadi objek digeser ke atas. */
+  /* Composition: the object shifts to the side opposite the text (setViewOffset).
+     On portrait screens the text is at the bottom, so the object shifts up. */
   function frameView(uu) {
     const w = innerWidth, h = innerHeight;
     const k = uu * (N - 1), i = Math.min(N - 2, Math.floor(k)), f = k - i;
@@ -313,7 +313,7 @@ function start() {
   addEventListener("resize", resize);
   resize();
 
-  /* Lenis: gulir halus (dimatikan bila pengguna memilih kurangi gerak). */
+  /* Lenis: smooth scrolling (off when the user prefers reduced motion). */
   let lenis = null;
   if (!reduce) lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
   document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
@@ -324,7 +324,7 @@ function start() {
     t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true });
   }));
 
-  /* Render hanya saat ada section 3D yang terlihat dan tab aktif. */
+  /* Render only while a 3D section is visible and the tab is active. */
   let visible = true;
   const seen = new Set();
   const io = new IntersectionObserver((entries) => {
@@ -360,7 +360,7 @@ function start() {
     }
     renderer.render(scene, camera);
     if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
-    /* Turunkan pixel ratio bila rata-rata frame > 22 ms (target 60 fps). */
+    /* Lower the pixel ratio when the average frame is > 22 ms (target 60 fps). */
     frames++;
     if (dt > 0.022) slow++;
     if (frames === 90) {
@@ -379,7 +379,7 @@ function start() {
   }
   raf = requestAnimationFrame(frame);
 
-  /* Bersihkan semuanya saat halaman ditinggalkan. */
+  /* Clean everything up when the page is left. */
   function dispose() {
     cancelAnimationFrame(raf);
     io.disconnect();
@@ -445,11 +445,11 @@ ${s.sections.map(sectionHtml).join("\n")}
 <script type="module">
 ${LIB_IMPORTS}
 
-/* ==== KONFIGURASI: warna 3D, anggaran, dan jalur kamera per section ==== */
+/* ==== CONFIGURATION: 3D colors, budget, and camera path per section ==== */
 const CONFIG = ${dataBlock("CONFIG", "Pengaturan 3D", config, ["maksPixelRatio", "maksSegitiga", "jarakAktif", "benih", "adegan"])};
 /* ==================================================================== */
 
-/* Adegan per section (urutan = urutan section). Semua bentuk prosedural. */
+/* Scenes per section (order = section order). All shapes are procedural. */
 ${s.scenes.trim()}
 ${ENGINE.trim()}
 </script>`;
@@ -473,7 +473,7 @@ ${BOOT}`,
 
 const SCENES_NEBULA = String.raw`
 const GLOBAL = (ctx) => {
-  /* Bintang di seluruh jalur (Points, bukan segitiga). */
+  /* Stars along the whole path (Points, not triangles). */
   const { THREE, rand } = ctx;
   const n = 1800, pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { pos[i * 3] = (rand() - 0.5) * 220; pos[i * 3 + 1] = (rand() - 0.5) * 140; pos[i * 3 + 2] = 30 - rand() * 240; }
@@ -503,7 +503,7 @@ const SCENES = [
     place(0);
     return { update: place };
   },
-  /* 2. Giroskop tiga cincin */
+  /* 2. Three-ring gyroscope */
   (ctx, g) => {
     const { THREE, warna } = ctx;
     const mat = new THREE.MeshStandardMaterial({ color: 0xe8e6ff, metalness: 0.85, roughness: 0.25 });
@@ -599,7 +599,7 @@ const SCENES = [
     g.add(mesh, roof);
     return { update: (t) => { roof.position.y = 5.4 + Math.sin(t * 0.5) * 0.08; } };
   },
-  /* 4. Kubah dengan oculus */
+  /* 4. Dome with an oculus */
   (ctx, g) => {
     const { THREE } = ctx;
     const dome = new THREE.Mesh(new THREE.SphereGeometry(7, 48, 20, 0, Math.PI * 2, 0.18, Math.PI / 2 - 0.18), new THREE.MeshStandardMaterial({ color: STONE, roughness: 0.85, side: THREE.DoubleSide }));
@@ -617,14 +617,14 @@ const SCENES = [
 const SCENES_SAMUDRA = String.raw`
 const GLOBAL = (ctx) => {
   const { THREE, rand } = ctx;
-  /* Partikel plankton di seluruh jalur. */
+  /* Plankton particles along the whole path. */
   const n = 1400, pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { pos[i * 3] = (rand() - 0.5) * 160; pos[i * 3 + 1] = (rand() - 0.5) * 60; pos[i * 3 + 2] = 20 - rand() * 220; }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   ctx.scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x9ff5ec, size: 1.8, sizeAttenuation: false, transparent: true, opacity: 0.6 })));
 };
 const SCENES = [
-  /* 0. Permukaan laut dilihat dari bawah + berkas cahaya */
+  /* 0. The sea surface seen from below + light shafts */
   (ctx, g) => {
     const { THREE } = ctx;
     const geo = new THREE.PlaneGeometry(90, 90, 80, 80);
@@ -699,7 +699,7 @@ const SCENES = [
     place(0);
     return { update: place };
   },
-  /* 4. Cincin cahaya di laut dalam */
+  /* 4. Light rings in the deep sea */
   (ctx, g) => {
     const { THREE } = ctx;
     const ring = new THREE.Mesh(new THREE.TorusGeometry(5, 0.12, 10, 96), new THREE.MeshBasicMaterial({ color: 0x5ff2df }));
@@ -714,7 +714,7 @@ const SCENES = [
 
 const SCENES_KOPI = String.raw`
 const GLOBAL = (ctx) => {
-  /* Debu hangat di sepanjang jalur (Points). */
+  /* Warm dust along the path (Points). */
   const { THREE, rand } = ctx;
   const n = 900, pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { pos[i * 3] = (rand() - 0.5) * 140; pos[i * 3 + 1] = (rand() - 0.5) * 50; pos[i * 3 + 2] = 20 - rand() * 210; }
@@ -724,7 +724,7 @@ const GLOBAL = (ctx) => {
 const BEAN = 0x5a3320, CREAM = 0xf4ece2;
 const beanGeo = (THREE) => { const g = new THREE.SphereGeometry(1, 14, 10); g.scale(0.62, 0.42, 0.9); return g; };
 const SCENES = [
-  /* 0. Cangkir, biji kopi mengorbit, dan uap */
+  /* 0. Cup, orbiting coffee beans, and steam */
   (ctx, g) => {
     const { THREE, rand, warna } = ctx;
     const prof = [[0, 0], [1.9, 0], [2.1, 0.25], [2.3, 2.6], [2.45, 3.2], [2.25, 3.25], [2.05, 0.5], [0, 0.45]].map((p) => new THREE.Vector2(p[0], p[1]));
@@ -754,7 +754,7 @@ const SCENES = [
     place(0, 0);
     return { update: place };
   },
-  /* 1. Kebun kopi bertingkat di dataran tinggi */
+  /* 1. Terraced coffee farm in the highlands */
   (ctx, g) => {
     const { THREE, rand } = ctx;
     const greens = [0x2f5d3a, 0x3c7046, 0x4c8452, 0x5d975e, 0x6fa86a];
@@ -816,7 +816,7 @@ const SCENES = [
     place(0);
     return { update: place };
   },
-  /* 4. Pulau asal biji kopi dengan penanda */
+  /* 4. The coffee beans' home island with a marker */
   (ctx, g) => {
     const { THREE, warna } = ctx;
     const geo = new THREE.IcosahedronGeometry(7, 3); geo.scale(1.3, 0.22, 0.8);
@@ -844,7 +844,7 @@ const GLOBAL = (ctx) => {
 };
 const PANEL = 0x1d3a66, WHITE = 0xf7fbfa;
 const SCENES = [
-  /* 0. Matahari dengan sinar berputar */
+  /* 0. Sun with rotating rays */
   (ctx, g) => {
     const { THREE, warna } = ctx;
     const sun = new THREE.Mesh(new THREE.IcosahedronGeometry(3.4, 6), new THREE.MeshStandardMaterial({ color: warna.aksen2, emissive: new THREE.Color(warna.aksen2), emissiveIntensity: 0.9, roughness: 0.4 }));
@@ -898,7 +898,7 @@ const SCENES = [
     }
     return { update: (t) => { cells.forEach((c) => { const h = 1.2 + (Math.sin(t * 0.6 + c.userData.k) * 0.5 + 0.5) * 3.4; c.scale.y = h; c.position.y = -4 + h / 2; }); } };
   },
-  /* 4. Kota hijau dan jaringan pintar */
+  /* 4. Green city and smart network */
   (ctx, g) => {
     const { THREE, rand, warna } = ctx;
     const n = 11, count = n * n;

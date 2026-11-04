@@ -7,11 +7,11 @@ import { decodeText, parseCsv } from "./csv";
 // ---------------------------------------------------------------------------
 
 export const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
-/** Format yang bisa dibaca di browser (ExcelJS + parser CSV sendiri). */
+/** Formats readable in the browser (ExcelJS + our own CSV parser). */
 const BROWSER_SHEET_EXT = /\.(xlsx|xlsm|csv|tsv|txt)$/i;
-/** Format lama yang TIDAK bisa dibaca ExcelJS → arahkan ke Konversi Server. */
+/** Old formats that ExcelJS CANNOT read → point to Server Convert. */
 export const LEGACY_SHEET_EXT = /\.(xls|ods|xlsb|numbers)$/i;
-/** Semua yang diterima pemilih file (format lama ditolak dengan pesan jelas). */
+/** Everything the file picker accepts (old formats are rejected with a clear message). */
 export const ACCEPTED_EXCEL_EXT = /\.(xlsx|xlsm|csv|tsv|txt|xls|ods|xlsb)$/i;
 export const ACCEPT_ATTR = ".xlsx,.xlsm,.csv,.tsv,.txt,.xls,.ods,.xlsb";
 
@@ -30,7 +30,7 @@ export function makeId(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Format Nilai Cell
+// Cell value format
 // ---------------------------------------------------------------------------
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,8 +42,8 @@ export function formatCellValue(value: any): any {
       return Number.isNaN(value.getTime()) ? "" : value.toISOString();
     }
     if ("formula" in value || "sharedFormula" in value) {
-      // Rumus tanpa hasil tersimpan (file belum pernah dihitung ulang) →
-      // kosong, bukan objek {formula} yang bocor ke JSON.
+      // Formulas without a stored result (the file was never recalculated) →
+      // empty, not a {formula} object leaking into the JSON.
       return value.result === undefined || value.result === null ? "" : formatCellValue(value.result);
     }
     if ("result" in value) {
@@ -68,7 +68,7 @@ export function formatCellValue(value: any): any {
   return value;
 }
 
-/** Nama kolom unik: "a", "a" → "a", "a_2"; tidak bertabrakan dengan header "a_2" asli. */
+/** Unique column names: "a", "a" → "a", "a_2"; never collides with a real "a_2" header. */
 export function uniqueHeaders(raw: string[]): string[] {
   const used = new Set<string>();
   return raw.map((h, i) => {
@@ -86,7 +86,7 @@ const isBlank = (v: unknown) => v === "" || v === null || v === undefined;
 // Extractor Row/Cell Worksheet (ExcelJS)
 // ---------------------------------------------------------------------------
 
-/** Semua baris tidak kosong sebagai array nilai (kolom kosong di tengah diisi ""). */
+/** Every non-empty row as an array of values (empty columns in the middle become ""). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function worksheetToArrays(worksheet: ExcelJS.Worksheet): any[][] {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,7 +110,7 @@ export function worksheetToArrays(worksheet: ExcelJS.Worksheet): any[][] {
   return result;
 }
 
-/** Baris pertama = nama kolom; baris berikutnya → objek. */
+/** First row = column names; following rows → objects. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function arraysToObjects(arrays: any[][]): Record<string, any>[] {
   if (!arrays.length) return [];
@@ -135,7 +135,7 @@ export function worksheetToObjects(worksheet: ExcelJS.Worksheet): Record<string,
 // CSV → Workbook
 // ---------------------------------------------------------------------------
 
-/** CSV dibaca apa adanya sebagai teks (perilaku lama dipertahankan: "007" tetap "007"). */
+/** CSV is read as is, as text (old behavior kept: "007" stays "007"). */
 function csvToWorkbook(workbook: ExcelJS.Workbook, text: string, fileName: string): void {
   const sheetName = fileName.replace(/\.[^/.]+$/, "").replace(/[*?:\\/[\]]/g, "_").slice(0, 31) || "Sheet1";
   const worksheet = workbook.addWorksheet(sheetName);
@@ -146,7 +146,7 @@ function csvToWorkbook(workbook: ExcelJS.Workbook, text: string, fileName: strin
 // readWorkbook
 // ---------------------------------------------------------------------------
 
-/** Baca File Excel/CSV jadi Workbook (ExcelJS) sepenuhnya di browser. */
+/** Reads an Excel/CSV File into a Workbook (ExcelJS) entirely in the browser. */
 export async function readWorkbook(file: File): Promise<ExcelJS.Workbook> {
   if (LEGACY_SHEET_EXT.test(file.name)) throw new DataError("legacyFormat", { ext: file.name.split(".").pop()?.toLowerCase() ?? "" });
   if (!BROWSER_SHEET_EXT.test(file.name)) throw new DataError("unsupportedFile", { name: file.name });
@@ -165,7 +165,7 @@ export async function readWorkbook(file: File): Promise<ExcelJS.Workbook> {
   if (ext === "csv" || ext === "tsv" || ext === "txt") {
     csvToWorkbook(workbook, decodeText(buffer), file.name);
   } else {
-    // .xlsx/.xlsm adalah ZIP ("PK"). Selain itu → bukan file Excel modern.
+    // .xlsx/.xlsm are ZIP ("PK"). Anything else → not a modern Excel file.
     const head = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
     if (head[0] !== 0x50 || head[1] !== 0x4b) throw new DataError("notXlsx");
     try {

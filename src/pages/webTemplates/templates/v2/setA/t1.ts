@@ -45,7 +45,7 @@ import {
 /* ================================================================== */
 
 /* ------------------- 1. Kafe Kopi Senja (FREE, 4 hlm) ---------------- */
-// Hanya section preset gratis + elemen gratis.
+// Only free section presets + free elements.
 
 const KS: Palette = { ink: "#3f1d0b", muted: "#78584a", primary: "#c2410c", primaryDark: "#9a3412", soft: "#ffedd5", line: "#fed7aa" };
 const ks = look(KS, { bg: "#fffaf3", alt: "#fdf1e3", dark: "#2a1408", radius: 14, headFont: FONTS.serif, font: FONTS.rounded, page: "#fffaf3" });

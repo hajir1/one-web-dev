@@ -6,23 +6,23 @@ import { patchLimits, type AccountLimits } from "../../../../marketplace/account
 import { useDesignStore, type SavedDesign } from "./designStore";
 
 /* ================================================================== */
-/* Sinkronisasi desain Page Maker ↔ server (GET/POST /designs)          */
+/* Page Maker design sync ↔ server (GET/POST /designs)                  */
 /*                                                                    */
-/* - Saat login: desain akun diambil dari server; desain yang dibuat     */
-/*   sebelum login (owner = null) diunggah ke akun itu. Desain milik      */
-/*   akun LAIN di browser yang sama tidak pernah ikut terunggah.         */
-/* - Setiap perubahan dikirim (debounce) sebagai upsert/delete. Konflik  */
-/*   antar-perangkat: yang terbaru menang (updatedAt).                  */
-/* - Kuota desain & website ditegakkan SERVER; desain yang ditolak       */
-/*   tetap ada di perangkat ini dan pengguna diberi tahu.                */
-/* - Saat keluar: salinan lokal dikosongkan (data tetap ada di server).  */
+/* - On sign-in: the account's designs are fetched from the server; designs created */
+/*   before signing in (owner = null) are uploaded to that account. Designs belonging to */
+/*   ANOTHER account in the same browser are never uploaded.            */
+/* - Every change is sent (debounced) as an upsert/delete. Conflicts    */
+/*   across devices: the newest wins (updatedAt).                       */
+/* - Design & website quotas are enforced by the SERVER; rejected designs */
+/*   stay on this device and the user is notified.                      */
+/* - On sign-out: the local copy is cleared (data stays on the server). */
 /* ================================================================== */
 
 type Designs = Record<string, SavedDesign[]>;
 type Key = string; // `${type}\u0000${id}`
 
 const DEBOUNCE_MS = 1500;
-/** Batas kasar ukuran satu permintaan sinkron (body server 25 MB). */
+/** Rough size limit of one sync request (server body 25 MB). */
 const MAX_BATCH_BYTES = 6 * 1024 * 1024;
 
 interface ServerDesign {
@@ -39,14 +39,14 @@ interface SyncResult {
   id: string;
   status: "ok" | "stale" | "limit" | "too_large";
   code?: string;
-  /** Item Premium yang dipakai tetapi belum dimiliki (v4). */
+  /** Premium items used but not owned yet (v4). */
   locked?: string[];
 }
 
 const key = (type: string, id: string): Key => `${type}\u0000${id}`;
 const valid = (type: string, id: string) => /^[\w-]{1,40}$/.test(type) && /^[\w-]{1,80}$/.test(id);
 
-/** Snapshot yang terakhir diketahui sama dengan server: key → updatedAt. */
+/** The snapshot last known to match the server: key → updatedAt. */
 let synced = new Map<Key, number>();
 let active: string | null = null;
 let applying = false;
@@ -69,14 +69,14 @@ function apply(next: Designs, owner: string | null) {
   }
 }
 
-/** Gabungkan daftar server ke salinan lokal (yang terbaru menang). */
+/** Merges the server list into the local copy (the newest wins). */
 function mergeServer(local: Designs, rows: ServerDesign[]): Designs {
   const next: Designs = Object.fromEntries(Object.entries(local).map(([t, l]) => [t, [...(l ?? [])]]));
   for (const r of rows) {
     const list = (next[r.type] ??= []);
     const i = list.findIndex((d) => d.id === r.id);
     const cur = i >= 0 ? list[i] : null;
-    if (cur && cur.updatedAt > r.updatedAt) continue; // lokal lebih baru → akan diunggah
+    if (cur && cur.updatedAt > r.updatedAt) continue; // local is newer → will be uploaded
     if (r.deleted) {
       if (i >= 0) list.splice(i, 1);
     } else {
@@ -94,20 +94,20 @@ function quota(raw: unknown) {
   if (raw && typeof raw === "object") patchLimits(raw as Partial<AccountLimits>);
 }
 
-/** Ambil perubahan dari server (penuh saat login, inkremental setelahnya). */
+/** Fetches changes from the server (full on sign-in, incremental afterwards). */
 async function pullDesigns(full = false): Promise<void> {
   if (!active) return;
   const since = full ? 0 : serverTime;
   const r = await api<{ designs: ServerDesign[]; serverTime: number; quota?: unknown }>(`/designs?since=${since}`);
   if (!active) return;
   quota(r.quota);
-  // Jarak aman 5 detik untuk jam yang sedikit berbeda.
+  // A 5-second safety margin for slightly different clocks.
   serverTime = Math.max(0, r.serverTime - 5000);
   const { designs } = useDesignStore.getState();
   apply(mergeServer(designs, r.designs ?? []), active);
 }
 
-/** Kirim perubahan lokal yang belum ada di server. */
+/** Sends local changes that are not on the server yet. */
 async function pushDesigns(): Promise<void> {
   if (!active) return;
   const now = flat(useDesignStore.getState().designs);
@@ -120,7 +120,7 @@ async function pushDesigns(): Promise<void> {
   }
   if (!upserts.length && !deletes.length) return;
 
-  // Pecah per ukuran agar satu permintaan tidak terlalu besar.
+  // Split by size so one request is not too large.
   const batches: { upserts: typeof upserts; deletes: typeof deletes }[] = [];
   let cur = { upserts: [] as typeof upserts, deletes, bytes: 0 };
   for (const u of upserts) {
@@ -142,18 +142,18 @@ async function pushDesigns(): Promise<void> {
       const k = key(res.type, res.id);
       const u = b.upserts.find((x) => x.type === res.type && x.id === res.id);
       if (!u) {
-        synced.delete(k); // hapus diterima
+        synced.delete(k); // deletion accepted
         continue;
       }
       if (res.status === "ok") {
         synced.set(k, u.updatedAt);
-        // Desain memakai item Premium yang belum dimiliki: tetap tersimpan, tetapi ekspor akan ditolak server.
+        // The design uses Premium items not owned yet: it is still saved, but exports will be rejected by the server.
         const locked = (res.locked ?? []).join(",");
         if (locked && lockedSeen.get(k) !== locked) notify.warn(i18n.t("sync.locked", { name: u.name, items: (res.locked ?? []).slice(0, 3).join(", ") }));
         if (locked) lockedSeen.set(k, locked);
         else lockedSeen.delete(k);
       }
-      else if (res.status === "stale") synced.delete(k); // server lebih baru → diambil saat pull
+      else if (res.status === "stale") synced.delete(k); // the server is newer → fetched on pull
       else rejected.push({ name: u.name, code: res.code ?? res.status });
     }
     for (const d of b.deletes) synced.delete(key(d.type, d.id));
@@ -161,12 +161,12 @@ async function pushDesigns(): Promise<void> {
   const msgKey = (code: string) =>
     code === "DESIGN_TOO_LARGE" || code === "too_large" ? "sync.tooLarge" : code === "DESIGN_STORAGE_FULL" ? "sync.storageFull" : "sync.limit";
   for (const x of rejected.slice(0, 3)) notify.warn(i18n.t(msgKey(x.code), { name: x.name }));
-  // Desain yang ditolak tetap ada di perangkat ini; dicoba lagi pada perubahan berikutnya.
+  // Rejected designs stay on this device; retried on the next change.
 }
 
 /**
- * Kirim semua perubahan lokal SEKARANG dan tunggu selesai (dipakai sebelum
- * ekspor server, karena server membuat kode dari desain yang tersimpan).
+ * Sends every local change NOW and waits for it to finish (used before
+ * server exports, because the server builds code from the stored design).
  */
 export async function flushDesigns(): Promise<void> {
   if (!active) return;
@@ -178,7 +178,7 @@ export async function flushDesigns(): Promise<void> {
   await pushDesigns();
 }
 
-/** Kunci item Premium terkunci terakhir per desain (peringatan hanya saat berubah). */
+/** Last locked Premium item keys per design (the warning only shows when they change). */
 const lockedSeen = new Map<string, string>();
 
 async function cycle(pull: boolean) {
@@ -207,7 +207,7 @@ function schedule() {
 
 async function start(user: SessionUser) {
   const store = useDesignStore.getState();
-  // Salinan lokal milik akun lain → buang (jangan pernah diunggah ke akun ini).
+  // A local copy belonging to another account → drop it (never upload it to this account).
   if (store.owner && store.owner !== user.id) apply({}, user.id);
   const claimAnonymous = !useDesignStore.getState().owner;
   active = user.id;
@@ -232,12 +232,12 @@ function stop() {
   synced = new Map();
   if (timer) clearTimeout(timer);
   timer = null;
-  // Desain milik akun tetap di server; salinan lokal dikosongkan.
+  // The account's designs stay on the server; the local copy is cleared.
   apply({}, null);
 }
 
 let installed = false;
-/** Pasang sekali (dipanggil dari bootstrap aplikasi). */
+/** Installs once (called from the app bootstrap). */
 export function installDesignSync() {
   if (installed || typeof window === "undefined") return;
   installed = true;
@@ -245,7 +245,7 @@ export function installDesignSync() {
     if (s.designs !== prev.designs) schedule();
   });
   onUserChange((u) => {
-    // Hanya saat akun berganti (perubahan profil lain, mis. mode admin, tidak memicu tarik ulang).
+    // Only when the account changes (other profile changes, e.g. admin mode, do not trigger a re-pull).
     if (u) {
       if (u.id !== active) void start(u);
     }
@@ -253,7 +253,7 @@ export function installDesignSync() {
   });
   const u = useSession.getState().user;
   if (u) void start(u);
-  // Sesi berakhir (bukan sekadar server tak terjangkau) → salinan milik akun dikosongkan.
+  // Session ended (not just an unreachable server) → the account's copies are cleared.
   useSession.subscribe((s, prev) => {
     if (s.status === "anonymous" && prev.status !== "anonymous" && useDesignStore.getState().owner) stop();
   });

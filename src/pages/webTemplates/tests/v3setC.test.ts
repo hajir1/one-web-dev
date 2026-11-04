@@ -22,7 +22,7 @@ import type { TplLang } from "../types";
 
 type SectionBox = { tag?: string; name: string };
 
-/* Katalog v3 bagian C: 25 template (1 Free + 24 Premium), 4–10 halaman, library & font Google. */
+/* v3 catalog part C: 25 templates (1 Free + 24 Premium), 4–10 pages, libraries & Google fonts. */
 
 const LANGS: TplLang[] = ["id", "en"];
 const PAGES: Record<string, number> = {
@@ -66,7 +66,7 @@ function premiumItems(tpl: WebTemplate): string[] {
   ];
 }
 
-/** Library yang dipakai node di halaman. */
+/** Libraries used by nodes on the page. */
 function nodeLibs(root: ComponentNode): Set<string> {
   const used = new Set<string>();
   walk(root, (n) => {

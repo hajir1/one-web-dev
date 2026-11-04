@@ -6,7 +6,7 @@ import { invalidateCatalogQueries } from "../../api/queryClient";
 import { loadServerCatalog } from "../../marketplace/serverCatalog";
 import { clearTemplateCache } from "../webTemplates/templateContent";
 
-/* Util data panel admin (bukan komponen; dipisah agar Fast Refresh tetap jalan). */
+/* Admin panel data utilities (not components; split out so Fast Refresh keeps working). */
 
 export type Row = Record<string, unknown>;
 

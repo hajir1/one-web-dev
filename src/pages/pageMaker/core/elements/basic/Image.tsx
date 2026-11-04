@@ -12,7 +12,7 @@ import { sceneImage } from "../placeholders";
 /* ------------------------------------------------------------------ */
 
 export interface ImageState {
-  /* Ukuran */
+  /* Size */
   widthMode: "auto" | "fixed" | "full";
   width: number;
   heightMode: "auto" | "fixed" | "aspect";
@@ -71,7 +71,7 @@ export interface ImageState {
   srcUrl: string;
   altText: string;
   lazyLoad: boolean;
-  /** Gambar utama halaman (LCP): tanpa lazy, fetchpriority="high". */
+  /** The page's main image (LCP): no lazy loading, fetchpriority="high". */
   priority?: boolean;
 }
 
@@ -235,7 +235,7 @@ ${hoverShadowLine}}
   );
 }
 
-/** "16 / 9" → 16/9; nilai tak valid → null. */
+/** "16 / 9" → 16/9; invalid value → null. */
 function ratioOf(v: string): number | null {
   const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(v);
   const r = m ? Number(m[1]) / Number(m[2]) : Number(v);
@@ -257,11 +257,11 @@ function buildMarkup(s: ImageState, cls: string) {
       class: cls,
       src: safeUrl(s.srcUrl, ""),
       alt: s.altText,
-      // Rasio ukuran asli sebelum gambar termuat (cegah layout bergeser); ukuran tampil tetap dari CSS.
+      // Original size ratio before the image loads (prevents layout shift); the displayed size still comes from CSS.
       ...imageDims(s),
       loading: s.lazyLoad ? "lazy" : undefined,
       decoding: "async",
-      // Gambar utama di atas lipatan (hero): diunduh lebih dulu.
+      // Main image above the fold (hero): downloaded first.
       fetchpriority: s.priority ? "high" : undefined,
     }),
     s.overlayEnabled ? h("div", { class: `${cls}-overlay`, "aria-hidden": "true" }) : null,
@@ -282,7 +282,7 @@ const FILTERS = [
   { base: "filterSepia", hover: "hoverFilterSepia", label: () => "Sepia", max: 100, unit: "%" },
 ] as const;
 
-/** Lima slider filter; set yang sama dipakai untuk kondisi normal & hover. */
+/** Five filter sliders; the same set is used for the normal & hover states. */
 function filterFields(p: { s: ImageState; update: Updater<ImageState> }, hover: boolean) {
   return (
     <>
@@ -408,7 +408,7 @@ function imageSections(s: ImageState, update: Updater<ImageState>): PanelSection
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const imageElement = defineElement<ImageState>({

@@ -1,95 +1,95 @@
 import type { TemplateCategory, TemplateTier } from "../../../../../config/templates";
 
 /* ================================================================== */
-/* Spesifikasi template v7 bagian H: DASHBOARD                          */
+/* v7 template specification part H: DASHBOARDS                         */
 /*                                                                    */
-/* Satu template = isi domain (./domains.ts: KPI, grafik, tabel, form   */
-/* dwibahasa) + tampilan (shell sidebar/topnav, gaya kartu, gaya KPI,   */
-/* palet, font, urutan blok). Mesin di ./kitH.ts menyusunnya menjadi    */
-/* section Page Maker biasa (Section → Row → Elemen), jadi setiap       */
-/* halaman tetap bisa diedit penuh dan diekspor ke semua format.        */
+/* One template = domain content (./domains.ts: KPIs, charts, tables, forms */
+/* bilingual) + look (sidebar/topnav shell, card style, KPI style,      */
+/* palette, fonts, block order). The engine in ./kitH.ts assembles it into */
+/* regular Page Maker sections (Section → Row → Element), so every      */
+/* page stays fully editable and exportable to every format.           */
 /* ================================================================== */
 
-/** Teks dwibahasa "id|en" (tanpa "|" = sama untuk kedua bahasa). */
+/** Bilingual text "id|en" (without "|" = the same for both languages). */
 export type X = string;
 
 /** Kerangka aplikasi. */
 export type Shell =
   | "side-dark" // sidebar gelap
   | "side-light" // sidebar terang bergaris
-  | "side-brand" // sidebar warna merek (gradien)
-  | "side-float" // sidebar kartu melayang
-  | "topnav" // navigasi atas, tanpa sidebar
-  | "topnav-dark" // navigasi atas gelap
+  | "side-brand" // brand-colored sidebar (gradient)
+  | "side-float" // floating card sidebar
+  | "topnav" // top navigation, no sidebar
+  | "topnav-dark" // dark top navigation
   | "rail"; // sidebar ramping + label grup
 
-/** Gaya kartu. */
+/** Card style. */
 export type CardStyle = "shadow" | "border" | "flat" | "glass" | "brutal" | "accent";
 
-/** Gaya kartu statistik (KPI). */
+/** Stat card (KPI) style. */
 export type KpiStyle = "plain" | "icon" | "tint" | "accent" | "split" | "counter";
 
-/** Jenis halaman selain beranda (overview). */
+/** Page types other than the home page (overview). */
 export type PageKind = "records" | "analytics" | "board" | "settings" | "login" | "customers" | "reports";
 
-/** Blok isi dashboard. */
+/** Dashboard content block. */
 export type HBlock =
-  | "kpis" // kartu statistik
+  | "kpis" // stat cards
   | "main" // grafik utama + donat samping
-  | "duo" // dua grafik
-  | "wide" // grafik lebar
-  | "table" // tabel data + toolbar + paginasi
-  | "mini-table" // tabel ringkas (5 baris)
+  | "duo" // two charts
+  | "wide" // wide chart
+  | "table" // data table + toolbar + pagination
+  | "mini-table" // compact table (5 rows)
   | "activity" // linimasa aktivitas
   | "goals" // target (bilah progres)
   | "team" // anggota tim
-  | "board" // kanban 3 kolom
+  | "board" // 3-column kanban
   | "form" // formulir pengaturan
   | "alerts" // pemberitahuan
   | "steps" // langkah onboarding
   | "tabs" // tab wawasan
   | "quick" // pintasan
-  | "split-act" // tabel ringkas + aktivitas berdampingan
+  | "split-act" // compact table + activity side by side
   | "split-goal"; // target + tim berdampingan
 
 export interface HChart {
   type: "bar" | "line" | "pie" | "doughnut";
   title: X;
-  /** Nama seri dipisah koma, mis. "Pendapatan, Target|Revenue, Target". */
+  /** Series names separated by commas, e.g. "Pendapatan, Target|Revenue, Target". */
   series: X;
   /** "Label, nilai1, nilai2" — label dwibahasa "Jan|Jan". */
   rows: string[];
 }
 
-/** Paket isi satu domain (admin, CRM, keuangan, …). */
+/** Content pack of one domain (admin, CRM, finance, …). */
 export interface Domain {
   key: string;
-  /** Peran/subjudul di beranda. */
+  /** Role/subtitle on the home page. */
   role: X;
-  /** Deskripsi katalog (tanpa jumlah halaman). */
+  /** Catalog description (without the page count). */
   desc: X;
   tags: string[];
-  /** Nama halaman. `records` = halaman tabel utama (mis. Pesanan). */
+  /** Page names. `records` = the main table page (e.g. Orders). */
   names: Partial<Record<"overview" | PageKind, X>>;
-  /** Ikon/glyph satu karakter untuk logo. */
+  /** One-character icon/glyph for the logo. */
   glyph: string;
-  /** Placeholder kotak cari. */
+  /** Search box placeholder. */
   search: X;
-  /** Tombol aksi utama. */
+  /** Main action button. */
   action: X;
-  /** KPI: "label|label en ; nilai ; delta ; up/down ; glyph". Minimal 6. */
+  /** KPI: "label|label en ; value ; delta ; up/down ; glyph". At least 6. */
   kpis: string[];
   main: HChart;
   side: HChart;
   extra: HChart;
-  /** Grafik tambahan halaman analitik. */
+  /** Extra charts on the analytics page. */
   extra2?: HChart;
   table: { title: X; cols: X[]; rows: string[][]; filter: X[] };
-  /** Tabel kedua (halaman pelanggan/laporan). */
+  /** Second table (customers/reports page). */
   table2?: { title: X; cols: X[]; rows: string[][]; filter: X[] };
-  /** "waktu | judul | teks" (dwibahasa per bagian). */
+  /** "time | title | text" (bilingual per part). */
   activity: string[];
-  /** "label ; nilai 0–100". */
+  /** "label ; value 0–100". */
   goals: string[];
   /** "Nama ; peran". */
   team: string[];
@@ -114,12 +114,12 @@ export interface HSpec {
   shell: Shell;
   kpi: KpiStyle;
   login: "split" | "center" | "banner";
-  /** Halaman selain beranda (urut menu). */
+  /** Pages other than the home page (menu order). */
   pages: PageKind[];
-  /** Urutan blok beranda. */
+  /** Home page block order. */
   home: HBlock[];
   /** Tag tambahan (gaya). */
   tags?: string[];
-  /** Efek muncul (hanya Premium). */
+  /** Entrance effects (Premium only). */
   fx?: "aos" | "animate";
 }

@@ -1,13 +1,13 @@
 /* ================================================================== */
-/* Mesin ekspor kode untuk SERVER (dibundel ke backend).                 */
+/* Code export engine for the SERVER (bundled into the backend).        */
 /*                                                                    */
-/* Fungsi murni tanpa React/DOM/penyimpanan: dokumen desain + ikon/font  */
-/* + aturan akses Premium → daftar berkas. Backend menjalankannya agar   */
-/* kode lengkap hanya dibuat setelah server memeriksa kepemilikan item   */
-/* Premium dan memotong kuota ekspor.                                   */
+/* Pure functions without React/DOM/storage: design document + icons/fonts */
+/* + Premium access rules → file list. The backend runs it so that      */
+/* full code is only built after the server checks item ownership       */
+/* Premium and deducts the export quota.                                */
 /*                                                                    */
-/* Bundel ulang setelah elemen/compose berubah:                         */
-/*   npm run build:export-engine   (lihat tools/buildExportEngine.mjs)   */
+/* Rebundle after elements/compose change:                              */
+/*   npm run build:export-engine   (see tools/buildExportEngine.mjs)     */
 /* ================================================================== */
 import "../i18n";
 import i18n from "../i18n";
@@ -33,13 +33,13 @@ export interface EngineFile {
   lang: string;
 }
 
-/** Hak akses Premium pemanggil (dihitung server dari user_items + template_grants). */
+/** The caller's Premium access (computed by the server from user_items + template_grants). */
 export interface Access {
-  /** Kunci item yang dimiliki, mis. "element:slider", "event:onChange", "preset:pro-faq". */
+  /** Owned item keys, e.g. "element:slider", "event:onChange", "preset:pro-faq". */
   owned: string[];
-  /** Item bawaan per template yang dimiliki: templateId → kunci item. */
+  /** Built-in items per owned template: templateId → item keys. */
   templateGrants: Record<string, string[]>;
-  /** true = semua item Premium boleh (admin). */
+  /** true = all Premium items allowed (admin). */
   all?: boolean;
 }
 
@@ -49,19 +49,19 @@ export interface EngineInput {
   icons?: GlobalIcon[];
   fonts?: GlobalFont[];
   baseFontId?: string | null;
-  /** v7: variabel global pengguna (warna/ukuran/font) → :root di setiap format. */
+  /** v7: the user's global variables (colors/sizes/fonts) → :root in every format. */
   vars?: unknown;
-  /** v7: judul proyek ekspor satu halaman (nama desain). */
+  /** v7: project title for a single-page export (design name). */
   title?: string;
   access: Access;
 }
 
-/** Variabel global dari klien: dibersihkan, lalu digabung dengan variabel bawaan + font pustaka. */
+/** Global variables from the client: sanitized, then merged with the default variables + library fonts. */
 function varsOf(input: EngineInput) {
   return mergeVars(libraryFontVars(input.fonts ?? []), withBuiltinVars(sanitizeVars(input.vars)));
 }
 
-/** Item yang dipakai satu dokumen halaman: section preset, elemen, event. */
+/** Items used by one page document: section presets, elements, events. */
 export function itemsUsed(doc: PageDoc): { sections: string[]; elements: string[]; events: string[] } {
   const sections = new Set<string>();
   const events = new Set<string>();
@@ -74,7 +74,7 @@ export function itemsUsed(doc: PageDoc): { sections: string[]; elements: string[
   return { sections: [...sections], elements: [...elements], events: [...events] };
 }
 
-/** Predikat akses item untuk satu dokumen (item bawaan template hanya di desain dari template itu). */
+/** Item access predicate for one document (built-in template items only in designs from that template). */
 function allowFor(doc: PageDoc, access: Access): (key: string) => boolean {
   if (access.all) return () => true;
   const owned = new Set(access.owned);
@@ -95,7 +95,7 @@ function check(framework: string): Framework {
   return framework as Framework;
 }
 
-/** Ekspor satu desain halaman (Page Maker) sebagai proyek satu halaman siap jalan. */
+/** Exports one page design (Page Maker) as a ready-to-run single-page project. */
 export function exportPage(state: unknown, rootClass: string, input: EngineInput): EngineFile[] {
   setLang(input.lang);
   const fw = check(input.framework);
@@ -115,7 +115,7 @@ export function exportPage(state: unknown, rootClass: string, input: EngineInput
   return projectFiles(fw, title, [singlePage(composed, title)]).map((f) => ({ name: f.name, content: f.content, lang: f.lang }));
 }
 
-/** Ekspor satu folder website beserta halaman-halamannya. */
+/** Export one website folder with its pages. */
 export function exportSite(site: SavedDesign, pages: SavedDesign[], input: EngineInput): EngineFile[] {
   setLang(input.lang);
   const fw = check(input.framework);
@@ -131,7 +131,7 @@ export function exportSite(site: SavedDesign, pages: SavedDesign[], input: Engin
   return built.files(fw).map((f) => ({ name: f.name, content: f.content, lang: f.lang }));
 }
 
-/** Item Premium yang dipakai dokumen tetapi tidak boleh dipakai pemanggil. */
+/** Premium items the document uses but the caller may not use. */
 export function lockedItems(state: unknown, access: Access, premium: Set<string>): string[] {
   const doc = normalizePageDoc(state);
   const allow = allowFor(doc, access);

@@ -6,8 +6,8 @@ import { formatSize } from "../lib/format";
 import { summarizeRejections, validateFiles, type AcceptedFile, type FileRules, type RejectedFile } from "../lib/validate";
 
 /**
- * Validasi file masuk (isi, ukuran, jumlah) lalu teruskan yang lolos.
- * Penolakan disimpan untuk ditampilkan, tidak dibuang diam-diam.
+ * Validates incoming files (content, size, count), then passes on those that pass.
+ * Rejections are kept for display, not silently dropped.
  */
 export function useFileIntake(rules: FileRules, onAccepted: (files: AcceptedFile[]) => void) {
   const [checking, setChecking] = useState(false);
@@ -33,12 +33,12 @@ interface DropzoneProps {
   rules: FileRules;
   onFiles: (files: File[]) => void;
   multiple?: boolean;
-  /** Atribut accept untuk dialog file (petunjuk OS; validasi tetap dari isi). */
+  /** accept attribute for the file dialog (an OS hint; validation still uses the content). */
   accept: string;
   title?: ReactNode;
   compact?: boolean;
   busy?: boolean;
-  /** Terima Ctrl/Cmd+V gambar dari clipboard. */
+  /** Accepts Ctrl/Cmd+V images from the clipboard. */
   allowPaste?: boolean;
   testId?: string;
 }
@@ -46,8 +46,8 @@ interface DropzoneProps {
 export default function Dropzone({ rules, onFiles, multiple = true, accept, title, compact, busy, allowPaste, testId = "dropzone" }: DropzoneProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-  // Penghitung dragenter/dragleave: tanpa ini status "drag" berkedip saat
-  // kursor melewati elemen anak (bug versi lama).
+  // dragenter/dragleave counter: without it the "drag" state flickers when
+  // the cursor passes over child elements (old version bug).
   const depth = useRef(0);
   const [over, setOver] = useState(false);
 

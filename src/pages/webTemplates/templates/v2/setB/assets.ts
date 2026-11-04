@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ilustrasi SVG tambahan untuk template v2 bagian B (nama unik         */
-/* berawalan "v2b-"). Buatan sendiri, ASCII, tanpa URL eksternal. Setiap */
-/* bentuk menerima warna sehingga satu adegan bisa dipakai ulang.        */
+/* Extra SVG illustrations for v2 templates part B (unique names        */
+/* prefixed "v2b-"). In-house, ASCII, no external URLs. Each            */
+/* shape takes colors so one scene can be reused.                       */
 /* ================================================================== */
 
 const svg = (w: number, h: number, body: string) =>
@@ -18,7 +18,7 @@ function face(bg: string, skin: string, hair: string, shirt: string, long = fals
   return svg(400, 400, `<rect width="400" height="400" fill="${bg}"/>${long ? hairShape : ""}<circle cx="200" cy="172" r="76" fill="${skin}"/>${long ? `<path d="M126 150 Q150 90 200 92 Q250 90 274 150 Q230 118 200 120 Q170 118 126 150Z" fill="${hair}"/>` : hairShape}<path d="M64 400 Q76 276 200 268 Q324 276 336 400Z" fill="${shirt}"/>`);
 }
 
-/** Pose yoga di atas matras. */
+/** A yoga pose on a mat. */
 function yoga(bg: string, mat: string, body: string, sun: string): string {
   return svg(800, 600, `${lg("y", bg, "#ffffff")}<rect width="800" height="600" fill="url(#y)"/><circle cx="620" cy="140" r="80" fill="${sun}" opacity="0.6"/><rect x="170" y="470" width="460" height="22" rx="11" fill="${mat}"/><circle cx="400" cy="210" r="34" fill="${body}"/><path d="M400 246 L400 360 M400 270 L300 200 M400 270 L500 200 M400 360 L320 468 M400 360 L480 468" stroke="${body}" stroke-width="26" stroke-linecap="round" fill="none"/>`);
 }
@@ -75,7 +75,7 @@ function music(bg: string, wood: string, keys: string): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${bg}"/>${k}<rect x="520" y="40" width="24" height="230" rx="8" fill="#1f2937" transform="rotate(30 532 155)"/><ellipse cx="420" cy="320" rx="100" ry="80" fill="${wood}" transform="rotate(30 420 320)"/><ellipse cx="470" cy="245" rx="74" ry="60" fill="${wood}" transform="rotate(30 470 245)"/><circle cx="445" cy="285" r="24" fill="#1f2937"/>`);
 }
 
-/** Ruang interior. */
+/** Interior room. */
 function room(wall: string, floor: string, sofa: string, accent: string): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${wall}"/><rect x="0" y="430" width="800" height="170" fill="${floor}"/><rect x="480" y="90" width="200" height="240" rx="6" fill="#ffffff" opacity="0.7"/><rect x="490" y="100" width="85" height="220" fill="#bae6fd"/><rect x="585" y="100" width="85" height="220" fill="#bae6fd"/><rect x="110" y="320" width="330" height="110" rx="24" fill="${sofa}"/><rect x="90" y="300" width="50" height="140" rx="20" fill="${sofa}"/><rect x="410" y="300" width="50" height="140" rx="20" fill="${sofa}"/><rect x="150" y="270" width="110" height="70" rx="18" fill="${accent}"/><path d="M620 430 L640 330 L660 430Z" fill="${accent}"/><circle cx="640" cy="320" r="24" fill="#22c55e"/><rect x="180" y="460" width="220" height="16" rx="8" fill="${accent}" opacity="0.6"/>`);
 }
@@ -87,7 +87,7 @@ function crane(sky: string, steel: string, block: string): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${sky}"/>${floors}<rect x="230" y="80" width="18" height="460" fill="${steel}"/><rect x="120" y="80" width="460" height="16" fill="${steel}"/><path d="M248 96 L120 96 L248 150Z" fill="${steel}" opacity="0.5"/><path d="M520 96 L520 220" stroke="#111827" stroke-width="4"/><rect x="495" y="220" width="50" height="34" fill="${block}"/><rect x="0" y="540" width="800" height="60" fill="#78716c"/>`);
 }
 
-/** Vila dengan kolam. */
+/** Villa with a pool. */
 function villa(sky: string, roof: string, pool: string, leaf: string): string {
   return svg(1000, 640, `${lg("v", sky, "#ffffff")}<rect width="1000" height="640" fill="url(#v)"/><path d="M260 260 L500 140 L740 260Z" fill="${roof}"/><rect x="300" y="260" width="400" height="190" fill="#fafaf9"/><rect x="340" y="300" width="100" height="150" fill="#d6d3d1"/><rect x="470" y="300" width="190" height="90" fill="#bae6fd"/><rect x="180" y="470" width="640" height="90" rx="10" fill="${pool}"/><path d="M220 510 Q300 490 380 510 T540 510 T700 510" stroke="#ffffff" stroke-width="5" fill="none" opacity="0.7"/><rect x="0" y="560" width="1000" height="80" fill="${leaf}" opacity="0.5"/><path d="M120 560 L130 300" stroke="#78350f" stroke-width="12"/><path d="M130 300 Q60 280 40 330 M130 300 Q200 270 230 320 M130 300 Q110 230 60 230 M130 300 Q160 230 210 240" stroke="${leaf}" stroke-width="18" fill="none" stroke-linecap="round"/>`);
 }
@@ -109,7 +109,7 @@ function pet(kind: "cat" | "dog", bg: string, fur: string, inner: string): strin
   return svg(600, 600, `<rect width="600" height="600" fill="${bg}"/>${ears}<circle cx="300" cy="300" r="130" fill="${fur}"/><circle cx="250" cy="280" r="14" fill="#1f2937"/><circle cx="350" cy="280" r="14" fill="#1f2937"/><ellipse cx="300" cy="340" rx="${kind === "dog" ? 46 : 20}" ry="${kind === "dog" ? 32 : 14}" fill="${kind === "dog" ? inner : "#f472b6"}"/><circle cx="300" cy="332" r="10" fill="#1f2937"/><rect x="200" y="420" width="200" height="26" rx="13" fill="#ef4444"/>`);
 }
 
-/** Produk kemasan (toko hewan, apotek, kopi). */
+/** Packaged products (pet store, pharmacy, coffee). */
 function pack(kind: "bag" | "bottle" | "box" | "tube", bg: string, c: string, d: string): string {
   const body: Record<typeof kind, string> = {
     bag: `<path d="M200 170 L400 170 L430 480 L170 480Z" fill="${c}"/><rect x="200" y="150" width="200" height="30" rx="6" fill="${d}"/><circle cx="300" cy="330" r="60" fill="#ffffff" opacity="0.85"/><circle cx="300" cy="330" r="30" fill="${d}"/>`,
@@ -120,7 +120,7 @@ function pack(kind: "bag" | "bottle" | "box" | "tube", bg: string, c: string, d:
   return svg(600, 600, `<rect width="600" height="600" fill="${bg}"/>${body[kind]}<ellipse cx="300" cy="510" rx="160" ry="14" fill="#000000" opacity="0.08"/>`);
 }
 
-/** Kebun kopi di lereng. */
+/** Coffee farm on a slope. */
 function farm(sky: string, hill: string, leaf: string, cherry: string): string {
   let plants = "";
   for (let r = 0; r < 3; r++)
@@ -137,7 +137,7 @@ function truck(bg: string, cab: string, box: string, road: string): string {
   return svg(1000, 600, `<rect width="1000" height="600" fill="${bg}"/><rect x="0" y="450" width="1000" height="150" fill="${road}"/><rect x="0" y="515" width="1000" height="8" fill="#fde68a" opacity="0.6"/><rect x="200" y="220" width="460" height="200" rx="8" fill="${box}"/>${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<rect x="${220 + i * 56}" y="236" width="12" height="168" fill="#ffffff" opacity="0.25"/>`).join("")}<path d="M670 270 L780 270 L840 340 L840 420 L670 420Z" fill="${cab}"/><path d="M690 285 L770 285 L815 340 L690 340Z" fill="#bae6fd"/><circle cx="290" cy="440" r="36" fill="#111827"/><circle cx="560" cy="440" r="36" fill="#111827"/><circle cx="770" cy="440" r="36" fill="#111827"/>`);
 }
 
-/** Tumpukan kontainer di pelabuhan. */
+/** Stacked containers at a port. */
 function containers(bg: string, a: string, b: string, c: string): string {
   const cols = [a, b, c, b, a, c];
   let s = "";
@@ -172,12 +172,12 @@ function news(bg: string, a: string, b: string, shape: number): string {
   return svg(800, 500, `<rect width="800" height="500" fill="${bg}"/>${shapes[shape % shapes.length]}`);
 }
 
-/** Ponsel dengan kartu & saldo (fintech). */
+/** Phone with cards & balance (fintech). */
 function phone(bg: string, card: string, accent: string): string {
   return svg(800, 600, `${lg("f", bg, "#ffffff")}<rect width="800" height="600" fill="url(#f)"/><rect x="290" y="60" width="240" height="480" rx="36" fill="#0f172a"/><rect x="304" y="80" width="212" height="440" rx="26" fill="#f8fafc"/><rect x="320" y="110" width="180" height="104" rx="16" fill="${card}"/><rect x="336" y="130" width="70" height="12" rx="6" fill="#ffffff" opacity="0.8"/><rect x="336" y="170" width="120" height="20" rx="8" fill="#ffffff"/>${[0, 1, 2, 3].map((i) => `<rect x="320" y="${240 + i * 56}" width="180" height="44" rx="10" fill="#e2e8f0"/><circle cx="342" cy="${262 + i * 56}" r="12" fill="${accent}"/>`).join("")}<rect x="120" y="200" width="150" height="96" rx="16" fill="${accent}" transform="rotate(-12 195 248)"/><circle cx="640" cy="200" r="52" fill="${card}" opacity="0.6"/>`);
 }
 
-/** Furnitur (produk toko). */
+/** Furniture (store products). */
 function furniture(kind: "sofa" | "chair" | "table" | "lamp" | "shelf" | "bed", bg: string, c: string, wood: string): string {
   const body: Record<typeof kind, string> = {
     sofa: `<rect x="110" y="250" width="380" height="140" rx="30" fill="${c}"/><rect x="90" y="300" width="60" height="140" rx="22" fill="${c}"/><rect x="450" y="300" width="60" height="140" rx="22" fill="${c}"/><rect x="140" y="360" width="320" height="70" rx="16" fill="${c}" opacity="0.85"/><rect x="130" y="440" width="14" height="50" fill="${wood}"/><rect x="456" y="440" width="14" height="50" fill="${wood}"/>`,
@@ -190,7 +190,7 @@ function furniture(kind: "sofa" | "chair" | "table" | "lamp" | "shelf" | "bed", 
   return svg(600, 600, `<rect width="600" height="600" fill="${bg}"/><ellipse cx="300" cy="500" rx="230" ry="18" fill="#000000" opacity="0.08"/>${body[kind]}`);
 }
 
-/** Gelembung percakapan (kursus bahasa). */
+/** Speech bubbles (language course). */
 function speech(bg: string, a: string, b: string): string {
   return svg(800, 600, `<rect width="800" height="600" fill="${bg}"/><rect x="120" y="120" width="340" height="190" rx="40" fill="${a}"/><path d="M190 300 L170 380 L260 306Z" fill="${a}"/><text x="290" y="235" font-size="72" font-family="Arial" font-weight="700" fill="#ffffff" text-anchor="middle">Halo!</text><rect x="360" y="290" width="320" height="180" rx="40" fill="${b}"/><path d="M600 460 L630 530 L540 466Z" fill="${b}"/><text x="520" y="398" font-size="66" font-family="Arial" font-weight="700" fill="#ffffff" text-anchor="middle">Hello!</text>`);
 }

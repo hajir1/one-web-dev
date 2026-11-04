@@ -1,6 +1,6 @@
 import { box, btn, contentJ, footer, form, fx, globe3, grid, H, header, home, Lbl, line, lookJ, pg, pic, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 04 · Kongsi Pala Banda: eksportir pala. Ide besar: jalur rempah digambar ulang sebagai atlas; catatan pinggir bergerak (parallax). */
+/* 04 · Kongsi Pala Banda: a nutmeg exporter. Big idea: the spice route redrawn as an atlas; margin notes move (parallax). */
 
 const C = { perkamen: "#EFE3C8", sepia: "#4A3426", segel: "#9E2A2B", pala: "#C9792B", laut: "#21364A" };
 export const L04 = lookJ({ ink: C.sepia, muted: "#6a5242", primary: C.segel, primaryDark: "#7a1f20", soft: "#e6d6b4", line: "#cdb88f", bg: C.perkamen, head: "Libre Caslon Display", body: "Alegreya", r: 0 });
@@ -14,7 +14,7 @@ const PORTS: [string, string, string][] = [
   ["Houston", "29.8° U", "95.4° B"],
 ];
 
-/** Catatan pinggir bergaris tinta, bergerak lebih lambat dari isi (parallax). */
+/** Ink-ruled margin notes that move slower than the content (parallax). */
 const note = (j: J, n: string, b: B) =>
   fx(box([Tx(L, n, { size: 13, color: C.segel, weight: 700 }), Tx(L, j.t(b), { size: 15, lh: 1.45, css: "font-style: italic;" })], { gap: 4, name: "Catatan pinggir", css: `border-left: 1px solid ${C.sepia}; padding-left: 12px;` }), "parallax", 30);
 

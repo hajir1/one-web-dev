@@ -4,8 +4,8 @@ import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 /* ================================================================== */
-/* Dialog modal yang aksesibel: role dialog/alertdialog, fokus awal,     */
-/* Escape menutup, fokus dikembalikan ke pemicu, Tab tetap di dalam.     */
+/* Accessible modal dialog: role dialog/alertdialog, initial focus,      */
+/* Escape closes, focus returns to the trigger, Tab stays inside.        */
 /* ================================================================== */
 
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';

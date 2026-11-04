@@ -1,12 +1,12 @@
 /**
- * Awali setiap selector dengan `scope` supaya CSS preview tidak bocor ke
- * seluruh aplikasi. Tanpa ini, nama class buatan user seperti "hidden",
- * "flex", atau "container" ikut mengubah tampilan aplikasi (karena CSS
- * preview disuntik global lewat <style>).
+ * Prefixes every selector with `scope` so preview CSS does not leak into
+ * the whole app. Without this, user class names such as "hidden",
+ * "flex", or "container" would change the app's appearance (because preview
+ * CSS is injected globally through <style>).
  *
- * Parser sederhana berbasis kurung kurawal — cukup untuk CSS yang kita
- * generate sendiri: rule biasa, @media/@supports (isi di-scope), dan
- * @keyframes/@font-face (dibiarkan apa adanya).
+ * A simple brace-based parser, enough for the CSS we
+ * generate ourselves: plain rules, @media/@supports (content scoped), and
+ * @keyframes/@font-face (left as is).
  */
 export function scopeCss(css: string, scope: string): string {
   let out = "";
@@ -14,7 +14,7 @@ export function scopeCss(css: string, scope: string): string {
   const n = css.length;
 
   const readBlock = (start: number): number => {
-    // start = index tepat setelah '{'; kembalikan index '}' penutupnya
+    // start = index right after '{'; returns the index of its closing '}'
     let depth = 1;
     let j = start;
     while (j < n && depth > 0) {

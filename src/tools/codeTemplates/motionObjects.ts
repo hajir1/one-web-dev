@@ -1,14 +1,14 @@
 /* ================================================================== */
-/* Objek 3D prosedural untuk template 3D Motion (v18).                 */
-/* Tiap objek = fungsi buildObject({ THREE, COL, makeScreen,           */
+/* Procedural 3D objects for the 3D Motion templates (v18).            */
+/* Each object = a buildObject({ THREE, COL, makeScreen,               */
 /* glowTexture, textTexture, brand }) → { group, floor, update(t,dt,P) }.*/
-/* P berisi pose + "keadaan" bab (mis. P.open, P.zoom, P.flame, 0..1)  */
-/* yang di-scrub OWD Scrub. Tanpa model/tekstur eksternal; < 50.000 segitiga.*/
+/* P holds the pose + chapter "state" (e.g. P.open, P.zoom, P.flame, 0..1) */
+/* that OWD Scrub scrubs. No external models/textures; < 50,000 triangles. */
 /* ================================================================== */
 
 export type ObjectKind = "monitor" | "phone" | "laptop" | "camera" | "vinyl" | "perfume" | "rocket" | "book";
 
-/** Bantuan bersama (disalin ke template bersama objeknya). */
+/** Shared helpers (copied into the template along with the object). */
 const HELPERS = String.raw`
 function rrShape(THREE, w, h, r) {
   const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
@@ -18,7 +18,7 @@ function rrShape(THREE, w, h, r) {
   s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
   return s;
 }
-/* Lempeng bersudut bulat (lebar w, tinggi h, tebal d) berpusat di titik asal. */
+/* Rounded slab (width w, height h, depth d) centered at the origin. */
 function slabGeo(THREE, w, h, d, r, b) {
   const g = new THREE.ExtrudeGeometry(rrShape(THREE, w - 2 * b, h - 2 * b, Math.max(0.002, r - b)), { depth: Math.max(0.002, d - 2 * b), bevelEnabled: b > 0, bevelThickness: b, bevelSize: b, bevelSegments: 3, curveSegments: 8 });
   g.translate(0, 0, -(d - 2 * b) / 2);
@@ -52,7 +52,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture }) {
   const neck = new THREE.Mesh(slabGeo(THREE, 0.36, 1.25, 0.12, 0.06, 0.02), body); neck.position.set(0, -0.92, -0.3); neck.rotation.x = -0.12; group.add(neck);
   const base = new THREE.Mesh(slabGeo(THREE, 1.5, 0.95, 0.06, 0.32, 0.02), body); base.rotation.x = -Math.PI / 2; base.position.set(0, -1.56, -0.25); group.add(base);
 
-  /* Keyboard dengan tombol yang menyala saat "mengetik". */
+  /* Keyboard with keys that light up while "typing". */
   const kb = new THREE.Group(); kb.position.set(-0.2, -1.56, 1.15); group.add(kb);
   const kbBase = new THREE.Mesh(slabGeo(THREE, 2.75, 0.92, 0.07, 0.08, 0.02), body); kbBase.rotation.x = -Math.PI / 2; kb.add(kbBase);
   const COLS = 14, ROWS = 4, N = COLS * ROWS;
@@ -95,7 +95,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture }) {
   const lensG = new THREE.CylinderGeometry(0.12, 0.12, 0.05, 24), lensM = mat(THREE, "#0a0d16", { roughness: 0.1, metalness: 0.6 });
   [[-0.53, 1.31], [-0.27, 1.05], [-0.53, 1.05]].forEach((p) => { const l = new THREE.Mesh(lensG, lensM); l.rotation.x = Math.PI / 2; l.position.set(p[0], p[1], -0.15); group.add(l); });
 
-  /* Kartu aplikasi yang melayang keluar dari HP (keadaan "fan"). */
+  /* App cards that float out of the phone ("fan" state). */
   const ICON = ["●", "▲", "■"];
   const cards = [[-1.55, 0.95, 0.55, 0.12], [1.55, 0.15, 0.75, -0.14], [-1.4, -0.95, 0.65, 0.1]].map((p, i) => {
     const tex = textTexture((g, w, h) => {
@@ -176,7 +176,7 @@ function buildObject({ THREE, COL, glowTexture }) {
   const flash = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.2, 0.04), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.2, roughness: 0.2 })); flash.position.set(0.95, 0.55, 0.52); group.add(flash);
   const flashGlow = glowSprite(THREE, glowTexture(), 0xffffff, 3.2, 0); flashGlow.position.set(0.95, 0.55, 0.8); group.add(flashGlow);
 
-  /* Lensa: cincin-cincin yang memanjang saat "zoom". */
+  /* Lens: rings that extend while "zooming". */
   const lens = new THREE.Group(); lens.position.z = 0.5; group.add(lens);
   const mount = new THREE.Mesh(new THREE.CylinderGeometry(0.74, 0.74, 0.12, 48), metal); mount.rotation.x = Math.PI / 2; mount.position.z = 0.06; lens.add(mount);
   const rings = [0.68, 0.64, 0.66, 0.62].map((r, i) => {
@@ -226,7 +226,7 @@ function buildObject({ THREE, COL, glowTexture, textTexture, brand }) {
   record.position.set(-0.35, 0.09, 0); group.add(record);
   const spindle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.12, 12), metal); spindle.position.set(-0.35, 0.12, 0); group.add(spindle);
 
-  /* Lengan jarum: berputar ke atas piringan (keadaan "arm"). */
+  /* Tonearm: swings over the record ("arm" state). */
   const arm = new THREE.Group(); arm.position.set(1.3, 0.05, -0.95); group.add(arm);
   const armBase = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.16, 28), metal); arm.add(armBase);
   const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.75, 10), metal); tube.rotation.x = Math.PI / 2; tube.position.set(0, 0.16, 0.85); arm.add(tube);
@@ -286,7 +286,7 @@ function buildObject({ THREE, COL, glowTexture, textTexture, brand }) {
   const mist = new THREE.Points(mg, new THREE.PointsMaterial({ color: COL.accent2, size: 0.12, map: glowTexture(), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
   group.add(mist);
 
-  /* Bahan yang mengorbit (kelopak & butir). */
+  /* Orbiting ingredients (petals & grains). */
   const orb = new THREE.Group(); group.add(orb);
   const petal = new THREE.SphereGeometry(0.16, 14, 8), bead = new THREE.IcosahedronGeometry(0.1, 0);
   const bits = [];
@@ -394,7 +394,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture, brand }
   const spine = new THREE.Mesh(new THREE.CylinderGeometry(D / 2 + T, D / 2 + T, H, 20, 1, false, Math.PI, Math.PI), cloth); spine.position.set(0, 0, T / 2 + D / 2); inner.add(spine);
   const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.6, 0.01), mat(THREE, COL.accent, { roughness: 0.5 })); ribbon.position.set(0.5, -H / 2 - 0.2, T / 2 + D + 0.004); inner.add(ribbon);
 
-  /* Sampul depan berengsel di punggung buku (keadaan "open"). */
+  /* Front cover hinged at the book's spine ("open" state). */
   const cover = new THREE.Group(); cover.position.set(0, 0, T + D + T / 2); inner.add(cover);
   const front = new THREE.Mesh(slabGeo(THREE, W, H, T, 0.05, 0.012), cloth); front.position.x = W / 2; cover.add(front);
   const art = textTexture((g, w, h) => {
@@ -418,7 +418,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture, brand }
   const leftPage = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.14, H - 0.2), new THREE.MeshStandardMaterial({ map: leftTex, roughness: 0.95 }));
   leftPage.rotation.y = Math.PI; leftPage.position.set(W / 2 - 0.02, 0, -T / 2 - 0.052); cover.add(leftPage);
 
-  /* Halaman yang membalik (keadaan "flip"). */
+  /* Turning page ("flip" state). */
   const pageGeo = new THREE.PlaneGeometry(W - 0.12, H - 0.16, 8, 1); pageGeo.translate((W - 0.12) / 2, 0, 0);
   const pages = [0, 1, 2].map(() => { const p = new THREE.Group(); p.position.set(0, 0, T / 2 + D + 0.01); const m = new THREE.Mesh(pageGeo, new THREE.MeshStandardMaterial({ color: "#f7f1e4", roughness: 0.95, side: THREE.DoubleSide })); p.add(m); inner.add(p); return p; });
   const glow = glowSprite(THREE, glowTexture(), COL.accent, 6, 0.15); glow.position.z = -0.8; group.add(glow);

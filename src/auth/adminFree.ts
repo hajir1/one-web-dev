@@ -1,12 +1,12 @@
 // ─── auth/adminFree.ts ───────────────────────────────────────────────────────
-// v6: mode "Admin: tanpa kredit". Nilainya HANYA dari profil sesi yang dikirim
-// backend (`GET /auth/me` → adminFree), yang dihitung server dari peran di
-// database + klaim 2FA token. Frontend memakai flag ini untuk TAMPILAN saja
-// (badge, tanpa peringatan kredit, item tampil terbuka); pemotongan kredit
-// yang sebenarnya selalu diputuskan backend.
+// v6: "Admin: no credits" mode. Its value comes ONLY from the session profile sent
+// by the backend (`GET /auth/me` → adminFree), which the server computes from the role in
+// the database + the token's 2FA claim. The frontend uses this flag for DISPLAY only
+// (badge, no credit warnings, items shown unlocked); credit charging
+// which is always decided by the backend in the end.
 //
-// Modul ini sengaja tanpa dependensi (bukan store React) agar bisa dipakai
-// fungsi murni seperti `planCharge` tanpa impor melingkar.
+// This module deliberately has no dependencies (not a React store) so it can be used
+// by pure functions such as `planCharge` without circular imports.
 
 let current = { adminFree: false, pendingMfa: false };
 const listeners = new Set<() => void>();
@@ -17,9 +17,9 @@ export function setAdminFree(adminFree: boolean, pendingMfa = false) {
   listeners.forEach((cb) => cb());
 }
 
-/** true = sesi admin tervalidasi; semua fitur tanpa kredit. */
+/** true = validated admin session; every feature without credits. */
 export const isAdminFree = () => current.adminFree;
-/** true = akun admin, tetapi sesi belum lolos 2FA (mode belum aktif). */
+/** true = admin account, but the session has not passed 2FA yet (mode not active). */
 export const isAdminFreePendingMfa = () => current.pendingMfa;
 
 export function subscribeAdminFree(cb: () => void) {

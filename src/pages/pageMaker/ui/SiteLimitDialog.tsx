@@ -17,11 +17,11 @@ import { useSiteLimitDialog } from "../helpers/siteQuota";
 const NONE: SavedDesign[] = [];
 
 /**
- * Dialog "kuota website penuh" dengan dua pilihan:
- *  1. Bayar: buka 1 slot website (atau paket lebih hemat di Web Market).
- *  2. Hapus website lama: pengguna memilih sendiri, setiap hapus dikonfirmasi.
- *     Desain halamannya tetap tersimpan di Desain Saya.
- * Setelah ruang cukup, "Lanjutkan" menjalankan aksi yang tertunda.
+ * The "website quota full" dialog with two options:
+ *  1. Pay: unlock 1 website slot (or a cheaper pack in Web Market).
+ *  2. Delete an old website: the user chooses; every delete is confirmed.
+ *     Its page designs stay saved in My Designs.
+ * Once there is enough space, "Continue" runs the pending action.
  */
 export default function SiteLimitDialog() {
   const { t, i18n } = useTranslation();
@@ -95,7 +95,7 @@ export default function SiteLimitDialog() {
         </p>
         {room ? <Notice tone="success">{t("siteLimit.roomOk")}</Notice> : <Notice tone="warn">{t(demo ? "demo.siteLimit.choose" : "siteLimit.choose", { max: limit })}</Notice>}
 
-        {/* Mode demo (v12): tanpa pembayaran slot; satu-satunya cara = hapus website lama. */}
+        {/* Demo mode (v12): no slot payment; the only way = delete an old website. */}
         {!demo && (
           <section className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-500/20 dark:bg-blue-500/10" data-testid="site-limit-pay" aria-labelledby="site-limit-pay-title">
             <h3 id="site-limit-pay-title" className="text-sm font-semibold text-gray-800 dark:text-gray-100">

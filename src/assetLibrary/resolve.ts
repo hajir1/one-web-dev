@@ -3,13 +3,13 @@ import { assetBlob, assetDataUrl, assetMeta, useAssets } from "./store";
 import { ASSET_SCHEME, findAssetIds, MISSING_ASSET, replaceAssetRefs } from "./refs";
 import { layoutFor, packAssets, type AssetSource, type TextFile } from "./pack";
 
-/** Sumber aset untuk pack (pustaka aktif). */
+/** Asset source for packing (active library). */
 export const assetSource: AssetSource = {
   meta: (id) => assetMeta(id),
   blob: (id) => assetBlob(id),
 };
 
-/** Teks dengan `aset:<id>` → data URL (pratinjau). Aset hilang → kotak abu-abu. */
+/** Text with `aset:<id>` → data URL (preview). Missing asset → gray box. */
 export async function resolveForPreview(text: string): Promise<string> {
   const ids = findAssetIds(text);
   if (!ids.length) return text;
@@ -19,8 +19,8 @@ export async function resolveForPreview(text: string): Promise<string> {
 }
 
 /**
- * Hook: daftar teks dengan rujukan aset diterjemahkan untuk pratinjau.
- * Tanpa rujukan → dikembalikan langsung (tanpa jeda satu render).
+ * Hook: resolves a list of texts with asset references for preview.
+ * No references → returned directly (no one-render delay).
  */
 export function useResolvedAssets<T extends readonly string[]>(texts: T): T {
   const has = texts.some((t) => t && t.includes(ASSET_SCHEME));
@@ -34,13 +34,13 @@ export function useResolvedAssets<T extends readonly string[]>(texts: T): T {
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` mewakili isi `texts`
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` represents the content of `texts`
   }, [key, has, version]);
   if (!has) return texts;
-  // Selagi data URL disiapkan: pakai hasil sebelumnya bila ada (hindari kedip), selain itu teks tanpa gambar.
+  // While data URLs are being prepared: use the previous result if any (avoids flicker), otherwise text without images.
   if (out) return out.val;
   return texts.map((t) => replaceAssetRefs(t, () => MISSING_ASSET)) as unknown as T;
 }
 
-/** Berkas ekspor + gambar aset → siap di-zip / di-deploy. */
+/** Export files + asset images → ready to zip / deploy. */
 export const packForFramework = <F extends TextFile>(files: F[], framework: string) => packAssets(files, layoutFor(framework), assetSource);

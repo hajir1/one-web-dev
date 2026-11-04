@@ -1,8 +1,8 @@
 /* ================================================================== */
-/* Ilustrasi SVG set F (buatan sendiri, ASCII, tanpa URL eksternal;      */
-/* kunci "v5f-<nama>"). Motif menerima warna agar punya beberapa varian. */
-/* Banyak dipakai sebagai latar Header Lebar Penuh, jadi komposisinya    */
-/* lebar dan objek utamanya tidak di tengah persis.                      */
+/* Set F SVG illustrations (in-house, ASCII, no external URLs;          */
+/* keys "v5f-<name>"). Motifs take colors so they have several variants. */
+/* Often used as Full Width Header backgrounds, so the composition is   */
+/* wide and the main subject is not exactly centered.                   */
 /* ================================================================== */
 
 const svg = (body: string, w = 1200, h = 700) =>
@@ -28,7 +28,7 @@ function plate(a: string, b: string, food: string, acc: string): string {
   );
 }
 
-/** Resor tepi pantai saat senja (hotel). */
+/** Beachfront resort at dusk (hotel). */
 function resort(a: string, b: string, sea: string, acc: string): string {
   return svg(
     bg(a, b) +
@@ -42,7 +42,7 @@ function resort(a: string, b: string, sea: string, acc: string): string {
   );
 }
 
-/** Mobil di jalan berkelok (rental). */
+/** Car on a winding road (rental). */
 function car(a: string, b: string, body: string, acc: string): string {
   return svg(
     bg(a, b) +
@@ -139,7 +139,7 @@ function museum(a: string, b: string, stone: string, acc: string): string {
   );
 }
 
-/** Ponsel berisi dasbor aplikasi + kartu melayang (aplikasi keuangan). */
+/** Phone showing an app dashboard + floating cards (finance app). */
 function phone(a: string, b: string, screen: string, acc: string): string {
   return svg(
     bg(a, b) +

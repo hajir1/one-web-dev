@@ -1,7 +1,7 @@
 // ─── plans/planCore.ts ───────────────────────────────────────────────────────
-// v11: tipe, angka cadangan, validasi, dan hitungan kuota paket langganan.
-// Tanpa impor runtime ke billing/pricing (dipakai sanitizeAccount di
-// pricing.ts; mencegah impor melingkar). API ada di plans.ts.
+// v11: subscription plan types, fallback numbers, validation, and quota math.
+// No runtime imports into billing/pricing (used by sanitizeAccount in
+// pricing.ts; avoids a circular import). The API lives in plans.ts.
 
 import i18n from "../../i18n";
 import type { ServerFeatureId, UsageInput } from "../media/processing/pricing";
@@ -46,7 +46,7 @@ interface Meter {
   left: number;
 }
 
-/** Kuota yang berlaku untuk akun (dari backend). */
+/** The quota in effect for the account (from the backend). */
 export interface PlanView {
   plan: PlanId;
   paidPlan: PlanId | null;
@@ -104,10 +104,10 @@ export const DEFAULT_ADDONS: AddonSpec[] = [
 
 export const DEFAULT_CATALOG: PlanCatalog = { yearlyDiscountPercent: YEARLY_DISCOUNT_PERCENT, plans: DEFAULT_PLANS, addons: DEFAULT_ADDONS, paymentAvailable: false };
 
-/** Fitur yang dihitung per menit video/audio (bukan per proses). */
+/** Features counted per minute of video/audio (not per run). */
 export const VIDEO_MINUTE_FEATURES: ReadonlySet<ServerFeatureId> = new Set(["video-compress", "audio-extract"]);
 
-/** Proses untuk satu input (sama dengan backend `unitsFor`). */
+/** Runs for one input (same as the backend `unitsFor`). */
 export function unitsFor(feature: ServerFeatureId, usage: UsageInput = {}): number {
   if (VIDEO_MINUTE_FEATURES.has(feature)) return 0;
   if (feature === "image-upscaler" && (usage.scale ?? 2) > 2) return 2;
@@ -115,7 +115,7 @@ export function unitsFor(feature: ServerFeatureId, usage: UsageInput = {}): numb
   return 1;
 }
 
-/** Detik video untuk satu input (0 bila durasi belum diketahui). */
+/** Video seconds for one input (0 when the duration is not known yet). */
 export function videoSecondsFor(feature: ServerFeatureId, usage: UsageInput = {}): number {
   if (!VIDEO_MINUTE_FEATURES.has(feature)) return 0;
   const s = usage.seconds;
@@ -126,7 +126,7 @@ export function videoSecondsFor(feature: ServerFeatureId, usage: UsageInput = {}
 
 export const planName = (p: PlanId) => i18n.t(`plans.names.${p}`);
 export const priceOf = (p: PlanSpec, i: PlanInterval) => (i === "year" ? p.yearlyIdr : p.monthlyIdr);
-/** Harga per bulan bila bayar tahunan (dibulatkan ke bawah, untuk tampilan). */
+/** Monthly price when paying yearly (rounded down, for display). */
 export const perMonthWhenYearly = (p: PlanSpec) => Math.floor(p.yearlyIdr / 12 / 100) * 100;
 export const minutes = (sec: number) => Math.floor(sec / 60);
 export const formatBytes = (b: number) => (b >= 1024 * MB ? `${+(b / (1024 * MB)).toFixed(1)} GB` : `${Math.round(b / MB)} MB`);
@@ -151,7 +151,7 @@ function meter(raw: unknown): Meter | null {
   return { limit, bonus, used, left: int(m.left) ?? Math.max(0, limit + bonus - used) };
 }
 
-/** Validasi tampilan kuota dari server; null bila bentuknya tidak dikenal. */
+/** Validates the server quota display; null when its shape is unknown. */
 export function sanitizePlanView(raw: unknown): PlanView | null {
   if (!raw || typeof raw !== "object") return null;
   const v = raw as Record<string, unknown>;
@@ -229,15 +229,15 @@ export function sanitizeCatalog(raw: unknown): PlanCatalog {
 export interface QuotaPlan {
   units: number;
   videoSeconds: number;
-  /** Ada input yang durasinya belum diketahui (menit video dihitung setelah selesai). */
+  /** Some inputs have an unknown duration (video minutes are counted after finishing). */
   durationUnknown: boolean;
-  /** null = tidak diketahui (kuota belum dimuat). */
+  /** null = unknown (quota not loaded yet). */
   enough: boolean | null;
-  /** Alasan bila tidak cukup / melebihi batas. */
+  /** Reason when insufficient / over the limit. */
   problem: "units" | "video" | "size" | "duration" | null;
 }
 
-/** Perkiraan pemakaian kuota untuk sekumpulan input (urut, sama dengan cek backend). */
+/** Estimated quota usage for a set of inputs (in order, same as the backend check). */
 export function planQuota(feature: ServerFeatureId, inputs: UsageInput[], view: PlanView | null, techMaxBytes?: number): QuotaPlan {
   let units = 0;
   let videoSeconds = 0;

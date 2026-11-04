@@ -33,7 +33,7 @@ test("32 preset: 12 gratis + 20 premium (termasuk 10 preset Pro baru: 4 + 6), se
   assert.equal(SECTION_PRESETS.length, 32);
   assert.equal(SECTION_PRESETS.filter((p) => p.tier === "free").length, 12);
   assert.equal(SECTION_PRESETS.filter((p) => p.tier === "premium").length, 20);
-  // gratis tampil lebih dulu
+  // free ones are shown first
   assert.ok(SECTION_PRESETS.slice(0, 12).every((p) => p.tier === "free"));
   const ids = new Set();
   for (const p of SECTION_PRESETS) {
@@ -47,7 +47,7 @@ test("32 preset: 12 gratis + 20 premium (termasuk 10 preset Pro baru: 4 + 6), se
   }
   assert.equal(new Set(SECTION_PRESETS.map((p) => p.id)).size, 32);
   assert.ok(ids.size > 32);
-  // preset bergambar memakai URL yang aman & lolos normalisasi
+  // image presets use safe URLs & pass normalization
   const hero = SECTION_PRESETS.find((p) => p.id === "hero-image").build();
   assert.ok(isSafeBgImage(hero.bgImage));
   const n = normalizePageDoc({ version: 2, root: createPageRoot([hero]) });
@@ -66,7 +66,7 @@ test("halaman baru kosong; elemen tidak boleh langsung di root (section wajib)",
   assert.equal(canInsertInto(root, row.id, el()), true);
   assert.equal(canInsertInto(root, row.children[0].id, el()), true);
   assert.equal(canInsertInto(root, row.id, createSectionFromPreset("single")), false);
-  // section hanya menerima Row; Row tidak boleh di dalam Row
+  // sections only accept Rows; a Row may not go inside a Row
   assert.equal(canInsertInto(root, sec.id, el()), false);
   assert.equal(canInsertInto(root, sec.id, createRow()), true);
   assert.equal(canInsertInto(root, row.id, createRow()), false);
@@ -74,7 +74,7 @@ test("halaman baru kosong; elemen tidak boleh langsung di root (section wajib)",
 
 test("enforcePageStructure: tidak ada elemen yang hilang", () => {
   const stray = el("badge");
-  const box = createSectionFromPreset(SECTION_PRESETS[2])!; // kerangka tanpa contoh isi
+  const box = createSectionFromPreset(SECTION_PRESETS[2])!; // skeleton without sample content
   box.section = undefined;
   box.children[0].children[0].children.push(el("text"));
   const root = enforcePageStructure(createPageRoot([stray, box, createSectionFromPreset("single")]));
@@ -147,9 +147,9 @@ test("compose: tag semantik, padding section, bgImage, preview == export", () =>
   assert.match(c.html.body, /^<main class="custom-page">/);
   assert.match(c.html.body, /<header class="custom-page__box-1">/);
   assert.match(c.html.body, /<section class="custom-page__box-\d+">/);
-  // Jarak section cair: 96px di desktop, 53px di HP.
+  // Fluid section spacing: 96px on desktop, 53px on phones.
   assert.match(c.html.css, /padding: clamp\(53px, [\d.]+px \+ [\d.]+vw, 96px\) 24px;/);
-  // lebar isi section diterapkan pada Row (bawaan: ikut lebar isi, rata tengah)
+  // the section content width is applied to the Row (default: follow the content width, centered)
   assert.match(c.html.css, /\{[^}]*max-width: 1120px;[^}]*margin-left: auto;\n {2}margin-right: auto;/);
   assert.match(c.html.css, /background: url\("https:\/\/x.com\/h.jpg"\) center \/ cover no-repeat #f8fafc;/);
   const pv = compose(root, { rootClass: "custom-page", icons, preview: true });
@@ -161,7 +161,7 @@ test("compose: tag semantik, padding section, bgImage, preview == export", () =>
 
 function pageWithRects() {
   let root = createPageRoot();
-  const a = createSectionFromPreset("features-3"); // 3 kolom
+  const a = createSectionFromPreset("features-3"); // 3 columns
   const b = createSectionFromPreset("single");
   root = insertNode(root, root.id, 0, a);
   root = insertNode(root, root.id, 1, b);
@@ -231,7 +231,7 @@ test("drop: section hanya di antara section; memindah kontainer ke dirinya ditol
   assert.equal(r.index, 2);
   const top = resolveDrop(root, rects, { x: 500, y: 5 }, { kind: "node", id: a.id });
   assert.equal(top.index, 0);
-  // kolom diseret ke dalam dirinya sendiri → target lain / null, tidak pernah dirinya sendiri
+  // a column dragged into itself → another target / null, never itself
   const col = a.children[0].children[0];
   const self = resolveDrop(root, rects, { x: 100, y: 100 }, { kind: "node", id: col.id });
   assert.notEqual(self?.parentId, col.id);
@@ -270,15 +270,15 @@ test("placeNode: konten ke section dibungkus Row; Row ke dalam Row naik jadi sau
   assert.equal(sec2.children.length, 2);
   assert.ok(isRow(sec2.children[1]));
   assert.equal(sec2.children[1].children[0].id, e.id);
-  // konten ke root ditolak
+  // content into the root is rejected
   assert.equal(placeNode(root, root.id, 0, el()).id, null);
-  // Row di dalam Row → jadi saudara tepat di bawahnya
+  // a Row inside a Row → becomes the sibling right below it
   const first = sec.children[0];
   const nr = createRow({ name: "Baru" });
   const q = placeNode(root, first.id, 0, nr);
   const s3 = findNode(q.root, sec.id);
   assert.deepEqual(s3.children.map((c) => c.id), [first.id, nr.id]);
-  // Row ke root ditolak; section ke Row ditolak
+  // a Row onto the root is rejected; a section into a Row is rejected
   assert.equal(placeNode(root, root.id, 0, createRow()).id, null);
   assert.equal(placeNode(root, first.id, 0, createSectionFromPreset("cta")).id, null);
 });
@@ -329,7 +329,7 @@ test("Row bisa di-styling dan gayanya masuk CSS", () => {
 
 test("migrasi halaman lama: section flex/grid + kolom langsung → section blok + satu Row (tampilan sama)", () => {
   const old = createSectionFromPreset("features-3");
-  // bentuk lama: kolom langsung di section bergrid
+  // old shape: columns directly in a grid section
   const cells = old.children[0].children;
   cells[1].children.push(el("badge"));
   old.layout = "grid";
@@ -349,14 +349,14 @@ test("migrasi halaman lama: section flex/grid + kolom langsung → section blok 
   assert.equal(countElements(d.root), 1);
   // idempoten
   assert.deepEqual(normalizePageDoc(d), d);
-  // elemen langsung di section stack lama → Row
+  // elements directly in an old stack section → Row
   const old2 = createSectionFromPreset("single");
   old2.children = [el(), el("text")];
   old2.layout = "stack";
   const d2 = normalizePageDoc({ version: 2, root: createPageRoot([old2]) });
   assert.equal(d2.root.children[0].children.length, 1);
   assert.equal(d2.root.children[0].children[0].children.length, 2);
-  // section kosong lama (flex/grid) jadi blok
+  // an old empty section (flex/grid) becomes a block
   const old3 = createSectionFromPreset("single");
   old3.children = [];
   old3.layout = "grid";
@@ -386,7 +386,7 @@ test("movePageNode: pindah elemen antar Row; pindah Row; Row tidak masuk grup", 
   assert.equal(findNode(m2, sec.id).children[0].id, r2.id);
   const cell = sec.children[0].children[0];
   assert.equal(movePageNode(root, r2.id, cell.id, 0) === root || findParent(movePageNode(root, r2.id, cell.id, 0), r2.id).parent.id !== cell.id, true);
-  // drop Row: hanya antar Row dalam section
+  // Row drop: only between Rows within a section
   const rects = {
     root: { x: 0, y: 0, w: 1000, h: 600 },
     [sec.id]: { x: 0, y: 0, w: 1000, h: 600 },
@@ -417,7 +417,7 @@ test("background: solid, none, gradient linear/radial + warna tengah", () => {
     gradientCss({ gradientKind: "radial", gradientFrom: "#000", gradientVia: "#f00", gradientTo: "#fff" }),
     "radial-gradient(circle, #000, #f00, #fff)",
   );
-  // warna jahat tidak bisa menutup deklarasi
+  // a malicious color cannot close the declaration
   assert.equal(gradientCss({ gradientFrom: "red;}body{x:y", gradientTo: "#fff", gradientAngle: 0 }), "linear-gradient(0deg, transparent, #fff)");
 });
 
@@ -435,18 +435,18 @@ test("background: gambar + ukuran/posisi/ulangi/parallax/overlay; URL berbahaya 
 });
 
 test("background kontainer: data lama (bgEnabled / section.bgImage) tetap tampil & bisa diubah", () => {
-  const s = createSectionFromPreset("cta"); // bgEnabled + bgColor lama
+  const s = createSectionFromPreset("cta"); // old bgEnabled + bgColor
   assert.equal(boxBackground(s).bgType, "solid");
   const c1 = compose(createPageRoot([s]), { rootClass: "pg", icons });
   assert.match(c1.html.css, /background: #eff6ff;/);
-  // tipe baru: gradient pada Row
+  // new type: gradient on a Row
   const row = s.children[0];
   Object.assign(row, { bgType: "gradient", gradientFrom: "#ff0000", gradientTo: "#0000ff", gradientAngle: 180, gradientKind: "linear" });
   const d = normalizePageDoc({ version: 2, root: createPageRoot([s]) });
   assert.equal(d.root.children[0].children[0].bgType, "gradient");
   const c2 = compose(d.root, { rootClass: "pg", icons });
   assert.match(c2.html.css, /background: linear-gradient\(180deg, #ff0000, #0000ff\);/);
-  // bgType "none" → tidak ada deklarasi background
+  // bgType "none" → no background declaration
   const g = sanitizeBg({ bgType: "zzz", bgOverlayOpacity: 500 }, "none");
   assert.equal(g.bgType, "none");
   assert.equal(g.bgOverlayOpacity, 100);
@@ -494,7 +494,7 @@ test("event: onClick gratis di semua framework; premium diabaikan tanpa kredit",
   const ng = c.files("angular");
   assert.match(ng.find((f) => f.name.endsWith(".component.html")).content, /\(click\)="handleButton1Click\(\$event\)"/);
   assert.match(ng.find((f) => f.name.endsWith(".component.ts")).content, /handleButton1Click\(event: any\): void \{/);
-  // dengan kredit (opsi) event premium ikut
+  // with credits (option) premium events are included
   const paid = compose(root, { rootClass: "pg", icons, allowPremiumEvents: true });
   assert.match(paid.html.script, /addEventListener\("mousedown", handleButton1MouseDown\)/);
   assert.match(paid.files("react")[0].content, /onMouseDown=\{handleButton1MouseDown\}/);
@@ -514,7 +514,7 @@ test("event: tidak jalan di canvas desain, kode tidak valid dibuang, elemen form
   assert.match(ex.html.script, /handleButton1Click/);
   assert.doesNotMatch(ex.html.script, /handleAnchor1Click/);
   assert.ok(ex.warnings.some((w) => /tidak valid/.test(w.message)));
-  // checkbox: event dipasang di <input>, bukan label pembungkus
+  // checkbox: the event is attached to the <input>, not the wrapping label
   assert.match(ex.files("react")[0].content, /<input[^>]*onClick=\{handleCheckbox1Click\}/);
   assert.equal(eventCodeError("let x = 1;"), null);
   assert.ok(eventCodeError("let = ;"));
@@ -532,7 +532,7 @@ test("event: semua elemen pendukung tidak stateful (bawaan) & data tersimpan dib
   const ev = sanitizeEvents([{ name: "onClick", code: "x" }, { name: "onClick", code: "dup" }, { name: "onEvil", code: "x" }, 5, { name: "onBlur", code: 7 }]);
   assert.deepEqual(ev, [{ name: "onClick", code: "x" }, { name: "onBlur", code: "" }]);
   assert.equal(sanitizeEvents("x"), undefined);
-  // Fitur event dihapus dari mode edit: event tersimpan dipindah ke Custom JavaScript saat dibuka.
+  // The event feature was removed from edit mode: stored events move to Custom JavaScript when opened.
   const b = el("button");
   b.events = [{ name: "onClick", code: "go()" }];
   b.advanced = { customJs: "console.log('lama');" };
@@ -543,21 +543,21 @@ test("event: semua elemen pendukung tidak stateful (bawaan) & data tersimpan dib
   assert.equal(eventCodeError(nb.advanced.customJs), null);
   const ex = compose(d.root, { rootClass: "pg", icons });
   assert.ok(ex.html.script.includes('on(target, "click"'));
-  // elemen form: event dipasang ke kontrolnya
+  // form elements: the event is attached to the control
   const ck = el("checkbox");
   ck.events = [{ name: "onChange", code: "x()" }, { name: "onBlur", code: "  " }];
   const nc = normalizePageDoc({ version: 2, root: pageWith([ck]) }).root.children[0].children[0].children[0];
   assert.match(nc.advanced.customJs, /querySelector\("input, select, textarea"\)/);
   assert.match(nc.advanced.customJs, /"change"/);
   assert.doesNotMatch(nc.advanced.customJs, /"blur"/);
-  // elemen yang tidak mendukung event → peringatan, tidak ada handler
+  // elements that do not support events → a warning, no handler
   const t = el("tabs");
   t.events = [{ name: "onClick", code: "1" }];
   const c = compose(pageWith([t]), { rootClass: "pg", icons });
   assert.ok(c.warnings.some((w) => /tidak didukung/.test(w.message)));
 });
 
-/* ---------------------- kuota unduh & pratinjau ---------------------- */
+/* ---------------------- download quota & preview ---------------------- */
 
 import { FREE_EXPORTS, serverExport } from "../../../credits/downloadQuota";
 import { limitedPreview } from "../core/ui/CodeExportPanel";
@@ -578,7 +578,7 @@ test("ekspor server: kode dari POST /exports; ulang identik tidak dihitung; habi
       assert.equal(init.credentials, "include");
       const b = JSON.parse(String(init.body));
       bodies.push(b);
-      // Server menghitung sidik jari sendiri dari isi (di sini: framework + rootClass).
+      // The server computes its own fingerprint from the content (here: framework + rootClass).
       const fp = `${b.framework}:${b.rootClass}`;
       const files = [{ name: "index.html", content: `<main class="${b.rootClass}"></main>`, lang: "html" }];
       const q = () => ({ used: Math.min(seen.size, 20), free: 20, remaining: Math.max(0, 20 - seen.size), cost: 1 });
@@ -633,7 +633,7 @@ test("pratinjau kode terbatas: sebagian baris saja, sisanya tidak dikirim", () =
 });
 
 
-/* ----------------------------- lebar Row ----------------------------- */
+/* ----------------------------- Row width ----------------------------- */
 
 import { rowWidthRules } from "../engine/helpers/compose";
 

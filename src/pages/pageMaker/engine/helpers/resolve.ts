@@ -9,7 +9,7 @@ export interface ResolvedState {
   state: any;
 }
 
-/** State efektif sebuah elemen bawaan: salinan di node, dilengkapi default. */
+/** Effective state of a built-in element: the copy on the node, completed with defaults. */
 export function resolveElement(node: ElementNode): ResolvedState {
   const def = ELEMENT_DEFINITION_BY_TYPE[node.elementType];
   return { def, state: def ? mergeWithDefault(def.defaults, node.state) : node.state };

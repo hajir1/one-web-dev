@@ -18,9 +18,9 @@ import { commerceService } from "../../marketplace/services";
 import type { PieceCatalogItem } from "../../marketplace/types";
 
 /* ================================================================== */
-/* Web Market: paket desain & website, saldo kredit, hak akses, dan toko */
-/* section/elemen Premium. Semua transaksi lewat backend (commerceService */
-/* → /marketplace/*); saldo & hak akses hanya dari respons server.       */
+/* Web Market: design & website packs, credit balance, access rights, and the store */
+/* Premium sections/elements. Every transaction goes through the backend (commerceService */
+/* → /marketplace/*); balance & access only come from server responses. */
 /* ================================================================== */
 
 const NONE: unknown[] = [];
@@ -125,7 +125,7 @@ function DesignPacks() {
   );
 }
 
-/** Paket folder website: makin banyak makin murah per website. */
+/** Website folder packs: the more you buy, the cheaper per website. */
 function SitePacks() {
   const { t } = useTranslation();
   const account = useMarketAccount();

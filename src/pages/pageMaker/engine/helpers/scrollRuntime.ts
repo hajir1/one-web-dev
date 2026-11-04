@@ -1,33 +1,33 @@
 /* ================================================================== */
-/* OWD Scroll: efek scroll "sinematik" tanpa library (v26).              */
+/* OWD Scroll: "cinematic" scroll effects without a library (v26).       */
 /*                                                                    */
-/* Ditulis sendiri (bukan GSAP: lisensi GSAP melarang pemakaian di       */
-/* builder visual tanpa kode). Ditanam di HTML seperti OWD Motion, tanpa */
-/* CDN. Atribut `data-scroll` ditulis compose() dari pengaturan node:     */
-/*   split     judul muncul per kata dari balik garis                    */
+/* Written in-house (not GSAP: the GSAP license forbids use in          */
+/* no-code visual builders). Embedded in the HTML like OWD Motion, without */
+/* CDN. The `data-scroll` attribute is written by compose() from the node settings: */
+/*   split     headings appear word by word from behind a line          */
 /*   rise      anak-anak box naik bergantian                             */
 /*   mask      box terbuka seperti tirai (clip-path)                     */
-/*   parallax  bergerak lebih lambat dari scroll                         */
-/*   scale     membesar sampai 100% saat discroll                        */
+/*   parallax  moves slower than the scroll                              */
+/*   scale     grows to 100% while scrolling                             */
 /*   scrub-x   section menempel, isinya bergeser horizontal              */
-/*   pin       section menempel, anak-anaknya muncul satu per satu       */
-/*   counter   angka di teks dihitung naik                               */
-/*   marquee   isi berjalan terus ke samping                             */
+/*   pin       the section sticks, its children appear one by one        */
+/*   counter   numbers in text count up                                 */
+/*   marquee   content keeps moving sideways                            */
 /*                                                                    */
-/* Prinsip: konten SELALU terlihat bila JavaScript mati (keadaan awal    */
-/* dipasang oleh skrip, bukan CSS), semua efek mati untuk "kurangi       */
-/* gerakan", dan scrub-x/pin hanya di layar >= 768px (di HP isinya tetap */
-/* tersusun vertikal). Memakai Web Animations API, IntersectionObserver, */
-/* dan position: sticky. init() aman dipanggil berulang.                 */
-/* scrub-x: pakai pada box BARIS berisi anak lebar tetap (mis. kartu).   */
-/* pin: pakai pada box yang anak-anaknya muncul bergantian (tinggi box   */
-/* < 90% layar); anak pertama selalu terlihat.                           */
+/* Principle: content is ALWAYS visible when JavaScript is off (initial state */
+/* set by the script, not CSS), every effect is off for "reduce         */
+/* motion", and scrub-x/pin only on screens >= 768px (on phones the content stays */
+/* stacked vertically). Uses the Web Animations API, IntersectionObserver, */
+/* and position: sticky. init() is safe to call repeatedly.             */
+/* scrub-x: use on a ROW box with fixed-width children (e.g. cards).    */
+/* pin: use on a box whose children appear in turn (box height          */
+/* < 90% of the screen); the first child is always visible.              */
 /* ================================================================== */
 
 export const SCROLL_EFFECTS = ["split", "rise", "mask", "parallax", "scale", "scrub-x", "pin", "counter", "marquee"] as const;
 export type ScrollEffect = (typeof SCROLL_EFFECTS)[number];
 
-/** Nilai "amount" bawaan per efek (0 di pengaturan = pakai ini). */
+/** Default "amount" value per effect (0 in the settings = use this). */
 export const SCROLL_AMOUNT: Record<ScrollEffect, { def: number; min: number; max: number; unit: string }> = {
   split: { def: 60, min: 0, max: 200, unit: "ms" },
   rise: { def: 48, min: 8, max: 160, unit: "px" },
@@ -49,7 +49,7 @@ html.owds-clip,html.owds-clip body{overflow-x:clip}
 @keyframes owds-mq{to{transform:translate3d(-50%,0,0)}}
 @media (prefers-reduced-motion:reduce){.owds-mq-track{animation:none}}`;
 
-export const SCROLL_JS = `/* owd-scroll: efek scroll OneWebDev, tanpa library */
+export const SCROLL_JS = `/* owd-scroll: OneWebDev scroll effects, no library */
 (function () {
   if (window.OWDScroll) return;
   var d = document, W = window;
@@ -89,13 +89,13 @@ export const SCROLL_JS = `/* owd-scroll: efek scroll OneWebDev, tanpa library */
     });
     return Array.prototype.slice.call(el.querySelectorAll(".owds-i"));
   }
-  /* Elemen yang bergerak mengikuti posisi scroll. */
+  /* Elements that move with the scroll position. */
   var live = [], raf = 0;
   function tick() { raf = 0; var vh = W.innerHeight; live = live.filter(function (u) { return u(vh) !== false; }); }
   function queue() { if (!raf) raf = requestAnimationFrame(tick); }
   W.addEventListener("scroll", queue, { passive: true });
   W.addEventListener("resize", queue);
-  /* position: sticky gagal bila ada leluhur dengan overflow selain visible/clip. */
+  /* position: sticky fails when an ancestor has overflow other than visible/clip. */
   function stickyOk(el) {
     for (var p = el.parentElement; p && p !== d.body; p = p.parentElement) {
       var cs = getComputedStyle(p);
@@ -103,7 +103,7 @@ export const SCROLL_JS = `/* owd-scroll: efek scroll OneWebDev, tanpa library */
     }
     return true;
   }
-  /* Bungkus el dengan "lintasan" setinggi jarak scroll; el sendiri menempel (sticky) di tengah layar. */
+  /* Wrap el in a "track" as tall as the scroll distance; el itself sticks in the middle of the screen. */
   function stick(el, extra) {
     var outer = d.createElement("div"); outer.className = "owds-pin";
     el.parentNode.insertBefore(outer, el); outer.appendChild(el);
@@ -140,7 +140,7 @@ export const SCROLL_JS = `/* owd-scroll: efek scroll OneWebDev, tanpa library */
       var text = leaf.textContent, m = text.match(/\\d[\\d.,]*\\d|\\d/);
       if (!m) return;
       var raw = m[0], dot = raw.indexOf(".") > -1, comma = raw.indexOf(",") > -1;
-      // Gaya Indonesia: titik = ribuan, koma = desimal (12.500 / 4,8).
+      // Indonesian style: dot = thousands, comma = decimal (12.500 / 4,8).
       var decSep = comma ? "," : dot && !/\\.\\d{3}(\\D|$)/.test(raw) ? "." : "";
       var parts = decSep ? raw.split(decSep) : [raw];
       var intPart = parts[0].replace(/[.,]/g, ""), places = parts[1] ? parts[1].length : 0;
@@ -199,7 +199,7 @@ export const SCROLL_JS = `/* owd-scroll: efek scroll OneWebDev, tanpa library */
     },
     "scrub-x": function (el, amt) {
       if (!wide() || !stickyOk(el)) return;
-      // Anak-anak box berjajar satu baris lalu digeser bersama; halaman tidak boleh ikut melebar.
+      // The box's children line up in one row and slide together; the page must not get wider.
       d.documentElement.classList.add("owds-clip");
       el.classList.add("owds-hx");
       var kids = Array.prototype.slice.call(el.children), dist = 0;

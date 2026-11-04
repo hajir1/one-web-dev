@@ -5,7 +5,7 @@ import { bookstorePenerbit, bookstorePustaka, energyEvCharging, energySurya, rec
 import { laundryKiloanExpress, printingMerch, saasHrAbsensi, scienceLabRiset, scienceMuseum } from "./d4";
 import { agencySeo, financeKoperasi, musicDj, nonprofitLingkungan, realestateApartemen } from "./d5";
 
-/** Konten template katalog v3 (bagian D), dikunci dengan ID di ../catalogD.ts. */
+/** Catalog v3 template content (part D), keyed by the IDs in ../catalogD.ts. */
 export const V3D_TEMPLATES: Record<string, TemplateContent> = {
   "blog-catatan-kuliner": blogCatatanKuliner,
   "government-desa-digital": governmentDesaDigital,

@@ -1,21 +1,21 @@
 // ─── processing/serverClient.ts ──────────────────────────────────────────────
-// Klien pekerjaan server Media & Data (backend Nest = satu-satunya gateway).
-// Berkas TIDAK lewat Nest: Nest memberi URL unggah bertanda tangan, browser
-// mengunggah langsung ke object storage, lalu job dibuat dengan uploadId.
-// Job diproses di antrean (processor lokal Nest atau pekerja Python
-// internal yang tidak pernah dibuka ke internet); frontend mem-poll status.
-// Kredit dipotong server HANYA untuk job yang berhasil.
+// Media & Data server job client (the Nest backend = the only gateway).
+// Files do NOT go through Nest: Nest issues a signed upload URL, the browser
+// uploads directly to object storage, then the job is created with the uploadId.
+// Jobs are processed in a queue (the local Nest processor or an internal Python
+// worker that is never exposed to the internet); the frontend polls the status.
+// The server charges credits ONLY for successful jobs.
 //
 // ┌─ BACKEND (NestJS) ────────────────────────────────────────────────────┐
 // │ POST {base}/media/jobs/uploads  { feature, fileName, contentType, bytes }
 // │        → 201 { uploadId, upload:{ url, method:"PUT", headers }, maxBytes }
-// │        (akses fitur & saldo dicek di sini; 402/403/413 sebelum unggah)
-// │ PUT  upload.url  (langsung ke storage, header dari respons di atas)
+// │        (feature access & balance are checked here; 402/403/413 before upload)
+// │ PUT  upload.url  (directly to storage, headers from the response above)
 // │ POST {base}/media/jobs  { feature, uploadId, params } + Idempotency-Key
-// │        → 202 { jobId, status }  · kunci sama → job lama, TANPA biaya baru
+// │        → 202 { jobId, status }  · same key → the old job, NO new cost
 // │ GET  {base}/media/jobs/:id  → { status, progress?, resultUrl?, error?, account? }
-// │ DELETE {base}/media/jobs/:id  batalkan (tidak ditagih)
-// │ Fitur Data (data-*) memakai kontrak yang sama di {base}/data/jobs, fitur VR (vr-*, v7) di {base}/vr/jobs.
+// │ DELETE {base}/media/jobs/:id  cancel (not charged)
+// │ Data features (data-*) use the same contract at {base}/data/jobs, VR features (vr-*, v7) at {base}/vr/jobs.
 // └───────────────────────────────────────────────────────────────────────┘
 
 import i18n, { currentLang } from "../../../i18n";
@@ -28,7 +28,7 @@ import type { BillingAccount, ServerFeatureId } from "./pricing";
 
 /* ------------------------------ error ------------------------------- */
 
-/** Menghentikan antrean (bukan kegagalan item): item kembali "menunggu". */
+/** Stops the queue (not an item failure): items go back to "waiting". */
 export class StopQueueError extends Error {}
 
 export class ServerUnavailableError extends StopQueueError {
@@ -53,9 +53,9 @@ export class FeatureLockedError extends StopQueueError {
 }
 
 /**
- * v6: layanan pemrosesan (pekerja Python) mati / tidak merespons → backend
- * membalas 503 dengan pesan ramah. Antrean berhenti (item kembali menunggu)
- * dan pesan tampil sebagai notifikasi, bukan galat mentah.
+ * v6: the processing service (Python worker) is down / not responding → the backend
+ * replies 503 with a friendly message. The queue stops (items go back to waiting)
+ * and the message shows as a notification, not a raw error.
  */
 export class ServiceUnavailableError extends StopQueueError {
   constructor(message?: string | null) {
@@ -64,9 +64,9 @@ export class ServiceUnavailableError extends StopQueueError {
   }
 }
 
-/** Kode alasan gagal dari backend/pekerja (mis. "timeout") → kalimat untuk pengguna. */
+/** Failure reason code from the backend/worker (e.g. "timeout") → a sentence for the user. */
 export function jobErrorMessage(code: unknown): string {
-  if (typeof code === "string" && code.trim() && !/^[a-z_]{1,60}$/i.test(code.trim())) return code.trim().slice(0, 300); // sudah berupa kalimat
+  if (typeof code === "string" && code.trim() && !/^[a-z_]{1,60}$/i.test(code.trim())) return code.trim().slice(0, 300); // already a sentence
   const c = typeof code === "string" ? code.trim().toLowerCase() : "";
   return i18n.t(`errors.server.jobErrors.${c || "processing_failed"}`, { defaultValue: i18n.t("errors.server.failed") });
 }
@@ -83,21 +83,21 @@ export class ServerJobError extends Error {
 
 /* --------------------------- konfigurasi ---------------------------- */
 
-/** Untuk pengujian / saat backend siap. */
+/** For testing / when the backend is ready. */
 export function configureServerClient(c: Partial<ApiConfig>) {
   configureApi(c);
 }
 
-/** Server siap untuk fitur ini: backend terpasang DAN fitur tidak dinonaktifkan. */
+/** The server is ready for this feature: a backend is configured AND the feature is not disabled. */
 export const isServerConfigured = (feature?: ServerFeatureId) =>
   isBackendConfigured() && (!feature || useBilling.getState().pricing[feature].enabled);
 
 /* ---------------------------- idempotensi --------------------------- */
 
 /**
- * Kunci idempotensi stabil: fitur + parameter + sidik jari file (ukuran,
- * nama, SHA-256 dari 1 MB awal & akhir). Klik ganda, retry, atau request
- * duplikat menghasilkan kunci yang SAMA → backend tidak menagih dua kali.
+ * Stable idempotency key: feature + parameters + file fingerprint (size,
+ * name, SHA-256 of the first & last 1 MB). Double clicks, retries, or duplicate
+ * requests produce the SAME key → the backend does not charge twice.
  */
 export async function jobKey(feature: ServerFeatureId, file: Blob & { name?: string }, params: unknown): Promise<string> {
   const MB = 1024 * 1024;
@@ -125,7 +125,7 @@ export interface ServerJobRequest {
 export interface ServerJobResult {
   blob: Blob;
   jobId: string;
-  /** Saldo & hak akses terbaru menurut backend (setelah biaya dipotong). */
+  /** Latest balance & access rights according to the backend (after the cost is deducted). */
   account: BillingAccount | null;
 }
 
@@ -144,11 +144,11 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     );
   });
 
-/** Saldo/hak akses HANYA diperbarui dari angka yang dikirim backend. v11: + kuota paket (`subscription`). */
+/** Balance/access are ONLY updated from numbers sent by the backend. v11: + plan quota (`subscription`). */
 const recordAccount = (raw: unknown, subscription?: unknown) =>
   raw ? useBilling.getState().setAccountFromServer(subscription ? { ...(raw as object), subscription } : raw) : null;
 
-/** v11: kuota paket dari respons galat (PLAN_*) → perbarui tampilan sisa kuota tanpa memuat ulang akun. */
+/** v11: plan quota from an error response (PLAN_*) → update the remaining quota display without reloading the account. */
 function recordPlan(plan: unknown) {
   const acc = useBilling.getState().account;
   if (acc && plan && typeof plan === "object") useBilling.getState().setAccountFromServer({ ...acc, subscription: plan });
@@ -156,9 +156,9 @@ function recordPlan(plan: unknown) {
 
 function httpError(status: number, body: Record<string, unknown>): Error {
   if (status === 401) return new ServerJobError(i18n.t("errors.billing.signIn"), 401);
-  // v7 (P6): kredit tim habis / batas bulanan anggota — bukan kekurangan saldo pribadi.
+  // v7 (P6): team credits used up / member monthly limit — not a personal balance shortfall.
   if (status === 402 && typeof body.code === "string" && body.code.startsWith("TEAM_")) return new ServerJobError(jobErrorMessage(body.code), 402);
-  // v11: kuota paket langganan habis / batas paket → pesan dari server + sisa kuota terbaru.
+  // v11: subscription plan quota used up / plan limit → message from the server + latest remaining quota.
   if (typeof body.code === "string" && (body.code.startsWith("PLAN_") || body.code === "SERVER_BUSY")) {
     recordPlan(body.plan);
     return new ServerJobError(typeof body.error === "string" ? body.error : i18n.t("errors.server.status", { status }), status);
@@ -173,10 +173,10 @@ function httpError(status: number, body: Record<string, unknown>): Error {
   return new ServerJobError(msg ?? i18n.t("errors.server.status", { status }), status);
 }
 
-/** Endpoint job per kelompok fitur: Media → /media/jobs, Data → /data/jobs (kontrak sama). */
+/** Job endpoint per feature group: Media → /media/jobs, Data → /data/jobs (same contract). */
 export const jobsPath = (feature: ServerFeatureId) => (feature.startsWith("data-") ? "/data/jobs" : feature.startsWith("vr-") ? "/vr/jobs" : "/media/jobs");
 
-/** URL milik backend ini (kirim cookie) atau storage luar (tanpa cookie). */
+/** A URL that belongs to this backend (send cookies) or external storage (no cookies). */
 const isApiUrl = (url: string) => !!apiConfig.baseUrl && url.startsWith(`${apiConfig.baseUrl}/`);
 
 interface UploadTicket {
@@ -185,7 +185,7 @@ interface UploadTicket {
   headers: Record<string, string>;
 }
 
-/** Minta izin unggah lalu kirim berkas LANGSUNG ke storage (bukan lewat Nest). */
+/** Requests upload permission, then sends the file DIRECTLY to storage (not through Nest). */
 async function uploadInput(group: string, req: ServerJobRequest): Promise<UploadTicket> {
   const name = req.fileName ?? (req.file as File).name ?? "file";
   const contentType = req.file.type || "application/octet-stream";
@@ -229,7 +229,7 @@ async function execute(key: string, req: ServerJobRequest): Promise<ServerJobRes
   try {
     res = await apiFetch(group, {
       method: "POST",
-      // v7 (P4): minta email bila job berjalan lama (server yang memutuskan berdasarkan durasi).
+      // v7 (P4): request an email when the job runs long (the server decides based on duration).
       body: JSON.stringify({ feature: req.feature, uploadId: ticket.uploadId, params: req.params ?? {}, notify: useJobPrefs.getState().notify, lang: currentLang() }),
       headers: { "Content-Type": "application/json", "Idempotency-Key": key },
       signal: req.signal,
@@ -256,7 +256,7 @@ async function execute(key: string, req: ServerJobRequest): Promise<ServerJobRes
     }
   } catch (e) {
     if ((e as Error)?.name === "AbortError") {
-      // Beri tahu server agar job dihentikan & tidak ditagih (best effort).
+      // Tell the server to stop the job & not charge for it (best effort).
       f(`${base}/${encodeURIComponent(jobId)}`, { method: "DELETE", credentials: "include" }).catch(() => {});
     }
     throw e;
@@ -272,9 +272,9 @@ async function execute(key: string, req: ServerJobRequest): Promise<ServerJobRes
 }
 
 /**
- * Jalankan satu pekerjaan server. Permintaan dengan kunci yang sama yang
- * masih berjalan digabung (tidak ada request ganda). Penggunaan/kredit HANYA
- * diperbarui dari angka yang dikirim backend.
+ * Runs one server job. Requests with the same key that are
+ * still running are merged (no duplicate requests). Usage/credits are ONLY
+ * updated from numbers sent by the backend.
  */
 export async function runServerJob(req: ServerJobRequest): Promise<ServerJobResult> {
   if (!isServerConfigured(req.feature)) throw new ServerUnavailableError(req.feature);
@@ -283,7 +283,7 @@ export async function runServerJob(req: ServerJobRequest): Promise<ServerJobResu
   if (existing) return existing;
   const p = execute(key, req)
     .catch((e: unknown) => {
-      // 503: tampilkan sebagai notifikasi (sekali per permintaan), lalu teruskan ke halaman.
+      // 503: show as a notification (once per request), then pass it on to the page.
       if (e instanceof ServiceUnavailableError) notify.warn(e.message);
       throw e;
     })

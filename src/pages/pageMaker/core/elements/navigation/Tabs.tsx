@@ -49,7 +49,7 @@ export interface TabsState {
   listBorderEnabled: boolean;
   listBorderColor: string;
 
-  /* Panel isi */
+  /* Content panel */
   panelPaddingX: number;
   panelPaddingY: number;
   panelFontSize: number;
@@ -57,7 +57,7 @@ export interface TabsState {
   panelTextColor: string;
   panelBgColor: string;
 
-  /* Kotak luar */
+  /* Outer box */
   borderWidth: number;
   borderStyle: "none" | "solid" | "dashed" | "dotted";
   borderColor: string;
@@ -197,7 +197,7 @@ ${widthCss(s)}${hasBox ? `  border: ${s.borderWidth}px ${s.borderStyle} ${s.bord
   line-height: 1.6;
 }`);
 
-  // Pastikan panel tersembunyi benar-benar hilang walau ada CSS lain yang mengatur display.
+  // Make sure hidden panels are really gone even if other CSS sets display.
   rules.push(`.${cls}__panel[hidden] {
   display: none;
 }`);
@@ -209,7 +209,7 @@ ${widthCss(s)}${hasBox ? `  border: ${s.borderWidth}px ${s.borderStyle} ${s.bord
 /* Kode per framework                                                  */
 /* ------------------------------------------------------------------ */
 
-/** JSON aman untuk ditanam di <script> (escape "<" agar tidak menutup tag). */
+/** JSON that is safe to embed in a <script> (escapes "<" so it does not close the tag). */
 const jsData = (tabs: TabData[]) =>
   JSON.stringify(
     tabs.map((t) => ({ title: t.title, content: t.content })),
@@ -224,7 +224,7 @@ else if (e.key === "Home") next = 0;
 else if (e.key === "End") next = tabs.length - 1;
 else return;
 e.preventDefault();
-// Pindahkan fokus ke tab tujuan (saudara di dalam tablist yang sama).
+// Move focus to the target tab (a sibling inside the same tablist).
 e.currentTarget.parentElement.children[next].focus();`;
 
 function staticMarkup(s: TabsState, cls: string) {
@@ -602,7 +602,7 @@ function tabsSections(s: TabsState, update: Updater<TabsState>): PanelSection[] 
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const tabsElement = defineElement<TabsState>({

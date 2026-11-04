@@ -5,12 +5,12 @@ import { el, heading, image, inline, linkButton, para, type Palette } from "./bl
 import type { Tr } from "./sectionPresetsPro";
 
 /* ================================================================== */
-/* Contoh isi untuk 22 preset dasar (dulu hanya kerangka kosong).        */
+/* Sample content for the 22 base presets (previously only empty skeletons). */
 /*                                                                    */
-/* Dipakai saat "Sertakan contoh isi" dicentang, supaya hasil klik sama  */
-/* dengan gambar & deskripsi preset. Isi ditentukan dari NAMA kolom/Row   */
-/* yang dibuat preset (mis. "Teks", "Gambar", "Paket 1"), jadi struktur  */
-/* preset tidak berubah: tanpa centang, emptySection() membuangnya lagi. */
+/* Used when "Include sample content" is ticked, so the click result matches */
+/* the preset's picture & description. Content is chosen from the NAMES of the columns/Rows */
+/* the preset creates (e.g. "Teks", "Gambar", "Paket 1"), so the preset */
+/* structure does not change: without the tick, emptySection() drops it again. */
 /* ================================================================== */
 
 const P: Palette = { ink: "#0f172a", muted: "#475569", primary: "#2563eb", primaryDark: "#1d4ed8", soft: "#eff6ff", line: "#dbeafe" };
@@ -44,7 +44,7 @@ const titleBlock = (tr: Tr, align: "left" | "center"): ElementNode[] => [
 
 const footerLinks = (title: string, links: string[]) => [heading(title, "h4", { size: 16 }), ...links.map((l) => muted(l, { size: 14 }))];
 
-/** Isi per nama Row tanpa kolom (Row itu sendiri yang menampung elemen). */
+/** Content per Row name without columns (the Row itself holds the elements). */
 const ROW_FILL: Record<string, Fill> = {
   Row: (tr) => titleBlock(tr, "left"),
   "Row Judul": (tr) => titleBlock(tr, "center"),
@@ -55,7 +55,7 @@ const ROW_FILL: Record<string, Fill> = {
   ],
 };
 
-/** Isi per nama kolom; angka di akhir nama (mis. "Paket 2") dikirim sebagai `n`. */
+/** Content per column name; a trailing number in the name (e.g. "Paket 2") is passed as `n`. */
 const CELL_FILL: Record<string, Fill> = {
   Teks: (tr) => heroText(tr, "left"),
   Gambar: (tr) => [image(asset("workspace"), tr("Gambar contoh", "Sample image"), { ratio: "4 / 3", radius: 16 })],
@@ -131,12 +131,12 @@ const CELL_FILL: Record<string, Fill> = {
   Kontak: (tr) => footerLinks(tr("Kontak", "Contact"), ["halo@contoh.com", "+62 812 0000 0000"]),
 };
 
-/** Isi khusus Row hero per preset (judul besar rata tengah, teks terang di atas gambar). */
+/** Hero Row content per preset (a large centered heading, light text over an image). */
 const HERO_ROW: Record<string, Fill> = {
   "hero-center": (tr) => heroText(tr, "center"),
   "hero-image": (tr) => heroText(tr, "center", true),
 };
-/** Kolom "Teks" di hero gradient memakai teks terang. */
+/** The "Teks" column in a gradient hero uses light text. */
 const LIGHT_TEXT = new Set(["hero-gradient"]);
 
 function cellFill(name: string, presetId: string): Fill | null {
@@ -150,7 +150,7 @@ function cellFill(name: string, presetId: string): Fill | null {
   return null;
 }
 
-/** Isi kotak kosong preset dasar dengan contoh elemen (kotak yang sudah berisi tidak disentuh). */
+/** Fills a base preset's empty boxes with sample elements (boxes that already have content are untouched). */
 export function withSampleContent(presetId: string, section: BoxNode, tr: Tr): BoxNode {
   for (const row of section.children) {
     if (!isBox(row)) continue;

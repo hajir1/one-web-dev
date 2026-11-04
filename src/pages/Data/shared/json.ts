@@ -1,7 +1,7 @@
 import { DataError } from "./errors";
 
 /* ================================================================== */
-/* JSON: parse dengan posisi error (baris/kolom), format, minify.        */
+/* JSON: parse with error position (line/column), format, minify.        */
 /* ================================================================== */
 
 /** Offset karakter → { line, col } (1-based). */
@@ -18,9 +18,9 @@ export function lineCol(text: string, offset: number): { line: number; col: numb
 }
 
 /**
- * Posisi karakter pertama yang membuat JSON tidak valid (pemindai kecil,
- * karena pesan JSON.parse tidak selalu menyebut posisi — mis. V8 untuk
- * token tak terduga). null bila teks ternyata valid.
+ * Position of the first character that makes the JSON invalid (a small scanner,
+ * because JSON.parse messages do not always include the position, e.g. V8 for
+ * unexpected tokens). null when the text turns out to be valid.
  */
 function findJsonErrorOffset(text: string): number | null {
   let i = 0;
@@ -116,7 +116,7 @@ function findJsonErrorOffset(text: string): number | null {
   }
 }
 
-/** JSON.parse yang melempar DataError("invalidJson", {line, col, detail}). */
+/** JSON.parse that throws DataError("invalidJson", {line, col, detail}). */
 export function parseJsonStrict(text: string): unknown {
   if (!text.trim()) throw new DataError("emptyInput");
   const src = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
@@ -131,7 +131,7 @@ export function parseJsonStrict(text: string): unknown {
   }
 }
 
-/** Urutkan kunci objek secara rekursif (stabil, untuk diff). */
+/** Sort object keys recursively (stable, for diffs). */
 function sortKeysDeep(v: unknown): unknown {
   if (Array.isArray(v)) return v.map(sortKeysDeep);
   if (v && typeof v === "object") {
@@ -154,7 +154,7 @@ export function minifyJson(text: string): string {
   return JSON.stringify(parseJsonStrict(text));
 }
 
-/** Ringkasan struktur untuk validator: tipe akar, jumlah elemen, kedalaman, jumlah kunci. */
+/** Structure summary for the validator: root type, element count, depth, key count. */
 export function jsonStats(v: unknown): { root: string; size: number; depth: number; keys: number } {
   let keys = 0;
   const depthOf = (x: unknown): number => {
@@ -162,7 +162,7 @@ export function jsonStats(v: unknown): { root: string; size: number; depth: numb
     const vals = Array.isArray(x) ? x : Object.values(x as object);
     if (!Array.isArray(x)) keys += vals.length;
     let d = 0;
-    for (const c of vals) d = Math.max(d, depthOf(c)); // loop, bukan spread (array besar)
+    for (const c of vals) d = Math.max(d, depthOf(c)); // a loop, not spread (large arrays)
     return 1 + d;
   };
   const depth = depthOf(v);

@@ -15,7 +15,7 @@ import { isDemoMode } from "../../demo/demoMode";
 export const PRO_KEY = itemIdOf.feature(VR_PRO.id);
 const slug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "tur-360";
 
-/** Buka dialog kredit Tur 360° Pro. Mode demo (v15): Pro sudah terbuka, jadi dialog tidak pernah perlu. */
+/** Opens the 360° Tour Pro credit dialog. Demo mode (v15): Pro is already unlocked, so the dialog is never needed. */
 export const unlockVrPro = (onUnlocked?: () => void) => {
   if (isDemoMode()) {
     onUnlocked?.();
@@ -24,7 +24,7 @@ export const unlockVrPro = (onUnlocked?: () => void) => {
   return requireCredit("premium-vr", { item: "Tur 360° Pro", itemKey: PRO_KEY, simCost: VR_PRO.price, onUnlocked });
 };
 
-/** Berkas tur dari IndexedDB, lengkap dengan jenisnya. */
+/** Tour files from IndexedDB, together with their kind. */
 async function tourMediaFiles(tour: Tour): Promise<TourMediaFile[]> {
   const meta = useTourStore.getState().media;
   const blobs = await getMediaMap(mediaIdsOf(tour));
@@ -34,9 +34,9 @@ async function tourMediaFiles(tour: Tour): Promise<TourMediaFile[]> {
 }
 
 /**
- * Unduhan tur: ZIP untuk hosting, atau pratinjau 1 berkas yang bisa dibuka
- * dengan klik ganda. Keduanya memakai syarat yang sama (tur lengkap, fitur
- * Pro hanya bila sudah dibuka).
+ * Tour downloads: a ZIP for hosting, or a single-file preview that can be opened
+ * with a double click. Both use the same requirements (a complete tour, Pro
+ * features only when unlocked).
  */
 export function useTourExport(tour: Tour) {
   const { t, i18n } = useTranslation();

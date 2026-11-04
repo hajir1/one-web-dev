@@ -47,15 +47,15 @@ import DemoTemplateFrame from "../../demo/DemoTemplateFrame";
 import { staticThumbUrl } from "./staticThumb";
 
 /* ================================================================== */
-/* Web Templates — katalog, pratinjau, unduh, dan "Edit di Page Maker"  */
+/* Web Templates: catalog, preview, download, and "Edit in Page Maker"  */
 /*                                                                    */
-/* - Metadata template dari server (GET /templates lewat repository).     */
-/* - Pratinjau & thumbnail = halaman demo HTML statis hasil render       */
-/*   server (iframe sandbox), bukan isi JSON template.                  */
-/* - Template gratis: langsung dipakai. Premium: dibeli dengan kredit    */
-/*   (POST /templates/:id/purchase), lalu isinya diambil lewat acquire.  */
-/* - Edit = salinan baru (folder + desain). Template asli tidak berubah.*/
-/*   Kuota desain & folder website diperiksa sebelum menyimpan.         */
+/* - Template metadata from the server (GET /templates through the repository). */
+/* - Preview & thumbnail = a static HTML demo page rendered by the       */
+/*   server (sandboxed iframe), not the template JSON.                  */
+/* - Free templates: usable right away. Premium: bought with credits    */
+/*   (POST /templates/:id/purchase), then the content is fetched through acquire. */
+/* - Edit = a new copy (folder + design). The original template does not change. */
+/*   Design & website folder quotas are checked before saving.          */
 /* ================================================================== */
 
 const NONE: SavedDesign[] = [];
@@ -71,8 +71,8 @@ const VIEWPORTS = [
 
 /* ------------------------------ aksi ------------------------------- */
 
-/** `needCatalog` = katalog lengkap (item bawaan) dimuat sekarang; di daftar
- *  berhalaman katalog baru dimuat saat dialog beli dibuka. */
+/** `needCatalog` = load the full catalog (built-in items) now; in the paginated
+ *  list the catalog only loads when the purchase dialog opens. */
 function useTemplateActions(needCatalog = false) {
   const { t, i18n } = useTranslation();
   const lang = toTplLang(i18n.language);
@@ -90,7 +90,7 @@ function useTemplateActions(needCatalog = false) {
   const name = useCallback((tpl: Tpl) => tpl.name, []);
   const itemOf = useCallback((tpl: Tpl) => tpl, []);
 
-  /** Login dulu: isi template & pembelian butuh akun. Mode demo (v12): tanpa akun. */
+  /** Sign in first: template content & purchases need an account. Demo mode (v12): no account. */
   const requireSignIn = () => {
     if (signedIn || isDemoMode()) return true;
     notify.info(t("auth.signInToContinue"));
@@ -98,14 +98,14 @@ function useTemplateActions(needCatalog = false) {
     return false;
   };
 
-  /** Jalankan `run` bila punya akses; Premium yang belum dimiliki → dialog pembelian (server). */
+  /** Runs `run` when there is access; Premium not owned yet → the purchase dialog (server). */
   const withAccess = (tpl: Tpl, run: () => void) => {
     if (!requireSignIn()) return;
     if (hasAccess(tpl)) return run();
     setBuying({ item: tpl, then: run });
   };
 
-  /** Ambil isi template dari server (402 → tawarkan beli). */
+  /** Fetches template content from the server (402 → offer to buy). */
   const content = async (tpl: Tpl) => {
     try {
       return await acquireTemplate(refOf(tpl), lang);
@@ -117,7 +117,7 @@ function useTemplateActions(needCatalog = false) {
   };
 
   const once = async (key: string, fn: () => Promise<void> | void) => {
-    if (busyRef.current) return; // cegah klik ganda (unduh/buat salinan dua kali)
+    if (busyRef.current) return; // prevent double clicks (downloading/copying twice)
     busyRef.current = true;
     setBusy(key);
     try {
@@ -128,15 +128,15 @@ function useTemplateActions(needCatalog = false) {
     }
   };
 
-  /** Pilihan format unduhan (v7): dialog dibuka setelah akses dipastikan. */
+  /** Download format choice (v7): the dialog opens after access is confirmed. */
   const [formatFor, setFormatFor] = useState<Tpl | null>(null);
   const download = (tpl: Tpl) => withAccess(tpl, () => (tpl.code ? void downloadCode(tpl) : setFormatFor(tpl)));
 
-  /** v16: Template Kode diunduh apa adanya (index.html + README), tanpa pilihan framework. */
+  /** v16: Code Templates download as is (index.html + README), with no framework choice. */
   const downloadCode = (tpl: Tpl) =>
     once(`download:${tpl.refId}`, async () => {
       try {
-        // Pembuat ZIP (jszip + data preset) dimuat saat tombol Unduh ditekan, bukan saat galeri dibuka.
+        // The ZIP builder (jszip + preset data) loads when the Download button is pressed, not when the gallery opens.
         const { buildCodeTemplateZip } = await import("./codeTemplates/download");
         const zip = await buildCodeTemplateZip(tpl.refId, tpl.name, lang);
         triggerDownload(zip.blob, zip.fileName);
@@ -151,7 +151,7 @@ function useTemplateActions(needCatalog = false) {
       const pages = await content(tpl);
       if (!pages) return;
       try {
-        // Template dimiliki/gratis → elemen Premium bawaannya ikut diekspor.
+        // Owned/free template → its built-in Premium elements are exported too.
         const { buildTemplateZip } = await import("./exportTemplate");
         const zip = await buildTemplateZip(refOf(tpl), lang, tpl.name, pages, { icons, allowPremiumElements: true }, fw);
         triggerDownload(zip.blob, zip.fileName);
@@ -193,12 +193,12 @@ function useTemplateActions(needCatalog = false) {
     </Modal>
   );
 
-  /** Buat salinan baru (kuota diperiksa). */
+  /** Creates a new copy (quota checked). */
   const createCopy = (tpl: Tpl, slotConfirmed = false) => {
     const pages = tpl.pages.length;
     if (!ensureDesignRoom(pages, "template", { label: name(tpl), onRoom: () => createCopy(tpl, slotConfirmed) })) return;
-    // Kuota website penuh → pilih bayar slot atau hapus website lama. Slot dibuka
-    // SERVER → lanjut tanpa cek ulang (batas di klien bisa belum diperbarui).
+    // Website quota full → choose to pay for a slot or delete an old website. The slot is unlocked
+    // by the SERVER → continue without rechecking (the client limit may not be updated yet).
     if (!slotConfirmed && !ensureSiteRoom({ reason: "template", label: name(tpl), onRoom: (paid) => createCopy(tpl, !!paid) })) return;
     void once(`edit:${tpl.refId}`, async () => {
       const built = await content(tpl);
@@ -212,10 +212,10 @@ function useTemplateActions(needCatalog = false) {
   const edit = (tpl: Tpl) => {
     if (!requireSignIn()) return;
     const existing = sitesFromTemplate(tpl.refId);
-    // Sudah ada salinan → tawarkan buka salinan lama dulu (tanpa beli/kuota).
+    // A copy already exists → offer to open the old copy first (no purchase/quota).
     if (existing.length && hasAccess(tpl)) return setDupe({ tpl, sites: existing });
-    // Kuota website dicek SEBELUM membeli template, supaya pengguna tidak
-    // membayar lalu tertahan karena folder website penuh.
+    // The website quota is checked BEFORE buying the template, so users do not
+    // pay and then get stuck because the website folders are full.
     if (!ensureSiteRoom({ reason: "template", label: name(tpl), onRoom: (paid) => withAccess(tpl, () => createCopy(tpl, !!paid)) })) return;
     withAccess(tpl, () => {
       const copies = sitesFromTemplate(tpl.refId);
@@ -224,7 +224,7 @@ function useTemplateActions(needCatalog = false) {
     });
   };
 
-  /** v17: Template Kode → proyek baru di editor tanpa kode (salinan lama ditawarkan dulu). */
+  /** v17: Code Template → a new project in the no-code editor (an old copy is offered first). */
   const [codeDupe, setCodeDupe] = useState<{ tpl: Tpl; list: SavedDesign[] } | null>(null);
   const createCodeProject = (tpl: Tpl) => {
     const store = useDesignStore.getState();
@@ -360,7 +360,7 @@ function useTemplateActions(needCatalog = false) {
 
 function TierChip({ tpl, owned }: { tpl: Tpl; owned: boolean }) {
   const { t } = useTranslation();
-  // Mode demo (v15): tanpa label harga/tingkat sama sekali.
+  // Demo mode (v15): no price/tier labels at all.
   if (isDemoMode()) return null;
   if (tpl.tier === "free") return <Chip tone="green">{t("common.free")}</Chip>;
   return (
@@ -370,7 +370,7 @@ function TierChip({ tpl, owned }: { tpl: Tpl; owned: boolean }) {
   );
 }
 
-/** v16: penanda Template Kode (satu berkas HTML mandiri). */
+/** v16: Code Template marker (one standalone HTML file). */
 function CodeChip() {
   const { t } = useTranslation();
   return (
@@ -380,7 +380,7 @@ function CodeChip() {
   );
 }
 
-/** Harga katalog: Free = 0 kredit, Premium = harga promo (harga awal dicoret selama promo). */
+/** Catalog price: Free = 0 credits, Premium = promo price (original price struck through during a promo). */
 function PriceTag({ tpl }: { tpl: Tpl }) {
   if (isDemoMode()) return null;
   return (
@@ -391,15 +391,15 @@ function PriceTag({ tpl }: { tpl: Tpl }) {
 }
 
 /**
- * Thumbnail kartu. v21: gambar statis (thumbnail server, lalu WebP dari
- * npm run gen:thumbs). Hanya template tanpa gambar yang masih memakai
- * halaman demo beranda di iframe sandbox, diperkecil mengikuti lebar kartu
- * dan dimuat saat kartu mendekati layar.
+ * Card thumbnail. v21: a static image (the server thumbnail, then the WebP from
+ * npm run gen:thumbs). Only templates without an image still use the
+ * home demo page in a sandboxed iframe, scaled to the card width
+ * and loaded when the card approaches the screen.
  */
 function Thumb({ tpl }: { tpl: Tpl }) {
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.3);
-  // Tanpa IntersectionObserver (browser lama/tes) → langsung render.
+  // No IntersectionObserver (old browsers/tests) → render right away.
   const [visible, setVisible] = useState(() => typeof IntersectionObserver === "undefined");
   useLayoutEffect(() => {
     const el = box.current;
@@ -430,7 +430,7 @@ function Thumb({ tpl }: { tpl: Tpl }) {
   return (
     <div ref={box} className="relative h-52 overflow-hidden bg-gray-100 dark:bg-gray-800" aria-hidden="true" style={{ backgroundColor: `${tpl.accent}14` }}>
       {visible && demo ? (
-        // Mode demo (v12): beranda dirender di browser.
+        // Demo mode (v12): the home page is rendered in the browser.
         <div className="pointer-events-none absolute left-0 top-0 origin-top-left" style={{ width: 1280, height: Math.ceil(208 / scale) + 4, transform: `scale(${scale})` }}>
           <DemoTemplateFrame templateId={tpl.refId} lang={i18n.language} thumb title="" className="block w-[1280px] border-0 bg-white" style={{ height: Math.ceil(208 / scale) + 4 }} />
         </div>
@@ -448,7 +448,7 @@ function Thumb({ tpl }: { tpl: Tpl }) {
 }
 
 
-/** Filter katalog terakhir sebelum membuka detail (tombol Kembali memulihkan filter + posisi gulir). */
+/** The last catalog filter before opening a detail (the Back button restores the filter + scroll position). */
 const LAST_SEARCH_KEY = "tpl-last-search";
 function lastCatalogSearch(): string {
   try {
@@ -463,11 +463,11 @@ const SORTS: TemplateSort[] = ["featured", "price-asc", "price-desc", "category"
 type CatalogState = TemplateQuery & { page: number };
 
 /**
- * Daftar template dengan infinite scroll (v7): 12 per muatan (paginasi
- * server), muatan berikutnya otomatis saat mendekati bawah (IntersectionObserver)
- * dengan tombol cadangan "Muat lebih banyak". Filter disimpan di URL
- * (?q&category&tier&sort) agar bisa dibagikan; ganti filter = daftar mulai
- * dari awal. Posisi gulir dipulihkan saat kembali dari halaman detail.
+ * Template list with infinite scroll (v7): 12 per batch (server
+ * pagination), the next batch loads automatically near the bottom (IntersectionObserver)
+ * with a fallback "Load more" button. Filters are kept in the URL
+ * (?q&category&tier&sort) so they can be shared; changing a filter = the list starts
+ * from the beginning. The scroll position is restored when returning from a detail page.
  */
 function Catalog() {
   const { t, i18n } = useTranslation();
@@ -482,7 +482,7 @@ function Catalog() {
   const catLabel = useCallback((c: string) => t(`templates.categories.${c}`), [t]);
   const listTop = useRef<HTMLDivElement>(null);
 
-  /** Ubah filter/halaman di URL. Filter berubah → kembali ke halaman 1 (riwayat diganti, bukan ditambah). */
+  /** Changes the filter/page in the URL. Filter changed → back to page 1 (history replaced, not pushed). */
   const update = useCallback(
     (patch: Partial<CatalogState>) =>
       setSearch(
@@ -495,11 +495,11 @@ function Catalog() {
     [setSearch],
   );
 
-  // Kotak cari: ketik bebas, URL diperbarui setelah jeda (bukan setiap huruf).
+  // Search box: type freely; the URL updates after a pause (not on every letter).
   const [text, setText] = useState(q.text);
   const pushed = useRef(q.text);
   useEffect(() => {
-    // URL berubah dari luar (Kembali/Reset) → isi kotak mengikuti.
+    // The URL changed from outside (Back/Reset) → the box content follows.
     if (q.text !== pushed.current) setText(q.text);
     pushed.current = q.text;
   }, [q.text]);
@@ -517,13 +517,13 @@ function Catalog() {
   const first = res.data?.pages[0];
   const last = res.data?.pages[res.data.pages.length - 1];
   const items = useMemo(() => flattenTemplatePages(res.data?.pages), [res.data]);
-  // Info filter (total, facet) dari muatan terakhir = data paling baru.
+  // Filter info (total, facets) from the last batch = the newest data.
   const data = last ?? first;
   const loadingMore = res.isFetchingNextPage;
   const nextError = res.isFetchNextPageError;
   const canLoadMore = !!res.hasNextPage && !loadingMore && !nextError;
 
-  // Muatan berikutnya otomatis saat penanda di bawah daftar mendekati layar.
+  // The next batch loads automatically when the marker below the list approaches the screen.
   const sentinel = useRef<HTMLDivElement>(null);
   const loadMore = res.fetchNextPage;
   useEffect(() => {
@@ -534,7 +534,7 @@ function Catalog() {
     return () => io.disconnect();
   }, [canLoadMore, loadMore, items.length]);
 
-  // Pulihkan posisi gulir setelah kembali dari detail (muatan masih di cache).
+  // Restore the scroll position after returning from a detail (batches are still cached).
   const scrollKey = `tpl-scroll:${search.toString()}`;
   const restored = useRef(false);
   useLayoutEffect(() => {
@@ -545,7 +545,7 @@ function Catalog() {
       sessionStorage.removeItem(scrollKey);
       if (y > 0) window.scrollTo(0, y);
     } catch {
-      /* sessionStorage tidak tersedia */
+      /* sessionStorage not available */
     }
   }, [items.length, scrollKey]);
   const rememberScroll = () => {
@@ -562,7 +562,7 @@ function Catalog() {
     setSearch(new URLSearchParams(), { replace: true });
   };
   const filtered = q.text !== "" || q.category !== "all" || q.tier !== "all";
-  // Mode demo (v12): semua template gratis → tanpa filter Free/Premium & urutan harga.
+  // Demo mode (v12): every template is free → no Free/Premium filter & price sorting.
   const demo = isDemoMode();
   const facet = (label: string, n: number | undefined) => (n === undefined ? label : `${label} (${n})`);
 
@@ -762,7 +762,7 @@ function ActionButtons({ tpl, a }: { tpl: Tpl; a: ReturnType<typeof useTemplateA
       <button type="button" onClick={() => a.download(tpl)} disabled={!!a.busy} className={`${btn.secondary} !py-2 text-sm`} data-testid={`download-${tpl.refId}`}>
         {dl ? <Loader2 className="h-4 w-4 animate-spin" /> : locked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />} {t("templates.download")}
       </button>
-      {/* v16: Template Kode tidak dibuka di Desain Halaman. v17: diedit lewat editor tanpa kode. */}
+      {/* v16: Code Templates are not opened in Page Design. v17: edited through the no-code editor. */}
       {tpl.code ? (
         <button type="button" onClick={() => a.editCode(tpl)} disabled={!!a.busy} className={`${locked ? btn.secondary : btn.primary} !py-2 text-sm`} data-testid={`edit-code-${tpl.refId}`}>
           {locked ? <Lock className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />} {t("templates.code.edit")}
@@ -809,7 +809,7 @@ function Detail({ tpl }: { tpl: Tpl }) {
               <>
                 <CodeChip />
                 <Chip tone="gray">{t("templates.code.size", { kb: tpl.code.budgetKb })}</Chip>
-                {/* Daftar library bisa panjang: boleh turun baris di layar sempit (Chip bawaan nowrap). */}
+                {/* The library list can be long: it may wrap on narrow screens (the default Chip is nowrap). */}
                 <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300">
                   {tpl.code.libs.length ? t("templates.code.libs", { list: tpl.code.libs.join(", ") }) : t("templates.code.noLibs")}
                 </span>
@@ -884,7 +884,7 @@ function Detail({ tpl }: { tpl: Tpl }) {
               style={{ width: width ? `${width}px` : "100%" }}
             />
           ) : tpl.code && !src ? (
-            // Template kode tanpa demo server (mis. backend lama): render dari HTML yang bisa dimuat.
+            // Code templates without a server demo (e.g. an old backend): render from loadable HTML.
             <CodeTemplateFrame templateId={tpl.refId} title={t("templates.previewTitle")} testId="template-demo" className="h-full border-0 bg-white" style={{ width: width ? `${width}px` : "100%" }} />
           ) : src ? (
             <iframe
@@ -902,7 +902,7 @@ function Detail({ tpl }: { tpl: Tpl }) {
           )}
         </div>
       </Panel>
-      {/* Mode demo (v12): tidak ada item Premium/pembelian → panel "isi template" disembunyikan. */}
+      {/* Demo mode (v12): no Premium items/purchases → the "template content" panel is hidden. */}
       {!demo && !tpl.code && (
         <Panel title={t("market.included.title")} description={t("market.included.hint")}>
           {item && a.catalog.data ? <IncludedSection item={item} catalog={a.catalog.data} /> : a.catalog.status === "error" ? <CatalogError onRetry={a.catalog.reload} /> : <Loader2 className="h-5 w-5 animate-spin text-gray-400" />}
@@ -949,7 +949,7 @@ export default function WebTemplates() {
   const { templateId } = useParams();
   useLang();
   const lang = toTplLang(i18n.language);
-  // Detail dari GET /templates/:id (cache diisi dari kartu katalog → tampil seketika).
+  // Detail from GET /templates/:id (the cache is filled from the catalog card → shows instantly).
   const detail = useTemplateDetail(lang, templateId);
   const tpl = templateId ? (detail.data ?? null) : null;
   const missing = detail.error instanceof ApiError && detail.error.status === 404;

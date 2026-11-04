@@ -53,12 +53,12 @@ test("10 elemen v2: 5 Free + 5 Premium, terdaftar, berikon, harga 0 / 5–10 kre
     else assert.equal(info.price, 0);
     assert.equal(info.price, elementPrice(t, info.tier));
   }
-  // urutan registry: gratis setelah clipboard, premium setelah typewriter
+  // registry order: free after clipboard, premium after typewriter
   assert.deepEqual(types.slice(types.indexOf("clipboard") + 1, types.indexOf("clipboard") + 6), FREE);
   assert.deepEqual(types.slice(types.indexOf("typewriter") + 1, types.indexOf("typewriter") + 6), PREMIUM);
 });
 
-/* ------------------------------ Ekspor ------------------------------ */
+/* ------------------------------ Export ------------------------------ */
 
 test("setiap elemen v2 tampil di 5 framework tanpa peringatan; JS kustom valid", () => {
   for (const t of ALL) {
@@ -104,30 +104,30 @@ test("Premium v2 terkunci tanpa izin (tidak ikut + 1 peringatan); Free tetap iku
 test("markup: label/aria benar, tombol type=button, React memakai atribut JSX", () => {
   const all = build(page(...ALL.map((t) => el(t))), { allowPremiumElements: true });
   const body = all.html.body;
-  // semua <button> bertipe button
+  // every <button> has type button
   for (const b of body.match(/<button[^>]*>/g) ?? []) assert.match(b, /type="button"/, b);
   // textarea berlabel
   assert.match(body, /<label class="pg__textarea-1__label" for="pg__textarea-1-input">/);
   assert.match(body, /<textarea[^>]*id="pg__textarea-1-input"[^>]*rows="4"/);
-  // radio: fieldset/legend, opsi kedua terpilih
+  // radio: fieldset/legend, second option selected
   assert.match(body, /<fieldset class="pg__radio-group-1">/);
   assert.match(body, /<legend/);
   assert.match(body, /value="Bisnis" checked/);
-  // divider tanpa label = <hr>, dengan label = separator
+  // a divider without a label = <hr>, with a label = separator
   assert.match(body, /<hr class="pg__divider-1"/);
   const lbl = build(page(el("divider", { label: "atau" }))).html.body;
   assert.match(lbl, /role="separator" aria-label="atau"/);
-  // modal: dialog tersembunyi, aria-modal, judul terhubung
+  // modal: hidden dialog, aria-modal, linked title
   assert.match(body, /role="dialog" aria-modal="true" aria-labelledby="pg__modal-popup-1-title"/);
   assert.match(body, /class="pg__modal-popup-1__backdrop" hidden/);
-  // lightbox tersembunyi, before/after range berlabel
+  // hidden lightbox, labeled before/after range
   assert.match(body, /class="pg__gallery-lightbox-1__box" role="dialog" aria-modal="true" aria-label="Galeri" hidden/);
   assert.match(body, /type="range" min="0" max="100" step="1" value="50" aria-label="Sebelum \/ Sesudah"/);
   // marquee: salinan kedua aria-hidden + reduced motion
   assert.equal((body.match(/pg__logo-marquee-1__track/g) ?? []).length, 2);
   assert.match(body, /class="pg__logo-marquee-1__track" aria-hidden="true"/);
   assert.match(all.html.css, /prefers-reduced-motion: reduce\) \{\n {2}\.pg__logo-marquee-1__viewport/);
-  // social: tab baru aman
+  // social: safe new tab
   assert.match(body, /target="_blank" rel="noopener noreferrer"/);
 
   const react = all.files("react").map((f) => f.content).join("\n");
@@ -156,7 +156,7 @@ test("URL javascript:/vbscript:/data: dinetralkan di semua elemen v2", () => {
   assert.match(out.html.body, /href="https:\/\/ok\.example\/"/);
   assert.match(out.html.body, /href="https:\/\/img\.example\/a\.jpg"/);
   assert.match(out.html.body, /<a class="pg__modal-popup-1__cta" href="#">/);
-  // logo berbahaya → tampil sebagai teks
+  // a dangerous logo → shown as text
   assert.match(out.html.body, /<span class="pg__logo-marquee-1__text">Logo<\/span>/);
 });
 
@@ -184,7 +184,7 @@ test("parseSocialLinks & socialGlyph", () => {
   assert.deepEqual(parseSocialLinks(["LinkedIn | https://linkedin.com/in/x", "", "TanpaUrl", "Bad | javascript:x", " | https://x.com"]), [
     { name: "LinkedIn", href: "https://linkedin.com/in/x", glyph: "in", icon: "linkedin" },
   ]);
-  // Logo asli: dikenali dari nama atau URL; jaringan tak dikenal memakai teks.
+  // Real logos: recognized from the name or URL; unknown networks use text.
   const [ig, web, mail, other] = parseSocialLinks(["IG | https://instagram.com/a", "Toko | https://www.tiktok.com/@a", "Surel | mailto:a@b.co", "Mastodon2 | https://contoh.id"]);
   assert.equal(ig.icon, "instagram");
   assert.equal(web.icon, "tiktok");

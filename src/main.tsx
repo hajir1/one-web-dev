@@ -18,11 +18,11 @@ import { installDemoLocale } from "./demo/demoLocale";
 initObservability();
 captureReferralFromUrl();
 bootstrapApi();
-// Mode demo (v15): teks tanpa "gratis"/kredit.
+// Demo mode (v15): text without "free"/credits.
 if (isDemoMode()) installDemoLocale(i18n);
 
-// Vercel Web Analytics (v19): aktif hanya bila di-build di Vercel (VITE_VERCEL_ENV diisi Vercel otomatis).
-// Paksa nyala/mati lewat VITE_VERCEL_ANALYTICS=true|false. Aktifkan juga "Analytics" di dashboard proyek Vercel.
+// Vercel Web Analytics (v19): active only when built on Vercel (VITE_VERCEL_ENV is set by Vercel automatically).
+// Force on/off with VITE_VERCEL_ANALYTICS=true|false. Also enable "Analytics" in the Vercel project dashboard.
 // Frontend-only (open source, VITE_API_BASE_URL=off): mati kecuali diminta eksplisit (opt-in).
 const frontendOnly = import.meta.env.VITE_API_BASE_URL === "off";
 const vercelAnalytics = import.meta.env.VITE_VERCEL_ANALYTICS

@@ -4,7 +4,7 @@ import { worksheetToObjects, worksheetToArrays } from "../shared/excelUtils";
 import { DataError } from "../shared/errors";
 
 /**
- * Ubah satu sheet dari Workbook jadi teks JSON / objek JavaScript siap-pakai.
+ * Turns one Workbook sheet into ready-to-use JSON text / a JavaScript object.
  */
 export function sheetToText(
   workbook: ExcelJS.Workbook,

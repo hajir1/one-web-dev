@@ -6,14 +6,14 @@ import { collectionsScript, crudNames, isNumeric, searchFields, seedRow, tableFi
 /* ================================================================== */
 /* CRUD Node.js (Express, ditulis manual) per koleksi                    */
 /*                                                                    */
-/* Express + EJS + SQLite bawaan Node (node:sqlite, tanpa build native) + multer. */
-/* Login admin sederhana dari .env (satu akun) + token CSRF di sesi.     */
-/* Situs hasil desain disajikan dari public/.                            */
+/* Express + EJS + Node's built-in SQLite (node:sqlite, no native build) + multer. */
+/* A simple admin login from .env (one account) + a CSRF token in the session. */
+/* The designed site is served from public/.                             */
 /* ================================================================== */
 
 const js = (s: string) => JSON.stringify(s);
 const cmt = (s: string) => s.replace(/\*\//g, "* /").replace(/[\r\n]+/g, " ");
-/** Teks statis di template EJS (HTML-escape, tanpa tag EJS). */
+/** Static text in an EJS template (HTML-escaped, no EJS tags). */
 const et = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/%/g, "&#37;");
 
 function sqlColumn(f: CollectionField): string {
@@ -53,13 +53,13 @@ function packageJson(name: string): string {
 }
 
 const ENV_EXAMPLE = `PORT=3000
-# Ganti dengan teks acak panjang (minimal 32 karakter), mis. hasil:
+# Replace with a long random string (at least 32 characters), e.g. the output of:
 #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 SESSION_SECRET=ganti-dengan-teks-acak
-# Akun admin dashboard (/admin). Password minimal 12 karakter.
+# Dashboard admin account (/admin). Password at least 12 characters.
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=ganti-password-ini
-# production = server MENOLAK jalan bila secret/password di atas belum diganti.
+# production = the server REFUSES to start if the secret/password above has not been changed.
 NODE_ENV=development
 `;
 
@@ -76,7 +76,7 @@ ${names.map((n) => `import ${n.camel}Routes, { ${[`${n.camel}Api`, `${n.camel}Ca
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-// Secret & password bawaan/terlalu pendek: produksi menolak jalan, pengembangan memberi peringatan.
+// Default/too short secret & password: production refuses to start, development shows a warning.
 const weak = (v, min) => !v || v.length < min || /^(ganti|dev-only|changeme|password|admin)/i.test(v);
 const problems = [
   weak(process.env.SESSION_SECRET, 32) && "SESSION_SECRET (minimal 32 karakter acak)",
@@ -99,7 +99,7 @@ app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev-only-secret",
-    // Sesi disimpan di SQLite: login admin tetap ada walau server di-restart.
+    // Sessions are stored in SQLite: the admin login survives a server restart.
     store: new SqliteSessionStore(),
     resave: false,
     saveUninitialized: false,
@@ -108,16 +108,16 @@ app.use(
 );
 app.use(csrf);
 
-// Data publik untuk halaman situs (dibaca public/assets/collections.js).
+// Public data for the site pages (read by public/assets/collections.js).
 ${names.map((n) => `app.get(${js(`/api/${n.slug}`)}, ${n.camel}Api);\napp.get(${js(`/api/${n.slug}/kategori`)}, ${n.camel}CategoriesApi);\napp.get(${js(`/api/${n.slug}/:slug`)}, ${n.camel}ItemApi);\napp.get(${js(`/api/${n.slug}/:slug/related`)}, ${n.camel}RelatedApi);`).join("\n")}
-${names.filter((n) => itemPages[n.slug]).length ? `\n// Halaman item (detail): /<koleksi>/<slug>.\n${names.filter((n) => itemPages[n.slug]).map((n) => `app.get(${js(`/${n.slug}/:slug`)}, ${n.camel}Page);`).join("\n")}` : ""}
+${names.filter((n) => itemPages[n.slug]).length ? `\n// Item page (detail): /<collection>/<slug>.\n${names.filter((n) => itemPages[n.slug]).map((n) => `app.get(${js(`/${n.slug}/:slug`)}, ${n.camel}Page);`).join("\n")}` : ""}
 
 // Login + dashboard CRUD.
 app.use(authRoutes);
 app.get("/admin", requireAuth, (_req, res) => res.redirect(${js(`/admin/${names[0]?.slug ?? "produk"}`)}));
 ${names.map((n) => `app.use(${js(`/admin/${n.slug}`)}, requireAuth, ${n.camel}Routes);`).join("\n")}
 
-// Situs hasil desain + gambar unggahan.
+// The designed site + uploaded images.
 app.use(express.static(path.join(root, "public"), { extensions: ["html"] }));
 
 app.use((err, _req, res, _next) => {
@@ -125,7 +125,7 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).send(err.expose ? err.message : "Terjadi galat di server.");
 });
 
-// Dijalankan langsung (npm start) → buka port. Diimpor (npm test) → hanya mengekspor app.
+// Run directly (npm start) → open the port. Imported (npm test) → only export the app.
 if (process.argv[1] && toPath(import.meta.url) === path.resolve(process.argv[1])) {
   const port = Number(process.env.PORT) || 3000;
   app.listen(port, () => console.log(\`Situs: http://localhost:\${port}  ·  Dashboard: http://localhost:\${port}/admin\`));
@@ -142,15 +142,15 @@ import { DatabaseSync } from "node:sqlite";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 fs.mkdirSync(path.join(root, "data"), { recursive: true });
 
-// SQLite bawaan Node.js (22.13+): tidak perlu build native / Visual Studio di Windows.
-// DB_FILE dipakai test (database sementara); bawaan data/app.db.
+// Node.js built-in SQLite (22.13+): no native build / Visual Studio needed on Windows.
+// DB_FILE is used by tests (temporary database); default data/app.db.
 export const db = new DatabaseSync(process.env.DB_FILE || path.join(root, "data", "app.db"));
 db.exec("PRAGMA journal_mode = WAL");
 
-/** Slug yang dipakai rute API (mis. /api/produk/kategori). Ditulis sebelum tabel dibuat (dipakai saat migrasi). */
+/** Slug used by the API routes (e.g. /api/produk/kategori). Written before the table is created (used during migration). */
 export const RESERVED = ["kategori"];
 
-/** Tabel koleksi (dibuat OneWebDev). Data awal dari desain diisi sekali saat tabel kosong. */
+/** Collection table (made by OneWebDev). Seed data from the design is inserted once while the table is empty. */
 ${cols
   .map((c, i) => {
     const n = names[i];
@@ -180,7 +180,7 @@ export function slugify(text) {
   return s || "item";
 }
 
-/** Slug unik di tabel (ganda → -2, -3, …). exceptId = baris yang sedang diubah. */
+/** Unique slug in the table (duplicate → -2, -3, …). exceptId = the row being edited. */
 export function uniqueSlug(table, base, exceptId = 0) {
   const taken = db.prepare(\`SELECT 1 FROM \${table} WHERE slug = ? AND id != ?\`);
   let slug = RESERVED.includes(base) ? base + "-2" : base;
@@ -188,13 +188,13 @@ export function uniqueSlug(table, base, exceptId = 0) {
   return slug;
 }
 
-/** Database lama: kolom yang baru ditambahkan di desain (mis. kategori) dibuat otomatis. */
+/** Old database: columns newly added in the design (e.g. kategori) are created automatically. */
 function ensureColumns(table, defs) {
   const cols = db.prepare(\`PRAGMA table_info(\${table})\`).all().map((c) => c.name);
   for (const [key, def] of Object.entries(defs)) if (!cols.includes(key)) db.exec(\`ALTER TABLE \${table} ADD COLUMN \${def}\`);
 }
 
-/** Database lama (tanpa kolom slug): tambah kolom, isi dari nama, lalu buat indeks unik. */
+/** Old database (no slug column): add the column, fill it from the name, then create a unique index. */
 function ensureSlugs(table) {
   const cols = db.prepare(\`PRAGMA table_info(\${table})\`).all().map((c) => c.name);
   if (!cols.includes("slug")) db.exec(\`ALTER TABLE \${table} ADD COLUMN slug TEXT\`);
@@ -226,7 +226,7 @@ function seed(table, file) {
 const SESSION_STORE_JS = `import session from "express-session";
 import { db } from "./db.js";
 
-/* Penyimpanan sesi di SQLite (tabel sessions): login admin tidak hilang saat server restart. */
+/* Session storage in SQLite (sessions table): the admin login is not lost when the server restarts. */
 
 db.exec("CREATE TABLE IF NOT EXISTS sessions (sid TEXT PRIMARY KEY, sess TEXT NOT NULL, expires INTEGER NOT NULL)");
 
@@ -240,7 +240,7 @@ export class SqliteSessionStore extends session.Store {
     this.setStmt = db.prepare("INSERT INTO sessions (sid, sess, expires) VALUES (?, ?, ?) ON CONFLICT(sid) DO UPDATE SET sess = excluded.sess, expires = excluded.expires");
     this.delStmt = db.prepare("DELETE FROM sessions WHERE sid = ?");
     this.touchStmt = db.prepare("UPDATE sessions SET expires = ? WHERE sid = ?");
-    // Bersihkan sesi kedaluwarsa tiap jam.
+    // Clean up expired sessions every hour.
     setInterval(() => db.prepare("DELETE FROM sessions WHERE expires < ?").run(Date.now()), 60 * 60 * 1000).unref();
   }
   get(sid, cb) {
@@ -279,7 +279,7 @@ export class SqliteSessionStore extends session.Store {
 }
 `;
 
-/** Test API bawaan proyek ekspor (npm test). */
+/** Built-in API test of the exported project (npm test). */
 function apiTestJs(slug: string): string {
   return `// Test API bawaan (npm test): jalan di database sementara, tidak menyentuh data/app.db.
 import { test, before, after } from "node:test";
@@ -358,7 +358,7 @@ test("dashboard terkunci tanpa login; POST tanpa token CSRF ditolak", async () =
 const AUTH_JS = `import crypto from "node:crypto";
 import { Router } from "express";
 
-/* Login admin sederhana: satu akun dari .env (ADMIN_EMAIL, ADMIN_PASSWORD). */
+/* Simple admin login: one account from .env (ADMIN_EMAIL, ADMIN_PASSWORD). */
 
 const same = (a, b) => {
   const x = Buffer.from(String(a));
@@ -366,12 +366,12 @@ const same = (a, b) => {
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 };
 
-/** Token CSRF per sesi: dicek untuk setiap POST (form dashboard & login). */
+/** Per-session CSRF token: checked on every POST (dashboard & login forms). */
 export function csrf(req, res, next) {
   if (!req.session.csrf) req.session.csrf = crypto.randomBytes(24).toString("hex");
   res.locals.csrf = req.session.csrf;
   res.locals.admin = req.session.admin || null;
-  // Form multipart dicek setelah multer membaca body (lihat checkCsrf).
+  // Multipart forms are checked after multer reads the body (see checkCsrf).
   if (req.method === "POST" && !req.is("multipart/form-data")) return checkCsrf(req, res, next);
   next();
 }
@@ -390,7 +390,7 @@ export const authRoutes = Router();
 
 authRoutes.get("/login", (req, res) => res.render("login", { error: null, email: "", next: req.query.next || "/admin" }));
 
-/* Batas percobaan login: 10 gagal per 15 menit per IP (cegah tebak password). */
+/* Login attempt limit: 10 failures per 15 minutes per IP (prevents password guessing). */
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILS = 10;
 const fails = new Map();
@@ -449,9 +449,9 @@ const toInt = (v) => {
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
- * Validasi body form → { data, errors }. Gambar ditangani route (multer).
- * \`id\` = baris yang diubah (slug kosong = slug lama tetap); tanpa id = baris baru
- * (slug kosong = dibuat dari nama).
+ * Validate the form body → { data, errors }. Images are handled by the route (multer).
+ * \`id\` = the row being edited (empty slug = keep the old slug); no id = a new row
+ * (empty slug = generated from the name).
  */
 export function validate(body, id = 0) {
   const data = {};
@@ -504,7 +504,7 @@ function where(q, category) {
   return { sql: parts.length ? "WHERE " + parts.join(" AND ") : "", params };
 }
 
-/** Urutan yang boleh dipilih (?sort=). "manual" = urutan data (id). */
+/** Sort orders that may be chosen (?sort=). "manual" = data order (id). */
 export const SORTS = {
   manual: "id ASC",
   newest: "id DESC",
@@ -515,7 +515,7 @@ export const SORTS = {
   rating_desc: "rating DESC, id ASC",
 };
 
-/** Daftar dengan pencarian, filter kategori, urutan, dan pagination. */
+/** List with search, category filter, sorting, and pagination. */
 export function paginate({ q = "", page = 1, perPage = 10, order = "DESC", category = "", sort = "" } = {}) {
   const w = where(q, category);
   const orderBy = SORTS[sort] || (order === "ASC" ? "id ASC" : "id DESC");
@@ -530,7 +530,7 @@ export function paginate({ q = "", page = 1, perPage = 10, order = "DESC", categ
 
 export const find = (id) => db.prepare(\`SELECT * FROM \${TABLE} WHERE id = ?\`).get(Number(id)) || null;
 
-/** Daftar kategori unik (urutan kemunculan pertama). */
+/** Unique category list (order of first appearance). */
 export function categories() {
   if (!HAS_CATEGORY) return [];
   const rows = db.prepare(\`SELECT category, MIN(id) AS first FROM \${TABLE} WHERE TRIM(COALESCE(category, '')) != '' GROUP BY LOWER(TRIM(category)) ORDER BY first\`).all();
@@ -539,7 +539,7 @@ export function categories() {
 
 export const findBySlug = (slug) => db.prepare(\`SELECT * FROM \${TABLE} WHERE slug = ?\`).get(String(slug)) || null;
 
-/** Item terkait: label sama dulu, lalu item lain (tanpa item itu sendiri). */
+/** Related items: same label first, then other items (excluding the item itself). */
 export function related(row, limit = 3) {
   const n = Math.max(1, Math.min(12, Number(limit) || 3));
   return db
@@ -561,7 +561,7 @@ export function update(id, data) {
 
 export const remove = (id) => db.prepare(\`DELETE FROM \${TABLE} WHERE id = ?\`).run(Number(id)).changes > 0;
 
-/** Bentuk data untuk kartu di halaman publik. */
+/** Data shape for the cards on public pages. */
 export const toCard = (row) => ({
   id: row.id,
   slug: row.slug,${itemPage ? `\n  url: ${js(`/${n.slug}/`)} + row.slug,` : ""}
@@ -601,7 +601,7 @@ const PER_PAGE = [10, 25, 50];
 const VIEW = ${js(`admin/${n.slug}`)};
 const BASE = ${js(`/admin/${n.slug}`)};
 
-/** Hapus berkas unggahan lama (hanya di public/uploads/). */
+/** Delete the old uploaded file (only inside public/uploads/). */
 function dropUpload(url) {
   if (typeof url !== "string" || !url.startsWith(${js(`/uploads/${n.slug}/`)})) return;
   fs.rm(path.join(uploadDir, path.basename(url)), { force: true }, () => {});
@@ -609,7 +609,7 @@ function dropUpload(url) {
 
 const router = Router();
 
-// Daftar kategori untuk isian otomatis (datalist) di form.
+// Category list for autocomplete (datalist) in the form.
 router.use((_req, res, next) => {
   res.locals.categories = M.categories();
   next();
@@ -722,7 +722,7 @@ export function ${n.camel}Page(req, res, next) {
     if (err) return next(err);
     res.type("html").send(
       html
-        // Alamat relatif (assets/…, halaman lain) dihitung dari akar situs.
+        // Relative addresses (assets/…, other pages) are resolved from the site root.
         .replace(/<head>/i, '<head>\\n  <base href="/" />')
         .replace(/<title>[\\s\\S]*?<\\/title>/i, () => "<title>" + esc(row.name) + "</title>"),
     );
@@ -910,7 +910,7 @@ const LOGIN_EJS = `<!DOCTYPE html>
 </html>
 `;
 
-/** Berkas CRUD Express. `site` = berkas situs statis (dipindah ke public/). */
+/** Express CRUD files. `site` = the static site files (moved into public/). */
 export function expressCrudFiles(cols: CollectionDef[], siteName: string, itemPages: Record<string, string> = {}): GeneratedFile[] {
   const names = cols.map(crudNames);
   const files: GeneratedFile[] = [

@@ -1,6 +1,6 @@
 // ─── lib/audioFormats.ts ─────────────────────────────────────────────────────
-// Daftar format tujuan "Konversi Audio" + aturan murni (tanpa DOM) yang
-// dipakai worker dan diuji di Node: batas kanal/sample rate per format dan
+// The "Convert Audio" target format list + pure rules (no DOM)
+// used by the worker and tested in Node: channel/sample rate limits per format and
 // pemetaan bitrate → kualitas Vorbis.
 
 export type AudioTargetId = "mp3" | "wav" | "ogg" | "opus" | "flac" | "aac" | "m4a";
@@ -10,13 +10,13 @@ export interface AudioTarget {
   label: string;
   ext: string;
   mime: string;
-  /** Tanpa kompresi lossy (bitrate tidak berlaku). */
+  /** No lossy compression (bitrate does not apply). */
   lossless: boolean;
-  /** Kanal maksimum yang didukung encoder. */
+  /** Maximum channels supported by the encoder. */
   maxChannels: number;
-  /** Sample rate maksimum yang didukung encoder (null = bebas). */
+  /** Maximum sample rate supported by the encoder (null = any). */
   maxSampleRate: number | null;
-  /** Butuh encoder WebCodecs bawaan browser (tidak ada versi WASM). */
+  /** Needs the browser's built-in WebCodecs encoder (no WASM version). */
   needsWebCodecs?: boolean;
 }
 
@@ -32,12 +32,12 @@ export const AUDIO_TARGETS: AudioTarget[] = [
 
 export const audioTarget = (id: AudioTargetId) => AUDIO_TARGETS.find((t) => t.id === id) ?? AUDIO_TARGETS[0];
 
-/** Bitrate yang ditawarkan (kbps). */
+/** Bitrates offered (kbps). */
 export const AUDIO_BITRATES = [96, 128, 160, 192, 256, 320] as const;
 export const AUDIO_SAMPLE_RATES = [22050, 32000, 44100, 48000] as const;
 
 export interface AudioConvertSettings {
-  /** kbps, untuk format lossy. */
+  /** kbps, for lossy formats. */
   bitrate: number;
   /** null = sample rate asli. */
   sampleRate: number | null;
@@ -47,16 +47,16 @@ export interface AudioConvertSettings {
 
 export const DEFAULT_AUDIO_SETTINGS: AudioConvertSettings = { bitrate: 192, sampleRate: null, channels: null };
 
-/** Jumlah kanal keluaran: pilihan pengguna atau asli, dibatasi kemampuan encoder. */
+/** Output channel count: the user's choice or the original, limited by the encoder. */
 export function outputChannels(target: AudioTarget, chosen: AudioConvertSettings["channels"], source: number): number {
   const want = chosen ?? Math.max(1, source || 2);
   return Math.max(1, Math.min(target.maxChannels, want));
 }
 
 /**
- * Sample rate keluaran. Sumber 96 kHz ke MP3/AAC/Vorbis turun ke 48 kHz;
- * sumber 22,05 kHz tetap 22,05 kHz kecuali pengguna memilih lain.
- * Opus selalu 48 kHz (kodek Opus bekerja di 48 kHz).
+ * Output sample rate. A 96 kHz source to MP3/AAC/Vorbis drops to 48 kHz;
+ * a 22.05 kHz source stays 22.05 kHz unless the user picks otherwise.
+ * Opus is always 48 kHz (the Opus codec works at 48 kHz).
  */
 export function outputSampleRate(target: AudioTarget, chosen: number | null, source: number): number {
   if (target.id === "opus") return 48000;
@@ -84,14 +84,14 @@ export function vorbisQuality(kbps: number): number {
   return 10;
 }
 
-/** Bitrate efektif: Opus maksimal 256 kbps untuk stereo (di atas itu tidak terdengar bedanya). */
+/** Effective bitrate: Opus maxes out at 256 kbps for stereo (no audible difference above that). */
 export function outputBitrate(target: AudioTarget, kbps: number, channels: number): number {
   const k = Math.max(32, Math.min(320, Math.round(kbps)));
   if (target.id === "opus") return Math.min(k, 128 * channels) * 1000;
   return k * 1000;
 }
 
-/** Turunkan jumlah kanal (rata-rata kanal sisa ke kanal yang tersisa). */
+/** Reduces the channel count (remaining channels are averaged into the kept ones). */
 export function downmix(planes: Float32Array[], to: number): Float32Array[] {
   if (planes.length <= to) return planes;
   if (to === 1) {
@@ -99,7 +99,7 @@ export function downmix(planes: Float32Array[], to: number): Float32Array[] {
     for (const p of planes) for (let i = 0; i < out.length; i++) out[i] += p[i] / planes.length;
     return [out];
   }
-  // Stereo: L = kanal genap, R = kanal ganjil (cukup untuk 5.1 → 2.0 sederhana).
+  // Stereo: L = even channels, R = odd channels (good enough for a simple 5.1 → 2.0).
   const out = [new Float32Array(planes[0].length), new Float32Array(planes[0].length)];
   const counts = [0, 0];
   planes.forEach((p, c) => {
@@ -113,7 +113,7 @@ export function downmix(planes: Float32Array[], to: number): Float32Array[] {
   return out;
 }
 
-/** Resample linear sederhana (hanya untuk jalur cadangan > 48 kHz). */
+/** Simple linear resample (only for the > 48 kHz fallback path). */
 export function resampleLinear(src: Float32Array, from: number, to: number): Float32Array {
   if (from === to) return src;
   const n = Math.max(1, Math.round((src.length * to) / from));
@@ -130,7 +130,7 @@ export function resampleLinear(src: Float32Array, from: number, to: number): Flo
 }
 
 /* ------------------------------------------------------------------ */
-/* AIFF / AIFF-C → PCM (browser & mediabunny tidak membaca AIFF)         */
+/* AIFF / AIFF-C → PCM (the browser & mediabunny cannot read AIFF)       */
 /* ------------------------------------------------------------------ */
 
 export const isAiff = (head: Uint8Array) =>
@@ -146,7 +146,7 @@ function readExtended(v: DataView, o: number): number {
   return sign * (hi * 2 ** (exp - 16383 - 31) + lo * 2 ** (exp - 16383 - 63));
 }
 
-/** Parse AIFF/AIFF-C tanpa kompresi (PCM 8/16/24/32-bit, 'sowt', float 32/64). */
+/** Parse uncompressed AIFF/AIFF-C (PCM 8/16/24/32-bit, 'sowt', float 32/64). */
 export function parseAiff(buf: ArrayBuffer): { channels: Float32Array[]; sampleRate: number } {
   const v = new DataView(buf);
   const tag = (o: number) => String.fromCharCode(v.getUint8(o), v.getUint8(o + 1), v.getUint8(o + 2), v.getUint8(o + 3));

@@ -1,19 +1,19 @@
 // ─── api/queries.ts ──────────────────────────────────────────────────────────
-// Hook TanStack Query per resource. Komponen memakai hook ini, bukan fetch
-// langsung, sehingga data yang sama dipakai bersama (cache), permintaan
-// paralel digabung, dan status loading/error seragam.
+// TanStack Query hooks per resource. Components use these hooks instead of fetching
+// directly, so the same data is shared (cached), requests
+// in parallel are merged, and loading/error states are consistent.
 //
 //   useTemplatesPage(params)   GET /templates?page&limit&tier&category&q&sort
-//   useTemplatesInfinite(p)    idem, dimuat bertahap 12 per muatan (infinite scroll, v7)
+//   useTemplatesInfinite(p)    same, loaded in steps of 12 per batch (infinite scroll, v7)
 //   useTemplateDetail(id)      GET /templates/:id
-//   useCatalogQuery()          katalog lengkap (template + section + elemen) untuk Web Market
+//   useCatalogQuery()          full catalog (templates + sections + elements) for Web Market
 //   useTransactions(limit)     GET /billing/transactions
 //   useReferral()              GET /referrals/me
 //   useMfaStatus()             GET /auth/2fa
 //
-// Data akun yang dipakai banyak komponen lama (saldo, akun marketplace, sesi)
-// tetap tersedia lewat store zustand, tetapi pengambilannya juga lewat cache
-// query yang sama (lihat billing.ts, marketplace/account.ts).
+// Account data used by many older components (balance, marketplace account, session)
+// is still available through zustand stores, but it is also fetched through the same
+// query cache (see billing.ts, marketplace/account.ts).
 
 import { useEffect } from "react";
 import { infiniteQueryOptions, keepPreviousData, useInfiniteQuery, useQuery, type QueryClient } from "@tanstack/react-query";
@@ -30,13 +30,13 @@ import { transactionsQuery } from "../pages/media/processing/billing";
 import { catalogQuery as plansCatalogQuery, subscriptionQuery } from "../pages/plans/plans";
 import { isDemoMode } from "../demo/demoMode";
 
-/** Mode demo (v12): katalog template di frontend (v13: semua template), dimuat terpisah. */
+/** Demo mode (v12): template catalog in the frontend (v13: every template), loaded separately. */
 const demoTemplates = () => import("../demo/demoTemplates");
 
 const langOf = (lng?: string) => (lng?.startsWith("en") ? "en" : "id");
 
 /* ------------------------------------------------------------------ */
-/* Template: daftar berhalaman (server-side pagination)                 */
+/* Templates: paginated list (server-side pagination)                   */
 /* ------------------------------------------------------------------ */
 
 export const TEMPLATES_PER_PAGE = 10;
@@ -56,17 +56,17 @@ export interface TemplatesPage {
   page: number;
   pages: number;
   limit: number;
-  /** Jumlah setelah filter. */
+  /** Count after filtering. */
   total: number;
-  /** Jumlah semua template terbit. */
+  /** Count of all published templates. */
   totalAll: number;
-  /** Jumlah per tab tier untuk filter kategori + pencarian aktif. */
+  /** Count per tier tab for the category filter + active search. */
   facets: { all: number; free: number; premium: number };
 }
 
 const int = (v: unknown, d: number) => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : d);
 
-/** Validasi respons halaman template (entri rusak dibuang, angka aneh diganti default). */
+/** Validate the template page response (broken entries dropped, odd numbers replaced with defaults). */
 export function sanitizeTemplatesPage(raw: unknown, params: TemplatesPageParams): TemplatesPage {
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
   const templates = (Array.isArray(r.templates) ? r.templates : []).map(sanitizeTemplate).filter((t): t is TemplateCatalogItem => !!t);
@@ -93,7 +93,7 @@ async function fetchTemplatesPage(p: TemplatesPageParams & { limit: number }, si
   if (p.sort !== "featured") qs.set("sort", p.sort);
   const raw = await api<Record<string, unknown>>(`/templates?${qs}`, { signal });
   if ("promo" in raw) setServerPromo(raw.promo);
-  // v21.2: Template Kode terdaftar di backend v14 (kind "code") → ikut daftar server.
+  // v21.2: Code Templates are registered in backend v14 (kind "code") → included in the server list.
   return sanitizeTemplatesPage(raw, p);
 }
 
@@ -116,9 +116,9 @@ export const TEMPLATES_PER_LOAD = 12;
 export type TemplatesListParams = Omit<TemplatesPageParams, "page">;
 
 /**
- * Katalog template dimuat bertahap (paginasi server page/limit). Kunci query
- * memuat filter, jadi ganti filter/pencarian = daftar baru mulai dari muatan 1;
- * kembali ke filter lama memakai cache (muatan yang sudah ada tetap ada).
+ * The template catalog loads in batches (server page/limit pagination). The query key
+ * includes the filters, so changing a filter/search = a new list starting from batch 1;
+ * going back to an earlier filter uses the cache (loaded batches are kept).
  */
 export function templatesInfiniteQuery(params: TemplatesListParams) {
   const p = { lang: params.lang, tier: params.tier, category: params.category, q: params.q.trim(), sort: params.sort, limit: params.limit ?? TEMPLATES_PER_LOAD };
@@ -135,7 +135,7 @@ export function useTemplatesInfinite(params: TemplatesListParams) {
   return useInfiniteQuery(templatesInfiniteQuery(params));
 }
 
-/** Gabungkan muatan menjadi satu daftar; template ganda (data bergeser antar muatan) dibuang. */
+/** Merge batches into one list; duplicate templates (data shifting between batches) are dropped. */
 export function flattenTemplatePages(pages: readonly TemplatesPage[] | undefined): TemplateCatalogItem[] {
   const seen = new Set<string>();
   const out: TemplateCatalogItem[] = [];
@@ -148,14 +148,14 @@ export function flattenTemplatePages(pages: readonly TemplatesPage[] | undefined
   return out;
 }
 
-/** Siapkan muatan pertama katalog (mis. saat kursor di menu). */
+/** Prepare the first catalog batch (e.g. when the cursor is over the menu). */
 const prefetchTemplatesInfinite = (params: TemplatesListParams, client: QueryClient = queryClient) =>
   isBackendConfigured() || isDemoMode() ? client.prefetchInfiniteQuery(templatesInfiniteQuery(params)) : Promise.resolve();
 
 /**
- * Satu halaman katalog template. `placeholderData: keepPreviousData` → saat
- * pindah halaman/filter, daftar lama tetap tampil (redup) sampai data baru
- * datang, tanpa layar kosong. Halaman berikutnya di-prefetch otomatis.
+ * One page of the template catalog. `placeholderData: keepPreviousData` → when
+ * changing page/filter, the old list stays visible (dimmed) until the new data
+ * arrives, with no blank screen. The next page is prefetched automatically.
  */
 export function useTemplatesPage(params: TemplatesPageParams) {
   const opts = templatesPageQuery(params);
@@ -168,7 +168,7 @@ export function useTemplatesPage(params: TemplatesPageParams) {
   return query;
 }
 
-/** Prefetch satu halaman katalog (mis. saat kursor di atas tombol halaman). */
+/** Prefetch one catalog page (e.g. when the cursor is over a page button). */
 export const prefetchTemplatesPage = (params: TemplatesPageParams, client: QueryClient = queryClient) =>
   isBackendConfigured() || isDemoMode() ? client.prefetchQuery(templatesPageQuery(params)) : Promise.resolve();
 
@@ -199,19 +199,19 @@ export function useTemplateDetail(lang: string, id: string | undefined, initial?
   return useQuery({
     ...templateDetailQuery(lang, id ?? ""),
     enabled: !!id,
-    // Data dari kartu katalog sudah cukup untuk tampil seketika.
+    // Data from the catalog card is enough to render instantly.
     initialData: initial ?? undefined,
   });
 }
 
-/** Isi cache detail dari data kartu → membuka pratinjau tidak menunggu jaringan. */
+/** Fill the detail cache from card data → opening the preview does not wait for the network. */
 export function seedTemplateDetail(lang: string, tpl: TemplateCatalogItem) {
   const key = qk.template(langOf(lang), tpl.refId);
   if (!queryClient.getQueryData(key)) queryClient.setQueryData(key, tpl);
 }
 
 /* ------------------------------------------------------------------ */
-/* Katalog lengkap (Web Market, item bawaan template)                    */
+/* Full catalog (Web Market, built-in template items)                    */
 /* ------------------------------------------------------------------ */
 
 export const catalogQuery = (lang: string) => ({
@@ -221,7 +221,7 @@ export const catalogQuery = (lang: string) => ({
 });
 
 /* ------------------------------------------------------------------ */
-/* Akun: transaksi, referral, 2FA                                        */
+/* Account: transactions, referrals, 2FA                                 */
 /* ------------------------------------------------------------------ */
 
 export function useTransactions(limit = 50, enabled = true) {
@@ -239,7 +239,7 @@ export interface ReferralInfo {
   rewardsEarned: number;
   firstPurchaseOnly: boolean;
   voucherValidDays: number;
-  /** Kode yang dipakai akun ini saat mendaftar (bila ada). */
+  /** The code this account used when signing up (if any). */
   usedReferral: { code: string; at?: string } | null;
 }
 
@@ -280,7 +280,7 @@ const referralQuery = {
 
 export const useReferral = (enabled = true) => useQuery({ ...referralQuery, enabled: enabled && isBackendConfigured() });
 
-/** Pakai kode teman (akun yang sudah ada, belum pernah membeli). */
+/** Apply a friend's code (existing account that has never purchased). */
 export async function redeemReferral(code: string) {
   const r = await api<{ voucher: unknown }>("/referrals/redeem", { body: { code } });
   void queryClient.invalidateQueries({ queryKey: qk.referral });
@@ -288,13 +288,13 @@ export async function redeemReferral(code: string) {
   return r;
 }
 
-/** Tautan undangan: langsung ke halaman daftar dengan kode terisi. */
+/** Invite link: goes straight to the sign-up page with the code filled in. */
 export function referralInviteUrl(info: Pick<ReferralInfo, "code" | "shareUrl">, lang: string, fallbackOrigin = typeof window !== "undefined" ? window.location.origin : ""): string {
   let origin = fallbackOrigin;
   try {
     if (info.shareUrl) origin = new URL(info.shareUrl).origin;
   } catch {
-    /* pakai origin halaman */
+    /* use the page origin */
   }
   return `${origin}/${langOf(lang)}/signup?ref=${encodeURIComponent(info.code)}`;
 }
@@ -313,13 +313,13 @@ const idle = (fn: () => void) => {
   else setTimeout(fn, 1500);
 };
 
-/** Dipanggil sekali setelah sesi dimuat: siapkan halaman 1 katalog template. */
+/** Called once after the session loads: prepare page 1 of the template catalog. */
 export function prefetchCommonPages() {
   if (!isBackendConfigured()) return;
   idle(() => void prefetchTemplatesInfinite(DEFAULT_TEMPLATES_PAGE()));
 }
 
-/** Prefetch per tujuan menu (dipanggil saat kursor/fokus di tautan sidebar). */
+/** Prefetch per menu destination (called on cursor/focus over a sidebar link). */
 export function prefetchRoute(path: string, signedIn: boolean) {
   if (!isBackendConfigured()) return;
   if (path.endsWith("/web-templates")) void prefetchTemplatesInfinite(DEFAULT_TEMPLATES_PAGE());

@@ -59,7 +59,7 @@ import { portfolioMosaic, teamCards, testimonialsWall } from "../../../../pageMa
 /* ================================================================== */
 
 /* -------------- 1. Dapur Lirih — blog kuliner (FREE, 4 hlm) ----------- */
-// Hanya elemen & preset gratis; library: AOS.
+// Only free elements & presets; library: AOS.
 
 const KP: Palette = { ink: "#3b1d0e", muted: "#7c5a48", primary: "#c2410c", primaryDark: "#9a3412", soft: "#ffedd5", line: "#fed7aa" };
 const K = lookD(KP, { head: "Fraunces", body: "Nunito", shape: "soft", radius: 28, bg: "#fffaf5", alt: "#fff1e6", inv: "#3b1d0e", fx: { aos: "fade-up" } });

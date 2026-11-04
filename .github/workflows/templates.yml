@@ -1,7 +1,7 @@
-# Pemeriksaan otomatis semua template web (no. 12): overflow di 375/768/1280, error JS,
-# axe-core WCAG 2 A/AA, dan Lighthouse (mobile) pada 10 template contoh.
-# Gagal hanya bila ada masalah BARU dibanding scripts/templates-ci/baseline.json.
-# Template membaik? Jalankan `npm run templates:gen && npm run templates:baseline` lalu commit baseline.
+# Automatic checks for every web template (no. 12): overflow at 375/768/1280, JS errors,
+# axe-core WCAG 2 A/AA, and Lighthouse (mobile) on 10 sample templates.
+# Fails only on NEW problems compared with scripts/templates-ci/baseline.json.
+# Templates improved? Run `npm run templates:gen && npm run templates:baseline` and commit the baseline.
 name: templates-check
 
 on:
@@ -11,7 +11,7 @@ on:
       - "src/pages/pageMaker/**"
       - "scripts/templates-ci/**"
   schedule:
-    - cron: "0 20 * * 0" # Senin 03.00 WIB
+    - cron: "0 20 * * 0" # Monday 03:00 WIB (UTC+7)
   workflow_dispatch:
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Alat pemeriksa tidak masuk package-lock agar CI biasa tetap ringan.
+      # The checking tools stay out of package-lock so regular CI stays light.
       - run: npm i --no-save playwright@1.63.0 axe-core@4.10.3
       - run: npx playwright install --with-deps chromium
       - run: npm run templates:gen

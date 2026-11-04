@@ -1,9 +1,9 @@
 // ─── lib/wav.ts ──────────────────────────────────────────────────────────────
-// Encoder WAV PCM 16-bit (murni, tanpa dependensi) + utilitas kanal.
+// 16-bit PCM WAV encoder (pure, no dependencies) + channel utilities.
 
 import i18n from "../../../i18n";
 
-/** Potong kanal ke rentang [startSec, endSec). */
+/** Trim channels to the range [startSec, endSec). */
 export function sliceChannels(ch: Float32Array[], sampleRate: number, startSec: number, endSec: number): Float32Array[] {
   const len = ch[0]?.length ?? 0;
   const a = Math.max(0, Math.min(len, Math.floor(startSec * sampleRate)));
@@ -11,7 +11,7 @@ export function sliceChannels(ch: Float32Array[], sampleRate: number, startSec: 
   return ch.map((c) => c.subarray(a, b));
 }
 
-/** Campur semua kanal menjadi mono (rata-rata). */
+/** Mixes all channels down to mono (average). */
 export function mixToMono(ch: Float32Array[]): Float32Array {
   if (ch.length === 1) return ch[0];
   const n = ch[0].length;
@@ -21,10 +21,10 @@ export function mixToMono(ch: Float32Array[]): Float32Array {
   return out;
 }
 
-/** Ukuran file WAV 16-bit dalam byte. */
+/** 16-bit WAV file size in bytes. */
 export const wavBytes = (seconds: number, sampleRate: number, channels: number) => 44 + Math.round(seconds * sampleRate) * channels * 2;
 
-/** Encode kanal float (-1..1) ke WAV PCM 16-bit little-endian. */
+/** Encode float channels (-1..1) to 16-bit little-endian PCM WAV. */
 export function encodeWav(ch: Float32Array[], sampleRate: number): Uint8Array {
   const channels = ch.length;
   if (!channels) throw new Error(i18n.t("media.errors.noAudioChannels"));
@@ -37,7 +37,7 @@ export function encodeWav(ch: Float32Array[], sampleRate: number): Uint8Array {
   v.setUint32(4, 36 + dataBytes, true);
   str(8, "WAVE");
   str(12, "fmt ");
-  v.setUint32(16, 16, true); // ukuran chunk fmt
+  v.setUint32(16, 16, true); // fmt chunk size
   v.setUint16(20, 1, true); // PCM
   v.setUint16(22, channels, true);
   v.setUint32(24, sampleRate, true);

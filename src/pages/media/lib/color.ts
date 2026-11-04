@@ -1,5 +1,5 @@
 // ─── lib/color.ts ────────────────────────────────────────────────────────────
-// Konversi warna & ekstraksi palet dominan (median cut). Fungsi murni.
+// Color conversion & dominant palette extraction (median cut). Pure functions.
 
 export interface RGBA {
   r: number;
@@ -41,7 +41,7 @@ function rgbToHsv(r: number, g: number, b: number) {
   return { h: Math.round(h) % 360, s: Math.round((max === 0 ? 0 : d / max) * 100), v: Math.round(max * 100) };
 }
 
-/** CMYK naif (tanpa profil ICC) — hanya perkiraan. */
+/** Naive CMYK (no ICC profile); an approximation only. */
 export function rgbToCmyk(r: number, g: number, b: number) {
   const k = 1 - Math.max(r, g, b) / 255;
   if (k >= 1) return { c: 0, m: 0, y: 0, k: 100 };
@@ -58,7 +58,7 @@ function luminance({ r, g, b }: Pick<RGBA, "r" | "g" | "b">): number {
   return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b);
 }
 
-/** Rasio kontras WCAG antara dua warna (1–21). */
+/** WCAG contrast ratio between two colors (1–21). */
 export function contrastRatio(a: Pick<RGBA, "r" | "g" | "b">, b: Pick<RGBA, "r" | "g" | "b">): number {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
@@ -87,8 +87,8 @@ export interface PaletteColor extends RGBA {
 }
 
 /**
- * Warna dominan dengan median cut. Piksel hampir transparan (alpha < 125)
- * diabaikan; maksimal ±60 ribu sampel agar cepat untuk gambar besar.
+ * Dominant colors with median cut. Nearly transparent pixels (alpha < 125)
+ * are ignored; at most about 60 thousand samples so large images stay fast.
  */
 export function extractPalette(data: Uint8ClampedArray, count = 6, maxSamples = 60_000): PaletteColor[] {
   const total = data.length / 4;
@@ -112,7 +112,7 @@ export function extractPalette(data: Uint8ClampedArray, count = 6, maxSamples = 
     return hi - lo;
   };
   while (boxes.length < count) {
-    // Bagi kotak dengan rentang terbesar (dikali jumlah piksel, agar kotak ramai diprioritaskan).
+    // Split the box with the largest range (times the pixel count, so busy boxes are prioritized).
     let bi = -1, best = 0, bc = 0;
     boxes.forEach((b, i) => {
       if (b.length < 2) return;
@@ -143,7 +143,7 @@ export function extractPalette(data: Uint8ClampedArray, count = 6, maxSamples = 
       return { r: s[0] / b.length, g: s[1] / b.length, b: s[2] / b.length, count: b.length };
     })
     .sort((x, y) => y.count - x.count);
-  // Median cut bisa memecah satu warna besar ke beberapa kotak: gabungkan yang hampir sama.
+  // Median cut can split one large color into several boxes: merge the near-identical ones.
   const merged: typeof raw = [];
   for (const c of raw) {
     const m = merged.find((x) => (x.r - c.r) ** 2 + (x.g - c.g) ** 2 + (x.b - c.b) ** 2 < 18 ** 2);

@@ -1,18 +1,18 @@
 /* ================================================================== */
-/* OWD Motion: pengganti AOS, Animate.css, dan Vanilla Tilt (v25)        */
+/* OWD Motion: replacement for AOS, Animate.css, and Vanilla Tilt (v25)  */
 /*                                                                    */
-/* Atribut & class TETAP sama dengan library aslinya (data-aos,         */
-/* animate__*, data-tilt), jadi desain lama tidak perlu diubah. Bedanya: */
-/*   - tidak ada request ke CDN (CSS ±4 KB + JS ±2 KB ditanam di HTML),  */
-/*   - konten tetap terlihat bila JavaScript mati/gagal (kelas           */
-/*     html.owd-motion dipasang skrip kecil di <head>),                  */
-/*   - animasi mati otomatis untuk prefers-reduced-motion,               */
-/*   - tilt hanya untuk mouse (bukan layar sentuh).                       */
-/* Keyframes Animate.css diambil dari animate.css 4.1.1 (MIT,           */
+/* Attributes & classes STAY the same as the original libraries (data-aos, */
+/* animate__*, data-tilt), so old designs need no changes. The differences: */
+/*   - no CDN requests (about 4 KB CSS + 2 KB JS embedded in the HTML),  */
+/*   - content stays visible when JavaScript is off/fails (the           */
+/*     html.owd-motion class is set by a small script in <head>),       */
+/*   - animations turn off automatically for prefers-reduced-motion,     */
+/*   - tilt is mouse-only (not touch screens).                           */
+/* Animate.css keyframes are taken from animate.css 4.1.1 (MIT,         */
 /* Daniel Eden & Animate.css contributors).                              */
 /* ================================================================== */
 
-/** Penanda di <head>: aktifkan gaya "tersembunyi sebelum muncul" hanya bila JS jalan. */
+/** Marker in <head>: enables the "hidden before entering" style only when JS runs. */
 export const MOTION_HEAD_FLAG = `<script>document.documentElement.classList.add("owd-motion")</script>`;
 
 const AOS_FROM: Record<string, string> = {
@@ -29,7 +29,7 @@ const AOS_FROM: Record<string, string> = {
   "slide-up": "translate3d(0,100%,0)",
   "slide-left": "translate3d(100%,0,0)",
 };
-/** Efek tanpa opacity (sama dengan AOS: flip & slide tetap terlihat). */
+/** Effects without opacity (same as AOS: flip & slide stay visible). */
 const AOS_KEEP_OPACITY = new Set(["flip-up", "flip-left", "slide-up", "slide-left"]);
 
 const aosCss = () => {
@@ -88,19 +88,19 @@ const TILT_CSS = `[data-tilt]{transform-style:preserve-3d}
 
 const REDUCED = `@media (prefers-reduced-motion:reduce){html.owd-motion [data-aos]{opacity:1!important;transform:none!important;transition:none!important}.animate__animated{animation:none!important}}`;
 
-/** CSS runtime (ditanam di <head> sebagai <style>). */
-/** Elemen fade-left/zoom-out dll. mulai di luar layar: jangan sampai halaman bisa digeser ke samping. */
-// html "hidden" menahan propagasi ke viewport; body "clip" memotong tanpa menjadi kontainer scroll
-// (position: sticky tetap jalan, scroll samping lewat sentuhan/JS tidak mungkin).
+/** Runtime CSS (embedded in <head> as <style>). */
+/** fade-left/zoom-out etc. elements start off-screen: the page must never scroll sideways. */
+// html "hidden" stops propagation to the viewport; body "clip" clips without becoming a scroll container
+// (position: sticky still works, sideways scrolling via touch/JS is impossible).
 const NO_SIDE_SCROLL = "html.owd-motion{overflow-x:hidden}@supports (overflow-x:clip){html.owd-motion body{overflow-x:clip}}";
 
 export const MOTION_CSS = [NO_SIDE_SCROLL, aosCss(), ANIMATE_KEYFRAMES, ANIMATE_CLASSES, TILT_CSS, REDUCED].join("\n");
 
 /**
- * JS runtime (akhir <body>). `OWDMotion.init()` aman dipanggil berulang
- * (SPA / pratinjau memanggilnya setelah setiap render).
+ * Runtime JS (end of <body>). `OWDMotion.init()` is safe to call repeatedly
+ * (SPAs / the preview call it after every render).
  */
-export const MOTION_JS = `/* owd-motion: pengganti AOS + Vanilla Tilt, tanpa CDN */
+export const MOTION_JS = `/* owd-motion: replacement for AOS + Vanilla Tilt, no CDN */
 (function () {
   var d = document, root = d.documentElement;
   root.classList.add("owd-motion");

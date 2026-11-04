@@ -18,7 +18,7 @@ const CDN = LIBRARY_BY_ID.chartjs.js;
 const countEls = (b) => b.children.reduce((n, c) => n + (c.kind === "element" ? 1 : countEls(c)), 0);
 const boxes = (b) => b.children.filter((c) => c.kind === "box");
 
-/* --------------------------- Section kosong --------------------------- */
+/* --------------------------- Empty section --------------------------- */
 
 test("section baru dari preset: kosong (tanpa elemen), row & kolom tetap ada", () => {
   for (const p of SECTION_PRESETS) {
@@ -44,7 +44,7 @@ test("section dengan contoh isi tetap bisa dipilih; template tetap berisi", () =
   assert.equal(JSON.stringify(src), before, "emptySection tidak mengubah input");
 });
 
-/* --------------------------- Cari desain --------------------------- */
+/* --------------------------- Search designs --------------------------- */
 
 test("cari desain: tanpa beda huruf besar/aksen, semua kata harus cocok", () => {
   const list = [{ name: "Beranda Kopi" }, { name: "Tentang Kami" }, { name: "Café Menu Kopi" }, { name: "Kontak" }];

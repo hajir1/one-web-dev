@@ -8,14 +8,14 @@ import { safeColor } from "../../helpers/background";
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* Countdown (PREMIUM) — hitung mundur ke tanggal tertentu.             */
-/* Waktu dihitung di peramban pengunjung (zona waktu lokal). Timer      */
-/* 1 detik selalu dibersihkan saat komponen dilepas.                    */
+/* Countdown (PREMIUM) — counts down to a specific date.                */
+/* Time is computed in the visitor's browser (local time zone). The 1-second */
+/* timer is always cleared when the component unmounts.                 */
 /* ================================================================== */
 
 export interface CountdownState {
   title: string;
-  /** "YYYY-MM-DDTHH:mm" (waktu lokal pengunjung). */
+  /** "YYYY-MM-DDTHH:mm" (the visitor's local time). */
   target: string;
   finishedText: string;
   showDays: boolean;
@@ -51,7 +51,7 @@ const UNITS = [
 const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, Number.isFinite(n) ? n : a));
 const col = (c: string, d: string) => safeColor(c) ?? d;
 
-/** Hitung sisa waktu (dipakai di semua framework, ditulis sebagai JS biasa). */
+/** Computes the remaining time (used in every framework, written as plain JS). */
 const PARTS_FN = `function countdownParts(target, now) {
   const ms = Math.max(0, target - now);
   return {

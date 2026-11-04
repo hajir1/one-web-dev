@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { sentryPlan, stripQuery } from "../observability";
 
-/* v7 (P10): Sentry browser opsional. */
+/* v7 (P10): optional browser Sentry. */
 
 test("tanpa VITE_SENTRY_DSN → mati", () => {
   assert.equal(sentryPlan({}, "http://localhost:3000"), null);

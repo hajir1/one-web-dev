@@ -7,11 +7,11 @@ import { useBilling } from "../pages/media/processing/billing";
 import type { EntitlementSnapshot, ItemId, SimTransaction } from "./types";
 
 /* ================================================================== */
-/* Akun marketplace dari SERVER (GET /marketplace/account)              */
+/* Marketplace account from the SERVER (GET /marketplace/account)       */
 /*                                                                    */
-/* Saldo, kepemilikan template/item, kuota desain & website, dan          */
-/* riwayat HANYA berasal dari respons backend. Tidak disimpan ke          */
-/* localStorage: setiap halaman dibuka → muat ulang dari server.         */
+/* Balance, template/item ownership, design & website quotas, and         */
+/* history comes ONLY from backend responses. Nothing is stored in       */
+/* localStorage: every page open → reload from the server.              */
 /* ================================================================== */
 
 interface QuotaUsage {
@@ -28,9 +28,9 @@ export interface AccountLimits {
 export interface MarketAccount {
   balance: number;
   entitlements: EntitlementSnapshot;
-  /** Desain halaman tambahan dari paket desain. */
+  /** Extra page designs from design packs. */
   extraDesigns: number;
-  /** Slot folder website tambahan (paket website + slot satuan). */
+  /** Extra website folder slots (website packs + single slots). */
   extraSites: number;
   transactions: SimTransaction[];
   limits: AccountLimits;
@@ -52,7 +52,7 @@ export const emptyAccount = (): MarketAccount => ({
 });
 
 /* ------------------------------------------------------------------ */
-/* Validasi respons server (data aneh dibuang, tidak pernah melempar)    */
+/* Server response validation (odd data dropped, never throws)           */
 /* ------------------------------------------------------------------ */
 
 const ITEM_RE = /^(template|preset|element|event|feature):[\w-]{1,80}$/;
@@ -147,20 +147,20 @@ interface MarketStore {
 
 export const useMarketStore = create<MarketStore>(() => ({ account: emptyAccount(), status: "idle", error: null }));
 
-/** Terapkan akun dari respons server (dan saldo billing bila ikut dikirim). */
+/** Applies the account from a server response (and the billing balance when included). */
 export function commitAccount(raw: unknown, billing?: unknown): MarketAccount {
   const account = sanitizeAccount(raw);
   useMarketStore.setState({ account, status: "ready", error: null });
   queryClient.setQueryData(qk.market, raw);
   if (billing) {
     useBilling.getState().setAccountFromServer(billing);
-    // Saldo berubah → riwayat transaksi di halaman Credits perlu dimuat ulang.
+    // Balance changed → the transaction history on the Credits page needs reloading.
     void queryClient.invalidateQueries({ queryKey: qk.billing });
   }
   return account;
 }
 
-/** Perbarui sebagian kuota (mis. dari respons sinkron desain / ekspor). */
+/** Partially update the quota (e.g. from a design sync / export response). */
 export function patchLimits(patch: Partial<AccountLimits>) {
   useMarketStore.setState((s) => ({ account: { ...s.account, limits: { ...s.account.limits, ...patch } } }));
 }
@@ -174,7 +174,7 @@ export function refreshMarketAccount(): Promise<void> {
   inflight ??= (async () => {
     useMarketStore.setState({ status: "loading", error: null });
     try {
-      // Lewat cache query: panggilan paralel dari beberapa komponen = satu permintaan.
+      // Through the query cache: parallel calls from several components = one request.
       commitAccount(await queryClient.fetchQuery({ queryKey: qk.market, queryFn: ({ signal }) => api("/marketplace/account", { signal }), staleTime: 0, retry: false }));
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) useMarketStore.setState({ status: "anonymous", account: emptyAccount(), error: null });
@@ -186,5 +186,5 @@ export function refreshMarketAccount(): Promise<void> {
   return inflight;
 }
 
-/** Kosongkan saat keluar akun. */
+/** Clear on sign-out. */
 export const resetMarketAccount = () => useMarketStore.setState({ account: emptyAccount(), status: "anonymous", error: null });

@@ -1,12 +1,12 @@
 // ─── auth/referralCapture.ts ─────────────────────────────────────────────────
-// Kode referral dari tautan undangan (?ref=KODE). Kode disimpan di perangkat
-// (30 hari) agar tetap terisi di formulir daftar walaupun pengunjung sempat
-// membuka halaman lain dulu. Kode hanya saran: server yang memvalidasi.
+// Referral code from an invite link (?ref=CODE). The code is stored on the device
+// (30 days) so it stays filled in on the sign-up form even if the visitor
+// opens other pages first. The code is only a suggestion: the server validates it.
 
 const KEY = "owd.referral";
 const TTL_MS = 30 * 86400_000;
 
-/** Huruf besar, tanpa spasi/tanda hubung. null = format tidak mungkin valid. */
+/** Uppercase, no spaces/hyphens. null = the format cannot be valid. */
 export function normalizeReferralInput(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const v = raw.trim().toUpperCase().replace(/[\s-]/g, "");
@@ -53,9 +53,9 @@ export function clearStoredReferral(s: Store | null = storage()) {
 }
 
 /**
- * Dipanggil sekali saat aplikasi dibuka: ambil ?ref= dari URL, simpan, lalu
- * hapus dari alamat (tautan yang disalin ulang tidak membawa kode orang lain).
- * Di halaman daftar parameter dibiarkan agar formulir bisa membacanya.
+ * Called once when the app opens: read ?ref= from the URL, store it, then
+ * remove it from the address (a re-copied link does not carry someone else's code).
+ * On the sign-up page the parameter is kept so the form can read it.
  */
 export function captureReferralFromUrl() {
   if (typeof window === "undefined") return;

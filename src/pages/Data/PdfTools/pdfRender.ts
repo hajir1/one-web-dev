@@ -3,9 +3,9 @@ import { DataError } from "../shared/errors";
 import { parseRanges } from "./pdfLib";
 
 /* ================================================================== */
-/* Render halaman PDF ke gambar dengan pdf.js (Apache-2.0), di browser.  */
-/* Dipakai untuk PDF → gambar dan kompres kuat (halaman jadi JPEG).      */
-/* pdf.js dimuat dinamis agar tidak membebani halaman lain.              */
+/* Renders PDF pages to images with pdf.js (Apache-2.0), in the browser. */
+/* Used for PDF → images and strong compression (pages become JPEG).    */
+/* pdf.js loads dynamically so it does not weigh down other pages.      */
 /* ================================================================== */
 
 type PdfJs = typeof import("pdfjs-dist");
@@ -19,14 +19,14 @@ function pdfjs(): Promise<PdfJs> {
   return lib;
 }
 
-/** Batas piksel per halaman supaya tab browser tidak kehabisan memori di HP. */
+/** Pixel limit per page so the browser tab does not run out of memory on phones. */
 const MAX_PIXELS = 16_000_000;
 
 export interface RenderOptions {
-  /** DPI hasil (72 = ukuran asli PDF). */
+  /** Output DPI (72 = the PDF's original size). */
   dpi: number;
   format: "png" | "jpeg" | "webp";
-  /** 0..1 untuk JPEG/WebP. */
+  /** 0..1 for JPEG/WebP. */
   quality: number;
   ranges?: string;
   signal?: AbortSignal;
@@ -38,7 +38,7 @@ export interface RenderedPage {
   blob: Blob;
   width: number;
   height: number;
-  /** Ukuran halaman PDF dalam poin (untuk menyusun ulang PDF). */
+  /** PDF page size in points (for rebuilding the PDF). */
   pt: { w: number; h: number };
 }
 
@@ -49,7 +49,7 @@ export async function renderPages(bytes: Uint8Array, o: RenderOptions): Promise<
   const m = await pdfjs();
   let doc;
   try {
-    // pdf.js memindahkan buffer ke worker → kirim salinan.
+    // pdf.js transfers the buffer to the worker → send a copy.
     doc = await m.getDocument({ data: bytes.slice(), isEvalSupported: false }).promise;
   } catch (e) {
     if ((e as { name?: string })?.name === "PasswordException") throw new DataError("pdfEncrypted");
@@ -70,7 +70,7 @@ export async function renderPages(bytes: Uint8Array, o: RenderOptions): Promise<
       const vp = page.getViewport({ scale });
       canvas.width = Math.ceil(vp.width);
       canvas.height = Math.ceil(vp.height);
-      // Latar putih (PDF transparan jadi hitam di JPEG).
+      // White background (transparent PDFs turn black in JPEG).
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       await page.render({ canvas, canvasContext: ctx, viewport: vp }).promise;
@@ -87,9 +87,9 @@ export async function renderPages(bytes: Uint8Array, o: RenderOptions): Promise<
 }
 
 /**
- * Kompres kuat: setiap halaman dirender ulang menjadi JPEG lalu disusun
- * jadi PDF baru. Ukuran turun drastis untuk PDF hasil scan/berisi foto,
- * tetapi teks tidak bisa dipilih/dicari lagi.
+ * Strong compression: each page is re-rendered as JPEG and assembled
+ * into a new PDF. Size drops sharply for scanned/photo PDFs,
+ * but text can no longer be selected/searched.
  */
 export async function compressRaster(
   bytes: Uint8Array,

@@ -1,4 +1,4 @@
-// v15: mode demo tanpa tulisan "gratis", kredit, atau Premium.
+// v15: demo mode without "free", credit, or Premium wording.
 import test from "node:test";
 import assert from "node:assert/strict";
 import i18next from "i18next";

@@ -19,14 +19,14 @@ import { NEW_ELEMENT_TYPES } from "../../../../marketplace/data/prices";
 import { isDemoMode } from "../../../../demo/demoMode";
 
 /* ================================================================== */
-/* Pustaka elemen bawaan Page Maker                                     */
+/* Page Maker built-in element library                                  */
 /* ================================================================== */
 
 export interface LibraryPick {
   elementType: string;
 }
 
-/** Pratinjau mini yang otomatis diskalakan agar muat di kotaknya. */
+/** A mini preview automatically scaled to fit its box. */
 function FitPreview({ html, css, scope }: { html: string; css: string; scope: string }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -155,19 +155,19 @@ function Card({
 interface ElementLibraryProps {
   icons: IconLookup;
   onAdd: (p: LibraryPick) => void;
-  /** Nama tujuan penambahan (untuk petunjuk). */
+  /** Name of the add target (for the hint). */
   targetLabel: string;
   /** Nama area tujuan seret (default: "canvas", diterjemahkan). */
   dropAreaLabel?: string;
 }
 
-/** Pustaka elemen BAWAAN (satu-satunya sumber elemen untuk sementara). */
+/** The BUILT-IN element library (the only element source for now). */
 export default function ElementLibrary({ icons, onAdd, targetLabel, dropAreaLabel }: ElementLibraryProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<string>("all");
   const q = query.trim().toLowerCase();
-  /** Nama elemen sesuai bahasa (katalog marketplace), cadangan: label bawaan. */
+  /** Element name for the language (marketplace catalog), fallback: built-in label. */
   const labelOf = (d: AnyElementDefinition) => t(`market.el.${d.type}.name`, { defaultValue: d.label });
 
   const sections = ELEMENT_GROUP_ORDER.filter((g) => group === "all" || g === group)

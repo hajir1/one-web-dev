@@ -3,9 +3,9 @@ import { V6G_SPECS } from "./specs";
 import { artKey } from "./keys";
 
 /* ================================================================== */
-/* Ilustrasi set G: 6 gambar per template dari 3 motif (kunci           */
-/* "v6g-<id>-0..5"). 0–2 memakai warna lembut palet, 3–5 varian         */
-/* tercermin dengan latar & aksen berbeda. Ditambah 8 avatar.           */
+/* Set G illustrations: 6 images per template from 3 motifs (keys       */
+/* "v6g-<id>-0..5"). 0–2 use the soft palette colors, 3–5 variants      */
+/* mirrored with different backgrounds & accents. Plus 8 avatars.       */
 /* ================================================================== */
 
 function inks(s: (typeof V6G_SPECS)[number]): [Ink, Ink] {

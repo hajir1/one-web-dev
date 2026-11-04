@@ -18,7 +18,7 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
     },
     rules: {
-      // Aturan hooks klasik saja; aturan React Compiler di preset v7 belum dipakai proyek ini.
+      // Classic hooks rules only; the React Compiler rules in the v7 preset are not used by this project yet.
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': [
@@ -28,7 +28,7 @@ export default tseslint.config(
     },
   },
   {
-    // Uji (node:test via tsx) & skrip alat: di luar tsconfig.app, berjalan di Node.
+    // Tests (node:test via tsx) & tool scripts: outside tsconfig.app, run in Node.
     files: ['src/**/*.test.ts', 'src/**/tests/**', 'src/tools/**'],
     languageOptions: { globals: globals.node },
     plugins: { '@typescript-eslint': tseslint.plugin },

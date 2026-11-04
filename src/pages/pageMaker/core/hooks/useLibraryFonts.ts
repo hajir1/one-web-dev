@@ -5,10 +5,10 @@ import { useFontStore } from "../store/fontStore";
 const STYLE_ID = "om-library-fonts";
 
 /**
- * Muat SEMUA font pustaka ke dokumen aplikasi lewat satu <style> di <head>,
- * supaya pratinjau di DOM (Element Maker), pemilih font, dan halaman
- * Global Setting menampilkan font yang benar. (Iframe pratinjau Component/
- * Page Maker memuat font sendiri lewat CSS hasil compose.)
+ * Loads EVERY library font into the app document through one <style> in <head>,
+ * so the DOM preview (Element Maker), the font picker, and the
+ * Global Setting page show the right fonts. (The Component/Page Maker
+ * preview iframe loads fonts itself through the composed CSS.)
  */
 export function useLibraryFonts(): void {
   const fonts = useFontStore((s) => s.fonts);

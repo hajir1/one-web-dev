@@ -1,13 +1,13 @@
 import { DataError } from "../../shared/errors";
 
 /* ================================================================== */
-/* Utilitas teks & web (v10): ubah huruf, teks contoh, cron, diff,       */
-/* regex, kontras warna. Logika murni, diuji di Node.                    */
+/* Text & web utilities (v10): change case, sample text, cron, diff,    */
+/* regex, color contrast. Pure logic, tested in Node.                   */
 /* ================================================================== */
 
-/* ---------------------------- ubah huruf ---------------------------- */
+/* ---------------------------- change case ---------------------------- */
 
-/** Pecah teks menjadi kata: spasi, tanda baca, camelCase, angka. */
+/** Splits text into words: spaces, punctuation, camelCase, numbers. */
 export function words(s: string): string[] {
   return s
     .normalize("NFKD")
@@ -22,7 +22,7 @@ export type CaseId = "slug" | "camel" | "pascal" | "snake" | "constant" | "title
 
 const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
 
-/** Ubah huruf per baris (baris kosong dipertahankan). */
+/** Changes case per line (empty lines are kept). */
 export function convertCase(input: string, to: CaseId): string {
   return input
     .split("\n")
@@ -52,7 +52,7 @@ export function convertCase(input: string, to: CaseId): string {
     .join("\n");
 }
 
-/* ---------------------------- teks contoh --------------------------- */
+/* ---------------------------- sample text --------------------------- */
 
 const LOREM =
   "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum".split(
@@ -63,7 +63,7 @@ const ID_WORDS =
     " ",
   );
 
-/** PRNG kecil (mulberry32) supaya hasil bisa diuji dengan seed tetap. */
+/** Small PRNG (mulberry32) so results can be tested with a fixed seed. */
 function rng(seed: number) {
   let a = seed >>> 0;
   return () => {
@@ -145,7 +145,7 @@ function parseField(src: string, min: number, max: number, names: string[] | nul
       b = stepS === undefined ? a : max;
     }
     if (field === "dow" && b === 7) {
-      // 7 = Minggu (sama dengan 0).
+      // 7 = Sunday (same as 0).
       if (a === 7) a = 0;
       else values.add(0);
       b = a === 0 && part.split("/")[0] !== "*" && !range.includes("-") ? 0 : 6;
@@ -173,12 +173,12 @@ export function parseCron(input: string): CronExpr {
 function dayMatches(c: CronExpr, d: Date): boolean {
   const dom = c.dom.values.has(d.getDate());
   const dow = c.dow.values.has(d.getDay());
-  // Aturan cron standar: bila hari-bulan DAN hari-minggu dibatasi, cukup salah satu cocok.
+  // Standard cron rule: when both day-of-month AND day-of-week are restricted, either one matching is enough.
   if (!c.dom.any && !c.dow.any) return dom || dow;
   return (c.dom.any || dom) && (c.dow.any || dow);
 }
 
-/** Jadwal berikutnya (waktu lokal), maksimal `count`, dicari hingga ±4 tahun. */
+/** Next runs (local time), at most `count`, searched up to ±4 years. */
 export function nextRuns(c: CronExpr, from: Date, count = 5): Date[] {
   const out: Date[] = [];
   const d = new Date(from.getTime());
@@ -202,7 +202,7 @@ export function nextRuns(c: CronExpr, from: Date, count = 5): Date[] {
   return out;
 }
 
-/** Penjelasan cron dalam bahasa sederhana. */
+/** Cron explanation in plain language. */
 export function describeCron(c: CronExpr, lang: "id" | "en"): string {
   const id = lang === "id";
   const list = (f: CronField, fmt: (n: number) => string) => {
@@ -236,7 +236,7 @@ export function describeCron(c: CronExpr, lang: "id" | "en"): string {
 
 export type DiffOp = { type: "same" | "add" | "del"; text: string };
 
-/** Diff baris (LCS). Dibatasi supaya tab tidak hang untuk teks sangat besar. */
+/** Line diff (LCS). Limited so the tab does not hang on very large text. */
 export function diffLines(a: string, b: string, opts: { ignoreWhitespace?: boolean; ignoreCase?: boolean } = {}): DiffOp[] {
   const A = a.split("\n");
   const B = b.split("\n");
@@ -248,7 +248,7 @@ export function diffLines(a: string, b: string, opts: { ignoreWhitespace?: boole
   };
   const NA = A.map(norm);
   const NB = B.map(norm);
-  // Pangkas awalan & akhiran yang sama (kasus umum: perubahan kecil).
+  // Trim the shared prefix & suffix (the common case: small changes).
   let start = 0;
   while (start < NA.length && start < NB.length && NA[start] === NB[start]) start++;
   let endA = NA.length;
@@ -279,7 +279,7 @@ export function diffLines(a: string, b: string, opts: { ignoreWhitespace?: boole
   return out;
 }
 
-/** Format unified sederhana untuk diunduh/disalin. */
+/** Simple unified format for download/copy. */
 export const diffToText = (ops: DiffOp[]) => ops.map((o) => `${o.type === "add" ? "+" : o.type === "del" ? "-" : " "} ${o.text}`).join("\n");
 
 /* -------------------------------- regex ------------------------------- */
@@ -293,7 +293,7 @@ export interface RegexMatch {
 
 export const MAX_REGEX_MATCHES = 1000;
 
-/** Jalankan regex. Pola tidak valid → DataError dengan pesan mesin JS. */
+/** Runs a regex. Invalid pattern → DataError with the JS engine message. */
 export function runRegex(pattern: string, flags: string, text: string): { matches: RegexMatch[]; truncated: boolean } {
   let re: RegExp;
   try {

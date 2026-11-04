@@ -54,7 +54,7 @@ import {
 } from "./kitD";
 
 /* ================================================================== */
-/* Template v3 D11–D15: Portal lowongan, Toko buku, Penerbit,            */
+/* v3 templates D11–D15: Job portal, Bookstore, Publisher,               */
 /* Panel surya, Pengisian mobil listrik.                                 */
 /* ================================================================== */
 
@@ -137,7 +137,7 @@ export const recruitmentJobBoard: TemplateContent = {
     }),
 };
 
-/* ---------------- 12. Pustaka Teduh — toko buku (6 hlm) ---------------- */
+/* ---------------- 12. Pustaka Teduh — bookstore (6 pages) ---------------- */
 // Premium: slider, pro-stats-band. Library: AOS. Editorial hangat.
 
 const BP: Palette = { ink: "#2a1a10", muted: "#6f5646", primary: "#7c2d12", primaryDark: "#5c1f0b", soft: "#fdecd8", line: "#ead7c3" };
@@ -202,7 +202,7 @@ export const bookstorePustaka: TemplateContent = {
 };
 
 /* -------------- 13. Penerbit Daun Lontar (5 hlm, Premium) --------------- */
-// Premium: pro-portfolio-mosaic, countdown. Library: Tilt. Tipografi besar.
+// Premium: pro-portfolio-mosaic, countdown. Library: Tilt. Large typography.
 
 const NP: Palette = { ink: "#1f0a12", muted: "#6b4452", primary: "#be123c", primaryDark: "#9f1239", soft: "#ffe4e6", line: "#fecdd3" };
 const N = lookD(NP, { head: "Playfair Display", body: "Josefin Sans", shape: "sharp", radius: 0, bg: "#fffafa", alt: "#fff1f2", inv: "#1f0a12", fx: { tilt: true } });

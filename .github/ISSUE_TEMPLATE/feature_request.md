@@ -1,11 +1,11 @@
 ---
-name: Usulan fitur
-about: Ide untuk alat, elemen, atau template baru
+name: Feature request
+about: An idea for a new tool, element, or template
 labels: enhancement
 ---
 
-**Masalah apa yang ingin diselesaikan?**
+**What problem should this solve?**
 
-**Usulan solusi**
+**Proposed solution**
 
-**Alternatif yang sudah dicoba** (opsional)
+**Alternatives you have tried** (optional)

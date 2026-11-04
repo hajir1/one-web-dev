@@ -1,6 +1,6 @@
 // ─── workers/audioClient.ts ──────────────────────────────────────────────────
-// Klien worker konversi audio. Satu worker per file: memori (PCM, modul WASM)
-// dilepas begitu file selesai, dan membatalkan cukup dengan terminate().
+// Audio conversion worker client. One worker per file: memory (PCM, WASM modules)
+// released as soon as the file is done, and canceling is just terminate().
 
 import i18n from "../../../i18n";
 import { BROWSER_AUDIO_MAX_SECONDS } from "../lib/audio";
@@ -11,7 +11,7 @@ const aborted = () => new DOMException(i18n.t("media.errors.aborted"), "AbortErr
 
 type ACtor = typeof AudioContext;
 
-/** Decode di halaman utama (cadangan untuk sumber yang tidak bisa di-decode worker). */
+/** Decodes on the main page (fallback for sources the worker cannot decode). */
 async function decodeOnMainThread(file: Blob, sampleRate: number | null, channels: number | null, signal?: AbortSignal): Promise<{ channels: Float32Array[]; sampleRate: number }> {
   const g = globalThis as unknown as { AudioContext?: ACtor; webkitAudioContext?: ACtor };
   const Ctx = g.AudioContext ?? g.webkitAudioContext;
@@ -36,7 +36,7 @@ async function decodeOnMainThread(file: Blob, sampleRate: number | null, channel
   if (outCh === buffer.numberOfChannels && outRate === buffer.sampleRate) {
     return { channels: Array.from({ length: outCh }, (_, i) => buffer.getChannelData(i)), sampleRate: outRate };
   }
-  // OfflineAudioContext: resample + up/down-mix kanal sesuai aturan Web Audio.
+  // OfflineAudioContext: resample + channel up/down-mix following Web Audio rules.
   const off = new OfflineAudioContext(outCh, Math.max(1, Math.ceil(buffer.duration * outRate)), outRate);
   const node = off.createBufferSource();
   node.buffer = buffer;
@@ -81,7 +81,7 @@ export function convertAudioInWorker(
         decodeOnMainThread(file, m.sampleRate, m.channels, signal).then(
           (pcm) => {
             onProgress?.(55);
-            // Salin agar buffer AudioBuffer asli tidak ikut dipindahkan.
+            // Copy so the original AudioBuffer buffer is not transferred too.
             const planes = pcm.channels.map((c) => c.slice());
             send({ op: "pcm", channels: planes, sampleRate: pcm.sampleRate }, planes.map((p) => p.buffer));
           },
@@ -102,7 +102,7 @@ export function convertAudioInWorker(
   });
 }
 
-/** Opus butuh encoder WebCodecs bawaan browser (Chrome/Edge/Firefox; Safari belum). */
+/** Opus needs the browser's built-in WebCodecs encoder (Chrome/Edge/Firefox; not Safari yet). */
 export async function canEncodeOpus(): Promise<boolean> {
   const AE = (globalThis as unknown as { AudioEncoder?: { isConfigSupported(c: unknown): Promise<{ supported?: boolean }> } }).AudioEncoder;
   if (!AE) return false;

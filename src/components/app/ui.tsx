@@ -1,8 +1,8 @@
 // ─── components/app/ui.tsx ──────────────────────────────────────────────────
 // Kit UI bersama OneWebDev (Dashboard, Data, Media, Web Maker,
-// Credits). Gaya: biru OneWeb (lihat palet di index.css), abu slate,
-// sudut membulat, mode gelap, dan fokus keyboard yang terlihat.
-// Semua teks bawaan (aria-label, pesan validasi) lewat i18n.
+// Credits). Style: OneWeb blue (see the palette in index.css), slate gray,
+// rounded corners, dark mode, and visible keyboard focus.
+// All built-in text (aria-label, validation messages) goes through i18n.
 
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from "lucide-react";
@@ -21,7 +21,7 @@ export const ACCENT: Record<Accent, { tile: string; glow: string; text: string }
   rose: { tile: "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300", glow: "from-rose-100/70", text: "text-rose-700 dark:text-rose-300" },
 };
 
-/* ------------------------------ tombol ----------------------------- */
+/* ------------------------------ buttons ----------------------------- */
 
 const BTN_BASE =
   "inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 disabled:cursor-not-allowed disabled:opacity-40";
@@ -225,7 +225,7 @@ export function Toggle({ checked, onChange, label, hint, disabled }: { checked: 
 export const INPUT =
   "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-700 focus:ring-2 focus:ring-blue-600/20 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90";
 
-/** Angka yang divalidasi & dijepit saat selesai diketik (bukan tiap tombol). */
+/** A number that is validated & clamped when typing finishes (not on every keystroke). */
 export function NumberField({
   value,
   onChange,
@@ -278,7 +278,7 @@ const normalizeHex = (v: string) => {
   return t.length === 4 ? `#${t[1]}${t[1]}${t[2]}${t[2]}${t[3]}${t[3]}` : t;
 };
 
-/** Pilih warna; teks HEX hanya diterapkan bila valid (warna tidak valid sebelumnya membuat latar JPEG jadi hitam). */
+/** Color picker; HEX text is applied only when valid (an invalid color used to turn JPEG backgrounds black). */
 export function ColorField({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
   const id = useId();
   const [text, setText] = useState(value);

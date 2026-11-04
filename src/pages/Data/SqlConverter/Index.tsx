@@ -61,7 +61,7 @@ export default function SqlConverter() {
       setExcelWorkbook(null);
       try {
         const workbook = await readWorkbook(file);
-        if (token !== readToken.current) return; // file lain sudah dipilih
+        if (token !== readToken.current) return; // another file was already selected
         setExcelWorkbook(workbook);
         setExcelSelectedSheet(workbook.worksheets[0]?.name ?? "");
         notify.success(t("data.sql.fileRead", { name: file.name }));
@@ -137,7 +137,7 @@ export default function SqlConverter() {
     () => (canGenerate ? buildSql(rows, tableName, columnMaps, insertMode, dialect, nullAsKeyword, PREVIEW_ROW_LIMIT) : ""),
     [rows, tableName, columnMaps, insertMode, dialect, nullAsKeyword, canGenerate],
   );
-  // SQL lengkap dibuat hanya saat disalin/diunduh (data besar tidak dibangun ulang tiap ketikan).
+  // The full SQL is only built when copied/downloaded (large data is not rebuilt on every keystroke).
   const getFullSql = () => (canGenerate ? buildSql(rows, tableName, columnMaps, insertMode, dialect, nullAsKeyword) : "");
 
   const downloadSql = () => {

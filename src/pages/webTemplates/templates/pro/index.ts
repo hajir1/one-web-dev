@@ -4,7 +4,7 @@ import { educationKelas, personalBrand, realestateHunian, restaurantSaji } from 
 import { eventSummit, healthKlinik, photographyLensa, techDevhub } from "./setC";
 import { communityKita, creativeStudio, professionalLexa, travelJelajah } from "./setD";
 
-/** Konten 16 template Pro, dikunci dengan ID katalog (config/templates.ts). */
+/** Content of the 16 Pro templates, keyed by catalog ID (config/templates.ts). */
 export const PRO_TEMPLATES: Record<string, TemplateContent> = {
   "portfolio-minimal": portfolioMinimal,
   "blog-journal": blogJournal,

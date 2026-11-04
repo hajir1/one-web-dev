@@ -1,18 +1,18 @@
 import { TEMPLATE_PRICE } from "../config/marketplace";
 
 /* ================================================================== */
-/* Harga template Premium                                               */
+/* Premium template price                                               */
 /*                                                                    */
-/*   harga = 15 kredit × jumlah halaman + bonus kualitas (0–10)         */
-/*   bonus = 10 bila skor ≥ 6, 5 bila skor ≥ 3, selain itu 0            */
-/*   (1 kredit = Rp1.000 → Rp15rb per halaman, rentang Rp20rb–Rp300rb)   */
-/*   skor  = jumlah item Premium bawaan + jumlah library yang dipakai   */
+/*   price = 15 credits × page count + quality bonus (0–10)             */
+/*   bonus = 10 when score ≥ 6, 5 when score ≥ 3, otherwise 0           */
+/*   (1 credit = Rp1,000 → Rp15k per page, range Rp20k–Rp300k)           */
+/*   score = number of built-in Premium items + number of libraries used */
 /*                                                                    */
-/* Karena bonus maksimal (10) lebih kecil dari harga satu halaman (15), */
-/* template dengan halaman lebih banyak SELALU lebih mahal; kualitas    */
-/* hanya membedakan template dengan jumlah halaman yang sama.           */
-/* Template Free selalu 0 kredit. Harga di katalog ditulis statis dan   */
-/* dicocokkan dengan rumus ini oleh tests/pricing.test.ts.              */
+/* Because the maximum bonus (10) is less than the price of one page (15), */
+/* templates with more pages are ALWAYS more expensive; quality          */
+/* only distinguishes templates with the same number of pages.          */
+/* Free templates are always 0 credits. Catalog prices are written statically and */
+/* checked against this formula by tests/pricing.test.ts.               */
 /* ================================================================== */
 
 export const CREDITS_PER_PAGE = 15;

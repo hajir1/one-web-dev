@@ -10,7 +10,7 @@ import { useIconStore } from "../pageMaker/core/store/iconStore";
 import { useFontStore } from "../pageMaker/core/store/fontStore";
 import { useDesignStore } from "../pageMaker/core/store/designStore";
 
-/** Info singkat di bawah deskripsi sebuah menu (hanya untuk menu tertentu). */
+/** Short info under a menu's description (only for certain menus). */
 function useLeafMeta(): (leaf: MenuLeaf) => string | null {
   const { t } = useTranslation();
   const iconCount = useIconStore((s) => s.icons.length);
@@ -109,7 +109,7 @@ export default function Home() {
   const siteLimit = useSiteLimit();
   const demo = isDemoMode();
 
-  // Mode demo (v15): hanya banner promosi, tanpa daftar menu dan kuota.
+  // Demo mode (v15): only the promo banner, without the menu list and quotas.
   if (demo)
     return (
       <>

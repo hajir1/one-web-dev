@@ -29,10 +29,10 @@ import { sanitizeBind, sanitizeItemOf, sanitizeRelated } from "../../helpers/ite
 /* ================================================================== */
 /* Normalisasi state tersimpan                                          */
 /*                                                                    */
-/* Dipakai saat memuat "Desain Saya": menerima                          */
-/*   - format baru (version 2: pohon node)                              */
-/*   - format lama (templateId + slots) → dimigrasi ke pohon            */
-/*   - data korup / tak lengkap → dibersihkan, bukan membuat crash      */
+/* Used when loading "My Designs": accepts                              */
+/*   - new format (version 2: node tree)                                */
+/*   - the old format (templateId + slots) → migrated to a tree         */
+/*   - corrupt / incomplete data → cleaned, not a crash                 */
 /* ================================================================== */
 
 export function createDefaultDoc(): ComponentDoc {
@@ -88,10 +88,10 @@ function sanitizeNode(v: unknown, depth: number, budget: Budget): ComponentNode 
       elementType: v.elementType,
       name: str(v.name, def?.label ?? v.elementType),
       place: sanitizePlace(v.place),
-      // State dilengkapi default supaya field baru tidak jadi `undefined`.
+      // State is completed with defaults so new fields do not become `undefined`.
       state: def ? mergeWithDefault(def.defaults, v.state) : (isObj(v.state) ? v.state : {}),
     };
-    // Event lama → Custom JavaScript (fitur event per elemen sudah dihapus).
+    // Old events → Custom JavaScript (the per-element event feature was removed).
     const events = sanitizeEvents(v.events);
     const fromEvents = events ? eventsToCustomJs(events, v.elementType) : "";
     const advRaw = isObj(v.advanced) ? v.advanced : {};
@@ -116,7 +116,7 @@ function sanitizeNode(v: unknown, depth: number, budget: Budget): ComponentNode 
   return null;
 }
 
-/** URL gambar latar: hanya http(s), data:image, atau path relatif. */
+/** Background image URL: only http(s), data:image, or a relative path. */
 const isSafeImageUrl = (u: string) =>
   /^(https?:\/\/|data:image\/(png|jpe?g|gif|webp|avif);|\/|\.\/)/i.test(u) && !/["'()\\\s<>]/.test(u) && u.length <= 4000;
 
@@ -196,9 +196,9 @@ function sanitizeBox(v: Record<string, unknown>, depth: number, budget: Budget):
       return { ...(itemOf ? { itemOf } : {}), ...(related ? { related } : {}), ...(filterOf ? { filterOf } : {}), ...(cat ? { itemCategory: cat } : {}) };
     })(),
     ...(depth === 0 && sanitizeLibraryList(v.libraries) ? { libraries: sanitizeLibraryList(v.libraries) } : {}),
-    // v7: salinan variabel global yang dipakai desain (cadangan nilai bila variabel tidak ada di perangkat lain).
+    // v7: a copy of the global variables used by the design (fallback values when the variables are missing on other devices).
     ...(depth === 0 && sanitizeVars(v.vars).length ? { vars: sanitizeVars(v.vars) } : {}),
-    // Background lengkap hanya ditulis bila data sudah memakainya (data lama tetap lewat bgEnabled).
+    // The full background is only written when the data already uses it (old data still goes through bgEnabled).
     ...(typeof v.bgType === "string" ? sanitizeBg(v, "none") : {}),
     children,
   };
@@ -206,7 +206,7 @@ function sanitizeBox(v: Record<string, unknown>, depth: number, budget: Budget):
 
 /* ------------------------------ publik ----------------------------- */
 
-/** State tersimpan apa pun → ComponentDoc valid. Tidak pernah melempar. */
+/** Any saved state → a valid ComponentDoc. Never throws. */
 export function normalizeDoc(saved: unknown): ComponentDoc {
   try {
     if (!isObj(saved)) return createDefaultDoc();

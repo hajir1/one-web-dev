@@ -1,31 +1,31 @@
 import type { CodeModel } from "../editModel";
 
 /* ================================================================== */
-/* Studio template kode (v20): klik untuk edit, tata letak terkunci.     */
+/* Code template Studio (v20): click to edit, layout locked.             */
 /*                                                                    */
-/* Pratinjau diberi skrip "jembatan" (HANYA di pratinjau, tidak ikut     */
-/* diunduh/di-deploy):                                                  */
-/*   - mode Edit: garis bantu saat kursor di atas teks/bagian; klik      */
-/*     dikirim ke editor sebagai "pick" (kunci teks, tautan, bagian).    */
-/*     Tombol & isian form tetap bekerja (mis. "Buka Undangan"); teksnya */
-/*     diubah lewat klik bidang bagiannya;                               */
-/*   - mode Coba: template berjalan normal (tombol, animasi, 3D);        */
-/*   - posisi gulir & sampul undangan yang sudah dibuka diingat, jadi    */
-/*     pratinjau yang dimuat ulang setelah edit tidak lompat ke atas.    */
-/* Tidak ada tambah/pindah section: struktur template dipertahankan     */
-/* supaya animasi dan 3D tidak rusak.                                   */
+/* The preview gets a "bridge" script (ONLY in the preview, not included */
+/* downloaded/deployed):                                                */
+/*   - Edit mode: guide lines when the cursor is over text/a section; clicks */
+/*     are sent to the editor as a "pick" (text key, link, section).    */
+/*     Buttons & form fields still work (e.g. "Open Invitation"); their text */
+/*     is changed by clicking their section area;                       */
+/*   - Try mode: the template runs normally (buttons, animation, 3D);    */
+/*   - the scroll position & an already opened invitation cover are remembered, so */
+/*     a preview reloaded after an edit does not jump to the top.       */
+/* No adding/moving sections: the template structure is preserved       */
+/* so animation and 3D do not break.                                   */
 /* ================================================================== */
 
 export interface Pick {
-  /** Kunci data-owd-text yang diklik (bila ada). */
+  /** The clicked data-owd-text key (if any). */
   text?: string;
-  /** Kunci data-owd-href pada tautan yang diklik / pembungkusnya. */
+  /** The data-owd-href key on the clicked link / its wrapper. */
   link?: string;
-  /** Jalur foto di CONFIG (data-owd-img, mis. "tokoh.0.foto") bila yang diklik foto (v21). */
+  /** The photo path in CONFIG (data-owd-img, e.g. "tokoh.0.foto") when a photo was clicked (v21). */
   image?: string;
-  /** id section (atau "sampul" untuk sampul undangan). */
+  /** Section id (or "sampul" for the invitation cover). */
   section?: string;
-  /** Semua kunci teks & tautan di dalam section itu. */
+  /** Every text & link key inside that section. */
   sectionTexts: string[];
   sectionLinks: string[];
 }
@@ -38,7 +38,7 @@ export interface BridgeState {
 
 export const BRIDGE_MSG = "owd-studio";
 
-/** Skrip jembatan untuk pratinjau. Nilai awal ditanam sebagai JSON aman. */
+/** Bridge script for the preview. Initial values are embedded as safe JSON. */
 export function bridgeScript(state: BridgeState): string {
   const init = JSON.stringify(state).replace(/</g, "\\u003c");
   return `<style id="owd-studio-css">
@@ -77,14 +77,14 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 })();</script>`;
 }
 
-/** Pasang jembatan ke HTML pratinjau (sebelum </body>, atau di akhir). */
+/** Attaches the bridge to the preview HTML (before </body>, or at the end). */
 export function withBridge(html: string, state: BridgeState): string {
   const s = bridgeScript(state);
   const i = html.lastIndexOf("</body>");
   return i >= 0 ? html.slice(0, i) + s + html.slice(i) : html + s;
 }
 
-/** Bagian undangan → kunci CONFIG yang mengisinya. */
+/** Invitation part → the CONFIG key that fills it. */
 const INVITE_SECTIONS: Record<string, string[]> = {
   sampul: ["judul", "namaSampul", "tamuBawaan", "musik"],
   profil: ["salam", "judulProfil", "pembuka", "tokoh", "kutipan"],
@@ -97,24 +97,24 @@ const INVITE_SECTIONS: Record<string, string[]> = {
   penutup: ["penutup", "salamPenutup", "keluarga"],
 };
 
-/** Bagian portofolio/lainnya yang diisi blok data tertentu. */
+/** Portfolio/other parts filled by a specific data block. */
 const SECTION_BLOCKS: Record<string, string> = { proyek: "PROJECTS" };
-/** Website 3D bisnis: bagian → kunci daftar di blok DAFTAR (bisa ditambah, dihapus, diurutkan, diduplikat). */
+/** 3D business website: section → list key in the DAFTAR block (can be added, deleted, reordered, duplicated). */
 const LIST_KEYS: Record<string, string[]> = { katalog: ["kategori", "katalog"], keunggulan: ["keunggulan"], alur: ["alur"], testimoni: ["ulasan"], galeri: ["galeri"], harga: ["paket"], lokasi: ["jam"], faq: ["faq"], kontak: ["paket", "kategori"] };
 
 export interface PickFields {
   texts: string[];
   links: string[];
-  /** Blok data yang ditampilkan + kunci teratas yang boleh tampil (null = semua). */
+  /** The data blocks shown + the top-level keys allowed to show (null = all). */
   data: { name: string; keys: string[] | null }[];
-  /** Foto yang diklik: jalur di CONFIG (v21). */
+  /** The clicked photo: its path in CONFIG (v21). */
   image?: string[];
 }
 
 /**
- * Isian yang muncul di popup untuk satu klik. Teks yang diklik didahulukan;
- * klik pada bidang kosong section menampilkan semua teks di section itu dan
- * data yang mengisinya (undangan: CONFIG per bagian; portofolio: PROJECTS).
+ * Fields shown in the popup for one click. The clicked text comes first;
+ * a click on an empty area of a section shows every text in that section and
+ * the data that fills it (invitations: CONFIG per section; portfolio: PROJECTS).
  */
 export function fieldsForPick(model: CodeModel, pick: Pick): PickFields {
   const known = new Set(model.texts.map((t) => t.key));
@@ -127,7 +127,7 @@ export function fieldsForPick(model: CodeModel, pick: Pick): PickFields {
   if (!pick.text && !pick.link && pick.section) {
     const block = SECTION_BLOCKS[pick.section];
     if (block && model.data.some((d) => d.name === block)) data.push({ name: block, keys: null });
-    // 3D bisnis (v27): daftar per bagian ada di blok DAFTAR.
+    // Business 3D (v27): the per-part lists live in the DAFTAR block.
     const list = LIST_KEYS[pick.section];
     if (list && model.data.some((d) => d.name === "DAFTAR")) data.push({ name: "DAFTAR", keys: list });
     const cfg = model.data.find((d) => d.name === "CONFIG");
@@ -135,7 +135,7 @@ export function fieldsForPick(model: CodeModel, pick: Pick): PickFields {
       const top = Object.keys(cfg.value);
       const flat = pick.section.replace(/-/g, "").toLowerCase();
       const mapped = (INVITE_SECTIONS[pick.section] ?? []).filter((k) => top.includes(k));
-      // Template lain: kunci yang namanya memuat id bagian (mis. "judulGaleri").
+      // Other templates: keys whose name contains the part id (e.g. "judulGaleri").
       const guessed = top.filter((k) => !mapped.includes(k) && k.toLowerCase().includes(flat) && flat.length >= 4);
       const keys = [...mapped, ...guessed];
       if (keys.length) data.push({ name: "CONFIG", keys });
@@ -144,7 +144,7 @@ export function fieldsForPick(model: CodeModel, pick: Pick): PickFields {
   return { texts: texts.filter((k) => known.has(k)), links: links.filter((k) => knownLinks.has(k)), data };
 }
 
-/** Kunci teratas yang disembunyikan agar DataForm hanya menampilkan `keys`. */
+/** Top-level keys hidden so DataForm only shows `keys`. */
 export function hiddenExcept(value: unknown, keys: string[] | null, hidden: string[]): string[] {
   if (!keys || !value || typeof value !== "object" || Array.isArray(value)) return hidden;
   return [...hidden, ...Object.keys(value).filter((k) => !keys.includes(k))];
@@ -152,7 +152,7 @@ export function hiddenExcept(value: unknown, keys: string[] | null, hidden: stri
 
 export const isEmptyPick = (f: PickFields) => !f.image && !f.texts.length && !f.links.length && !f.data.length;
 
-/** "tokoh.0.foto" → ["tokoh", "0", "foto"] bila jalur itu memang ada di CONFIG dan berisi teks. */
+/** "tokoh.0.foto" → ["tokoh", "0", "foto"] when that path really exists in CONFIG and holds text. */
 function imagePath(model: CodeModel, path: string): string[] | null {
   const parts = path.split(".");
   let v: unknown = model.data.find((d) => d.name === "CONFIG")?.value;
@@ -160,7 +160,7 @@ function imagePath(model: CodeModel, path: string): string[] | null {
   return typeof v === "string" ? parts : null;
 }
 
-/** Ambil / ganti nilai di jalur (salinan baru, tanpa mengubah aslinya). */
+/** Gets / replaces the value at a path (a new copy, without changing the original). */
 export function getIn(value: unknown, path: string[]): unknown {
   return path.reduce<unknown>((v, p) => (v && typeof v === "object" ? (v as Record<string, unknown>)[p] : undefined), value);
 }

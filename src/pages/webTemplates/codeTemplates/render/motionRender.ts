@@ -1,15 +1,15 @@
 import type { RegionRenderer } from "../editModel";
 
 /* ================================================================== */
-/* Render "biodata dalam bentuk kode" untuk template 3D Motion (v18).    */
-/* SATU sumber untuk generator (HTML statis), skrip template (panel kode */
-/* & layar 3D), dan editor tanpa kode (bangun ulang HTML statis).        */
-/* Ditulis sebagai teks JS karena juga disalin apa adanya ke template.  */
+/* Renders the "bio as code" for the 3D Motion templates (v18).          */
+/* ONE source for the generator (static HTML), the template script (code panel */
+/* & the 3D screen), and the no-code editor (rebuilds the static HTML). */
+/* Written as JS text because it is also copied as is into the template. */
 /* ================================================================== */
 
 export const MOTION_RENDER = String.raw`
 function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-/* Baris kode berwarna dari CONFIG: [[kelas, teks], ...] per baris. Bahasa: js, py, json. */
+/* Colored code lines from CONFIG: [[class, text], ...] per line. Languages: js, py, json. */
 function bioLines(cfg) {
   var c = cfg || {}, p = c.profil && typeof c.profil === "object" ? c.profil : {};
   var lang = c.bahasa === "py" || c.bahasa === "json" ? c.bahasa : "js";
@@ -54,13 +54,13 @@ interface MotionApi {
   bioLines: (cfg: unknown) => [string, string][][];
 }
 let api: MotionApi | null = null;
-/** Fungsi render dari MOTION_RENDER (teks konstan milik aplikasi, bukan masukan pengguna). */
+/** Render functions from MOTION_RENDER (constant text owned by the app, not user input). */
 export function motionApi(): MotionApi {
   api ??= new Function(`${MOTION_RENDER}; return { bioHtml, bioText, bioLines };`)() as MotionApi;
   return api;
 }
 
-/** Pembangun ulang panel kode statis untuk editor (dari CONFIG). */
+/** Static code panel rebuilder for the editor (from CONFIG). */
 export const MOTION_REGIONS: Record<string, RegionRenderer> = {
   code: (data) => motionApi().bioHtml(data.CONFIG),
 };

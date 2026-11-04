@@ -3,37 +3,37 @@ import { createBox } from "../engine/helpers/tree";
 import { createRow } from "./rowModel";
 
 /* ================================================================== */
-/* Tipe section ala Divi: Reguler · Spesialisasi · Lebar Penuh          */
+/* Divi-style section types: Regular · Specialty · Full Width           */
 /*                                                                    */
-/*   Reguler      : section biasa (isi dibatasi lebar isi) + satu Row    */
-/*                  dengan struktur kolom yang dipilih (20 pilihan).     */
-/*   Spesialisasi : satu Row berkolom; satu kolom "spesial" berisi       */
-/*                  beberapa baris dalam (grup grid) sehingga kolom      */
-/*                  samping tetap setinggi section (pola sidebar).       */
-/*   Lebar Penuh  : section tanpa batas lebar & tanpa padding, Row       */
-/*                  selebar layar (untuk header, gambar, peta penuh).    */
+/*   Regular      : a regular section (content limited to the content width) + one Row */
+/*                  with the chosen column structure (20 options).      */
+/*   Specialty : one columned Row; one "special" column holds            */
+/*                  several inner rows (a grid group) so the side        */
+/*                  column stays as tall as the section (sidebar pattern). */
+/*   Full Width   : a section without width limits & padding, a Row     */
+/*                  as wide as the screen (for headers, images, full maps). */
 /*                                                                    */
-/* Semua struktur KOSONG (tanpa elemen contoh). Yang dibuat = persis     */
-/* yang digambar thumbnail-nya (thumbnail dibangun dari data yang sama). */
+/* Every structure is EMPTY (no sample elements). What gets created is exactly */
+/* what its thumbnail draws (thumbnails are built from the same data).  */
 /* ================================================================== */
 
 export const SECTION_KINDS: SectionKind[] = ["regular", "specialty", "fullwidth"];
 
-/** Tipe section (section lama/preset pustaka tanpa tanda = reguler). */
+/** Section type (old sections/library presets without a marker = regular). */
 export const sectionKindOf = (sec: SectionProps | undefined): SectionKind => sec?.sectionType ?? "regular";
 
 const SECTION_BASE: SectionProps = { contentWidth: 1120, padY: 64, padX: 24, minHeight: 0, bgImage: "" };
 
-/* --------------------------- struktur kolom ------------------------- */
+/* --------------------------- column structure ------------------------- */
 
 export interface ColumnLayout {
-  /** id stabil (dipakai payload drag & varian Row). */
+  /** Stable id (used by the drag payload & Row variants). */
   id: string;
-  /** Perbandingan lebar kolom (fr). */
+  /** Column width ratio (fr). */
   fr: number[];
 }
 
-/** 20 struktur kolom Row (urutan & proporsi seperti panel "Sisipkan Baris" Divi). */
+/** 20 Row column structures (order & proportions like Divi's "Insert Row" panel). */
 export const COLUMN_LAYOUTS: ColumnLayout[] = [
   { id: "1", fr: [1] },
   { id: "2", fr: [1, 1] },
@@ -61,7 +61,7 @@ const COLUMN_LAYOUT_BY_ID: Record<string, ColumnLayout> = Object.fromEntries(COL
 
 const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
 
-/** Label pecahan, mis. [1,2,1] → "1/4 + 1/2 + 1/4". */
+/** Fraction label, e.g. [1,2,1] → "1/4 + 1/2 + 1/4". */
 export function fractionLabel(fr: number[]): string {
   const sum = fr.reduce((a, b) => a + b, 0);
   return fr
@@ -72,15 +72,15 @@ export function fractionLabel(fr: number[]): string {
     .join(" + ");
 }
 
-/** grid-template-columns dari perbandingan fr. */
+/** grid-template-columns from the fr ratio. */
 const frTemplate = (fr: number[]) =>
   fr.every((n) => n === fr[0]) ? `repeat(${fr.length}, minmax(0, 1fr))` : fr.map((n) => `minmax(0, ${n}fr)`).join(" ");
 
-/** Sel kolom kosong. */
+/** Empty column cell. */
 const columnCell = (name: string, patch: Partial<BoxNode> = {}): BoxNode =>
   createBox("stack", { name, gap: 12, widthMode: "auto", stackOnMobile: false, align: "start", ...patch });
 
-/** Row kosong dengan struktur kolom tertentu (1 kolom = Row itu sendiri yang menampung isi). */
+/** An empty Row with a given column structure (1 column = the Row itself holds the content). */
 export function createColumnRow(layoutId: string): BoxNode | null {
   const l = COLUMN_LAYOUT_BY_ID[layoutId];
   if (!l) return null;
@@ -111,7 +111,7 @@ function sectionBox(name: string, kind: SectionKind, sec: Partial<SectionProps>,
   });
 }
 
-/** Section Reguler kosong dengan satu Row berstruktur kolom pilihan. */
+/** An empty Regular section with one Row of the chosen column structure. */
 export function createRegularSection(layoutId: string): BoxNode | null {
   const row = createColumnRow(layoutId);
   return row ? sectionBox("Section", "regular", {}, [row]) : null;
@@ -121,13 +121,13 @@ export function createRegularSection(layoutId: string): BoxNode | null {
 
 export interface SpecialtyLayout {
   id: string;
-  /** Kolom-kolom Row; `inner` = struktur baris dalam kolom spesial (fr per baris). */
+  /** Row columns; `inner` = inner row structure of the special column (fr per row). */
   cols: { fr: number; inner?: number[][] }[];
 }
 
 /**
- * Kolom spesial berisi dua baris dalam: satu kolom penuh, lalu beberapa
- * kolom (jumlahnya menyesuaikan lebar kolom spesial, seperti di Divi).
+ * A special column containing two inner rows: one full column, then several
+ * columns (their number adapts to the special column's width, as in Divi).
  */
 const IN3 = [[1], [1, 1, 1]];
 const IN2 = [[1], [1, 1]];
@@ -146,15 +146,15 @@ export const SPECIALTY_LAYOUTS: SpecialtyLayout[] = [
 
 const SPECIALTY_BY_ID: Record<string, SpecialtyLayout> = Object.fromEntries(SPECIALTY_LAYOUTS.map((l) => [l.id, l]));
 
-/** Label, mis. "1/4 + 3/4 ★" (★ = kolom spesial). */
+/** Label, e.g. "1/4 + 3/4 ★" (★ = special column). */
 export function specialtyLabel(l: SpecialtyLayout): string {
   const parts = fractionLabel(l.cols.map((c) => c.fr)).split(" + ");
   return parts.map((p, i) => (l.cols[i].inner ? `${p} ★` : p)).join(" + ");
 }
 
 /**
- * Row dalam kolom spesial: grup grid biasa bertanda `innerRow` (bukan Row —
- * Row tidak boleh bersarang). 1 kolom = grup tumpuk yang langsung diisi modul.
+ * An inner Row in a special column: a regular grid group marked `innerRow` (not a Row;
+ * Rows may not nest). 1 column = a stack group filled directly with modules.
  */
 export function createInnerRow(fr: number[], n: number): BoxNode {
   if (fr.length <= 1) return columnCell(`Baris Dalam ${n}`, { widthMode: "full", align: "stretch", innerRow: true });
@@ -170,7 +170,7 @@ export function createInnerRow(fr: number[], n: number): BoxNode {
   });
 }
 
-/** Section Spesialisasi kosong. */
+/** Empty Specialty section. */
 export function createSpecialtySection(layoutId: string): BoxNode | null {
   const l = SPECIALTY_BY_ID[layoutId];
   if (!l) return null;
@@ -193,9 +193,9 @@ export function createSpecialtySection(layoutId: string): BoxNode | null {
   return sectionBox("Section Spesialisasi", "specialty", {}, [row]);
 }
 
-/* ---------------------------- lebar penuh --------------------------- */
+/* ---------------------------- full width --------------------------- */
 
-/** Section Lebar Penuh kosong: tanpa batas lebar & padding, Row selebar layar. */
+/** An empty Full Width section: no width limit & padding, a screen-wide Row. */
 export function createFullwidthSection(): BoxNode {
   const row = createRow({ name: "Row Lebar Penuh", padding: 0, rowWidth: "full" });
   return sectionBox("Section Lebar Penuh", "fullwidth", { contentWidth: 0, padY: 0, padX: 0 }, [row]);

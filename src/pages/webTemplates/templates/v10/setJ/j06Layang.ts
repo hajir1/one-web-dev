@@ -1,12 +1,12 @@
 import { box, btn, contentJ, el, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 06 · Festival Layang-Layang Pangandaran. Ide besar: halaman miring mengikuti angin (diagonal), judul pecah per kata (split). */
+/* 06 · Pangandaran Kite Festival. Big idea: the page tilts with the wind (diagonal), headings split per word (split). */
 
 const C = { langit: "#9CC9DD", pasir: "#E8D3A6", merah: "#D2412F", laut: "#123A5A", kertas: "#FAF6EE" };
 export const L06 = lookJ({ ink: C.laut, muted: "#2f4d63", primary: C.merah, primaryDark: "#a32e20", soft: "#dcebf2", line: C.laut, bg: C.kertas, head: "Big Shoulders Display", body: "Chivo", r: 0 });
 const L = L06;
 
-/** Potongan diagonal untuk tepi bawah section (arah angin). */
+/** A diagonal cut for a section's bottom edge (wind direction). */
 const SLANT = "clip-path: polygon(0 0, 100% 0, 100% calc(100% - 64px), 0 100%); padding-bottom: 120px !important; @media (max-width: 640px) { & { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 28px), 0 100%); } }";
 
 const DAYS: [B, [string, B, B][]][] = [

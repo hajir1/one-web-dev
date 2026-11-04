@@ -14,11 +14,13 @@ import { LANDING_SPECS } from "./codeTemplates/landingAll";
 import { buildLanding } from "./codeTemplates/landing";
 import { BIZ_SPECS } from "./codeTemplates/bizAll";
 import { buildBiz } from "./codeTemplates/biz3d";
+import { ANIM_CSS_SPECS } from "./codeTemplates/animCssScenes";
+import { buildAnimCss } from "./codeTemplates/animCss";
 
 /* ================================================================== */
-/* Generator Template Kode (v16, bagian J): menulis 12 berkas HTML       */
-/* mandiri ke pages/webTemplates/codeTemplates/files/.                  */
-/* Jalankan: npm run gen:code                                          */
+/* Code Template generator (v16, part J): writes 12 standalone HTML      */
+/* files to pages/webTemplates/codeTemplates/files/.                    */
+/* Run: npm run gen:code                                               */
 /* ================================================================== */
 
 const out = join(dirname(fileURLToPath(import.meta.url)), "../pages/webTemplates/codeTemplates/files");
@@ -34,6 +36,7 @@ const files: [string, string][] = [
   ...ANIM2_SPECS.map((s) => [s.id, buildAnim2(s)] as [string, string]),
   ...LANDING_SPECS.map((s) => [s.id, buildLanding(s)] as [string, string]),
   ...BIZ_SPECS.map((s) => [s.id, buildBiz(s)] as [string, string]),
+  ...ANIM_CSS_SPECS.map((s) => [s.id, buildAnimCss(s)] as [string, string]),
 ];
 
 for (const [id, html] of files) {

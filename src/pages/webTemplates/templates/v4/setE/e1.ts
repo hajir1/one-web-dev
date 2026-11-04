@@ -58,8 +58,8 @@ import {
 /* Ortodonti, Mebel kayu jati.                                           */
 /* ================================================================== */
 
-/* ---------- 1. Ruang Temu Cowork — coworking (FREE, 4 hlm) ---------- */
-// Hanya elemen & preset gratis; library: AOS.
+/* ---------- 1. Ruang Temu Cowork — coworking (FREE, 4 pages) ---------- */
+// Only free elements & presets; library: AOS.
 
 const RP: Palette = { ink: "#0b2b28", muted: "#4f6b67", primary: "#0f766e", primaryDark: "#115e59", soft: "#ccfbf1", line: "#99f6e4" };
 const R = lookD(RP, { head: "Outfit", body: "Work Sans", shape: "soft", radius: 20, bg: "#f7fcfb", alt: "#e9f7f4", inv: "#0b2b28", fx: { aos: "fade-up" } });

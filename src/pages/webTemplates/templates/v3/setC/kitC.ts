@@ -11,14 +11,14 @@ import { field, type Field, type Look } from "../../v2/setA/kitA";
 import { animate, aos, aosStagger, installLibs, tilt } from "../libs";
 
 /* ================================================================== */
-/* Perangkat template v3 bagian C                                        */
+/* Template kit v3 part C                                                */
 /*                                                                    */
-/* Desain section baru (bento, editorial, brutalist, kaca, layar terbagi, */
-/* tipografi raksasa, neon, pastel, retro). Setiap template memilih      */
-/* "skin" kartu, radius, gaya hero, header & footer, serta pasangan font  */
-/* Google (TF) sendiri. Efek library (AOS / Animate.css / Vanilla Tilt)  */
-/* dipasang lewat `fx` tema dan dicatat di root.libraries tiap halaman.  */
-/* Semua tetap tersusun dari elemen Page Maker (Section → Row → Elemen). */
+/* New section designs (bento, editorial, brutalist, glass, split screen, */
+/* giant typography, neon, pastel, retro). Each template picks its own   */
+/* card "skin", radius, hero style, header & footer, and Google font      */
+/* pair (TF). Library effects (AOS / Animate.css / Vanilla Tilt)         */
+/* installed through the theme `fx` and recorded in each page's root.libraries. */
+/* Everything is still built from Page Maker elements (Section → Row → Element). */
 /* ================================================================== */
 
 export type { Field };
@@ -31,15 +31,15 @@ export interface Fx {
   tilt?: { max: number; glare?: boolean };
 }
 
-/** Tema v3: palet, latar, radius, skin kartu, font judul/isi, efek library. */
+/** v3 theme: palette, background, radius, card skin, heading/body fonts, library effects. */
 export interface LC extends Look {
   skin: Skin;
   fx: Fx;
   btnR: number;
   caps: boolean;
-  /** Teks redup di latar gelap. */
+  /** Muted text on a dark background. */
   onDark: string;
-  /** Warna aksen kedua (gradien, neon). */
+  /** Second accent color (gradient, neon). */
   accent2: string;
 }
 
@@ -65,16 +65,16 @@ export function lookC(
   };
 }
 
-/* ------------------------------ halaman ---------------------------- */
+/* ------------------------------ pages ---------------------------- */
 
 export const home = (id = "Beranda", en = "Home"): TemplatePageDef => ({ key: "home", slug: { id: "index", en: "index" }, name: { id, en }, home: true });
 
-/** Definisi halaman: kunci, [slug, nama] ID, [slug, nama] EN. */
+/** Page definition: key, [slug, name] ID, [slug, name] EN. */
 export const pg = (key: string, idv: [string, string], env: [string, string]): TemplatePageDef => ({ key, slug: { id: idv[0], en: env[0] }, name: { id: idv[1], en: env[1] } });
 
 const LIB_ORDER: Exclude<EffectLibraryId, "scroll">[] = ["aos", "animate", "tilt"];
 
-/** Halaman: font & latar root + library dari `fx` (selalu ada node yang memakainya). */
+/** Page: root font & background + libraries from `fx` (there is always a node using them). */
 export function pageC(L: LC, sections: BoxNode[]): PageDoc {
   const doc = pageWith(sections, L.font, L.page);
   const ids = LIB_ORDER.filter((k) => L.fx[k]);
@@ -119,14 +119,14 @@ const fxGrid = (L: LC, row: BoxNode): BoxNode => (L.fx.aos ? aosStagger(row, L.f
 
 function css<T extends ElementNode | BoxNode>(n: T, decl: string): T {
   const raw = n.advanced?.customCss ?? "";
-  // Deklarasi biasa dan blok bersarang tidak boleh dicampur: bungkus yang lama dengan `& { }` bila perlu.
+  // Plain declarations and nested blocks must not be mixed: wrap the old ones in `& { }` when needed.
   const cur = raw && !raw.includes("{") && decl.includes("{") ? `& { ${raw} }` : raw;
   const next = decl.includes("{") ? `${cur}${cur ? "\n" : ""}${decl}` : cur.includes("{") ? `${cur}\n& { ${decl} }` : `${cur}${cur ? "\n" : ""}${decl}`;
   n.advanced = { ...n.advanced, customCss: next };
   return n;
 }
 
-/** Latar gelap? (luminansi warna hex). */
+/** Dark background? (hex color luminance). */
 function isDark(hex: string): boolean {
   const m = /^#([0-9a-f]{6})/i.exec(hex);
   if (!m) return false;
@@ -140,7 +140,7 @@ function isDark(hex: string): boolean {
 const inkOf = (L: LC, dark: boolean) => (dark ? "#ffffff" : L.p.ink);
 const mutedOf = (L: LC, dark: boolean) => (dark ? L.onDark : L.p.muted);
 
-/** Judul dengan font judul tema (huruf kapital bila tema `caps`). */
+/** A heading in the theme heading font (uppercase when the theme has `caps`). */
 export function H(L: LC, text: string, tag: "h1" | "h2" | "h3" | "h4", o: Parameters<typeof heading>[2] = {}): ElementNode {
   const n = heading(text, tag, { color: L.p.ink, transform: L.caps && (tag === "h1" || tag === "h2") ? "uppercase" : "none", ...o });
   if (L.headFont) css(n, `font-family: ${L.headFont};`);
@@ -167,7 +167,7 @@ function btn(L: LC, label: string, href: string, kind: Act[2] = "primary", o: { 
 
 export const acts = (L: LC, list: Act[], justify: "start" | "center" | "end" = "start") => inline(list.map(([l, h, k]) => btn(L, l, h, k)), { justify });
 
-/** Kartu sesuai skin tema. */
+/** Card matching the theme skin. */
 function card(L: LC, kids: (ElementNode | BoxNode)[], o: { dark?: boolean; tone?: "plain" | "soft" | "primary" | "dark"; pad?: number; name?: string; gap?: number; align?: "start" | "center" | "stretch" } = {}): BoxNode {
   const tone = o.tone ?? "plain";
   const dark = !!o.dark;
@@ -205,7 +205,7 @@ function card(L: LC, kids: (ElementNode | BoxNode)[], o: { dark?: boolean; tone?
   return c;
 }
 
-/** Section dengan opsi gradien/CSS latar tambahan. */
+/** Section with gradient/extra background CSS options. */
 export function sec(name: string, rows: BoxNode[], o: { bg?: string; gradient?: [string, string, number?]; padY?: number; width?: number; css?: string; tag?: "header" | "footer" } = {}): BoxNode {
   const s = section(name, rows, { bg: o.gradient ? undefined : o.bg, gradient: o.gradient, padY: o.padY ?? 88, width: o.width, tag: o.tag });
   if (o.css) css(s, o.css);
@@ -292,12 +292,12 @@ function socials(L: LC, links: string[], dark: boolean, align: "left" | "center"
   return el("social-links", { links, shape: L.radius < 6 ? "square" : "circle", size: 38, gap: 10, bgColor: dark ? "#ffffff14" : L.p.soft, iconColor: dark ? "#ffffff" : L.p.primaryDark, hoverBg: L.p.primary, hoverColor: "#ffffff", align, brandColors: false }, "Media sosial");
 }
 
-/** Grid di dalam kolom: Box "grid" biasa (bukan Row), agar tidak ada Row bersarang. */
+/** A grid inside a column: a regular "grid" Box (not a Row), so there are no nested Rows. */
 export function gbox(children: ComponentNode[], columns: string, o: { gap?: number; name?: string; stack?: boolean } = {}): BoxNode {
   return createBox("grid", { name: o.name ?? "Petak", columns, gap: o.gap ?? 16, align: "stretch", widthMode: "full", stackOnMobile: o.stack ?? true, children });
 }
 
-/** Footer (4 gaya). `backTop` menambah tombol Kembali ke Atas (Premium). */
+/** Footer (4 styles). `backTop` adds a Back to Top button (Premium). */
 export function ftr(L: LC, brand: string, o: FootOpts): BoxNode {
   const bg = o.bg ?? (o.kind === "card" ? L.page : L.dark);
   const dark = isDark(bg);
@@ -317,7 +317,7 @@ export function ftr(L: LC, brand: string, o: FootOpts): BoxNode {
   css(copy, `border-top: 1px solid ${dark ? "#ffffff1f" : L.p.line}; padding-top: 18px;`);
   if (o.kind === "giant") {
     const word = H(L, brand, "h2", { size: 120, color: dark ? "#ffffff" : L.p.ink, spacing: -4 });
-    // Selebar layar: ukuran mengikuti panjang nama agar tidak terpotong di HP.
+    // Screen-wide: the size follows the name length so it is not cut off on phones.
     css(word, `& { line-height: 0.9; opacity: 0.14; white-space: nowrap; overflow: hidden; font-size: min(120px, ${Math.round((86 / (0.62 * Math.max(4, brand.length))) * 10) / 10}vw); }`);
     return section("Footer", [colsRow, stack([word], { gap: 0, align: "stretch" }), copy], { bg, padY: 56, tag: "footer" });
   }
@@ -491,7 +491,7 @@ export function hero(L: LC, c: HeroC): BoxNode {
   }
 }
 
-/* ------------------------- judul halaman dalam ---------------------- */
+/* ------------------------- inner page titles ---------------------- */
 
 export function banner(L: LC, c: { kind: "band" | "rule" | "image" | "center"; eyebrow?: string; title: string; text?: string; image?: string; alt?: string }): BoxNode {
   if (c.kind === "band") {
@@ -526,7 +526,7 @@ export interface Tile {
   wide?: boolean;
 }
 
-/** Grid bento: ubin lebar/sempit, gambar, angka. */
+/** Bento grid: wide/narrow tiles, images, numbers. */
 export function bento(L: LC, c: Intro & { tiles: Tile[]; bg?: string }): BoxNode {
   const cell = (t: Tile) => {
     const lightText = t.tone === "primary" || t.tone === "dark";
@@ -541,7 +541,7 @@ export function bento(L: LC, c: Intro & { tiles: Tile[]; bg?: string }): BoxNode
   return sec("Bento", [intro(L, c, d), fxGrid(L, grid(c.tiles.map(cell), 3, { gap: 18, align: "stretch" }))], { bg: c.bg ?? L.bg });
 }
 
-/** Daftar bernomor gaya majalah (garis tipis, angka besar). */
+/** Magazine-style numbered list (thin lines, big numbers). */
 export function numbered(L: LC, c: Intro & { items: [string, string][]; bg?: string }): BoxNode {
   const d = isDark(c.bg ?? L.bg);
   const rows = c.items.map(([t, x], i) => {
@@ -568,7 +568,7 @@ export interface Item {
   image?: string;
 }
 
-/** Kartu fitur/layanan bergaya skin tema. */
+/** Feature/service cards in the theme skin. */
 export function cardsC(L: LC, c: Intro & { items: Item[]; cols?: number; bg?: string; name?: string }): BoxNode {
   const d = isDark(c.bg ?? L.bg);
   const cell = (it: Item) => {
@@ -586,7 +586,7 @@ export function cardsC(L: LC, c: Intro & { items: Item[]; cols?: number; bg?: st
   return sec(c.name ?? "Kartu", [intro(L, c, d), fxGrid(L, grid(c.items.map(cell), c.cols ?? Math.min(3, c.items.length), { gap: 22, align: "stretch" }))], { bg: c.bg ?? L.bg });
 }
 
-/** Layar terbagi: panel warna penuh + gambar, atau teks + gambar. */
+/** Split screen: a full color panel + image, or text + image. */
 export function split(L: LC, c: { eyebrow?: string; title: string; paras: string[]; bullets?: string[]; image: string; alt: string; reverse?: boolean; tone?: "primary" | "dark" | "soft"; acts?: Act[]; name?: string }): BoxNode {
   const tone = c.tone ?? "soft";
   const bg = tone === "primary" ? L.p.primaryDark : tone === "dark" ? L.dark : L.p.soft;
@@ -615,7 +615,7 @@ function checks(L: LC, items: string[], dark = false): ElementNode {
   );
 }
 
-/** Pita kata besar (teks garis luar), gratis. */
+/** A ribbon of large words (outline text), free. */
 export function words(L: LC, list: string[], o: { bg?: string } = {}): BoxNode {
   const bg = o.bg ?? L.p.primary;
   const d = isDark(bg);
@@ -627,7 +627,7 @@ export function words(L: LC, list: string[], o: { bg?: string } = {}): BoxNode {
   return sec("Pita Kata", [stack([inline(items, { gap: 28, justify: "center" })], { gap: 0, align: "stretch" })], { bg, padY: 28 });
 }
 
-/** Angka besar sebaris (teks biasa, gratis). */
+/** Large numbers in a row (plain text, free). */
 export function bigNumbers(L: LC, items: [string, string][], o: { bg?: string } = {}): BoxNode {
   const bg = o.bg ?? L.alt;
   const d = isDark(bg);
@@ -638,7 +638,7 @@ export function bigNumbers(L: LC, items: [string, string][], o: { bg?: string } 
   return sec("Angka Besar", [fxGrid(L, grid(cells, items.length, { gap: 24 }))], { bg, padY: 56 });
 }
 
-/** Daftar harga bertitik (menu, tarif). */
+/** Dotted price list (menu, rates). */
 export function priceLines(L: LC, c: Intro & { groups: { title: string; items: [string, string, string][] }[]; bg?: string; note?: string }): BoxNode {
   const d = isDark(c.bg ?? L.bg);
   const item = ([n, desc, pr]: [string, string, string]) => {
@@ -650,7 +650,7 @@ export function priceLines(L: LC, c: Intro & { groups: { title: string; items: [
   return sec("Daftar Harga", [intro(L, c, d), fxGrid(L, grid(groups, Math.min(2, groups.length), { gap: 48 })), ...(c.note ? [stack([P(L, c.note, { size: 13, color: mutedOf(L, d) })], { gap: 0 })] : [])], { bg: c.bg ?? L.bg, width: 1040 });
 }
 
-/** Tabel (Table Element gratis). */
+/** Table (free Table Element). */
 export function table(L: LC, c: Intro & { columns: string[]; rows: string[][]; bg?: string; note?: string; name?: string }): BoxNode {
   const t = el(
     "table",
@@ -661,7 +661,7 @@ export function table(L: LC, c: Intro & { columns: string[]; rows: string[][]; b
   return sec(c.name ?? "Jadwal", [intro(L, c, d), stack([fxText(L, t), ...(c.note ? [P(L, c.note, { size: 13, color: mutedOf(L, d) })] : [])], { gap: 10, align: "stretch" })], { bg: c.bg ?? L.bg, width: 1040 });
 }
 
-/** Langkah horizontal dengan nomor raksasa. */
+/** Horizontal steps with giant numbers. */
 export function steps(L: LC, c: Intro & { items: [string, string][]; bg?: string }): BoxNode {
   const bg = c.bg ?? L.alt;
   const d = isDark(bg);
@@ -673,7 +673,7 @@ export function steps(L: LC, c: Intro & { items: [string, string][]; bg?: string
   return sec("Langkah", [intro(L, c, d), fxGrid(L, grid(cells, c.items.length, { gap: 28 }))], { bg });
 }
 
-/** Kutipan editorial besar. */
+/** Large editorial quote. */
 export function pull(L: LC, c: { text: string; name: string; role: string; bg?: string }): BoxNode {
   const bg = c.bg ?? L.bg;
   const d = isDark(bg);
@@ -682,7 +682,7 @@ export function pull(L: LC, c: { text: string; name: string; role: string; bg?: 
   return sec("Kutipan", [stack([fxText(L, q), para(`${c.name} / ${c.role}`, { size: 14, weight: 700, color: d ? L.p.line : L.p.primaryDark, transform: "uppercase", spacing: 1 })], { gap: 18 })], { bg, padY: 96, width: 960 });
 }
 
-/** Strip foto asimetris dengan keterangan. */
+/** Asymmetric photo strip with captions. */
 export function strip(L: LC, c: Partial<Intro> & { images: [string, string][]; bg?: string }): BoxNode {
   const ratios = ["3 / 4", "4 / 3", "1 / 1", "3 / 4", "4 / 3"];
   const d = isDark(c.bg ?? L.bg);
@@ -691,7 +691,7 @@ export function strip(L: LC, c: Partial<Intro> & { images: [string, string][]; b
   return sec("Strip Foto", [...(c.title ? [intro(L, c as Intro, d)] : []), grid(cells, widths, { gap: 16, align: "center" })], { bg: c.bg ?? L.bg });
 }
 
-/** Tanya jawab: judul kiri lekat, akordeon kanan. */
+/** Q&A: a sticky heading on the left, an accordion on the right. */
 export function faq(L: LC, c: Intro & { items: [string, string][]; bg?: string; act?: Act }): BoxNode {
   const bg = c.bg ?? L.bg;
   const d = isDark(bg);
@@ -704,7 +704,7 @@ export function faq(L: LC, c: Intro & { items: [string, string][]; bg?: string; 
   return sec("Tanya Jawab", [grid([left, col([fxText(L, acc)], { name: "Pertanyaan" })], "minmax(0, 1fr) minmax(0, 1.5fr)", { gap: 48 })], { bg });
 }
 
-/** Formulir dengan panel info berwarna. */
+/** Form with a colored info panel. */
 export function form(L: LC, c: Intro & { info: [string, string][]; fields: Field[]; submit: string; note?: string; bg?: string; message?: string }): BoxNode {
   const info = col(
     [
@@ -722,7 +722,7 @@ export function form(L: LC, c: Intro & { info: [string, string][]; fields: Field
   return sec("Formulir", [grid([fxText(L, info), f], "minmax(0, 1fr) minmax(0, 1.2fr)", { gap: 28, align: "stretch" })], { bg: c.bg ?? L.alt });
 }
 
-/** Ajakan: "giant" (teks raksasa), "split" (dua kolom), "sticker" (kotak miring). */
+/** Call to action: "giant" (giant text), "split" (two columns), "sticker" (tilted box). */
 export function cta(L: LC, c: { kind: "giant" | "split" | "sticker"; title: string; text?: string; acts: Act[]; bg?: string }): BoxNode {
   if (c.kind === "giant") {
     const bg = c.bg ?? L.p.primary;
@@ -754,7 +754,7 @@ export function people(L: LC, c: Intro & { items: { name: string; role: string; 
   return sec("Profil", [intro(L, c, d), fxGrid(L, grid(c.items.map(cell), c.cols ?? Math.min(4, c.items.length), { gap: 20, align: "stretch" }))], { bg });
 }
 
-/** Linimasa (Timeline Element gratis). Item: "waktu | judul | teks". */
+/** Timeline (free Timeline Element). Item: "time | title | text". */
 export function timelineC(L: LC, c: Intro & { items: string[]; bg?: string; image?: string; alt?: string }): BoxNode {
   const bg = c.bg ?? L.bg;
   const d = isDark(bg);
@@ -778,7 +778,7 @@ export interface Listing {
   href: string;
 }
 
-/** Katalog (Product Card gratis). */
+/** Catalog (free Product Card). */
 export function catalog(L: LC, c: Intro & { items: Listing[]; cols?: number; bg?: string; name?: string }): BoxNode {
   const bg = c.bg ?? L.bg;
   const cards = c.items.map((o) => {
@@ -812,7 +812,7 @@ export function catalog(L: LC, c: Intro & { items: Listing[]; cols?: number; bg?
   return sec(c.name ?? "Katalog", [intro(L, c, isDark(bg)), fxGrid(L, grid(cards, c.cols ?? 3, { gap: 22, align: "stretch" }))], { bg });
 }
 
-/** Ubin info kunci–nilai (alamat, jam, kontak). */
+/** Key–value info tiles (address, hours, contact). */
 export function infoTiles(L: LC, items: [string, string][], o: { bg?: string } = {}): BoxNode {
   const bg = o.bg ?? L.bg;
   const d = isDark(bg);
@@ -820,7 +820,7 @@ export function infoTiles(L: LC, items: [string, string][], o: { bg?: string } =
   return sec("Info", [fxGrid(L, grid(cells, items.length, { gap: 16, align: "stretch" }))], { bg, padY: 48 });
 }
 
-/** Tab konten (Tabs Element gratis). */
+/** Content tabs (free Tabs Element). */
 export function tabs(L: LC, c: Intro & { tabs: [string, string][]; bg?: string; variant?: "underline" | "pills" | "boxed" }): BoxNode {
   const bg = c.bg ?? L.bg;
   return sec(
@@ -830,7 +830,7 @@ export function tabs(L: LC, c: Intro & { tabs: [string, string][]; bg?: string; 
   );
 }
 
-/** Langganan kabar (input + tombol). */
+/** Newsletter signup (input + button). */
 export function newsletter(L: LC, c: { title: string; text: string; ph: string; submit: string; bg?: string }): BoxNode {
   const bg = c.bg ?? L.p.soft;
   const d = isDark(bg);
@@ -842,7 +842,7 @@ export function newsletter(L: LC, c: { title: string; text: string; ph: string; 
   );
 }
 
-/** Artikel/jurnal gaya majalah: satu besar + daftar. */
+/** Magazine-style articles/journal: one large + a list. */
 export function journal(L: LC, c: Intro & { items: { image: string; tag: string; title: string; text: string; date: string }[]; bg?: string; read: string; href: string }): BoxNode {
   const [first, ...rest] = c.items;
   const bg = c.bg ?? L.bg;
@@ -859,7 +859,7 @@ export function journal(L: LC, c: Intro & { items: { image: string; tag: string;
   return sec("Jurnal", [intro(L, c, d), grid([big, list], "minmax(0, 1.4fr) minmax(0, 1fr)", { gap: 40 })], { bg });
 }
 
-/** Video (gratis). */
+/** Video (free). */
 export function video(L: LC, c: Intro & { url: string; title: string; bg?: string }): BoxNode {
   const bg = c.bg ?? L.dark;
   return sec("Video", [intro(L, c, isDark(bg)), stack([fxPic(L, el("video", { source: "youtube", url: c.url, title: c.title, radius: L.radius, shadow: true }, "Video"))], { align: "stretch" })], { bg, width: 960 });
@@ -885,7 +885,7 @@ export function lightbox(L: LC, c: Partial<Intro> & { images: [string, string][]
   return sec("Galeri Lightbox", [...(c.title ? [intro(L, c as Intro, isDark(bg))] : []), stack([fxText(L, g)], { align: "stretch" })], { bg });
 }
 
-/** Sebelum–Sesudah (Premium). */
+/** Before–After (Premium). */
 export function beforeAfter(L: LC, c: Intro & { before: string; after: string; labels: [string, string]; alt: string; bullets?: string[]; bg?: string }): BoxNode {
   const bg = c.bg ?? L.alt;
   const d = isDark(bg);
@@ -893,7 +893,7 @@ export function beforeAfter(L: LC, c: Intro & { before: string; after: string; l
   return sec("Sebelum Sesudah", [grid([col([...intro(L, c, d).children, ...(c.bullets ? [checks(L, c.bullets, d)] : [])], { gap: 12, name: "Teks" }), col([fxPic(L, ba)], { name: "Perbandingan" })], "minmax(0, 1fr) minmax(0, 1.3fr)", { gap: 48, align: "center" })], { bg });
 }
 
-/** Penawaran dengan Modal Popup (Premium). */
+/** Offer with a Modal Popup (Premium). */
 export function modalOffer(L: LC, c: { title: string; text: string; trigger: string; modalTitle: string; body: string; cta: [string, string]; bg?: string }): BoxNode {
   const bg = c.bg ?? L.p.soft;
   const d = isDark(bg);
@@ -905,7 +905,7 @@ export function modalOffer(L: LC, c: { title: string; text: string; trigger: str
   return sec("Penawaran Popup", [grid([col([H(L, c.title, "h2", { size: 34, color: inkOf(L, d) }), P(L, c.text, { color: mutedOf(L, d) })], { gap: 10, name: "Teks" }), col([fxText(L, m)], { name: "Popup", align: "end" })], "minmax(0, 1.6fr) minmax(0, 1fr)", { gap: 32, align: "center" })], { bg, padY: 64 });
 }
 
-/** Marquee Logo / kata berjalan (Premium). */
+/** Logo Marquee / running words (Premium). */
 export function marquee(L: LC, c: { title: string; items: string[]; bg?: string }): BoxNode {
   const bg = c.bg ?? L.bg;
   const d = isDark(bg);

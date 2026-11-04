@@ -1,15 +1,15 @@
 /* ================================================================== */
-/* Adegan 3D Cerita Scroll (v22), bagian B: palu → rumah, biji → hutan, */
-/* tetes kopi → peta kebun, kunci → gembok → perisai.                   */
+/* 3D Scroll Story scenes (v22), part B: hammer → house, seed → forest, */
+/* coffee drop → farm map, key → padlock → shield.                      */
 /* ================================================================== */
 
-/** 3. Palu mengetuk → fondasi → bata tersusun baris demi baris → atap → lampu menyala → taman. */
+/** 3. Hammer taps → foundation → bricks laid row by row → roof → lights on → garden. */
 export const SCENE_RUMAH = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow, rnd } = ctx;
   const ground = new THREE.Mesh(new THREE.CircleGeometry(9, 48), mat("#9fbf7a", { roughness: 1 })); ground.rotation.x = -Math.PI / 2; scene.add(ground);
   const slab = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.2, 3.6), mat("#b9b2a6", { roughness: 0.9 })); scene.add(slab);
-  /* Bata: dinding 4 sisi, 10 baris, susun selang-seling, sisakan pintu & jendela. */
+  /* Bricks: 4 walls, 10 rows, staggered, leaving a door & window. */
   const BW = 0.4, BH = 0.2, ROWS = 10, list = [];
   const hole = (side, u, r) => (side === 0 && Math.abs(u) < 0.45 && r < 6) || (side === 0 && Math.abs(Math.abs(u) - 1.25) < 0.32 && r >= 4 && r < 8) || ((side === 1 || side === 3) && Math.abs(u) < 0.35 && r >= 4 && r < 8);
   for (let r = 0; r < ROWS; r++) {
@@ -31,7 +31,7 @@ function scene(ctx) {
   list.forEach((b, i) => { tint.set(COL.obj).multiplyScalar(b.k); bricks.setColorAt(i, tint); });
   scene.add(bricks);
   const dm = new THREE.Object3D();
-  /* Atap: dua bidang miring + dua segitiga ujung. */
+  /* Roof: two sloped planes + two gable triangles. */
   const roof = new THREE.Group(); scene.add(roof);
   const rmat = mat(COL.obj2, { roughness: 0.7, flatShading: true });
   [-1, 1].forEach((sx) => { const p = new THREE.Mesh(new THREE.BoxGeometry(2.55, 0.12, 3.6), rmat); p.position.set(sx * 1.08, 0.62, 0); p.rotation.z = -sx * 0.62; roof.add(p); });
@@ -42,12 +42,12 @@ function scene(ctx) {
   const door = new THREE.Mesh(new THREE.BoxGeometry(0.82, 1.2, 0.08), mat(COL.accent)); door.position.set(0, 0.8, 1.52); scene.add(door);
   const winMat = new THREE.MeshStandardMaterial({ color: "#2a2a35", emissive: "#ffc46b", emissiveIntensity: 0, roughness: 0.3 });
   const wins = [[-1.25, 1.5, 0], [1.25, 1.5, 0], [2.0, 0, Math.PI / 2], [-2.0, 0, -Math.PI / 2]].map((w) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.78), winMat); m.position.set(w[0], 1.2, w[1]); m.rotation.y = w[2]; scene.add(m); return m; });
-  /* Patok & benang penanda lahan (sebelum fondasi). */
+  /* Stakes & string marking the plot (before the foundation). */
   const stakes = new THREE.Group(); scene.add(stakes);
   [[-2.3, -1.8], [2.3, -1.8], [2.3, 1.8], [-2.3, 1.8]].forEach((p) => { const k = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.02, 0.6, 6), mat("#c9a26b")); k.position.set(p[0], 0.3, p[1]); stakes.add(k); });
   const str = new THREE.Line(new THREE.BufferGeometry().setFromPoints([[-2.3, -1.8], [2.3, -1.8], [2.3, 1.8], [-2.3, 1.8], [-2.3, -1.8]].map((p) => new THREE.Vector3(p[0], 0.5, p[1]))), new THREE.LineBasicMaterial({ color: COL.accent })); stakes.add(str);
   const inside = new THREE.PointLight("#ffbe5c", 0, 8, 1.5); inside.position.set(0, 1.4, 2.3); scene.add(inside);
-  /* Taman: pohon bulat & batu jalan. */
+  /* Garden: round trees & paving stones. */
   const garden = [];
   const leaf = mat("#4f8f4a", { flatShading: true }), trunk = mat("#7a5233");
   [[-3.6, 1.6], [3.4, 1.9], [-3.1, -2.4], [3.8, -1.6], [-4.4, -0.4]].forEach((p, i) => {
@@ -57,7 +57,7 @@ function scene(ctx) {
     scene.add(t); garden.push(t);
   });
   for (let i = 0; i < 6; i++) { const s = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.05, 7), mat("#d8d2c4")); s.position.set(Math.sin(i) * 0.15, 0.03, 2.0 + i * 0.5); scene.add(s); garden.push(s); }
-  /* Palu: pegangan + kepala, berporos di ujung pegangan. */
+  /* Hammer: handle + head, pivoting at the end of the handle. */
   const hammer = new THREE.Group(); scene.add(hammer);
   const swing = new THREE.Group(); hammer.add(swing);
   const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 1.5, 10), mat("#b5793f")); handle.position.y = 0.75; swing.add(handle);
@@ -84,7 +84,7 @@ function scene(ctx) {
       wins.forEach((w) => { w.visible = S.build > 0.55; });
       stakes.visible = S.found < 0.6; stakes.scale.y = Math.max(0.001, 1 - S.found);
       garden.forEach((g, i) => { const k = seg(S.garden, i * 0.07, i * 0.07 + 0.35); g.scale.setScalar(Math.max(0.001, k)); g.visible = k > 0.01; });
-      /* Palu: naik mengikuti tinggi dinding, mengetuk berirama selama S.hammer > 0. */
+      /* Hammer: rises with the wall height, tapping rhythmically while S.hammer > 0. */
       const top = 0.2 + S.build * 2.0;
       hammer.position.set(lerp(1.2, 3.2, S.rest), lerp(top, 0, S.rest), lerp(2.0, 2.6, S.rest));
       const beat = Math.abs(Math.sin(t * 3.4));
@@ -106,12 +106,12 @@ function scene(ctx) {
   const soil = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.4, 0.5, 40), mat("#6b4a32", { roughness: 1 })); soil.position.y = -0.25; scene.add(soil);
   const grass = new THREE.Mesh(new THREE.CircleGeometry(30, 48), mat("#9cc27a", { roughness: 1 })); grass.rotation.x = -Math.PI / 2; grass.position.y = -0.02; scene.add(grass);
   const seed = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12), mat(COL.obj2, { roughness: 0.5 })); seed.scale.set(1, 1.5, 1); scene.add(seed);
-  /* Tunas: dua daun kecil di atas tanah sebelum batang tumbuh. */
+  /* Sprout: two small leaves above the ground before the stem grows. */
   const sprout = new THREE.Group(); scene.add(sprout);
   const sm = mat("#7cc35a", { flatShading: true, side: THREE.DoubleSide });
   const sst = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.035, 0.45, 6), sm); sst.position.y = 0.22; sprout.add(sst);
   [-1, 1].forEach((sx) => { const l = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 6), sm); l.scale.set(1.4, 0.25, 0.7); l.position.set(sx * 0.17, 0.46, 0); l.rotation.z = sx * 0.5; sprout.add(l); });
-  /* Cabang rekursif; tiap cabang tumbuh lewat drawRange (indeks tabung urut dari pangkal ke ujung). */
+  /* Recursive branches; each branch grows via drawRange (tube indices run from base to tip). */
   const bark = mat("#7b5a3c", { roughness: 0.9 });
   const branches = [], tips = [];
   function grow(start, dir, len, rad, level, t0) {
@@ -141,7 +141,7 @@ function scene(ctx) {
   const FR = 14, fruits = new THREE.InstancedMesh(new THREE.SphereGeometry(0.13, 12, 10), mat(COL.accent, { roughness: 0.35 }), FR), fruitData = [];
   for (let i = 0; i < FR; i++) { const tp = tips[(i * 7) % tips.length]; fruitData.push({ p: tp.p.clone().add(new THREE.Vector3(0, -0.25, 0)), d: rnd() * 0.5 }); }
   scene.add(fruits);
-  /* Hutan: pohon kecil yang tumbuh dari buah yang jatuh. */
+  /* Forest: small trees growing from fallen fruit. */
   const FN = 46, forest = new THREE.Group(); scene.add(forest);
   const cone = new THREE.InstancedMesh(new THREE.ConeGeometry(0.55, 1.6, 7), mat("#3f7d47", { flatShading: true }), FN);
   const stem = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.1, 0.5, 5), bark, FN);
@@ -151,7 +151,7 @@ function scene(ctx) {
   const drop = { y: 0 };
   return {
     update(S, t) {
-      /* Biji: melayang → jatuh → masuk tanah. */
+      /* Seed: floats → falls → enters the ground. */
       const fall = seg(S.drop, 0, 1);
       seed.position.set(0, lerp(3.2 + Math.sin(t * 1.4) * 0.15, 0.12, fall * fall) - S.plant * 0.3, 0);
       seed.rotation.set(t * 0.8 * (1 - fall), t * 0.6 * (1 - fall), 0);
@@ -183,7 +183,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 5. Uap dari cangkir → setetes kopi jatuh → riak → kamera menyelam ke permukaan → lereng gunung & kebun → titik asal kopi. */
+/** 5. Steam from a cup → a drop of coffee falls → ripples → the camera dives into the surface → mountain slopes & a farm → the coffee's origin point. */
 export const SCENE_KOPI = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, mat, seg, lerp, glow, paint, rnd } = ctx;
@@ -193,17 +193,17 @@ function scene(ctx) {
   cupG.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 48), cupM));
   const handle = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.07, 10, 24, Math.PI * 1.2), cupM); handle.position.set(0.95, 0.62, 0); handle.rotation.z = -Math.PI * 0.6; cupG.add(handle);
   const saucer = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.2, 0.08, 48), cupM); saucer.position.y = -0.04; cupG.add(saucer);
-  /* Permukaan kopi: cincin berderajat tinggi, simpul diangkat sesuai riak. */
+  /* Coffee surface: a high-segment ring, vertices raised by the ripples. */
   const surfG = new THREE.RingGeometry(0.001, 0.8, 64, 18);
   const surf = new THREE.Mesh(surfG, mat(COL.obj, { roughness: 0.15, metalness: 0.1 })); surf.rotation.x = -Math.PI / 2; surf.position.y = 0.9; cupG.add(surf);
   const sp = surfG.attributes.position, base = sp.array.slice();
   const drop = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), mat(COL.obj, { roughness: 0.1 })); drop.scale.set(1, 1.5, 1); cupG.add(drop);
-  /* Uap: titik cahaya pucat yang naik berputar. */
+  /* Steam: pale light dots rising in a swirl. */
   const SN = 70, st = new Float32Array(SN * 3), sd = [];
   for (let i = 0; i < SN; i++) sd.push([rnd() * 6.28, rnd(), 0.2 + rnd() * 0.4]);
   const steam = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(st, 3)), new THREE.PointsMaterial({ size: 0.45, map: glow(), color: "#ffffff", transparent: true, opacity: 0.18, depthWrite: false }));
   cupG.add(steam);
-  /* Lereng gunung di bawah permukaan (ditemukan setelah menyelam). */
+  /* Mountain slope below the surface (discovered after the dive). */
   const land = new THREE.Group(); land.position.y = -8; scene.add(land);
   const TG = new THREE.PlaneGeometry(28, 28, 110, 110); TG.rotateX(-Math.PI / 2);
   const tp = TG.attributes.position, H = new Float32Array(tp.count), cols = new Float32Array(tp.count * 3);
@@ -256,7 +256,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 6. Kunci melayang → masuk lubang → diputar → gembok terbuka → perisai heksagon menyebar. */
+/** 6. Key floats → enters the keyhole → turns → padlock opens → a hexagon shield spreads. */
 export const SCENE_GEMBOK = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow, rnd } = ctx;
@@ -269,18 +269,18 @@ function scene(ctx) {
   const hole = new THREE.Mesh(new THREE.ShapeGeometry(kh, 16), new THREE.MeshBasicMaterial({ color: "#05070c" })); hole.position.z = 0.37; lock.add(hole);
   const slot = new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.32), new THREE.MeshBasicMaterial({ color: "#05070c" })); slot.position.set(0, -0.08, 0.37); lock.add(slot);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.03, 8, 32), mat(COL.accent, { metalness: 0.6, roughness: 0.3, emissive: COL.accent, emissiveIntensity: 0.4 })); ring.position.set(0, 0.06, 0.38); lock.add(ring);
-  /* Belenggu: setengah torus + dua kaki; berporos di kaki kiri. */
+  /* Shackle: half torus + two legs; pivots on the left leg. */
   const shackle = new THREE.Group(); shackle.position.set(-0.6, 0, 0); lock.add(shackle);
   const sm = mat("#d5d9e2", { metalness: 0.4, roughness: 0.22 });
   const arc = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.12, 12, 32, Math.PI), sm); arc.position.set(0.6, 1.5, 0); shackle.add(arc);
   [0, 1.2].forEach((x, i) => { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, i ? 0.9 : 0.9, 12), sm); leg.position.set(x, 1.05, 0); shackle.add(leg); });
-  /* Kunci: kepala cincin, batang, gigi. */
+  /* Key: ring head, shaft, teeth. */
   const key = new THREE.Group(); scene.add(key);
   const km = mat(COL.accent, { metalness: 0.45, roughness: 0.3 });
   const bow = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.08, 10, 28), km); bow.position.z = 1.45; key.add(bow);
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 1.2, 10), km); shaft.rotation.x = Math.PI / 2; shaft.position.z = 0.6; key.add(shaft);
   [[0.0, 0.1], [0.22, 0.06], [0.38, 0.12]].forEach((tth) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, tth[1] + 0.06, 0.1), km); b.position.set(0, -0.08 - tth[1] / 2, 0.05 + tth[0]); key.add(b); });
-  /* Perisai: kisi heksagon yang menyala dari tengah. */
+  /* Shield: a hexagon grid that lights up from the center. */
   const hexes = [], R = 0.5;
   for (let q = -6; q <= 6; q++) for (let rr = -6; rr <= 6; rr++) { const s = -q - rr; if (Math.max(Math.abs(q), Math.abs(rr), Math.abs(s)) > 6) continue; const x = R * 1.5 * q * 1.04, y = R * Math.sqrt(3) * (rr + q / 2) * 1.04; hexes.push({ x, y, d: Math.hypot(x, y) }); }
   const HN = hexes.length;

@@ -86,7 +86,7 @@ test("compose: ukuran dari variabel menggantikan Npx", () => {
 });
 
 test("compose: field yang diolah generator memakai nilai variabel saat ini + peringatan", () => {
-  // fluidType: ukuran font dihitung jadi clamp(min, …, max) → tidak bisa dipetakan langsung.
+  // fluidType: the font size is computed as clamp(min, …, max) → cannot be mapped directly.
   const root = docWith("text", { fontSize: "var(--besar)", fluidType: true });
   const c = compose(root, opts({ vars: [v("besar", "size", "48px")] }));
   assert.ok(!c.html.css.includes("917301"));
@@ -120,7 +120,7 @@ test("font: referensi var(--font-x) dimuat (Google Fonts) dan berubah mengikuti 
   assert.match(c.html.css, /--font-poppins: "Poppins", sans-serif;/);
   assert.ok(c.html.css.startsWith("@import"), "font dimuat walau lewat variabel");
   assert.match(c.fontLoaders, /fonts\.googleapis\.com/);
-  // Ubah fallback font pustaka → nilai variabel ikut, referensi elemen tetap.
+  // Changing a library font's fallback → the variable value follows, element references stay.
   const c2 = compose(root, opts({ fonts: [{ ...poppins, fallback: "serif" }], vars: libraryFontVars([{ ...poppins, fallback: "serif" }]) }));
   assert.match(c2.html.css, /--font-poppins: "Poppins", serif;/);
   assert.match(c2.html.css, /font-family: var\(--font-poppins\);/);

@@ -5,19 +5,19 @@ import { Search, Settings } from "lucide-react";
 import { useIconStore, sanitizeSvg, resizeSvg } from "../../store/iconStore";
 
 interface IconSelectProps {
-  /** id ikon yang sedang terpilih, atau null kalau "tanpa ikon". */
+  /** id of the currently selected icon, or null for "no icon". */
   value: string | null;
   onChange: (iconId: string | null) => void;
-  /** Path ke halaman pengelola ikon global (tambah/rename/hapus). Opsional. */
+  /** Path to the global icon manager page (add/rename/delete). Optional. */
   manageHref?: string;
 }
 
 /**
- * Picker ringan untuk elemen maker (Button, Card, dst): hanya menampilkan
- * & memilih ikon dari pustaka global yang sama (useIconStore). Karena
- * store-nya di-persist ke localStorage, ikon yang ditambahkan lewat
- * halaman "Ikon Global" otomatis muncul di sini tanpa perlu refresh apa pun —
- * kedua tempat baca dari satu sumber data yang sama.
+ * A lightweight picker for element makers (Button, Card, etc.): only shows
+ * & selects icons from the same global library (useIconStore). Because
+ * the store is persisted to localStorage, icons added through the
+ * "Global Icons" page show up here automatically without any refresh;
+ * both places read from the same single data source.
  */
 export default function IconSelect({
   value,

@@ -21,7 +21,7 @@ import { templateFiles } from "../exportTemplate";
 import { WEB_TEMPLATES, buildTemplatePages, getTemplate, type BuiltTemplatePage, type WebTemplate } from "../registry";
 import type { TplLang } from "../types";
 
-/* Katalog v9 bagian I: template Premium 3D & animasi (setI/i*.ts), dibangun kitI. */
+/* v9 catalog part I: Premium 3D & animation templates (setI/i*.ts), built by kitI. */
 
 type SectionBox = { tag?: string; name: string };
 

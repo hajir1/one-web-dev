@@ -2,7 +2,7 @@ import { useEffect, useState, type ImgHTMLAttributes } from "react";
 import { assetIdOf, MISSING_ASSET } from "./refs";
 import { assetDataUrl, useAssets } from "./store";
 
-/** <img> yang mengerti `aset:<id>` (pustaka) maupun URL biasa. */
+/** <img> that understands `aset:<id>` (library) as well as plain URLs. */
 export default function AssetImage({ src, ...rest }: Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & { src: string }) {
   const id = assetIdOf(src);
   const version = useAssets((s) => s.version);

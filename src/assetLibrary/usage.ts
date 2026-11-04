@@ -1,6 +1,6 @@
 import { assetRef } from "./refs";
 
-/** Desain tersimpan (bentuk minimal, agar fungsi ini bisa diuji tanpa store). */
+/** A stored design (minimal shape, so this function can be tested without the store). */
 interface DesignLike {
   id: string;
   name: string;
@@ -8,7 +8,7 @@ interface DesignLike {
 }
 
 export interface AssetUse {
-  /** Teks untuk pengguna, mis. "Toko Kopi › Beranda" atau "Undangan Raka (template kode)". */
+  /** Text for the user, e.g. "Coffee Shop › Home" or "Raka Invitation (code template)". */
   label: string;
   type: string;
   designId: string;
@@ -23,8 +23,8 @@ const pagesOfSite = (state: unknown): string[] => {
 };
 
 /**
- * Tempat aset dipakai: halaman website (beserta nama websitenya), template kode,
- * dan desain elemen. Dipakai untuk mencegah gambar terhapus selagi masih tampil.
+ * Where an asset is used: website pages (with their website name), code templates,
+ * and element designs. Used to prevent deleting images that are still displayed.
  */
 export function assetUsage(id: string, designs: Record<string, DesignLike[]>, typeLabel: (type: string) => string = (t) => t): AssetUse[] {
   const ref = assetRef(id);
@@ -40,7 +40,7 @@ export function assetUsage(id: string, designs: Record<string, DesignLike[]>, ty
       } catch {
         continue;
       }
-      // `aset:abc123` tidak boleh cocok dengan `aset:abc1234`.
+      // `aset:abc123` must not match `aset:abc1234`.
       if (!json.includes(ref) || !new RegExp(`${ref}(?![a-z0-9-])`).test(json)) continue;
       const site = type === PAGE_TYPE ? siteOf.get(d.id) : undefined;
       out.push({ label: site ? `${site} › ${d.name}` : `${d.name} (${typeLabel(type)})`, type, designId: d.id });

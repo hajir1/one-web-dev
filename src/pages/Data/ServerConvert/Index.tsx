@@ -81,7 +81,7 @@ export default function ServerConvert() {
   const start = () => {
     if (!picked) return;
     if (!serverReady) {
-      // Jujur: tidak ada permintaan, tidak ada biaya.
+      // Honest: no request, no cost.
       setError(t("errors.serverUnavailable"));
       return;
     }

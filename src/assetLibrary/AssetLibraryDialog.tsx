@@ -5,7 +5,7 @@ import Modal from "../components/app/Modal";
 import { btn } from "../components/app/ui";
 import AssetLibrary from "./AssetLibrary";
 
-/** Menu "Aset" di bar Studio / editor template kode: kelola semua gambar. */
+/** "Assets" menu in the Studio bar / code template editor: manage every image. */
 export default function AssetLibraryDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
   return (
@@ -15,7 +15,7 @@ export default function AssetLibraryDialog({ open, onClose }: { open: boolean; o
   );
 }
 
-/** Tombol "Aset" + dialognya. */
+/** "Assets" button + its dialog. */
 export function AssetLibraryButton({ className, labelClassName }: { className?: string; labelClassName?: string }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);

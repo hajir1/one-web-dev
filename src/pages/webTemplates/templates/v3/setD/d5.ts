@@ -61,7 +61,7 @@ import {
 /* Template v3 D21–D25: Koperasi, Apartemen, DJ, Lingkungan, Agensi SEO. */
 /* ================================================================== */
 
-/* -------------- 21. Koperasi Arta Guyub — simpan pinjam (7 hlm) ---------- */
+/* -------------- 21. Koperasi Arta Guyub — savings & loans (7 pages) ---------- */
 // Premium: progress, pro-pricing-cards, testimonial. Library: AOS. Retro ramah.
 
 const GP: Palette = { ink: "#14301c", muted: "#4d6652", primary: "#15803d", primaryDark: "#166534", soft: "#dcfce7", line: "#bbf7d0" };

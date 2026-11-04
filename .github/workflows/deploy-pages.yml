@@ -1,7 +1,7 @@
-# v13: deploy MODE DEMO (frontend tanpa backend) ke GitHub Pages.
-# Aktifkan sekali: Settings → Pages → Build and deployment → Source: "GitHub Actions".
-# Jalankan manual dari tab Actions ("Run workflow"). Agar otomatis tiap push ke main/master,
-# buat variabel repo DEMO_PAGES_AUTO = true (Settings → Secrets and variables → Actions → Variables).
+# v13: deploys DEMO MODE (frontend without a backend) to GitHub Pages.
+# Enable once: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# Run it manually from the Actions tab ("Run workflow"). To deploy on every push to main/master,
+# create the repo variable DEMO_PAGES_AUTO = true (Settings → Secrets and variables → Actions → Variables).
 name: deploy-demo-pages
 
 on:
@@ -35,12 +35,12 @@ jobs:
       - name: Build demo
         run: npm run build:demo
         env:
-          # Awalan path dari GitHub: "/repo/" untuk situs proyek, "/" untuk nama.github.io atau
-          # domain sendiri. Bisa ditimpa lewat variabel repo DEMO_BASE_PATH (Settings → Variables).
+          # Path prefix from GitHub: "/repo/" for project sites, "/" for name.github.io or
+          # a custom domain. Can be overridden with the repo variable DEMO_BASE_PATH (Settings → Variables).
           VITE_BASE_PATH: ${{ vars.DEMO_BASE_PATH || steps.pages.outputs.base_path || '/' }}
-      - name: SPA fallback & tanpa Jekyll
-        # GitHub Pages tidak punya rewrite: 404.html = index.html supaya /id/page-maker dll.
-        # tetap membuka aplikasi saat dibuka langsung atau di-refresh.
+      - name: SPA fallback and no Jekyll
+        # GitHub Pages has no rewrites: 404.html = index.html so that /id/page-maker etc.
+        # still open the app when visited directly or refreshed.
         run: |
           cp dist/index.html dist/404.html
           touch dist/.nojekyll

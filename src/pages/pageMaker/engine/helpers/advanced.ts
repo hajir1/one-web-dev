@@ -1,27 +1,27 @@
 /* ================================================================== */
-/* Pengaturan "Lanjutan" tiap node: CSS ID, CSS Class, Custom CSS,       */
-/* Custom JavaScript (gratis). Logika murni → bisa dites.               */
+/* "Advanced" settings for each node: CSS ID, CSS Class, Custom CSS,     */
+/* Custom JavaScript (free). Pure logic → testable.                     */
 /*                                                                    */
 /* Custom CSS                                                           */
-/*   - Tanpa kurung kurawal = deklarasi untuk node itu sendiri:          */
+/*   - Without braces = declarations for the node itself:               */
 /*       color: red; padding: 8px;                                      */
-/*   - Dengan aturan: `&` = node itu; selector tanpa `&` otomatis        */
-/*     menjadi turunan node (di-scope), jadi tidak bocor ke elemen lain: */
+/*   - With rules: `&` = that node; selectors without `&` automatically  */
+/*     become descendants of the node (scoped), so they do not leak to other elements: */
 /*       &:hover { opacity: .8 }      p { margin: 0 }                    */
-/*   - @media/@supports di-scope; @keyframes/@font-face dibiarkan;       */
+/*   - @media/@supports are scoped; @keyframes/@font-face are left alone; */
 /*     @import dibuang.                                                 */
 /*                                                                    */
 /* Custom JavaScript                                                    */
-/*   Isi fungsi yang dijalankan SEKALI per mount dengan argumen:         */
+/*   The body of a function run ONCE per mount with the arguments:      */
 /*     element, elements, on(target, type, handler), onCleanup(fn), root */
-/*   `on()` otomatis dilepas saat dibersihkan → tidak ada listener ganda.*/
-/*   Error per node ditangkap (console.error) dan tidak menghentikan     */
+/*   `on()` is detached automatically on cleanup → no duplicate listeners. */
+/*   Errors per node are caught (console.error) and do not stop          */
 /*   node lain.                                                         */
 /* ================================================================== */
 
 export interface AdvancedProps {
   cssId?: string;
-  /** Satu atau beberapa class, dipisah spasi. */
+  /** One or more classes, separated by spaces. */
   cssClass?: string;
   customCss?: string;
   customJs?: string;
@@ -33,7 +33,7 @@ export const MAX_CUSTOM_JS = 20000;
 export const isValidCssId = (id: string) => /^[A-Za-z][\w-]{0,63}$/.test(id);
 const isValidClassName = (c: string) => /^-?[_A-Za-z][\w-]{0,63}$/.test(c);
 
-/** Class valid saja, tanpa duplikat (urutan dipertahankan). */
+/** Valid classes only, no duplicates (order kept). */
 export function parseClassList(v: string | undefined): string[] {
   const out: string[] = [];
   for (const c of (v ?? "").split(/\s+/)) if (c && isValidClassName(c) && !out.includes(c)) out.push(c);
@@ -44,7 +44,7 @@ export function invalidClasses(v: string | undefined): string[] {
   return (v ?? "").split(/\s+/).filter((c) => c && !isValidClassName(c));
 }
 
-/** Bersihkan `advanced` dari data tersimpan. undefined = tidak ada isi. */
+/** Sanitizes `advanced` from stored data. undefined = no content. */
 export function sanitizeAdvanced(v: unknown): AdvancedProps | undefined {
   if (!v || typeof v !== "object") return undefined;
   const o = v as Record<string, unknown>;
@@ -61,7 +61,7 @@ export const hasAdvanced = (a: AdvancedProps | undefined) =>
 
 /* ------------------------------ CSS -------------------------------- */
 
-/** Hapus komentar & urutan yang bisa menutup tag <style>. */
+/** Removes comments & sequences that could close the <style> tag. */
 function cleanCss(css: string): string {
   return css
     .replace(/\/\*[\s\S]*?\*\//g, "")
@@ -88,8 +88,8 @@ function scopeSelector(sel: string, scope: string, flavor: CssFlavor): string {
 }
 
 /**
- * Scope Custom CSS ke `scope` (mis. `.custom-page__box-3`).
- * Hasil: aturan CSS siap pakai; kurung tak seimbang → null (tidak valid).
+ * Scopes Custom CSS to `scope` (e.g. `.custom-page__box-3`).
+ * Result: ready-to-use CSS rules; unbalanced braces → null (invalid).
  */
 export function scopeCustomCss(raw: string, scope: string, flavor: CssFlavor = "plain"): string | null {
   const css = cleanCss(raw).trim();
@@ -105,8 +105,8 @@ export function scopeCustomCss(raw: string, scope: string, flavor: CssFlavor = "
     return `${flavor === "svelte" ? `:global(${scope})` : scope} {\n${decl}\n}\n`;
   }
   const self = flavor === "svelte" ? `:global(${scope})` : scope;
-  // Deklarasi lepas di antara blok (gaya CSS nesting: `color: red; &:hover { … }`)
-  // berlaku untuk node itu sendiri.
+  // Loose declarations between blocks (CSS nesting style: `color: red; &:hover { … }`)
+  // apply to the node itself.
   const bare = (txt: string): string => {
     const decl = txt
       .split(";")
@@ -123,7 +123,7 @@ export function scopeCustomCss(raw: string, scope: string, flavor: CssFlavor = "
       const open = src.indexOf("{", i);
       if (open === -1) {
         const rest = src.slice(i).trim();
-        if (rest && (rest.includes("}") || !rest.includes(":"))) return null; // sisa teks tanpa blok
+        if (rest && (rest.includes("}") || !rest.includes(":"))) return null; // remaining text without a block
         out += bare(rest);
         break;
       }
@@ -166,9 +166,9 @@ export function scopeCustomCss(raw: string, scope: string, flavor: CssFlavor = "
 /* --------------------------- atribut root -------------------------- */
 
 /**
- * Tambahkan id & class pada TAG PERTAMA sebuah template string
- * (HTML / JSX / Vue / Svelte / Angular). Class digabung ke `class="…"` /
- * `className="…"` yang sudah ada.
+ * Adds an id & class to the FIRST TAG of a template string
+ * (HTML / JSX / Vue / Svelte / Angular). The class is merged into an existing
+ * `class="…"` / `className="…"`.
  */
 export function injectRootAttrs(tpl: string, id: string | undefined, classes: string[], jsx: boolean, extra: Record<string, string> = {}): string {
   if (!id && !classes.length && !Object.keys(extra).length) return tpl;
@@ -191,7 +191,7 @@ export function injectRootAttrs(tpl: string, id: string | undefined, classes: st
 /* --------------------------- runtime JS ---------------------------- */
 
 export interface CustomScript {
-  /** Nama untuk pesan error (mis. "Section Hero"). */
+  /** Name for error messages (e.g. "Section Hero"). */
   label: string;
   selector: string;
   code: string;
@@ -204,7 +204,7 @@ const indent = (code: string, pad: string) =>
     .map((l) => (l.trim() ? pad + l : ""))
     .join("\n");
 
-/** Cek sintaks (dikompilasi saja, tidak dijalankan). null = valid / tidak bisa dicek. */
+/** Syntax check (compiled only, not run). null = valid / cannot be checked. */
 export function jsSyntaxError(code: string, params = "element, elements, on, onCleanup, root"): string | null {
   try {
     new Function(...params.split(",").map((p) => p.trim()), code);
@@ -215,9 +215,9 @@ export function jsSyntaxError(code: string, params = "element, elements, on, onC
 }
 
 /**
- * Isi modul runtime: fungsi `initCustomCode(root)` → fungsi pembersih.
- * Memanggil ulang pada root yang sama membersihkan inisialisasi sebelumnya
- * lebih dulu (aman untuk React StrictMode / render ulang pratinjau).
+ * Runtime module content: an `initCustomCode(root)` function → a cleanup function.
+ * Calling it again on the same root cleans up the previous initialization
+ * first (safe for React StrictMode / preview re-renders).
  */
 export function customRuntime(scripts: CustomScript[]): string {
   const blocks = scripts

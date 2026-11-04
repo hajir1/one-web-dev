@@ -6,13 +6,13 @@ import type { ElementCatalogItem, ItemId, SectionCatalogItem, TemplateCatalogIte
 import { isDemoMode } from "../demo/demoMode";
 
 /* ================================================================== */
-/* Repository katalog                                                   */
+/* Catalog repository                                                   */
 /*                                                                    */
-/* Komponen TIDAK membaca data katalog langsung; mereka memakai hook     */
-/* (./hooks.ts) yang memanggil repository ini.                          */
-/* - Template: metadata dari GET /templates (isi template TIDAK ikut;    */
-/*   diambil lewat POST /templates/:id/acquire saat dipakai).            */
-/* - Section & elemen: kode editor ada di frontend, tier & harga dari    */
+/* Components do NOT read catalog data directly; they use hooks          */
+/* (./hooks.ts) that call this repository.                              */
+/* - Templates: metadata from GET /templates (template content is NOT included; */
+/*   fetched via POST /templates/:id/acquire when used).                 */
+/* - Sections & elements: editor code lives in the frontend, tiers & prices from */
 /*   GET /catalog (diatur admin).                                       */
 /* ================================================================== */
 
@@ -20,12 +20,12 @@ export interface CatalogSnapshot {
   templates: TemplateCatalogItem[];
   sections: SectionCatalogItem[];
   elements: ElementCatalogItem[];
-  /** Bahasa saat nama/deskripsi dirakit. */
+  /** Language used when names/descriptions are assembled. */
   lang: string;
 }
 
 interface CatalogRepository {
-  /** Ambil katalog lengkap. Boleh melempar (jaringan/server) — hook menampilkan status error. */
+  /** Fetch the full catalog. May throw (network/server) — the hook shows an error state. */
   getCatalog(lang: string): Promise<CatalogSnapshot>;
 }
 
@@ -34,7 +34,7 @@ const str = (v: unknown, d = "") => (typeof v === "string" ? v : d);
 const strs = (v: unknown, re?: RegExp): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && (!re || re.test(x))) : []);
 const ITEM_RE = /^(preset|element|event|feature):[\w-]{1,80}$/;
 
-/** Validasi satu template dari server; null bila bentuknya tidak dikenal. */
+/** Validates one template from the server; null when its shape is unknown. */
 export function sanitizeTemplate(raw: unknown): TemplateCatalogItem | null {
   if (!isObj(raw)) return null;
   const refId = str(raw.refId);
@@ -73,13 +73,13 @@ export function sanitizeTemplate(raw: unknown): TemplateCatalogItem | null {
 }
 
 const CODE_GROUPS = new Set(["animation", "invitation", "web3d", "portfolio3d", "motion3d", "landing", "biz3d"]);
-/** v14: Template Kode dari server → { code: { group, budgetKb, libs } }. */
+/** v14: Code Templates from the server → { code: { group, budgetKb, libs } }. */
 function codeOf(v: unknown): { code?: NonNullable<TemplateCatalogItem["code"]> } {
   if (!isObj(v) || !CODE_GROUPS.has(str(v.group))) return {};
   return { code: { group: str(v.group), budgetKb: typeof v.budgetKb === "number" && v.budgetKb >= 0 ? v.budgetKb : 0, libs: strs(v.libs).slice(0, 20) } };
 }
 
-/** Repository server: template dari backend, section/elemen dari kode editor + harga server. */
+/** Server repository: templates from the backend, sections/elements from editor code + server prices. */
 export class ApiCatalogRepository implements CatalogRepository {
   private cache = new Map<string, CatalogSnapshot>();
 
@@ -87,7 +87,7 @@ export class ApiCatalogRepository implements CatalogRepository {
     const hit = this.cache.get(lang);
     if (hit) return hit;
     if (isDemoMode()) {
-      // Mode demo (v12): template dari frontend; section & elemen dari kode editor (semua gratis di demo).
+      // Demo mode (v12): templates from the frontend; sections & elements from editor code (all free in demo).
       const [demo, data] = await Promise.all([import("../demo/demoTemplates"), import("./data/catalog")]);
       const snap: CatalogSnapshot = { templates: demo.demoTemplateList(lang), sections: data.buildSectionCatalog(), elements: data.buildElementCatalog(), lang };
       this.cache.set(lang, snap);
@@ -105,7 +105,7 @@ export class ApiCatalogRepository implements CatalogRepository {
     return snap;
   }
 
-  /** Lupakan cache (mis. setelah admin mengubah katalog). */
+  /** Forget the cache (e.g. after an admin changes the catalog). */
   clear() {
     this.cache.clear();
   }

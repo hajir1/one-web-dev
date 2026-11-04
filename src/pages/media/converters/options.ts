@@ -1,14 +1,14 @@
 // ─── converters/options.ts ───────────────────────────────────────────────────
-// Satu bundle opsi untuk dispatcher; tiap jalur hanya memakai field yang relevan.
+// One options bundle for the dispatcher; each path only uses the relevant fields.
 
 import type { ResizeOptions } from "./sizings";
 
 interface TraceOptions {
-  /** Jumlah warna sebelum tracing (sedikit = SVG lebih sederhana). */
+  /** Number of colors before tracing (fewer = simpler SVG). */
   numberOfColors: number;
-  /** Buang bentuk lebih kecil dari N piksel (kurangi noise). */
+  /** Drop shapes smaller than N pixels (reduces noise). */
   pathomit: number;
-  /** Toleransi garis lurus. */
+  /** Straight line tolerance. */
   ltres: number;
   /** Toleransi kurva. */
   qtres: number;
@@ -18,14 +18,14 @@ const DEFAULT_TRACE_OPTIONS: TraceOptions = { numberOfColors: 8, pathomit: 8, lt
 
 export interface ConversionOptions {
   quality: number; // 1–100
-  /** Lossless untuk WebP/AVIF/JPEG XL (nama lama dipertahankan). */
+  /** Lossless for WebP/AVIF/JPEG XL (the old name is kept). */
   losslessWebp: boolean;
-  /** Ukuran yang dimasukkan ke berkas ICO. */
+  /** Sizes included in the ICO file. */
   icoSizes: number[];
   jpegBackgroundColor: string;
   resize: ResizeOptions;
   trace: TraceOptions;
-  vectorBackgroundColor: string | null; // null = tetap transparan
+  vectorBackgroundColor: string | null; // null = keep transparent
 }
 
 export const DEFAULT_CONVERSION_OPTIONS: ConversionOptions = {

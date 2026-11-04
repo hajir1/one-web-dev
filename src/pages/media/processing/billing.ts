@@ -1,33 +1,33 @@
 // ─── processing/billing.ts ───────────────────────────────────────────────────
-// Status akun (saldo, hak akses fitur) + klien billing.
+// Account status (balance, feature access) + billing client.
 //
 // PRINSIP KEAMANAN:
-// - Saldo, status pembayaran, dan hak akses HANYA berasal dari respons
-//   backend. Frontend tidak pernah menambah saldo, membuka akses, atau
-//   menganggap pembayaran berhasil berdasarkan state/URL sendiri.
-// - State ini sengaja TIDAK disimpan ke localStorage: data basi tidak boleh
-//   dipakai sebagai bukti hak akses. Setiap kali halaman dibuka → muat ulang.
-// - Pembayaran lewat payment gateway (halaman checkout hosted). Tidak ada
-//   secret/kunci gateway di frontend; backend yang membuat sesi checkout.
+// - Balance, payment status, and access rights come ONLY from backend
+//   responses. The frontend never adds balance, unlocks access, or
+//   treat a payment as successful based on its own state/URL.
+// - This state is deliberately NOT stored in localStorage: stale data must not
+//   be used as proof of access. Every page open → reload.
+// - Payment goes through a payment gateway (hosted checkout page). No
+//   gateway secrets/keys in the frontend; the backend creates the checkout session.
 //
-// ┌─ BACKEND (NestJS, sudah tersedia) ────────────────────────────────────┐
+// ┌─ BACKEND (NestJS, already available) ────────────────────────────────────┐
 // │ GET  {base}/billing/account   → { balance, entitlements:{fitur:{unlocked,packUses}} }
 // │ GET  {base}/billing/pricing   → { [fitur]: {costPerUse, usesPerCredit, packPrice, unlockRequired, enabled} }
 // │ POST {base}/billing/checkout  { packageId, returnUrl } + Idempotency-Key
 // │                               → { checkoutUrl }  (URL gateway, https)
 // │ GET  {base}/billing/checkout/:sessionId → { status:"paid"|"pending"|"failed", account }
-// │                               (status DARI WEBHOOK gateway, bukan dari redirect)
+// │                               (status FROM the gateway WEBHOOK, not from the redirect)
 // │ POST {base}/billing/unlock    { feature } + Idempotency-Key
-// │                               → { account }   402 bila saldo kurang
+// │                               → { account }   402 if the balance is too low
 // │ GET  {base}/billing/packages  → { packages:[{id,credits,priceIdr,highlight?}] } (Rupiah)
-// │                               (opsional; tanpa ini dipakai config/pricing.ts)
+// │                               (optional; without it config/pricing.ts is used)
 // │ GET  {base}/billing/transactions?limit=50
 // │                               → { transactions:[{id,type,credits,createdAt,
 // │                                   description?,status?,amount?,currency?}] } (amount = rupiah)
 // │ POST {base}/billing/unlock-item { item, feature } + Idempotency-Key
-// │                               → { account }  (account.items memuat item)
-// │                               402 saldo kurang · 409 sudah dimiliki (tanpa biaya)
-// │                               Kredit dipotong SEKALI per item & kunci idempoten.
+// │                               → { account }  (account.items includes the item)
+// │                               402 insufficient balance · 409 already owned (no cost)
+// │                               Credits are deducted ONCE per item & idempotency key.
 // └───────────────────────────────────────────────────────────────────────┘
 
 import { create } from "zustand";
@@ -60,12 +60,12 @@ interface BillingState {
   account: BillingAccount | null;
   pricing: Record<ServerFeatureId, FeaturePricing>;
   pricingSource: "default" | "server";
-  /** Paket kredit yang ditampilkan (bawaan, atau dari server bila valid). */
+  /** Credit packs shown (default, or from the server when valid). */
   packages: CreditPackage[];
   packagesSource: "default" | "server";
   status: Status;
   error: string | null;
-  /** Hanya dipanggil dengan data dari respons backend. */
+  /** Only called with data from a backend response. */
   setAccountFromServer: (raw: unknown) => BillingAccount | null;
 }
 
@@ -80,7 +80,7 @@ export const useBilling = create<BillingState>((set) => ({
   setAccountFromServer: (raw) => {
     const account = sanitizeAccount(raw);
     if (!account) return null;
-    // v11: respons yang tidak memuat kuota paket (mis. beli item) tidak menghapus kuota yang sudah diketahui.
+    // v11: responses without plan quotas (e.g. buying an item) do not erase quotas already known.
     const prev = useBilling.getState().account;
     if (!account.subscription && prev?.subscription) account.subscription = prev.subscription;
     set({ account });
@@ -116,12 +116,12 @@ async function call(path: string, init: RequestInit = {}): Promise<Record<string
 }
 
 /**
- * Muat saldo, hak akses, dan harga dari backend lewat cache TanStack Query.
- * - `refreshBilling()` (default) selalu mengambil data baru (dipakai tombol
- *   "Muat ulang" dan setelah transaksi), tetap digabung bila paralel.
- * - `ensureBilling()` memakai cache bila masih segar (dipakai saat komponen
- *   dibuka) → berpindah halaman tidak memanggil 3 endpoint lagi.
- * Harga fitur & paket kredit hampir statis → cache 30 menit.
+ * Loads balance, access, and prices from the backend through the TanStack Query cache.
+ * - `refreshBilling()` (default) always fetches new data (used by the
+ *   "Reload" button and after transactions), still merged when parallel.
+ * - `ensureBilling()` uses the cache when still fresh (used when a component
+ *   opens) → navigating between pages does not call 3 endpoints again.
+ * Feature prices & credit packs are nearly static → cached for 30 minutes.
  */
 export function refreshBilling(force = true): Promise<void> {
   return once(force ? "refresh" : "ensure", async () => {
@@ -151,12 +151,12 @@ export function refreshBilling(force = true): Promise<void> {
   });
 }
 
-/** Seperti refreshBilling, tetapi memakai cache yang masih segar. */
+/** Like refreshBilling, but uses the cache while it is fresh. */
 export const ensureBilling = () => refreshBilling(false);
 
 const randomKey = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 
-/** URL checkout hanya diterima bila https (atau http lokal saat pengembangan). */
+/** The checkout URL is only accepted when https (or local http during development). */
 export function safeCheckoutUrl(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   try {
@@ -164,21 +164,21 @@ export function safeCheckoutUrl(raw: unknown): string | null {
     if (u.protocol === "https:") return u.toString();
     if (u.protocol === "http:" && /^(localhost|127\.0\.0\.1)$/.test(u.hostname)) return u.toString();
   } catch {
-    /* tidak valid */
+    /* invalid */
   }
   return null;
 }
 
 /**
- * Mulai pembelian paket kredit → mengembalikan URL checkout gateway.
- * Klik ganda pada paket yang sama digabung menjadi satu permintaan.
+ * Starts a credit pack purchase → returns the gateway checkout URL.
+ * Double clicks on the same pack are merged into one request.
  */
 export function startCheckout(packageId: string, returnUrl: string): Promise<string> {
   return once(`checkout:${packageId}`, async () => {
     const body = await call("/billing/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Idempotency-Key": `checkout-${packageId}-${randomKey()}` },
-      // Seluruh pembayaran dalam Rupiah lewat Midtrans (Midtrans hanya memproses IDR).
+      // All payments are in Rupiah through Midtrans (Midtrans only processes IDR).
       body: JSON.stringify({ packageId, currency: "IDR", returnUrl }),
     });
     const url = safeCheckoutUrl(body.checkoutUrl);
@@ -190,8 +190,8 @@ export function startCheckout(packageId: string, returnUrl: string): Promise<str
 export type CheckoutStatus = "paid" | "pending" | "failed";
 
 /**
- * Setelah kembali dari gateway: status DIVERIFIKASI ke backend. Parameter
- * URL (?checkout=success) tidak pernah dipercaya sebagai bukti pembayaran.
+ * After returning from the gateway: the status is VERIFIED with the backend. URL
+ * parameters (?checkout=success) are never trusted as proof of payment.
  */
 export async function verifyCheckout(sessionId: string): Promise<CheckoutStatus> {
   if (!/^[\w-]{6,128}$/.test(sessionId)) throw new BillingError(i18n.t("errors.billing.invalidSession"));
@@ -203,7 +203,7 @@ export async function verifyCheckout(sessionId: string): Promise<CheckoutStatus>
   return status;
 }
 
-/** Buka akses fitur (beli paket fitur dari saldo). */
+/** Unlock feature access (buy a feature pack from the balance). */
 export function unlockFeature(feature: ServerFeatureId): Promise<BillingAccount | null> {
   return once(`unlock:${feature}`, async () => {
     const body = await call("/billing/unlock", {
@@ -219,26 +219,26 @@ export function unlockFeature(feature: ServerFeatureId): Promise<BillingAccount 
 export const pricingOf = (f: ServerFeatureId) => useBilling.getState().pricing[f];
 
 /* ------------------------------------------------------------------ */
-/* Item berbayar (template premium, preset, elemen, slot website)       */
+/* Paid items (premium templates, presets, elements, website slots)     */
 /* ------------------------------------------------------------------ */
 
-/** Kunci item yang valid, mis. "template:shop-premium" atau "site-slot". */
+/** A valid item key, e.g. "template:shop-premium" or "site-slot". */
 const isItemKey = (k: string) => /^[\w:.-]{1,80}$/.test(k);
 
-/** Apakah akun (menurut respons server terakhir) sudah memiliki item ini. */
+/** Whether the account (according to the latest server response) already owns this item. */
 export function hasItem(itemKey: string): boolean {
   return !!useBilling.getState().account?.items.includes(itemKey);
 }
 
 /**
- * Buka akses satu item berbayar dengan saldo kredit. Saldo hanya berubah
- * dari respons backend. Klik ganda digabung (satu permintaan) dan kunci
- * idempoten dikirim agar server tidak memotong kredit dua kali.
+ * Unlocks one paid item with the credit balance. The balance only changes
+ * from backend responses. Double clicks are merged (one request) and an
+ * idempotency key is sent so the server does not charge credits twice.
  */
 export function unlockItem(itemKey: string, feature: CreditFeature): Promise<BillingAccount | null> {
   if (!isItemKey(itemKey)) return Promise.reject(new BillingError(i18n.t("errors.billing.invalidItem")));
   return once(`unlock-item:${itemKey}`, async () => {
-    if (hasItem(itemKey)) return useBilling.getState().account; // sudah dimiliki: tidak ada biaya
+    if (hasItem(itemKey)) return useBilling.getState().account; // already owned: no cost
     let body: Record<string, unknown>;
     try {
       body = await call("/billing/unlock-item", {
@@ -247,7 +247,7 @@ export function unlockItem(itemKey: string, feature: CreditFeature): Promise<Bil
         body: JSON.stringify({ item: itemKey, feature }),
       });
     } catch (e) {
-      // 409 = sudah dimiliki → muat ulang akun dari server, tanpa biaya baru.
+      // 409 = already owned → reload the account from the server, no new cost.
       if (e instanceof BillingError && e.status === 409) {
         await refreshBilling();
         return useBilling.getState().account;
@@ -260,7 +260,7 @@ export function unlockItem(itemKey: string, feature: CreditFeature): Promise<Bil
 }
 
 /* ------------------------------------------------------------------ */
-/* Riwayat transaksi                                                    */
+/* Transaction history                                                  */
 /* ------------------------------------------------------------------ */
 
 type TransactionType = "purchase" | "usage" | "refund" | "unlock" | "adjustment";
@@ -268,21 +268,21 @@ type TransactionType = "purchase" | "usage" | "refund" | "unlock" | "adjustment"
 export interface CreditTransaction {
   id: string;
   type: TransactionType;
-  /** Positif = kredit masuk, negatif = kredit terpakai. */
+  /** Positive = credits in, negative = credits used. */
   credits: number;
   createdAt: string;
   description?: string;
   status?: "completed" | "pending" | "failed";
-  /** Nominal pembayaran dalam rupiah bulat (hanya transaksi pembelian). */
+  /** Payment amount in whole rupiah (purchase transactions only). */
   amountIdr?: number;
-  /** Pembayaran lunas: id pembayaran + nomor invoice (untuk tautan invoice). */
+  /** Paid payment: payment id + invoice number (for the invoice link). */
   paymentId?: string;
   invoiceNumber?: string;
 }
 
 const TX_TYPES: TransactionType[] = ["purchase", "usage", "refund", "unlock", "adjustment"];
 
-/** Validasi baris riwayat dari server (yang tidak valid dibuang). */
+/** Validates history rows from the server (invalid ones are dropped). */
 export function sanitizeTransactions(raw: unknown): CreditTransaction[] {
   if (!Array.isArray(raw)) return [];
   const out: CreditTransaction[] = [];
@@ -306,7 +306,7 @@ export function sanitizeTransactions(raw: unknown): CreditTransaction[] {
   return out;
 }
 
-/** Ambil riwayat transaksi kredit dari backend. */
+/** Fetch the credit transaction history from the backend. */
 function fetchTransactions(limit = 50): Promise<CreditTransaction[]> {
   return once(`tx:${limit}`, async () => {
     const body = await call(`/billing/transactions?limit=${Math.max(1, Math.min(200, Math.floor(limit)))}`);
@@ -314,7 +314,7 @@ function fetchTransactions(limit = 50): Promise<CreditTransaction[]> {
   });
 }
 
-/** Opsi query riwayat transaksi (dipakai useQuery di halaman Credits & prefetch). */
+/** Transaction history query options (used by useQuery on the Credits page & prefetch). */
 export const transactionsQuery = (limit = 50) => ({
   queryKey: qk.transactions(limit),
   queryFn: () => fetchTransactions(limit),

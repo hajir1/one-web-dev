@@ -33,7 +33,7 @@ export function excelRowsFromSheet(
 // JSON parsing
 // ---------------------------------------------------------------------------
 
-/** Teks JSON → baris. Melempar DataError dengan posisi baris/kolom bila tidak valid. */
+/** JSON text → rows. Throws a DataError with the line/column position when invalid. */
 export function parseJsonText(text: string): Row[] {
   const parsed = parseJsonStrict(text);
   const arr = Array.isArray(parsed) ? parsed : [parsed];
@@ -54,7 +54,7 @@ export function parseJsonText(text: string): Row[] {
 }
 
 // ---------------------------------------------------------------------------
-// Deteksi kolom
+// Column detection
 // ---------------------------------------------------------------------------
 
 export function detectColumns(rows: Row[]): string[] {
@@ -73,7 +73,7 @@ export function detectColumns(rows: Row[]): string[] {
 
 export type ColumnKind = "number" | "boolean" | "json" | "text";
 
-/** Tipe kolom dari ≤200 nilai pertama yang tidak kosong (campuran → text). */
+/** Column type from the first ≤200 non-empty values (mixed → text). */
 export function detectColumnType(rows: Row[], col: string): ColumnKind {
   const limit = Math.min(rows.length, 200);
   let kind: ColumnKind | null = null;
@@ -103,13 +103,13 @@ export function quoteIdent(name: string, dialect: SqlDialect): string {
     case "mssql":
       return `[${safe.replace(/]/g, "]]")}]`;
     default:
-      // Generic: tanpa kutip bila aman; selain itu kutip ANSI agar spasi/tanda
-      // baca di nama kolom Excel tidak merusak query.
+      // Generic: unquoted when safe; otherwise ANSI quotes so spaces/punctuation
+      // in Excel column names do not break the query.
       return PLAIN_IDENT.test(safe) ? safe : `"${safe.replace(/"/g, '""')}"`;
   }
 }
 
-/** Nilai → literal SQL sesuai dialek. */
+/** Value → SQL literal for the dialect. */
 export function escapeValue(value: unknown, nullAsKeyword: boolean, dialect: SqlDialect = "generic"): string {
   if (value === null || value === undefined || value === "") {
     return nullAsKeyword ? "NULL" : "''";
@@ -117,20 +117,20 @@ export function escapeValue(value: unknown, nullAsKeyword: boolean, dialect: Sql
   if (typeof value === "number") return Number.isFinite(value) ? String(value) : "NULL";
   if (typeof value === "bigint") return String(value);
   if (typeof value === "boolean") {
-    // PostgreSQL menolak 1/0 untuk kolom boolean; MySQL & SQL Server memakai 1/0.
+    // PostgreSQL rejects 1/0 for boolean columns; MySQL & SQL Server use 1/0.
     if (dialect === "postgres" || dialect === "generic") return value ? "TRUE" : "FALSE";
     return value ? "1" : "0";
   }
   const text = value instanceof Date ? value.toISOString() : typeof value === "object" ? JSON.stringify(value) : String(value);
   let body = text.replace(/'/g, "''");
-  // MySQL (mode default) memperlakukan backslash sebagai escape: C:\path\ → rusak.
+  // MySQL (default mode) treats backslash as an escape: C:\path\ → broken.
   if (dialect === "mysql") body = body.replace(/\\/g, "\\\\");
-  // SQL Server: N'' agar teks Unicode tidak berubah jadi "?".
-  // eslint-disable-next-line no-control-regex -- rentang ASCII sengaja dipakai untuk mendeteksi teks non-ASCII
+  // SQL Server: N'' so Unicode text does not turn into "?".
+  // eslint-disable-next-line no-control-regex -- the ASCII range is used on purpose to detect non-ASCII text
   return dialect === "mssql" && /[^\x00-\x7f]/.test(text) ? `N'${body}'` : `'${body}'`;
 }
 
-/** Validasi pemetaan kolom: nama kosong / duplikat (tidak peka huruf besar). */
+/** Validates column mapping: empty / duplicate names (case-insensitive). */
 export function validateColumns(columns: ColumnMap[]): { code: "noColumns" } | { code: "emptyColumn"; source: string } | { code: "duplicateColumn"; name: string } | null {
   const included = columns.filter((c) => c.included);
   if (!included.length) return { code: "noColumns" };

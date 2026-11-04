@@ -1,11 +1,11 @@
 /* ================================================================== */
-/* Bangun SEMUA template web menjadi situs HTML statis untuk diperiksa. */
+/* Builds EVERY web template into a static HTML site for checking.      */
 /*                                                                    */
-/*   npm run templates:gen -- [folder-keluar] [--only=id1,id2]          */
+/*   npm run templates:gen -- [output-folder] [--only=id1,id2]          */
 /*                                                                    */
-/* Dijalankan dengan tsx + src/testSetup.ts (memuat locale lengkap).   */
-/* Hasil: <keluar>/<id-template>/index.html, halaman lain, assets/…,   */
-/* dan <keluar>/manifest.json (daftar template & halamannya).          */
+/* Run with tsx + src/testSetup.ts (loads the full locales).           */
+/* Output: <out>/<template-id>/index.html, other pages, assets/…,      */
+/* and <out>/manifest.json (list of templates & their pages).          */
 /* ================================================================== */
 import fs from "node:fs";
 import path from "node:path";

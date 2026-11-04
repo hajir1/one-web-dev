@@ -1,7 +1,7 @@
 import { page } from "./dsl";
 import type { GSpec } from "./spec";
 
-/* Set G batch 4, bagian kedua (G67–G80). */
+/* Set G batch 4, second part (G67–G80). */
 
 export const G4B: GSpec[] = [
   /* ---------------- G67. Meong Pet Hotel ---------------- */

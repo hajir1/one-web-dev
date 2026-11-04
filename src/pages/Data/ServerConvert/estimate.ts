@@ -2,7 +2,7 @@ import { DataError } from "../shared/errors";
 import type { DataServerFeatureId } from "../../media/processing/pricing";
 
 /* ================================================================== */
-/* Validasi file & perkiraan input untuk Konversi Server (tanpa upload). */
+/* File validation & input estimate for Server Convert (without uploading). */
 /* ================================================================== */
 
 export type ServerOutput = "json" | "xlsx" | "csv" | "zip";
@@ -10,18 +10,18 @@ export type ServerOutput = "json" | "xlsx" | "csv" | "zip";
 export const SERVER_INPUT: Record<DataServerFeatureId, { ext: RegExp; accept: string; outputs: ServerOutput[] }> = {
   "data-legacy-sheet": { ext: /\.(xls|ods|xlsb)$/i, accept: ".xls,.ods,.xlsb", outputs: ["json", "xlsx", "csv"] },
   "data-pdf-table": { ext: /\.pdf$/i, accept: ".pdf,application/pdf", outputs: ["json", "xlsx", "csv"] },
-  // v7 (P8): OCR PDF hasil scan → ZIP berisi PDF yang bisa dicari + .txt.
+  // v7 (P8): OCR for scanned PDFs → a ZIP with a searchable PDF + .txt.
   "data-pdf-ocr": { ext: /\.pdf$/i, accept: ".pdf,application/pdf", outputs: ["zip"] },
 };
 
 export const isPdfFeature = (f: DataServerFeatureId) => f === "data-pdf-table" || f === "data-pdf-ocr";
-/** Bahasa OCR yang didukung server (Tesseract). */
+/** OCR languages supported by the server (Tesseract). */
 export const OCR_LANGS = ["ind+eng", "ind", "eng"] as const;
 export type OcrLang = (typeof OCR_LANGS)[number];
-/** Batas halaman OCR per berkas (sama dengan OCR_MAX_PAGES di layanan Python). */
+/** OCR page limit per file (same as OCR_MAX_PAGES in the Python service). */
 export const OCR_MAX_PAGES = 100;
 
-/** Tanda tangan file (magic bytes) agar file salah ekstensi ditolak sebelum dikirim. */
+/** File signatures (magic bytes) so files with the wrong extension are rejected before sending. */
 export function checkSignature(feature: DataServerFeatureId, head: Uint8Array, name: string): void {
   const hex = Array.from(head.slice(0, 8), (b) => b.toString(16).padStart(2, "0")).join("");
   if (isPdfFeature(feature)) {
@@ -35,8 +35,8 @@ export function checkSignature(feature: DataServerFeatureId, head: Uint8Array, n
 }
 
 /**
- * Perkiraan jumlah halaman PDF dari objek /Type /Page (tanpa parser PDF).
- * Hanya untuk ESTIMASI biaya; jumlah resmi dihitung server. null = tidak diketahui.
+ * Estimates the PDF page count from /Type /Page objects (no PDF parser).
+ * Only for cost ESTIMATES; the official count is computed by the server. null = unknown.
  */
 export function estimatePdfPages(bytes: Uint8Array): number | null {
   let text = "";
@@ -44,7 +44,7 @@ export function estimatePdfPages(bytes: Uint8Array): number | null {
   for (let i = 0; i < bytes.length; i += CHUNK) text += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
   const pages = text.match(/\/Type\s*\/Page(?![a-zA-Z])/g)?.length ?? 0;
   if (pages > 0) return pages;
-  // PDF dengan object stream terkompresi: ambil /Count terbesar dari /Pages.
+  // PDFs with compressed object streams: take the largest /Count from /Pages.
   const counts = [...text.matchAll(/\/Count\s+(\d+)/g)].map((m) => Number(m[1]));
   return counts.length ? Math.max(...counts) : null;
 }

@@ -11,13 +11,13 @@ import { artKeyI } from "./keys";
 import type { Block3D, Hero3D, IBlockRef, ISpec, Motion } from "./spec";
 
 /* ================================================================== */
-/* Mesin template v9 bagian I: ISpec (data) → TemplateContent.          */
+/* v9 template engine part I: ISpec (data) → TemplateContent.           */
 /*                                                                    */
-/* Blok biasa memakai mesin set G apa adanya (section sama persis dan   */
-/* bisa diedit di Desain Halaman). Hero & blok 3D memakai elemen 3D      */
-/* Premium (Three.js dimuat saat terlihat, gambar statis tanpa WebGL),   */
-/* dan setiap halaman diberi animasi CSS bawaan (tanpa library) sesuai   */
-/* gaya `motion`: judul, kartu (berurutan), gambar, dan elemen 3D.       */
+/* Regular blocks use the set G engine as is (exactly the same sections, */
+/* editable in Page Design). Hero & 3D blocks use Premium 3D elements   */
+/* (Three.js loads when visible, a static image without WebGL),         */
+/* and every page gets built-in CSS animations (no library) matching    */
+/* the `motion` style: headings, cards (staggered), images, and 3D elements. */
 /* ================================================================== */
 
 const HERO_3D: Hero3D[] = ["h3-globe", "h3-product", "h3-shape", "h3-particles", "h3-cards"];
@@ -48,7 +48,7 @@ function need<T>(v: T | undefined, what: string, s: ISpec): T {
   return v;
 }
 
-/* ------------------------------ elemen 3D -------------------------- */
+/* ------------------------------ 3D elements -------------------------- */
 
 const label = (c: Ctx, what: string) => `${c.s.brand} — ${what}`;
 
@@ -124,8 +124,8 @@ function tiltEl(c: Ctx, i: number, title: string, text: string, badgeText: strin
 }
 
 /**
- * Teks di atas latar partikel: kolom ditarik ke atas setinggi elemen
- * partikel (margin negatif), jadi tetap satu alur dokumen & responsif.
+ * Text over a particle background: the column is pulled up by the particle
+ * element's height (negative margin), so it stays one document flow & responsive.
  */
 function overlay(kids: (ElementNode | BoxNode)[], h: number, mh: number, name: string): BoxNode {
   const o = col(kids, { gap: 18, name, align: "center" });
@@ -223,7 +223,7 @@ function block3d(c: Ctx, s: ISpec, ref: IBlockRef, name: string): BoxNode {
   const bg = c.bg();
   switch (id) {
     case "x-globe": {
-      // Angka dibungkus baris (bukan Row bersarang) agar struktur Section → Row → isi tetap valid.
+      // Numbers are wrapped in a row (not a nested Row) so the Section → Row → content structure stays valid.
       const nums = col(
         b.stats.map(([n, l]) => col([K.T(L, n, "h3", { size: 34, color: "#ffffff" }), K.P(L, t(l), { size: 14, color: "#94a3b8" })], { gap: 4, name: "Angka", width: 160 })),
         { layout: "row", wrap: true, stackOnMobile: false, gap: 24, align: "start", name: "Daftar angka" },
@@ -283,13 +283,13 @@ const MOTION: Record<Motion, MotionSet> = {
 
 const THREE_TYPES = new Set(["three-globe", "three-product", "three-shape", "three-particles"]);
 const isCardBox = (n: BoxNode) => !n.section && !n.row && /^Kartu|^Sel kartu|^Angka|^Spesifikasi$|^Fitur$/.test(n.name ?? "");
-/** Node yang sudah memakai transform sendiri (mis. polaroid miring) tidak dianimasikan agar posisinya tidak tertimpa. */
+/** Nodes that already use their own transform (e.g. tilted polaroids) are not animated so their position is not overwritten. */
 const hasTransform = (n: ComponentNode) => /transform|rotate|translate/.test(n.advanced?.customCss ?? "");
 
 /**
- * Animasi CSS bawaan untuk satu section: judul h1/h2 & kartu (berurutan)
- * masuk saat terlihat, gambar & elemen 3D memudar masuk. Node yang sudah
- * dianimasikan tidak diturunkan lagi ke anak-anaknya.
+ * Built-in CSS animation for one section: h1/h2 headings & cards (staggered)
+ * enter when visible, images & 3D elements fade in. Nodes already
+ * animated do not pass it down to their children.
  */
 export function applyMotion(sec: BoxNode, m: Motion): void {
   const set = MOTION[m];
@@ -317,11 +317,11 @@ export function applyMotion(sec: BoxNode, m: Motion): void {
   visit(sec, 0);
 }
 
-/* ------------------------------ harga ------------------------------ */
+/* ------------------------------ pricing ------------------------------ */
 
 /**
- * Harga set I (kredit): 25 per halaman + 20 per jenis elemen 3D + bonus
- * kualitas set G (0/5/10 dari item Premium & library), dijepit 60–300.
+ * Set I price (credits): 25 per page + 20 per 3D element kind + the set G
+ * quality bonus (0/5/10 from Premium items & libraries), clamped to 60–300.
  */
 export function showcasePrice(pages: number, threeD: number, bonus: number): number {
   return Math.min(300, Math.max(60, 25 * pages + 20 * threeD + bonus));
@@ -333,7 +333,7 @@ export function showcasePrice(pages: number, threeD: number, bonus: number): num
 export function buildContentI(s: ISpec): TemplateContent {
   const [ink, muted, primary, primaryDark, soft, line] = s.pal;
   const P: Palette = { ink, muted, primary, primaryDark, soft, line };
-  // Efek muncul memakai animasi CSS bawaan (bukan library AOS/Animate).
+  // Entrance effects use built-in CSS animations (not the AOS/Animate libraries).
   const L = K.lookD(P, { ...s.look, fx: {} });
   const defs: TemplatePageDef[] = [K.home(), ...s.pages.map((p) => K.pg(p.key, [slug(p.name[0]), p.name[0]], [slug(p.name[1]), p.name[1]]))];
   const g = s as unknown as GSpec;
@@ -402,7 +402,7 @@ export function buildContentI(s: ISpec): TemplateContent {
   };
 }
 
-/** Jenis elemen 3D yang dipakai satu spesifikasi (hero + semua blok). */
+/** 3D element kinds used by one spec (hero + every block). */
 export function threeTypesOf(s: ISpec): string[] {
   const out = new Set<string>();
   const of: Record<string, string> = { "h3-globe": "three-globe", "x-globe": "three-globe", "h3-product": "three-product", "x-product": "three-product", "h3-shape": "three-shape", "x-shape": "three-shape", "h3-particles": "three-particles", "x-particles": "three-particles", "h3-cards": "card-3d", "x-tilt": "card-3d" };

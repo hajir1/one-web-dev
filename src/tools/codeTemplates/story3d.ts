@@ -4,25 +4,25 @@ import { MOTION_JS } from "./motion3d";
 import { SCRUB_JS } from "./scrub";
 
 /* ================================================================== */
-/* 3D CERITA SCROLL (v22): satu cerita visual per template.              */
+/* 3D SCROLL STORIES (v22): one visual story per template.               */
 /*                                                                    */
-/* Berbeda dengan 3D Motion v18 (satu objek + biodata kode), di sini     */
-/* setiap template punya ADEGAN sendiri yang berubah bentuk mengikuti    */
-/* scroll: komputer kosong yang di-zoom sampai teks keluar dari layarnya,*/
-/* mata kucing yang di-zoom lalu memperlihatkan semesta, palu yang       */
-/* memanggil bata sampai menjadi rumah, dan seterusnya.                  */
+/* Unlike 3D Motion v18 (one object + a code bio), here                 */
+/* each template has its own SCENE that changes shape following        */
+/* the scroll: an empty computer zoomed in until text comes out of its screen, */
+/* a cat's eye zoomed in to reveal a universe, a hammer that            */
+/* summons bricks until they become a house, and so on.                 */
 /*                                                                    */
-/* - three.js  : adegan prosedural (tanpa model/tekstur eksternal).      */
+/* - three.js  : procedural scenes (no external models/textures).        */
 /* - OWD Scrub : men-scrub keadaan adegan (KEYS) per babak  */
-/*               dan efek teks yang terikat scroll (ketik, sapu, zoom).  */
-/* - Motion    : teks per kata/huruf, kartu bertahap, angka, tombol.     */
-/* - Lenis     : gulir halus.                                           */
+/*               and scroll-bound text effects (typing, sweep, zoom).   */
+/* - Motion    : text per word/letter, staggered cards, numbers, buttons. */
+/* - Lenis     : smooth scrolling.                                      */
 /*                                                                    */
-/* Tiap babak (section data-act) punya satu keadaan di KEYS: posisi      */
-/* kamera + nilai cerita (mis. build 0..1, zoom, veil). Adegan membaca   */
-/* nilai itu tiap frame, jadi cerita bisa diputar maju-mundur.           */
-/* Fallback: tanpa WebGL → latar gradasi; tanpa Scrub → keadaan melompat  */
-/* per babak; kurangi gerak → tanpa animasi, semua teks tampil.          */
+/* Each act (a data-act section) has one state in KEYS: position        */
+/* camera + story values (e.g. build 0..1, zoom, veil). Scenes read      */
+/* those values every frame, so the story can play forward and backward. */
+/* Fallback: no WebGL → a gradient background; no Scrub → the state jumps */
+/* per act; reduce motion → no animation, all text shown.              */
 /* ================================================================== */
 
 const path = (u: string) => u.slice(CDNS[0].length);
@@ -41,9 +41,9 @@ export interface StoryAct {
   cards?: { tag?: string; title: string; text: string }[];
   stats?: [string, string][];
   cta?: { label: string; href: string; ghost?: boolean }[];
-  /** Tinggi babak (vh). Bawaan 150. */
+  /** Act height (vh). Default 150. */
   vh?: number;
-  /** Keadaan adegan di babak ini (yang tidak disebut ikut babak sebelumnya). cam/look = [x,y,z]; lainnya angka. */
+  /** Scene state in this act (unmentioned values carry over from the previous act). cam/look = [x,y,z]; others are numbers. */
   key: Record<string, number | number[]>;
 }
 
@@ -57,7 +57,7 @@ export interface StorySpec {
   colors: { bg: string; bg2: string; panel: string; ink: string; inkSoft: string; accent: string; accent2: string; line: string; obj: string; obj2: string; veil: string; dark: boolean };
   config: Record<string, unknown>;
   configLabel: string;
-  /** Babak untuk thumbnail (bawaan 0). */
+  /** Act for the thumbnail (default 0). */
   thumb?: number;
   /** Kode adegan: function scene(ctx) { ...; return { update(S, t, dt) } } */
   scene: string;
@@ -81,7 +81,7 @@ a { color: inherit; }
 
 #gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity 1s; pointer-events: none; }
 html.webgl #gl { opacity: 1; }
-/* Tirai warna: dipakai saat kamera "masuk" ke objek (layar, mata, cangkir), lalu teks muncul dari situ. */
+/* Color curtain: used when the camera "enters" the object (screen, eye, cup), then the text appears from there. */
 #veil { position: fixed; inset: 0; z-index: 1; background: var(--veil); opacity: 0; pointer-events: none; }
 .loader { position: fixed; left: 20px; bottom: 20px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
 html.loading .loader { display: flex; }
@@ -162,7 +162,7 @@ html.no-webgl #gl, html.no-webgl #veil { display: none; }
 const ENGINE = String.raw`
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, M = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -170,11 +170,11 @@ const COL = { bg: cssv("--bg"), bg2: cssv("--bg-2"), ink: cssv("--ink"), accent:
 const acts = Array.prototype.slice.call(document.querySelectorAll("[data-act]"));
 const navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav ul a"));
 const veil = document.getElementById("veil");
-/* Keadaan cerita saat ini (di-tween OWD Scrub di antara KEYS). */
+/* Current story state (tweened by OWD Scrub between KEYS). */
 const S = Object.assign({}, KEYS[0]);
 const animated = !reduce && hasG && !!M;
 
-/* 1) Teks: pecah per kata / huruf. */
+/* 1) Text: split into words / letters. */
 function splitWords(el) {
   const words = el.textContent.trim().split(/\s+/);
   el.setAttribute("aria-label", el.textContent.trim());
@@ -194,7 +194,7 @@ function splitChars(el) {
   return Array.prototype.slice.call(el.querySelectorAll(".c"));
 }
 
-/* 2) Gulir halus + progres + keadaan adegan per babak. */
+/* 2) Smooth scrolling + progress + scene state per act. */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 function setNav(i) { navLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + acts[i].id)); }
@@ -211,19 +211,19 @@ if (animated) {
     lenis.scrollTo(el, { offset: 0, duration: 1.6 });
   });
   G.to(".progress i", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: true } });
-  /* Keadaan babak i dicapai saat babak i naik dari bawah layar sampai 20% dari atas. */
+  /* The state of act i is reached as act i rises from the bottom of the screen to 20% from the top. */
   for (let i = 1; i < acts.length; i++) {
     G.timeline({ scrollTrigger: { trigger: acts[i], start: "top bottom", end: "top 20%", scrub: 1 } })
       .fromTo(S, Object.assign({}, KEYS[i - 1]), Object.assign({}, KEYS[i], { ease: "none", immediateRender: false }));
   }
   acts.forEach((sec, i) => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%", onToggle: (st) => { if (st.isActive) setNav(i); } }));
 } else if ("IntersectionObserver" in window) {
-  /* Tanpa mesin scroll / kurangi gerak: keadaan melompat ke babak yang sedang dibaca. */
+  /* No scroll engine / reduced motion: the state jumps to the act being read. */
   const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { const i = acts.indexOf(e.target); Object.assign(S, KEYS[i]); setNav(i); } }), { rootMargin: "-50% 0px -50% 0px" });
   acts.forEach((s) => io.observe(s));
 }
 
-/* 3) Efek teks per babak (data-fx). */
+/* 3) Text effects per act (data-fx). */
 if (animated) {
   const { animate, inView, stagger } = M;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -240,13 +240,13 @@ if (animated) {
       const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
       inView(sec, () => { animate(c, { opacity: [0, 1], y: [-30, 0], rotate: [-14, 0] }, { delay: stagger(0.02), duration: 0.55, ease }); showRest(0.4); }, { amount: 0.25 });
     } else if (fx === "type") {
-      /* Mengetik mengikuti scroll (seperti keluar dari layar). */
+      /* Typing with the scroll (as if coming out of the screen). */
       const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
       let shown = -1;
       ST.create({ trigger: sec, start: "top 70%", end: "top 15%", scrub: true, onUpdate: (st) => { const n = Math.round(st.progress * c.length); if (n === shown) return; shown = n; c.forEach((x, k) => { x.style.opacity = k < n ? "1" : "0"; }); } });
       inView(head, () => showRest(0.2), { amount: 0.9 });
     } else if (fx === "zoom") {
-      /* Panel membesar dari titik tengah layar (dari dalam objek). */
+      /* The panel grows from the center of the screen (from inside the object). */
       G.fromTo(panel, { scale: 0.18, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: sec, start: "top 85%", end: "top 25%", scrub: true } });
       rest.forEach((el) => { el.style.opacity = ""; });
     } else if (fx === "wipe") {
@@ -300,7 +300,7 @@ function start() {
   const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(4, 8, 6); scene.add(key);
   const rim = new THREE.DirectionalLight(COL.accent, 2.2); rim.position.set(-6, 3, -5); scene.add(rim);
 
-  /* Bantuan untuk adegan. */
+  /* Scene helpers. */
   const textures = [];
   function glow() {
     const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -309,7 +309,7 @@ function start() {
     g.fillStyle = r; g.fillRect(0, 0, 128, 128);
     const t = new THREE.CanvasTexture(c); textures.push(t); return t;
   }
-  /* Kanvas yang bisa digambar ulang (layar, peta, label). */
+  /* Canvases that can be redrawn (screen, map, labels). */
   function paint(w, h, draw) {
     const c = document.createElement("canvas"); c.width = w; c.height = h;
     const g = c.getContext("2d"), tex = new THREE.CanvasTexture(c);
@@ -320,7 +320,7 @@ function start() {
   }
   const mat = (color, o) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.55, metalness: 0.05 }, o || {}));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  /* Potongan progres: 0 sebelum a, 1 setelah b, halus di antaranya. */
+  /* Progress slice: 0 before a, 1 after b, smooth in between. */
   const seg = (v, a, b) => { const x = clamp((v - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
   const lerp = (a, b, k) => a + (b - a) * k;
   let seed = 7;
@@ -339,7 +339,7 @@ function start() {
   const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
   io.observe(canvas);
 
-  /* Kamera dari keadaan: cam (posisi) & look (titik pandang). Layar sempit: mundur & ke tengah. */
+  /* Camera from the state: cam (position) & look (look-at point). Narrow screens: pull back & center. */
   function applyCamera() {
     const narrow = camera.aspect < 0.9, k = narrow ? Math.pow(0.9 / camera.aspect, 0.8) : 1;
     const lx = S.lx * (narrow ? 0.15 : 1);
@@ -416,10 +416,10 @@ function actHtml(s: StorySpec, a: StoryAct, i: number): string {
 </section>`;
 }
 
-/** KEYS datar: setiap babak membawa semua nilai (yang tidak disebut ikut babak sebelumnya). */
+/** Flat KEYS: every act carries every value (unmentioned values carry over from the previous act). */
 export function flatKeys(s: StorySpec) {
   const r = (v: number) => Math.round(v * 1000) / 1000;
-  /* Nilai yang baru disebut di babak belakang: babak sebelumnya memakai nilai pertama itu (mesin scrub butuh semua kunci). */
+  /* Values first mentioned in a later act: earlier acts use that first value (the scrub engine needs every key). */
   const first: Record<string, number | number[]> = { veil: 0, sway: 0.4 };
   for (const a of s.acts) for (const [n, v] of Object.entries(a.key)) if (!(n in first)) first[n] = v;
   let prev: Record<string, number | number[]> = first;
@@ -471,18 +471,18 @@ ${s.acts.map((a, i) => actHtml(s, a, i)).join("\n")}
 <footer><span${ot("merek", "Nama merek")}>${esc(s.brand)}</span><span${ot("catatanKaki", "Catatan kaki")}>${esc(s.footer)}</span></footer>
 <script type="module">
 ${LIB_IMPORTS}
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, halaman tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the page still works. */
 await umd(${JSON.stringify(path(MOTION_JS))}).catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* ==== TEKS DI DALAM ADEGAN 3D: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== TEXT INSIDE THE 3D SCENE: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = ${dataBlock("CONFIG", s.configLabel, s.config)};
 /* ============================================================================ */
 const BRAND = ((document.querySelector(".nav .brand") || {}).textContent || "").trim() || ${JSON.stringify(s.brand)};
-/* Keadaan adegan per babak (urutan sama dengan section data-act). cam/look = kamera. */
+/* Scene state per act (same order as the data-act sections). cam/look = camera. */
 const KEYS = ${JSON.stringify(flatKeys(s))};
 const THUMB = ${s.thumb ?? 0};
 
-/* ---- Adegan 3D (prosedural, tanpa model/tekstur eksternal) ---- */
+/* ---- 3D scene (procedural, no external models/textures) ---- */
 ${s.scene.trim().replace(/^function scene\(/, "function scene_(")}
 ${ENGINE.trim()}
 </script>`;

@@ -5,8 +5,8 @@ import { LANG_LABEL, SUPPORTED_LANGS, switchLangPath, type Lang } from "../../i1
 import { useLang } from "./LocaleLink";
 
 /**
- * Pengalih bahasa ID / EN. Halaman, query (?design=…), dan hash tetap sama;
- * hanya prefix bahasa di URL yang berganti.
+ * ID / EN language switcher. The page, query (?design=…), and hash stay the same;
+ * only the language prefix in the URL changes.
  */
 export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();

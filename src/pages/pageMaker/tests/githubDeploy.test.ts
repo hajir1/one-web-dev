@@ -1,4 +1,4 @@
-// v14: deploy ekspor HTML ke GitHub Pages (API GitHub tiruan).
+// v14: deploy the HTML export to GitHub Pages (fake GitHub API).
 import test from "node:test";
 import assert from "node:assert/strict";
 import { deployFiles, deployToGitHub, GitHubDeployError, pagesUrlOf, sanitizeRepoName, vercelImportUrl } from "../helpers/githubDeploy";
@@ -137,7 +137,7 @@ test("galat GitHub dipetakan ke kode yang jelas", async () => {
   }) as unknown as typeof fetch;
   await assert.rejects(deployToGitHub({ token: "t", repo: "kopi", files: FILES, fetch: network }), (e: unknown) => e instanceof GitHubDeployError && e.code === "network");
   await assert.rejects(deployToGitHub({ token: "  ", repo: "kopi", files: FILES, fetch: network }), (e: unknown) => e instanceof GitHubDeployError && e.code === "token");
-  // Pages gagal diaktifkan (mis. token tanpa izin Pages) → kode "pages", berkas sudah terkirim.
+  // Pages failed to enable (e.g. a token without Pages permission) → code "pages", files already sent.
   assert.equal(
     await code({
       "GET /user": [200, { login: "budi" }],

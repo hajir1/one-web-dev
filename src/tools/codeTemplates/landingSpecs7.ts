@@ -1,7 +1,7 @@
 import type { LandingSpec } from "./landing";
 import { SENIN_JUMAT, SENIN_SABTU, SETIAP, jam, langkah } from "./landingKit";
 
-/* Landing v23, bagian 7: kesehatan & jasa profesional (kategori yang masih sedikit). */
+/* Landing v23, part 7: health & professional services (categories that are still sparse). */
 export const LANDING_7: LandingSpec[] = [
   {
     id: "lp-apotek-sehat-keluarga",

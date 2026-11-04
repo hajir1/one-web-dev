@@ -150,4 +150,4 @@ function TemplateRowView({ tp, onChanged, onDownload }: { tp: TemplateRow; onCha
   );
 }
 
-/* ------------------------------ item katalog ------------------------------ */
+/* ------------------------------ catalog items ------------------------------ */

@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Payung Hujan</title>
 <meta name="description" content="Animasi permintaan maaf: hujan di jalan, payung terbuka, tetes hujan berubah menjadi kelopak bunga, lalu langit cerah dengan pelangi.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #232c3a; /* Latar bawah */
   --bg-2: #3c4a61; /* Latar tengah */
@@ -97,7 +97,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true
@@ -113,10 +113,10 @@ function scene(api) {
       /* Langit cerah menutupi langit hujan. */
       if (clear > 0) { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, rgba("#ffd9a8", clear * 0.9)); gr.addColorStop(0.6, rgba("#ffeccc", clear * 0.85)); gr.addColorStop(1, rgba("#f3f0e2", clear * 0.8)); g.fillStyle = gr; g.fillRect(0, 0, W, H); glowDot(W * 0.82, H * 0.2, u * 26, "#fff3c4", clear * 0.8); }
       if (clear > 0) { const cols = ["#ff6b6b", "#ffa94d", "#ffe066", "#69db7c", "#4dabf7", "#9775fa"]; g.lineWidth = u * 1.6; g.globalAlpha = clear * 0.55; cols.forEach((c, i) => { g.strokeStyle = c; g.beginPath(); g.arc(W / 2, H * 0.92, Math.min(W, H * 1.4) * 0.48 - i * u * 1.6, Math.PI, Math.PI + Math.PI * clear); g.stroke(); }); g.globalAlpha = 1; }
-      /* Jalan basah dan genangan. */
+      /* Wet road and puddles. */
       g.fillStyle = rgba(COL["bg-1"], 1 - clear * 0.6); g.fillRect(0, H * 0.84, W, H * 0.16);
       for (let i = 0; i < 4; i++) { const x = W * (0.15 + i * 0.24), k = ((t * 0.7 + i * 0.3) % 1); g.strokeStyle = rgba(COL.ink, (1 - k) * 0.35 * (1 - clear)); g.lineWidth = 1; g.beginPath(); g.ellipse(x, H * 0.9, k * u * 6, k * u * 1.4, 0, 0, 7); g.stroke(); }
-      /* Payung: tongkat, kanopi yang mengembang. */
+      /* Umbrella: stick and an opening canopy. */
       const ux = W / 2, uy = H * 0.5, R = u * 17;
       g.strokeStyle = COL.ink; g.lineWidth = u * 0.7; g.lineCap = "round";
       g.beginPath(); g.moveTo(ux, uy - R * 0.1); g.lineTo(ux, uy + R * 1.2); g.arc(ux - R * 0.12, uy + R * 1.2, R * 0.12, 0, Math.PI); g.stroke();
@@ -150,16 +150,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -178,7 +178,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -201,7 +201,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

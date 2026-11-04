@@ -4,10 +4,10 @@ import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SECTION_PRESETS } from "../helpers/sectionPresets";
 
-// Regresi: klik "Tambah Section" membuat halaman putih karena thumbnail preset
-// yang berisi elemen (bukan hanya box) membaca `children` dari node elemen.
+// Regression: clicking "Add Section" produced a white page because preset thumbnails
+// containing elements (not just boxes) read `children` from element nodes.
 test("thumbnail semua preset section bisa dirender tanpa error", async () => {
-  // tsx memakai transform JSX klasik di tes: sediakan React global.
+  // tsx uses the classic JSX transform in tests: provide a global React.
   (globalThis as { React?: unknown }).React = React;
   const { ThumbNode } = await import("../engine/ui/ThumbNode");
   for (const p of SECTION_PRESETS) {

@@ -3,16 +3,16 @@ import { isBox } from "../../pageMaker/engine/helpers/componentTypes";
 import type { PageDoc } from "../../pageMaker/helpers/pageDoc";
 
 /* ================================================================== */
-/* Kontras warna otomatis untuk template (WCAG 2 AA)                    */
+/* Automatic color contrast for templates (WCAG 2 AA)                   */
 /*                                                                    */
-/* Setiap warna teks di elemen dipasangkan dengan latarnya:            */
-/*   - field "<x>TextColor"/"<x>Color" ↔ "<x>BgColor" di elemen yang sama,  */
-/*   - "textColor"/"color" ↔ "bgColor" elemen itu,                       */
-/*   - bila elemen transparan: latar box terdekat (bgColor).            */
-/* Bila rasio < 4.5 (3 untuk teks ≥ 24px), warna teks digeser sedikit   */
-/* (lebih gelap di latar terang, lebih terang di latar gelap) sampai    */
-/* lolos; bila teks sudah putih/hitam, latarnya yang digeser. Warna     */
-/* lain (border, bayangan, hover) tidak disentuh.                        */
+/* Each text color in an element is paired with its background:         */
+/*   - field "<x>TextColor"/"<x>Color" ↔ "<x>BgColor" on the same element, */
+/*   - "textColor"/"color" ↔ that element's "bgColor",                   */
+/*   - when the element is transparent: the nearest box background (bgColor). */
+/* When the ratio is < 4.5 (3 for text ≥ 24px), the text color is shifted slightly */
+/* (darker on light backgrounds, lighter on dark backgrounds) until      */
+/* it passes; when the text is already white/black, the background is shifted. Colors */
+/* other things (border, shadow, hover) are left untouched.              */
 /* ================================================================== */
 
 type Rgb = [number, number, number];
@@ -41,16 +41,16 @@ export function contrast(a: Rgb, b: Rgb): number {
   return (x + 0.05) / (y + 0.05);
 }
 
-/** Campur `c` ke arah `to` (0..1). */
+/** Mix `c` toward `to` (0..1). */
 const mix = (c: Rgb, to: Rgb, t: number): Rgb => c.map((v, i) => v + (to[i] - v) * t) as Rgb;
 
-/** Di bawah rasio ini pasangan dianggap salah tebak latar. */
+/** Below this ratio the pair is considered a wrong background guess. */
 const NEAR_MISS = 2;
 
 const BLACK: Rgb = [0, 0, 0];
 const WHITE: Rgb = [255, 255, 255];
 
-/** Geser `c` menjauhi `other` sampai kontras ≥ `min`; null bila tidak mungkin. */
+/** Shifts `c` away from `other` until the contrast is ≥ `min`; null when impossible. */
 function push(c: Rgb, other: Rgb, min: number): Rgb | null {
   const to = lum(other) > 0.18 ? BLACK : WHITE;
   for (let t = 0.04; t <= 1.0001; t += 0.04) {
@@ -60,17 +60,17 @@ function push(c: Rgb, other: Rgb, min: number): Rgb | null {
   return null;
 }
 
-/** Perbaiki pasangan teks/latar; mengembalikan warna baru (atau null bila sudah lolos). */
+/** Fixes a text/background pair; returns the new color (or null when it already passes). */
 export function fixPair(fgHex: string, bgHex: string, min = 4.5): { fg?: string; bg?: string } | null {
   const fg = parse(fgHex);
   const bg = parse(bgHex);
   if (!fg || !bg) return null;
   const now = contrast(fg, bg);
-  // Rasio sangat rendah hampir pasti berarti latar sebenarnya lain (gambar, gradien,
-  // CSS kustom): jangan disentuh. Yang diperbaiki hanya yang "nyaris lolos".
+  // A very low ratio almost certainly means the real background is something else (image, gradient,
+  // custom CSS): do not touch. Only the "nearly passing" ones are fixed.
   if (now >= min || now < NEAR_MISS) return null;
   const nf = push(fg, bg, min);
-  // Teks yang sudah hampir putih/hitam tidak bisa digeser jauh: geser latarnya.
+  // Text that is already nearly white/black cannot be shifted far: shift the background.
   const fgMoved = nf ? Math.max(...nf.map((v, i) => Math.abs(v - fg[i]))) : 999;
   if (nf && fgMoved <= 120) return { fg: toHex(nf) };
   const nb = push(bg, fg, min);
@@ -81,7 +81,7 @@ export function fixPair(fgHex: string, bgHex: string, min = 4.5): { fg?: string;
 const SKIP = /(border|shadow|overlay|glow|outline|ring|divider|line|track|accent|icon|hover|focus|active|placeholder|gradient|stroke|fill|dot|bar)/i;
 const opaque = (v: unknown) => typeof v === "string" && HEX.test(v.trim());
 
-/** Latar box: warna hex, "none" (transparan), atau "unknown" (gambar, gradien, variabel). */
+/** Box background: a hex color, "none" (transparent), or "unknown" (image, gradient, variable). */
 function boxBg(b: BoxNode): string | "none" | "unknown" {
   if (b.bgType && b.bgType !== "solid") return "unknown";
   if ((b as { section?: { bgImage?: string } }).section?.bgImage || b.bgImage) return "unknown";
@@ -96,8 +96,8 @@ function fixElement(el: ElementNode, parentBg: string | null): ElementNode {
   const min = big ? 3 : 4.5;
   const patch: Record<string, string> = {};
   const ownBg = opaque(s.bgColor) ? (s.bgColor as string) : null;
-  // Elemen yang menggambar latarnya lewat field lain (mis. tabel: headerBg, stripeBg) tidak
-  // bisa ditebak: hanya pasangan prefiks yang jelas yang diperiksa.
+  // Elements that draw their background through other fields (e.g. tables: headerBg, stripeBg) cannot
+  // be guessed: only clear prefix pairs are checked.
   const complex = Object.keys(s).some((k) => /^(header|stripe|row|cell|th|td)/i.test(k));
   for (const [k, v] of Object.entries(s)) {
     if (!/Color$/.test(k) || /bg|background/i.test(k) || SKIP.test(k) || !opaque(v)) continue;
@@ -110,7 +110,7 @@ function fixElement(el: ElementNode, parentBg: string | null): ElementNode {
     if (!fix) continue;
     if (fix.fg) patch[k] = fix.fg;
     else if (fix.bg) {
-      // Latar milik elemen ini saja yang boleh digeser (latar box induk dipakai elemen lain).
+      // Only this element's own background may be shifted (the parent box background is used by other elements).
       if (bgKey) patch[bgKey] = fix.bg;
       else if (ownBg) patch.bgColor = fix.bg;
       else {
@@ -125,14 +125,14 @@ function fixElement(el: ElementNode, parentBg: string | null): ElementNode {
 function walk(n: ComponentNode, bg: string | null): ComponentNode {
   if (!isBox(n)) return fixElement(n, bg);
   const own = boxBg(n);
-  // Box dengan gambar/gradien/variabel sebagai latar: warna latar tidak diketahui → isinya hanya
-  // diperiksa terhadap latarnya sendiri.
+  // Boxes with an image/gradient/variable background: the background color is unknown → their content is only
+  // checked against its own background.
   const next = own === "unknown" ? null : own === "none" ? bg : own;
   const kids = n.children.map((c) => walk(c, next));
   return kids.every((k, i) => k === n.children[i]) ? n : { ...n, children: kids };
 }
 
-/** Perbaiki kontras seluruh halaman (latar halaman bawaan putih). */
+/** Fixes the contrast of the whole page (the default page background is white). */
 export function fixPageContrast(doc: PageDoc, pageBg = "#ffffff"): PageDoc {
   const own = boxBg(doc.root);
   const root = walk(doc.root, own === "unknown" ? null : own === "none" ? pageBg : own) as BoxNode;

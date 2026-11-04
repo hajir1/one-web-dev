@@ -4,12 +4,12 @@ export type WidthMode = "auto" | "fixed" | "full";
 export type BgType = BgKind;
 export type HoverTransform = "none" | "lift" | "scale" | "lift-scale";
 type TextTransform = "none" | "uppercase" | "lowercase" | "capitalize";
-/** "blade" = Laravel Blade (markup sama dengan HTML, dibungkus layout & rute Laravel). */
+/** "blade" = Laravel Blade (the same markup as HTML, wrapped in a Laravel layout & routes). */
 export type Framework = "html" | "blade" | "react" | "vue" | "svelte" | "angular";
-/** Tag HTML buat elemen berbasis teks (Text/Heading). */
+/** HTML tags for text-based elements (Text/Heading). */
 export type TextTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p";
 type TextAlign = "left" | "center" | "right" | "justify";
-/** Tipe atribut `type` pada <input>. Cuma dipakai elemen Input. */
+/** The `type` attribute of an <input>. Only used by the Input element. */
 export type InputType =
   | "text"
   | "email"
@@ -19,7 +19,7 @@ export type InputType =
   | "tel"
   | "url";
 
-/** Label tampilan tiap framework — satu sumber kebenaran untuk semua elemen maker. */
+/** Display label for each framework: one source of truth for every element maker. */
 export const FRAMEWORK_LABELS: Record<Framework, string> = {
   html: "HTML",
   blade: "Laravel Blade",
@@ -30,13 +30,13 @@ export const FRAMEWORK_LABELS: Record<Framework, string> = {
 };
 
 /* ------------------------------------------------------------------ */
-/* State dipecah jadi potongan kecil (mixin) yang bisa dirakit sendiri  */
-/* per elemen. Section di PanelStyling bersifat adaptif: field hanya    */
-/* tampil kalau key-nya ada di state, jadi elemen cukup memilih mixin   */
-/* yang relevan (Pick<...>) tanpa harus mengisi field palsu.            */
+/* State is split into small pieces (mixins) that can be assembled      */
+/* per element. Sections in PanelStyling are adaptive: a field only     */
+/* shows when its key exists in the state, so an element only picks the */
+/* relevant mixins (Pick<...>) without filling in fake fields.          */
 /* ------------------------------------------------------------------ */
 
-/** Ukuran, padding, background, border, shadow — "kotak" CSS pada umumnya. */
+/** Size, padding, background, border, shadow: the usual CSS "box". */
 export interface BoxStyle {
   widthMode: WidthMode;
   width: number;
@@ -58,7 +58,7 @@ export interface BoxStyle {
   gradientFrom: string;
   gradientTo: string;
   gradientAngle: number;
-  /* Field background tambahan (opsional; lihat helpers/background.ts). */
+  /* Extra background fields (optional; see helpers/background.ts). */
   gradientKind?: BgFields["gradientKind"];
   gradientVia?: string;
   bgImage?: string;
@@ -86,12 +86,12 @@ export interface BoxStyle {
   cursor: string;
 }
 
-/** Gaya teks — dipakai elemen apa pun yang punya teks. */
+/** Text style: used by any element that has text. */
 export interface TypographyStyle {
-  /** String CSS font-family dari pustaka font global; kosong/undefined = warisi. */
+  /** CSS font-family string from the global font library; empty/undefined = inherit. */
   fontFamily?: string;
   fontSize: number;
-  /** Ukuran cair: `fontSize` di desktop, mengecil mulus sampai layar HP (clamp). */
+  /** Fluid size: `fontSize` on desktop, shrinking smoothly down to phone screens (clamp). */
   fluidType?: boolean;
   fontWeight: number;
   letterSpacing: number;
@@ -101,20 +101,20 @@ export interface TypographyStyle {
 }
 
 /**
- * `font-size` sebuah gaya teks. Ukuran cair: rem + vw di antara layar 360px
- * dan 1280px; di HP sekitar 72% dari ukuran desktop (minimal 18px).
+ * The `font-size` of a text style. Fluid size: rem + vw between 360px
+ * and 1280px screens; on phones about 72% of the desktop size (at least 18px).
  */
 export function fontSizeCss(s: Pick<TypographyStyle, "fontSize" | "fluidType">): string {
   const max = s.fontSize;
   if (!s.fluidType || max < 22) return `${max}px`;
-  // Judul kecil hampir tetap; judul besar mengecil lebih banyak (setara ukuran HP lama 72%).
+  // Small headings stay nearly fixed; large headings shrink more (equivalent to the old 72% phone size).
   const min = Math.max(18, Math.round(max <= 28 ? max * 0.85 : max <= 64 ? max * 0.72 : 46 + (max - 64) * 0.25));
   const slope = (max - min) / 920;
   const r = (n: number) => Math.round(n * 1000) / 1000;
   return `clamp(${r(min / 16)}rem, ${r((min - slope * 360) / 16)}rem + ${r(slope * 100)}vw, ${r(max / 16)}rem)`;
 }
 
-/** Transisi + state hover — dipakai elemen yang interaktif/bisa di-hover. */
+/** Transition + hover state: used by interactive/hoverable elements. */
 interface InteractionStyle {
   transitionDuration: number;
   transitionEasing: string;
@@ -133,7 +133,7 @@ interface InteractionStyle {
   hoverShadowOpacity: number;
 }
 
-/** Ikon dari pustaka global — dipakai elemen yang bisa dikasih ikon. */
+/** Icon from the global library: used by elements that can have an icon. */
 interface IconStyle {
   iconId: string | null;
   iconPosition: "left" | "right";
@@ -142,7 +142,7 @@ interface IconStyle {
   iconColorMode: "currentColor" | "original";
 }
 
-/** Potongan shadow saja (mis. untuk Table, Image). */
+/** Shadow fragment only (e.g. for Table, Image). */
 export type ShadowStyle = Pick<
   BoxStyle,
   | "shadowEnabled"
@@ -155,7 +155,7 @@ export type ShadowStyle = Pick<
 >;
 
 /**
- * Gabungan buat elemen "konten tunggal": satu teks + satu ikon opsional
+ * Combination for "single content" elements: one text + one optional icon
  * (Button, Alert, Text, Anchor, Input, Badge).
  */
 export interface StyleState
@@ -164,9 +164,9 @@ export interface StyleState
     InteractionStyle,
     IconStyle {
   text: string;
-  /** Opsional: dipakai elemen Text untuk pilih h1-h6/p. */
+  /** Optional: used by the Text element to choose h1-h6/p. */
   tag?: TextTag;
-  /** Opsional: dipakai elemen Input untuk pilih type="text|email|...". */
+  /** Optional: used by the Input element to choose type="text|email|...". */
   inputType?: InputType;
 }
 
@@ -175,9 +175,9 @@ export interface StyleState
 /* ------------------------------------------------------------------ */
 
 /**
- * Warna + opacity. Hex (#rgb/#rrggbb) dikonversi ke rgba(); warna lain
- * (transparent, rgb(), nama warna) memakai color-mix() supaya tidak lagi
- * menghasilkan "rgba(NaN, NaN, NaN, …)" seperti sebelumnya.
+ * Color + opacity. Hex (#rgb/#rrggbb) is converted to rgba(); other colors
+ * (transparent, rgb(), color names) use color-mix() so they no longer
+ * produce "rgba(NaN, NaN, NaN, …)" as before.
  */
 export function hexToRgba(color: string, opacityPct: number): string {
   const pct = Math.min(Math.max(Number(opacityPct) || 0, 0), 100);
@@ -215,7 +215,7 @@ export function paddingCss(s: PaddingLike): string {
   return `${s.paddingTop}px ${s.paddingRight}px ${s.paddingBottom}px ${s.paddingLeft}px`;
 }
 
-/** Nilai padding per sisi (memperhitungkan mode "sama rata"). */
+/** Padding value per side (accounts for the "uniform" mode). */
 export function paddingSides(s: PaddingLike) {
   const t = s.paddingTop;
   return s.paddingLinked
@@ -245,7 +245,7 @@ export function widthCss(s: { widthMode: WidthMode; width: number }): string {
       : "";
 }
 
-/** Baris `box-shadow: ...;` (atau string kosong). `prefix` = "shadow" / "hoverShadow" / dst. */
+/** A `box-shadow: ...;` line (or an empty string). `prefix` = "shadow" / "hoverShadow" / etc. */
 export function shadowLine(
   s: object,
   prefix = "shadow",
@@ -255,7 +255,7 @@ export function shadowLine(
   return v ? `  ${property}: ${v};\n` : "";
 }
 
-/** Nilai box-shadow saja (tanpa nama properti) atau "" kalau nonaktif. */
+/** The box-shadow value only (no property name), or "" when disabled. */
 export function shadowValue(s: object, prefix = "shadow"): string {
   const o = s as Record<string, unknown>;
   if (`${prefix}Enabled` in o && !o[`${prefix}Enabled`]) return "";
@@ -278,7 +278,7 @@ export function transformCss(t: HoverTransform): string {
   }
 }
 
-/** text-align → justify-content (untuk flex). */
+/** text-align → justify-content (for flex). */
 function alignToJustify(a: TextAlign | "left" | "center" | "right"): string {
   return a === "center"
     ? "center"
@@ -290,13 +290,13 @@ function alignToJustify(a: TextAlign | "left" | "center" | "right"): string {
 }
 
 /**
- * Escape untuk TEKS & NILAI ATRIBUT di semua template yang di-generate
- * (HTML, JSX, Vue, Svelte, Angular). Selain karakter HTML biasa, kurung
- * kurawal juga di-escape karena `{` memicu ekspresi di JSX/Svelte dan
- * `{{` memicu interpolasi di Vue/Angular — sebelumnya teks seperti
- * "Halo {nama}" membuat kode React hasil export error. `@` juga di-escape
- * karena memulai control-flow block di template Angular 17+ (mis. teks
- * "john@example.com" membuat template Angular gagal compile).
+ * Escaping for TEXT & ATTRIBUTE VALUES in every generated template
+ * (HTML, JSX, Vue, Svelte, Angular). Besides the usual HTML characters, curly
+ * braces are escaped too because `{` starts an expression in JSX/Svelte and
+ * `{{` starts interpolation in Vue/Angular; previously text such as
+ * "Halo {nama}" broke the exported React code. `@` is escaped too
+ * because it starts a control-flow block in Angular 17+ templates (e.g. the text
+ * "john@example.com" made the Angular template fail to compile).
  */
 export function escapeHtml(str: string): string {
   return String(str)
@@ -311,30 +311,30 @@ export function escapeHtml(str: string): string {
 }
 
 /**
- * Escape untuk isi TEKS (bukan atribut): kutip dibiarkan apa adanya supaya
- * kode hasil export tetap enak dibaca ("Jum'at", "kata "kunci"").
+ * Escaping for TEXT content (not attributes): quotes are left as is so
+ * the exported code stays readable ("Jum'at", "kata "kunci"").
  */
 export function escapeText(str: string): string {
   return escapeHtml(str).replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 }
 
-/** Hanya izinkan URL yang aman untuk href/src (blok javascript:, data:text/html, dst). */
+/** Only allows URLs that are safe for href/src (blocks javascript:, data:text/html, etc.). */
 export function safeUrl(url: string, fallback = "#"): string {
   const u = String(url ?? "").trim();
   if (!u) return fallback;
-  // eslint-disable-next-line no-control-regex -- karakter kontrol sengaja dibuang sebelum cek skema URL
+  // eslint-disable-next-line no-control-regex -- control characters are deliberately stripped before the URL scheme check
   if (/^(javascript|vbscript|data):/i.test(u.replace(/[\s\u0000-\u001f]/g, "")))
     return /^data:image\//i.test(u) ? u : fallback;
   return u;
 }
 
 
-/** Menghasilkan CSS lengkap (base + hover + ikon) untuk elemen StyleState. */
+/** Produces the full CSS (base + hover + icon) for a StyleState element. */
 export function generateCss(
   s: StyleState,
   className: string,
   hasIcon: boolean = false,
-  /** Paksa tata letak flex walau tanpa ikon (mis. Alert dengan tombol tutup). */
+  /** Forces a flex layout even without an icon (e.g. an Alert with a close button). */
   flex: boolean = hasIcon,
 ): string {
   const displayLines = flex

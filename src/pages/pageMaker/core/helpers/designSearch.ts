@@ -1,4 +1,4 @@
-/** Cari desain berdasarkan nama: tanpa beda huruf besar/kecil & aksen, semua kata harus cocok. */
+/** Searches designs by name: case & accent insensitive, every word must match. */
 export function filterDesigns<T extends { name: string }>(designs: T[], query: string): T[] {
   const norm = (v: string) => v.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const words = norm(query).split(/\s+/).filter(Boolean);

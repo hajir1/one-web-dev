@@ -1,4 +1,4 @@
-// v12: mode demo (frontend tanpa backend, VITE_API_BASE_URL=off). v13: semua template katalog. v15: tanpa batas.
+// v12: demo mode (frontend without a backend, VITE_API_BASE_URL=off). v13: every catalog template. v15: no limits.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { apiConfig, configureApi, resolveApiBase } from "../../pages/media/processing/apiConfig";
@@ -23,7 +23,7 @@ import { CODE_TEMPLATE_IDS } from "../../pages/webTemplates/codeTemplates/catalo
 
 const icons = makeIconLookup([]);
 
-/** Jalankan `fn` dengan backend dimatikan (mode demo), lalu pulihkan. */
+/** Runs `fn` with the backend turned off (demo mode), then restores it. */
 async function inDemo<T>(fn: () => T | Promise<T>): Promise<T> {
   const prev = apiConfig.baseUrl;
   configureApi({ baseUrl: null });
@@ -45,7 +45,7 @@ test("mode demo aktif hanya bila backend tidak dikonfigurasi (VITE_API_BASE_URL=
 });
 
 const ALL = TEMPLATE_CATALOG.length;
-/** v16–v18: katalog demo = template Desain Halaman + 37 Template Kode. */
+/** v16–v18: demo catalog = Page Design templates + 37 Code Templates. */
 const CODE = CODE_TEMPLATE_IDS.length;
 const SHOWN = ALL + CODE;
 
@@ -57,8 +57,8 @@ test("template demo = SEMUA template katalog: unik, isinya tersedia, termasuk se
   for (const id of DEMO_TEMPLATE_IDS) assert.ok(ids.has(id), `${id} tidak ada di katalog`);
   for (const t of TEMPLATE_CATALOG.filter((x) => x.tier === "free")) assert.ok(DEMO_TEMPLATE_IDS.includes(t.id), `template Free ${t.id} hilang`);
   assert.equal(demoTemplateList("id").length, SHOWN, "semua template demo punya konten");
-  assert.equal(CODE, 237);
-  // Unggahan terakhir (label "Terbaru") paling atas, lalu Template Kode, lalu template lain.
+  assert.equal(CODE, 277);
+  // The last upload ("Latest" label) on top, then Code Templates, then other templates.
   const list = demoTemplateList("id");
   const latest = LATEST_TEMPLATE_IDS.length;
   assert.deepEqual(list.slice(0, latest).map((t) => t.refId), [...LATEST_TEMPLATE_IDS], "template terbaru paling atas");
@@ -70,7 +70,7 @@ test("template demo = SEMUA template katalog: unik, isinya tersedia, termasuk se
 test("konten demo hasil generator identik dengan sumber template (id & en) dan lengkap", async () => {
   assert.deepEqual(Object.keys(DEMO_LOADERS).sort(), [...DEMO_TEMPLATE_IDS].sort());
   assert.deepEqual(Object.keys(DEMO_PAGES).sort(), [...DEMO_TEMPLATE_IDS].sort());
-  // ID node acak per pembangunan → disamakan sebelum dibandingkan.
+  // Random node IDs per build → normalized before comparing.
   const norm = (s: string) => {
     const m = new Map<string, string>();
     return s.replace(/n-\d+-[a-z0-9]+/g, (x) => m.get(x) ?? (m.set(x, `N${m.size}`), m.get(x)!));
@@ -108,7 +108,7 @@ test("halaman katalog demo: paginasi, filter kategori & cari, tab Premium kosong
   assert.equal(page({ tier: "premium" }).total, 0);
   const q = page({ q: "kopi" });
   assert.ok(q.total > 0 && q.total < SHOWN);
-  for (const [cat, n] of [["invitation", 35], ["animation", 27]] as const) assert.equal(page({ category: cat, limit: 100 }).total, n, cat);
+  for (const [cat, n] of [["invitation", 50], ["animation", 37]] as const) assert.equal(page({ category: cat, limit: 100 }).total, n, cat);
   const byName = page({ sort: "name", limit: SHOWN }).templates.map((t) => t.name);
   assert.deepEqual(byName, [...byName].sort((a, b) => a.localeCompare(b)));
 });
@@ -118,7 +118,7 @@ test("isi template demo dibangun di browser dan dicatat sumbernya", async () => 
   assert.ok(pages.length >= 1 && pages.some((p) => p.home));
   assert.ok(pages.every((p) => p.doc.source?.templateId === "company-starter"));
   await assert.rejects(() => demoAcquire({ id: "bukan-demo", version: 1 }, "id"));
-  // acquireTemplate (dipakai halaman Template) tidak memanggil server di mode demo.
+  // acquireTemplate (used by the Templates page) does not call the server in demo mode.
   const viaAcquire = await inDemo(() => acquireTemplate({ id: "shop-starter", version: 1 }, "en"));
   assert.ok(viaAcquire.length > 0 && viaAcquire.every((p) => p.doc.source?.templateId === "shop-starter"));
 });
@@ -136,9 +136,9 @@ test("pratinjau demo: HTML mandiri per halaman (CSS disisipkan) + navigasi antar
   const thumb = await demoPreview("company-starter", "id", icons, true);
   assert.ok(thumb && Object.keys(thumb.html).length >= 1);
   assert.equal(await demoPreview("bukan-demo", "id", icons), null);
-  // v16: Template Kode tidak dibangun sebagai pohon Desain Halaman.
+  // v16: Code Templates are not built as Page Design trees.
   await assert.rejects(() => demoAcquire({ id: CODE_TEMPLATE_IDS[0], version: 1 }, "id"), /CODE_TEMPLATE/);
-  // Template berbasis spesifikasi (set G/H/I) juga dimuat dari chunk set-nya.
+  // Spec-based templates (sets G/H/I) are also loaded from their set chunk.
   const spec = await demoPreview(DEMO_TEMPLATE_IDS[DEMO_TEMPLATE_IDS.length - 1], "en", icons, true);
   assert.ok(spec && Object.keys(spec.html).length === 1);
 });
@@ -168,7 +168,7 @@ test("dokumentasi demo: topik Kredit, Paket & Konversi Server disembunyikan", as
 });
 
 test("v15: demo tanpa batas folder website, desain, dan Tur 360°; gerbang kredit tidak pernah terbuka", async () => {
-  // Paket gratis produksi tidak berubah.
+  // The production free pack is unchanged.
   assert.equal(FREE_SITES, 2);
   assert.equal(MAX_DESIGNS, 10);
   const acc = emptyAccount();
@@ -177,7 +177,7 @@ test("v15: demo tanpa batas folder website, desain, dan Tur 360°; gerbang kredi
   assert.equal(siteLimit(), useMarketStore.getState().account.limits.sites.max);
   assert.equal(maxDesigns(), useMarketStore.getState().account.limits.designs.max);
   assert.equal(vrCap(VR_LIMITS.proScenes), VR_LIMITS.proScenes);
-  // Mode demo: tanpa batas.
+  // Demo mode: unlimited.
   assert.equal(await inDemo(siteLimit), UNLIMITED_LIMIT);
   assert.equal(await inDemo(maxDesigns), UNLIMITED_LIMIT);
   assert.equal(await inDemo(() => vrCap(VR_LIMITS.maxTours)), Infinity);

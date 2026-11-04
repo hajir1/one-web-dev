@@ -34,10 +34,10 @@ test("grid: tablet 2 kolom, HP 2 kolom / geser, selang-seling & hover", () => {
   assert.match(css, /> \* \{\s*scroll-snap-align: start;/);
   assert.match(css, /@media \(min-width: 1025px\) \{[\s\S]*> :nth-child\(2n\) \{\s*position: relative;\s*top: 40px;/);
   assert.match(css, /@media \(hover: hover\)[\s\S]*:hover \{\s*translate: 0 -6px;/);
-  // Tiga kolom berisi tiga kartu tetap tiga kolom di tablet (tanpa kartu yatim).
+  // Three columns with three cards stay three columns on tablets (no orphan cards).
   const tablet = css.slice(css.indexOf("max-width: 1024px"));
   assert.equal((tablet.slice(0, tablet.indexOf("@media")).match(/repeat\(2/g) ?? []).length, 1);
-  // Properti baru tersimpan lewat normalisasi dokumen.
+  // New properties are kept through document normalization.
   const doc = normalizeDoc({ version: 2, root });
   const [ng] = doc.root.children;
   assert.equal(ng.mobileGrid, "scroll");

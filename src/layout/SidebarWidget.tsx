@@ -7,7 +7,7 @@ import { FREE_EXPORTS } from "../credits/downloadQuota";
 import { isDemoMode } from "../demo/demoMode";
 import { DEMO_TEMPLATE_COUNT } from "../demo/demoTemplateIds";
 
-/** Mode demo (v12, v15: tanpa batas): ringkasan demo, tanpa tautan kredit. */
+/** Demo mode (v12, v15: unlimited): demo summary, no credit links. */
 function DemoWidget() {
   const { t } = useTranslation();
   return (
@@ -26,7 +26,7 @@ function DemoWidget() {
   );
 }
 
-/** Ringkasan paket gratis + tautan ke halaman Credits. */
+/** Free plan summary + link to the Credits page. */
 export default function SidebarWidget() {
   const { t } = useTranslation();
   if (isDemoMode()) return <DemoWidget />;

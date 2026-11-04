@@ -1,10 +1,10 @@
 /* ================================================================== */
-/* Aset gambar template (SVG buatan sendiri, tanpa lisensi pihak ketiga) */
+/* Template image assets (in-house SVG, no third-party licenses)        */
 /*                                                                    */
-/* Di aplikasi, gambar dipakai sebagai data URI agar pratinjau & Page    */
-/* Maker bekerja tanpa server. Saat diunduh, setiap data URI diubah      */
-/* menjadi berkas assets/img/<nama>.svg (lihat exportTemplate.ts).       */
-/* SVG hanya berisi karakter ASCII.                                      */
+/* In the app, images are used as data URIs so the preview & Page       */
+/* Maker work without a server. On download, every data URI is turned   */
+/* into an assets/img/<name>.svg file (see exportTemplate.ts).          */
+/* SVGs contain ASCII characters only.                                  */
 /* ================================================================== */
 
 import { EXTRA_SOURCES } from "./assetsExtra";
@@ -113,7 +113,7 @@ function boutiqueBanner(): string {
   );
 }
 
-/* ------------------------------- produk ----------------------------- */
+/* ------------------------------- products ----------------------------- */
 
 type ProductShape = "bag" | "mug" | "beans" | "dripper" | "tumbler" | "cookie" | "shirt" | "dress" | "sneaker" | "tote" | "watch" | "hat";
 
@@ -214,7 +214,7 @@ export const ASSET_NAMES = Object.keys(SOURCES);
 const cacheSvg = new Map<string, string>();
 const cacheUri = new Map<string, string>();
 
-/** Isi SVG sebuah aset. */
+/** SVG content of an asset. */
 export function assetSvg(name: string): string {
   let s = cacheSvg.get(name);
   if (s === undefined) {
@@ -226,7 +226,7 @@ export function assetSvg(name: string): string {
   return s;
 }
 
-/** Data URI (base64) sebuah aset — dipakai di state elemen. */
+/** An asset's data URI (base64), used in element state. */
 export function asset(name: string): string {
   let u = cacheUri.get(name);
   if (u === undefined) {
@@ -236,7 +236,7 @@ export function asset(name: string): string {
   return u;
 }
 
-/** Peta balik data URI → nama aset (untuk mengubahnya menjadi berkas saat diunduh). */
+/** Reverse map data URI → asset name (to turn it into a file on download). */
 export function assetNameOf(uri: string): string | null {
   for (const name of ASSET_NAMES) if (asset(name) === uri) return name;
   return null;

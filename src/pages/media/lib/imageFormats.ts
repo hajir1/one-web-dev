@@ -1,11 +1,11 @@
 // ─── lib/imageFormats.ts ─────────────────────────────────────────────────────
-// Penulis format gambar sederhana yang tidak butuh codec WASM: BMP (32-bit
-// dengan alpha) dan ICO (berisi beberapa ukuran PNG). Murni (tanpa DOM),
-// dipakai di Web Worker dan diuji di Node.
+// Simple image format writers that need no WASM codec: BMP (32-bit
+// with alpha) and ICO (containing several PNG sizes). Pure (no DOM),
+// used in a Web Worker and tested in Node.
 
 type Rgba = Uint8ClampedArray | Uint8Array;
 
-/** BMP 32-bit BGRA (header BITMAPV4 agar alpha terbaca di Windows & browser). */
+/** 32-bit BGRA BMP (BITMAPV4 header so alpha is read on Windows & in browsers). */
 export function encodeBmp(rgba: Rgba, width: number, height: number): ArrayBuffer {
   const FILE_HEADER = 14;
   const INFO_HEADER = 108; // BITMAPV4HEADER
@@ -22,7 +22,7 @@ export function encodeBmp(rgba: Rgba, width: number, height: number): ArrayBuffe
   const o = FILE_HEADER;
   v.setUint32(o, INFO_HEADER, true);
   v.setInt32(o + 4, width, true);
-  v.setInt32(o + 8, height, true); // positif = baris dari bawah ke atas
+  v.setInt32(o + 8, height, true); // positive = rows from bottom to top
   v.setUint16(o + 12, 1, true); // planes
   v.setUint16(o + 14, 32, true); // bit per piksel
   v.setUint32(o + 16, 3, true); // BI_BITFIELDS
@@ -34,7 +34,7 @@ export function encodeBmp(rgba: Rgba, width: number, height: number): ArrayBuffe
   v.setUint32(o + 48, 0x000000ff, true); // mask B
   v.setUint32(o + 52, 0xff000000, true); // mask A
   v.setUint32(o + 56, 0x73524742, true); // LCS_sRGB "sRGB"
-  // Piksel (BGRA, baris bawah lebih dulu)
+  // Pixels (BGRA, bottom row first)
   const out = new Uint8Array(buf, FILE_HEADER + INFO_HEADER);
   for (let y = 0; y < height; y++) {
     const src = (height - 1 - y) * rowBytes;
@@ -56,8 +56,8 @@ export interface RgbaImage {
 }
 
 /**
- * Perkecil/perbesar ke kotak `size×size` dengan rasio tetap (sisa transparan).
- * Rata-rata area saat mengecilkan (tajam untuk ikon), bilinear saat membesarkan.
+ * Scales down/up into a `size×size` box with a fixed ratio (the rest transparent).
+ * Area averaging when shrinking (sharp for icons), bilinear when enlarging.
  */
 export function fitSquare(src: RgbaImage, size: number): Uint8ClampedArray {
   const out = new Uint8ClampedArray(size * size * 4);
@@ -84,7 +84,7 @@ export function fitSquare(src: RgbaImage, size: number): Uint8ClampedArray {
           for (let xx = x0; xx < x1 && xx < src.width; xx++) {
             const i = (yy * src.width + xx) * 4;
             const al = src.data[i + 3];
-            // Premultiplied agar tepi transparan tidak menjadi gelap.
+            // Premultiplied so transparent edges do not turn dark.
             r += src.data[i] * al;
             g += src.data[i + 1] * al;
             b += src.data[i + 2] * al;
@@ -127,12 +127,12 @@ export function fitSquare(src: RgbaImage, size: number): Uint8ClampedArray {
   return out;
 }
 
-/** Ukuran ICO yang diizinkan (ICO menyimpan 1–256 px per sisi). */
+/** Allowed ICO sizes (ICO stores 1–256 px per side). */
 export const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256] as const;
 
 /**
- * ICO berisi beberapa ukuran, masing-masing PNG (didukung Windows Vista+ dan
- * semua browser). `encodePng` disuntikkan agar modul ini tetap murni.
+ * An ICO containing several sizes, each a PNG (supported on Windows Vista+ and
+ * every browser). `encodePng` is injected so this module stays pure.
  */
 export async function encodeIco(src: RgbaImage, sizes: number[], encodePng: (img: ImageData) => Promise<ArrayBuffer>): Promise<ArrayBuffer> {
   const list = [...new Set(sizes.filter((s) => s >= 1 && s <= 256).map(Math.round))].sort((a, b) => a - b);
@@ -147,7 +147,7 @@ export async function encodeIco(src: RgbaImage, sizes: number[], encodePng: (img
   const buf = new ArrayBuffer(total);
   const v = new DataView(buf);
   v.setUint16(0, 0, true);
-  v.setUint16(2, 1, true); // 1 = ikon
+  v.setUint16(2, 1, true); // 1 = icon
   v.setUint16(4, list.length, true);
   let offset = headerBytes;
   list.forEach((s, i) => {

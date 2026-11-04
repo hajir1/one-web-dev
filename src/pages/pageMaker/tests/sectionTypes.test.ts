@@ -31,7 +31,7 @@ import { isBox } from "../engine/helpers/componentTypes";
 import { makeIconLookup } from "../core/helpers/elementDefinition";
 
 const icons = makeIconLookup([]);
-/** Kerangka box (nama & layout) tanpa id — untuk membandingkan struktur. */
+/** Box skeleton (name & layout) without ids, to compare structure. */
 const shape = (n) => (isBox(n) ? { name: n.name, layout: n.layout, columns: n.columns, kids: n.children.filter(isBox).map(shape) } : null);
 const rowsInside = (n) => {
   let c = 0;
@@ -92,7 +92,7 @@ test("Section Spesialisasi: kolom spesial berisi baris dalam, tanpa Row bersaran
     });
     assert.equal(rowsInside(row), 0, "Row tidak boleh bersarang");
     assert.equal(countElements(s), 0);
-    // aturan struktur halaman tidak mengubah apa pun
+    // the page structure rules change nothing
     const root = createPageRoot([s]);
     assert.deepEqual(shape(enforcePageStructure(root).children[0]), shape(s));
   }
@@ -113,7 +113,7 @@ test("tipe section tersimpan & dimuat ulang (normalizePageDoc)", () => {
   const doc = { version: 2, root: createPageRoot([createRegularSection("2"), createSpecialtySection("1_4-3_4s"), createFullwidthSection()]) };
   const back = normalizePageDoc(JSON.parse(JSON.stringify(doc)));
   assert.deepEqual(back.root.children.map((s) => s.section.sectionType), ["regular", "specialty", "fullwidth"]);
-  // nilai asing dibuang, section lama tanpa tanda = reguler
+  // unknown values are dropped, old sections without a marker = regular
   const bad = JSON.parse(JSON.stringify(doc));
   bad.root.children[0].section.sectionType = "<x>";
   const b2 = normalizePageDoc(bad);
@@ -127,9 +127,9 @@ test("pustaka preset: yang ditambahkan = yang digambar (presetTree), dengan & ta
       assert.deepEqual(shape(createSectionForEditor(p, withContent)), shape(presetTree(p, withContent)), `${p.id} ${withContent}`);
       assert.equal(countElements(createSectionForEditor(p, withContent)), countElements(presetTree(p, withContent)), p.id);
     }
-    // tanpa centang: kerangka kosong
+    // without the tick: an empty skeleton
     assert.equal(countElements(presetTree(p, false)), 0, p.id);
-    // dengan centang: SEMUA preset kini berisi contoh (dulu 22 preset dasar kosong)
+    // with the tick: EVERY preset now has samples (previously 22 base presets were empty)
     assert.ok(countElements(presetTree(p, true)) > 0, `${p.id} punya contoh isi`);
   }
 });
@@ -141,7 +141,7 @@ test("contoh isi preset dasar tidak mengubah kerangka Row & kolomnya", () => {
     const full = p.build();
     const empty = p.buildEmpty();
     assert.deepEqual(full.children.map((r) => r.name), empty.children.map((r) => r.name), p.id);
-    // setiap kolom bernama dari kerangka kosong ikut terisi
+    // every named column from the empty skeleton is filled too
     full.children.forEach((r, i) => {
       const er = empty.children[i];
       if (er.children.length === 0) assert.ok(r.children.length > 0, `${p.id}/${r.name}`);

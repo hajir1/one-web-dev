@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ilustrasi tambahan (SVG buatan sendiri, ASCII, tanpa lisensi pihak    */
-/* ketiga) untuk preset section Pro dan 16 template baru. Setiap fungsi  */
-/* menerima warna sehingga satu bentuk bisa punya banyak identitas.      */
+/* Extra illustrations (in-house SVG, ASCII, no third-party             */
+/* licenses) for the Pro section presets and 16 new templates. Each function */
+/* takes colors so one shape can have many identities.                  */
 /* ================================================================== */
 
 const svg = (w: number, h: number, body: string) =>
@@ -50,7 +50,7 @@ function house(bg: string, wall: string, roof: string, glass: string): string {
   );
 }
 
-/** Piring tampak atas (restoran). */
+/** Plate seen from above (restaurant). */
 function dish(bg: string, plate: string, a: string, b: string): string {
   return svg(
     1000,
@@ -120,7 +120,7 @@ function books(bg: string, a: string, b: string, c: string): string {
   );
 }
 
-/** Panggung acara (event). */
+/** Event stage. */
 function stage(bg1: string, bg2: string, light: string, crowd: string): string {
   let heads = "";
   for (let i = 0; i < 16; i++) heads += `<circle cx="${50 + i * 75}" cy="${700 + (i % 2) * 18}" r="38" fill="${crowd}"/>`;

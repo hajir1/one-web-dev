@@ -5,7 +5,7 @@ import LanguageSwitcher from "../../components/app/LanguageSwitcher";
 import { Link } from "../../components/app/LocaleLink";
 import ThemeToggle from "../../components/app/ThemeToggle";
 
-/** Kerangka halaman Masuk / Daftar (tanpa sidebar). */
+/** Sign-in / Sign-up page shell (no sidebar). */
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   return (
@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </header>
       <main className="flex flex-1 items-start justify-center px-4 pb-12 pt-6 sm:items-center sm:pt-0">
         <div className="w-full max-w-md">
-          {/* v9: ikon "1" di atas kartu Masuk/Daftar. */}
+          {/* v9: the "1" icon above the Sign-in/Sign-up card. */}
           <BrandMark className="mx-auto mb-4 h-12 w-12 drop-shadow-sm" />
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8 dark:border-gray-800 dark:bg-gray-900">{children}</div>
         </div>

@@ -6,30 +6,30 @@ import { MOTION_SPECS_DATA } from "./motionSpecs";
 import { SCRUB_JS } from "./scrub";
 
 /* ================================================================== */
-/* Kategori 3D MOTION (v18): satu objek 3D yang "bercerita" saat scroll. */
-/* Library: three (WebGL) + OWD Scrub (scroll) + Motion (teks,  */
-/* angka, tombol) + Lenis (gulir halus), semuanya dari CDN, versi        */
+/* 3D MOTION category (v18): one 3D object that "tells a story" on scroll. */
+/* Libraries: three (WebGL) + OWD Scrub (scroll) + Motion (text, */
+/* numbers, buttons) + Lenis (smooth scrolling), all from a CDN, versions */
 /* dipatok.                                                            */
 /*                                                                    */
-/* Alur tiap template (contoh PC): objek kecil di hero → saat scroll     */
-/* objek membesar dan layarnya MENGETIK biodata dalam bentuk kode →      */
-/* objek bergeser dan kalimat muncul kata demi kata → kartu, angka,     */
+/* Each template's flow (PC example): a small object in the hero → on scroll */
+/* the object grows and its screen TYPES the bio as code →               */
+/* the object shifts and sentences appear word by word → cards, numbers, */
 /* kontak.                                                             */
 /*                                                                    */
-/* - Pose objek & kamera per bab (POSES) di-scrub OWD Scrub per section.     */
-/* - Layar objek (PC, HP, laptop, halaman buku) = CanvasTexture yang     */
-/*   digambar ulang: logo, kode biodata (diketik sesuai scroll), UI,    */
-/*   atau teks.                                                        */
-/* - Konten = HTML biasa di atas canvas; biodata kode dibuat dari        */
-/*   CONFIG (bisa diedit tanpa kode).                                  */
-/* - Fallback: tanpa WebGL → latar gradasi; tanpa Scrub/Motion → konten  */
-/*   tetap tampil penuh; kurangi gerak → pose diam, teks langsung tampil.*/
-/* - Anggaran: pixel ratio maks 2 (turun otomatis bila lambat), maks     */
-/*   50.000 segitiga, satu konteks WebGL, dispose saat pagehide.         */
+/* - Object & camera pose per chapter (POSES) scrubbed by OWD Scrub per section. */
+/* - Object screens (PC, phone, laptop, book page) = a CanvasTexture that */
+/*   redrawn: logo, bio code (typed with the scroll), UI,               */
+/*   or text.                                                          */
+/* - Content = regular HTML above the canvas; the code bio is built from */
+/*   CONFIG (editable without code).                                   */
+/* - Fallback: no WebGL → a gradient background; no Scrub/Motion → content */
+/*   still shows in full; reduce motion → a still pose, text shown right away. */
+/* - Budget: pixel ratio max 2 (drops automatically when slow), max      */
+/*   50,000 triangles, one WebGL context, disposed on pagehide.          */
 /* ================================================================== */
 
 export const MOTION_JS = "https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js";
-/** Jalur paket tanpa alamat CDN (untuk pemuat dengan CDN cadangan). */
+/** Package path without a CDN address (for the loader with a fallback CDN). */
 const path = (u: string) => u.slice(CDNS[0].length);
 
 type V3 = [number, number, number];
@@ -41,7 +41,7 @@ export interface Pose {
   pos: V3;
   rot: V3;
   s: number;
-  /** Nilai keadaan objek (mis. open, zoom, flame), 0..1. */
+  /** Object state value (e.g. open, zoom, flame), 0..1. */
   st?: Record<string, number>;
   screen?: ScreenMode;
 }
@@ -74,7 +74,7 @@ export interface MotionSpec {
   object: ObjectKind;
   font: { display: string; text: string; href: string };
   colors: { bg: string; bg2: string; panel: string; ink: string; inkSoft: string; accent: string; accent2: string; line: string; obj: string; obj2: string; dark: boolean };
-  /** Isi CONFIG: biodata kode + teks layar. */
+  /** CONFIG content: the code bio + screen text. */
   config: { komentar: string; variabel: string; bahasa: "js" | "py" | "json"; profil: Record<string, string | string[] | number | boolean>; layarTeks: string; layarSub: string };
   berkas: string;
   chapters: Chapter[];
@@ -103,7 +103,7 @@ a { color: inherit; }
 
 #gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity 1s; pointer-events: none; }
 html.webgl #gl { opacity: 1; }
-/* Loading: penanda kecil di bawah, konten tetap terbaca selama objek 3D dimuat (v19). */
+/* Loading: a small indicator at the bottom; content stays readable while the 3D object loads (v19). */
 .loader { position: fixed; left: 20px; bottom: 20px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
 html.loading .loader { display: flex; }
 .loader > div { display: flex; align-items: center; gap: 10px; }
@@ -161,11 +161,11 @@ html.typing .ln.on { opacity: 1; transform: none; }
 html.typing .ln.cur::after { content: ""; display: inline-block; width: .55em; height: 1.15em; margin-left: 2px; vertical-align: -.2em; background: var(--accent); animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Kalimat besar */
+/* Large statement */
 .statement { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 3.9vw, 54px); line-height: 1.14; letter-spacing: -.02em; color: var(--ink) !important; }
 .text-ch .panel { width: min(100%, 44rem); }
 
-/* Kartu & angka */
+/* Cards & numbers */
 .cards { display: grid; gap: 12px; margin: 22px 0 0; padding: 0; list-style: none; }
 .cards li { padding: 16px 18px; border-radius: 16px; background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid var(--line); }
 .cards b { display: block; font-family: var(--font-display); font-size: 19px; }
@@ -180,10 +180,10 @@ html.typing .ln.cur::after { content: ""; display: inline-block; width: .55em; h
 .mail { display: inline-block; margin: 6px 0 4px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 34px); color: var(--accent); word-break: break-word; text-underline-offset: 6px; }
 footer { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 28px var(--pad) 40px; font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 80%, transparent); }
 
-/* Layar objek menampilkan kode → panel kode HTML disembunyikan di layar lebar (tetap terbaca pembaca layar). */
+/* The object's screen shows code → the HTML code panel is hidden on wide screens (still read by screen readers). */
 @media (min-width: 821px) { html.webgl .code-win.mirror { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
 
-/* Tanpa WebGL: latar gradasi. */
+/* No WebGL: gradient background. */
 html.no-webgl body { background: radial-gradient(90% 70% at 75% 30%, color-mix(in srgb, var(--accent) 28%, var(--bg-2)), var(--bg) 70%) fixed; }
 html.no-webgl #gl { display: none; }
 
@@ -210,7 +210,7 @@ html.no-webgl #gl { display: none; }
 const ENGINE = String.raw`
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, M = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -220,7 +220,7 @@ const navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav ul a
 const P = Object.assign({}, POSES[0]);
 let screenMode = POSES[0].screen, screenDirty = true, current = 0;
 
-/* 1) Biodata kode dari CONFIG; diketik mengikuti scroll. */
+/* 1) Bio code from CONFIG; typed along with the scroll. */
 const codeEl = document.getElementById("kode");
 if (codeEl) codeEl.innerHTML = bioHtml(CONFIG);
 const LINES = bioLines(CONFIG);
@@ -242,7 +242,7 @@ function setTyped(chars) {
 }
 const berkas = (document.getElementById("berkas") || {}).textContent || "biodata";
 
-/* 2) Pecah judul & kalimat besar jadi kata (untuk animasi per kata). */
+/* 2) Split headings & large sentences into words (for per-word animation). */
 function splitWords(el) {
   const words = el.textContent.trim().split(/\s+/);
   el.setAttribute("aria-label", el.textContent.trim());
@@ -254,7 +254,7 @@ const animated = !reduce && hasG && !!M;
 const heroWords = animated ? splitWords(document.querySelector("h1")) : [];
 const statements = animated ? Array.prototype.slice.call(document.querySelectorAll(".statement")).map(splitWords) : [];
 
-/* 3) OWD Scrub + Lenis: gulir halus, progres, kalimat muncul kata demi kata, pengetikan kode, pose objek per bab. */
+/* 3) OWD Scrub + Lenis: smooth scrolling, progress, statements appearing word by word, code typing, object pose per chapter. */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 if (animated) {
@@ -285,7 +285,7 @@ if (animated) {
   }
   sections.forEach((sec, i) => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%", onToggle: (st) => { if (st.isActive) setChapter(i); } }));
 } else {
-  // Tanpa animasi (kurangi gerak / library gagal dimuat): semua konten tampil, layar menunjukkan kode lengkap.
+  // No animation (reduced motion / library failed to load): all content shows, and the screen shows the full code.
   const ci = POSES.findIndex((p) => p.screen === "code");
   if (ci > 0 && !reduce) Object.assign(P, POSES[ci]);
   screenMode = ci >= 0 ? "code" : screenMode;
@@ -302,7 +302,7 @@ function setChapter(i) {
   screenDirty = true;
 }
 
-/* 4) Motion: judul per kata, panel muncul, kartu bertahap, angka menghitung, tombol magnetis. */
+/* 4) Motion: per-word headings, panels appear, staggered cards, counting numbers, magnetic buttons. */
 if (animated) {
   const { animate, inView, stagger } = M;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -352,7 +352,7 @@ function start() {
   const rim = new THREE.DirectionalLight(COL.accent, 2.6); rim.position.set(-6, 2, -5); scene.add(rim);
   const fill = new THREE.PointLight(COL.accent2, 18, 26, 1.6); fill.position.set(4, -1, 5); scene.add(fill);
 
-  /* Tekstur bantu: cahaya bulat & teks. */
+  /* Helper textures: round light & text. */
   const textures = [];
   function glowTexture() {
     const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -378,7 +378,7 @@ function start() {
   scene.add(api.group);
   const floor = typeof api.floor === "number" ? api.floor : -1.9;
 
-  /* Bayangan lembut & debu cahaya. */
+  /* Soft shadow & light dust. */
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ map: glowTexture(), color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; scene.add(shadow);
   const DUST = 420, dp = new Float32Array(DUST * 3);
@@ -387,7 +387,7 @@ function start() {
   const dust = new THREE.Points(dg, new THREE.PointsMaterial({ color: COL.accent, size: 0.05, map: glowTexture(), transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending }));
   scene.add(dust);
 
-  /* Layar: logo / kode / UI / teks. */
+  /* Screen: logo / code / UI / text. */
   const TK = { dark: { bg: "#0b1020", kw: "#c792ea", var: "#eef1ff", key: COL.accent, str: "#c3e88d", num: "#f78c6c", pun: "#8f9bb3", com: "#6f789b", ln: "#3c4566", bar: "rgba(255,255,255,.05)", ink: "#eef1ff" },
                paper: { bg: "#f4ecda", kw: "#7a3e9d", var: "#2a2420", key: "#a4442b", str: "#3d6f3a", num: "#a0522d", pun: "#7d7468", com: "#9a8f7e", ln: "#c9bca2", bar: "rgba(0,0,0,.05)", ink: "#2a2420" } };
   function wrap(g, text, maxW) { const words = String(text).split(/\s+/), out = []; let line = ""; words.forEach((w) => { const t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
@@ -412,7 +412,7 @@ function start() {
           if (left <= 0) break;
           let txt = tk[1].slice(0, Math.max(0, left)); left -= tk[1].length;
           g.fillStyle = k[tk[0]] || k.var;
-          /* Baris panjang dibungkus ke baris berikutnya (penting untuk layar tegak seperti HP). */
+          /* Long lines wrap to the next line (important for portrait screens such as phones). */
           if (txt.length > (maxX - x) / cw && txt.length <= (maxX - x0 - cw * 2) / cw && x > x0) { y += lh; x = x0 + cw * 2; }
           while (txt.length) {
             if (maxX - x < cw) { y += lh; x = x0 + cw * 2; }
@@ -468,7 +468,7 @@ function start() {
   const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
   io.observe(canvas);
 
-  /* Pose → kamera & objek. Layar sempit: objek ke tengah-atas, kamera mundur supaya muat. */
+  /* Pose → camera & object. Narrow screens: object to the top center, camera pulls back so it fits. */
   function applyPose(t) {
     const narrow = camera.aspect < 0.9, k = narrow ? Math.pow(0.9 / camera.aspect, 0.85) : 1;
     const lx = P.lx * (narrow ? 0.1 : 1), ly = P.ly - (narrow ? 0.8 + 0.55 * (k - 0.6) : 0);
@@ -484,14 +484,14 @@ function start() {
     shadow.scale.setScalar(P.s);
   }
 
-  /* v21: di desktop objek 3D tidak boleh menabrak panel teks. Kotak objek di layar dibandingkan
-     dengan panel yang terlihat; bila bertabrakan, objek digeser menjauh dari panel (dan dikecilkan
-     bila ruangnya kurang), dengan transisi halus. Panel di tengah & layar sempit tidak diubah. */
+  /* v21: on desktop the 3D object must not overlap the text panels. The object's on-screen box is compared
+     with the visible panels; if they overlap, the object moves away from the panel (and shrinks
+     when space is short), with a smooth transition. Centered panels & narrow screens are unchanged. */
   const panels = Array.prototype.slice.call(document.querySelectorAll("[data-ch] .panel"));
   const corner = new THREE.Vector3(), right = new THREE.Vector3();
   const avoid = { x: 0, s: 1, tx: 0, ts: 1 };
-  /* Kotak layar objek: sudut kotak lokal tiap mesh diproyeksikan langsung (lebih rapat daripada
-     kotak dunia gabungan, yang menggembung saat objek diputar). Halo/kilau transparan diabaikan. */
+  /* Object screen box: the corners of each mesh's local box are projected directly (tighter than the
+     combined world box, which grows when the object rotates). Transparent halos/glints are ignored. */
   function objRect() {
     api.group.updateMatrixWorld(true);
     let l = Infinity, r = -Infinity, tp = Infinity, b = -Infinity;
@@ -515,8 +515,8 @@ function start() {
     camera.updateMatrixWorld();
     const o = objRect(); if (!o) return;
     const W = innerWidth, gap = 32, edge = 12, w = o.r - o.l, c = (o.l + o.r) / 2;
-    /* Kandidat posisi: tetap, atau tepat di kiri/kanan tiap panel (diperkecil bila ruangnya sempit).
-       Dipilih yang paling sedikit menabrak SEMUA panel yang terlihat; seri → geser paling kecil. */
+    /* Candidate positions: fixed, or right to the left/right of each panel (shrunk when space is tight).
+       The one that overlaps ALL visible panels the least wins; ties → the smallest shift. */
     const rects = [];
     for (const p of panels) {
       const r = p.getBoundingClientRect();
@@ -695,7 +695,7 @@ function chapterHtml(s: MotionSpec, c: Chapter, i: number, codeHtml: string): st
 </section>`;
 }
 
-/** Pose datar untuk OWD Scrub: {cx..,lx..,px..,rx..,s, ...keadaan, screen}. Keadaan yang tidak disebut ikut bab sebelumnya. */
+/** Flat pose for OWD Scrub: {cx..,lx..,px..,rx..,s, ...state, screen}. Unmentioned state carries over from the previous chapter. */
 function flatPoses(s: MotionSpec) {
   const keys = new Set<string>();
   s.chapters.forEach((c) => Object.keys(c.pose.st ?? {}).forEach((k) => keys.add(k)));
@@ -755,19 +755,19 @@ ${s.chapters.map((c, i) => chapterHtml(s, c, i, codeHtml)).join("\n")}
 <footer><span${ot("merek", "Nama merek")}>${esc(s.brand)}</span><span${ot("catatanKaki", "Catatan kaki")}>${esc(s.footer)}</span></footer>
 <script type="module">
 ${LIB_IMPORTS}
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, halaman tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the page still works. */
 await umd(${JSON.stringify(path(MOTION_JS))}).catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* ==== BIODATA & TEKS LAYAR: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== BIO & SCREEN TEXT: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = ${dataBlock("CONFIG", "Biodata & layar", config, ["bahasa"])};
 /* ========================================================================= */
-/* Nama merek di layar/objek 3D = teks merek di navigasi (ikut berubah bila diedit). */
+/* Brand name on the screen/3D object = the brand text in the navigation (updates when edited). */
 const BRAND = ((document.querySelector(".nav .brand") || {}).textContent || "").trim() || ${JSON.stringify(s.brand)};
-/* Pose kamera & objek per bab (urutan sama dengan section data-ch). */
+/* Camera & object pose per chapter (same order as the data-ch sections). */
 const POSES = ${JSON.stringify(flatPoses(s))};
 ${MOTION_RENDER.trim()}
 
-/* Objek 3D (prosedural, tanpa model/tekstur eksternal). */
+/* 3D object (procedural, no external models/textures). */
 ${OBJECTS[s.object].trim()}
 ${ENGINE.trim()}
 </script>`;

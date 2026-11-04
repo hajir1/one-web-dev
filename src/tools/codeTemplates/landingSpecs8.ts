@@ -1,7 +1,7 @@
 import type { LandingSpec } from "./landing";
 import { SELASA_MINGGU, SENIN_JUMAT, SENIN_SABTU, SETIAP, jam, langkah } from "./landingKit";
 
-/* Landing v23, bagian 8: pendidikan, komunitas & ruang publik (kategori yang masih sedikit). */
+/* Landing v23, part 8: education, community & public spaces (categories that are still sparse). */
 export const LANDING_8: LandingSpec[] = [
   {
     id: "lp-kursus-inggris-speak-up",

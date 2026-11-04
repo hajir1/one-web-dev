@@ -37,14 +37,14 @@ import { encodeWav, mixToMono, sliceChannels, wavBytes } from "../lib/wav";
 import { compressPlan, gifPlan } from "../lib/serverPlans";
 
 const P = DEFAULT_PRICING;
-// v11: Media & Data memakai kuota paket; mesin kredit/paket fitur di bawah diuji dengan tarif kredit (seperti VR).
+// v11: Media & Data use plan quotas; the credit/plan feature engine below is tested with credit rates (like VR).
 const legacy = (p) => ({ ...p, inPlan: false, unlockRequired: true });
 const MB = 1024 * 1024;
 const acct = (balance, ents = {}) => ({ balance, entitlements: ents, syncedAt: 0 });
 const hdr = (init, k) => new Headers(init.headers).get(k);
-/** Tiket unggah: URL storage luar (bukan API) → PUT tanpa cookie. */
+/** Upload ticket: external storage URL (not the API) → PUT without cookies. */
 const uploadTicket = (id = "u1") => json(201, { uploadId: id, upload: { method: "PUT", url: `https://store.test/put/${id}?sig=abc`, headers: { "Content-Type": "image/png" } } });
-/** Bungkus fetch job: tangani langkah unggah (POST …/uploads + PUT ke storage), sisanya ke `rest`. */
+/** Wraps the job fetch: handles the upload step (POST …/uploads + PUT to storage), the rest goes to `rest`. */
 const withUpload = (rest, puts = []) => async (url, init = {}) => {
   const u = String(url);
   if (u.endsWith("/uploads")) return uploadTicket();
@@ -55,7 +55,7 @@ const withUpload = (rest, puts = []) => async (url, init = {}) => {
   return rest(url, init);
 };
 
-/* ------------------------------ harga ------------------------------- */
+/* ------------------------------ prices ------------------------------- */
 
 test("harga: konfigurasi awal sesuai tabel & terpusat", () => {
   assert.deepEqual(
@@ -90,9 +90,9 @@ test("biaya: pengali per ukuran/durasi/skala, batas server", () => {
 test("rencana biaya: kuota paket dulu, lalu saldo; kekurangan dihitung", () => {
   const rb = legacy(P["remove-background"]);
   const inputs = [{ bytes: MB }, { bytes: MB }, { bytes: 15 * MB }];
-  // tanpa akun: semua dihitung dari saldo, keterjangkauan tidak diketahui
+  // no account: everything is computed from the balance, affordability unknown
   assert.deepEqual(planCharge(rb, inputs, null), { packUses: 0, credits: 1.75, creditsWithoutPack: 1.75, affordable: null, shortfall: 0 });
-  // 2 kuota paket → 2 file kecil dari paket, file besar dari saldo
+  // 2 plan quota → 2 small files from the plan, the large file from the balance
   const a = acct(0.5, { "remove-background": { unlocked: true, packUses: 2 } });
   const p1 = planCharge(rb, inputs, a);
   assert.equal(p1.packUses, 2);
@@ -129,7 +129,7 @@ test("harga & akun dari backend disanitasi", () => {
   assert.equal(m["video-to-gif"].enabled, false);
   assert.equal(m["remove-background"].costPerUse, 0.5, "nilai tidak valid diabaikan");
   assert.equal(m["image-upscaler"], P["image-upscaler"]);
-  // v6: saldo boleh negatif (setelah refund/chargeback) dan tetap ditampilkan apa adanya.
+  // v6: the balance may be negative (after a refund/chargeback) and is still shown as is.
   assert.equal(sanitizeAccount({ balance: -5 }).balance, -5);
   assert.equal(sanitizeAccount({ balance: "x" }), null);
   const a = sanitizeAccount({ balance: 2.5, entitlements: { "video-to-gif": { unlocked: true, packUses: 3.9 }, palsu: { unlocked: true } } });

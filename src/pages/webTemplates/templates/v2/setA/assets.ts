@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ilustrasi SVG tambahan untuk template v2 bagian A                     */
-/* (buatan sendiri, ASCII, tanpa URL eksternal; nama berawalan "v2a-").  */
-/* Setiap fungsi menerima warna sehingga satu bentuk punya banyak varian. */
+/* Extra SVG illustrations for v2 templates part A                       */
+/* (in-house, ASCII, no external URLs; names prefixed "v2a-").          */
+/* Each function takes colors so one shape has many variants.           */
 /* ================================================================== */
 
 const svg = (w: number, h: number, body: string) =>
@@ -85,7 +85,7 @@ function chart(a: string, b: string, bar: string, coin: string): string {
   );
 }
 
-/** Hati di atas tangan (donasi). */
+/** A heart above a hand (donation). */
 function care(a: string, b: string, heart: string, hand: string): string {
   return svg(
     800,
@@ -97,7 +97,7 @@ function care(a: string, b: string, heart: string, hand: string): string {
   );
 }
 
-/** Dua cincin + bunga (pernikahan). */
+/** Two rings + flowers (wedding). */
 function rings(a: string, b: string, gold: string, flower: string): string {
   return svg(
     800,
@@ -125,7 +125,7 @@ function guitar(a: string, b: string, body: string, accent: string): string {
   );
 }
 
-/** Crane + gedung setengah jadi. */
+/** Crane + a half-built building. */
 function crane(a: string, b: string, steel: string, wall: string): string {
   let floors = "";
   for (let y = 300; y < 520; y += 44) floors += `<rect x="430" y="${y}" width="230" height="8" fill="${steel}" opacity="0.7"/>`;
@@ -192,7 +192,7 @@ function field(sky: string, land: string, crop: string, sun: string): string {
   );
 }
 
-/** Truk kontainer di jalan. */
+/** Container truck on the road. */
 function truck(a: string, b: string, cab: string, box: string): string {
   return svg(
     800,
@@ -373,7 +373,7 @@ function avatar(a: string, skin: string, hair: string, shirt: string): string {
   );
 }
 
-/** Piring makanan dari atas. */
+/** A plate of food from above. */
 function plate(a: string, food: string, side: string): string {
   return svg(
     800,
@@ -445,7 +445,7 @@ const SCENES: Record<string, () => string> = {
   // SaaS CRM
   "v2a-crm-hero": () => crm("#ede9fe", "#f5f3ff", "#7c3aed", "#14b8a6"),
   "v2a-crm-report": () => crm("#ccfbf1", "#f0fdfa", "#0f766e", "#f59e0b"),
-  // Skincare (produk)
+  // Skincare (products)
   "v2a-skin-hero": () => bottle("#fdf2f8", "#fce7f3", "#f9a8d4", "#831843", 0),
   "v2a-skin-1": () => bottle("#fff1f2", "#ffe4e6", "#fda4af", "#9f1239", 0),
   "v2a-skin-2": () => bottle("#f0fdf4", "#dcfce7", "#86efac", "#14532d", 1),

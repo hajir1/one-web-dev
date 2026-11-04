@@ -1,34 +1,34 @@
-# Lisensi template & hasil ekspor
+# Template and exported website license
 
-Kode aplikasi OneWebDev memakai lisensi **GNU AGPL-3.0** (lihat `LICENSE`). Berkas ini menambahkan aturan khusus untuk **template website** dan **website hasil ekspor**, supaya pemakai biasa tidak terikat AGPL.
+The OneWebDev application code is licensed under the **GNU AGPL-3.0** (see `LICENSE`). This file adds special terms for **website templates** and **exported websites**, so that regular users are not bound by the AGPL.
 
-## 1. Website Anda adalah milik Anda
+## 1. Your website belongs to you
 
-Website, halaman, atau kode yang Anda buat atau ekspor dengan OneWebDev, termasuk yang berasal dari template bawaan, **tidak terikat AGPL**. Anda boleh:
+Websites, pages, or code that you create or export with OneWebDev, including those based on the built-in templates, are **not bound by the AGPL**. You may:
 
-- memakainya untuk diri sendiri, klien, atau bisnis (komersial);
-- mengubah, menerbitkan, dan meng-hosting-nya di mana saja;
-- tidak mencantumkan nama OneWebDev (atribusi tidak wajib).
+- use them for yourself, your clients, or your business (commercial use);
+- modify, publish, and host them anywhere;
+- leave out the OneWebDev name (attribution is not required).
 
-## 2. Template bebas diunduh dan dipakai
+## 2. Templates are free to download and use
 
-Semua template di aplikasi boleh diunduh dan dipakai siapa saja, gratis, termasuk sebagai titik awal website klien yang Anda jual jasanya.
+Anyone may download and use every template in the app, free of charge, including as the starting point for client websites that you build as a paid service.
 
-## 3. Satu larangan: template tidak boleh dijual ulang sebagai template
+## 3. One restriction: templates may not be resold as templates
 
-Anda **tidak boleh** menjual, menyewakan, atau membagikan ulang template OneWebDev (asli atau sedikit diubah) **sebagai produk template**, misalnya:
+You **may not** sell, rent, or redistribute OneWebDev templates (original or lightly modified) **as a template product**, for example:
 
-- dijual di marketplace tema/template (ThemeForest, Creative Market, Gumroad, dan sejenisnya);
-- dikemas sebagai paket atau koleksi template, gratis maupun berbayar, yang menyaingi koleksi OneWebDev.
+- selling them on theme or template marketplaces (ThemeForest, Creative Market, Gumroad, and similar);
+- bundling them as a template pack or collection, free or paid, that competes with the OneWebDev collection.
 
-Menjual **jasa** membuat website untuk klien dengan template ini tetap boleh; yang dilarang adalah menjual **template-nya** sebagai barang.
+Selling the **service** of building websites for clients with these templates is allowed; what is not allowed is selling the **templates themselves** as goods.
 
-## 4. Gambar, ikon, dan font di dalam template
+## 4. Images, icons, and fonts inside templates
 
-Gambar contoh, ikon, dan objek 3D di template dibuat sendiri oleh OneWebDev dan ikut aturan berkas ini. Font (Google Fonts, SIL OFL / Apache 2.0) dan pustaka JavaScript (MIT/ISC) mengikuti lisensinya masing-masing (lihat `THIRD_PARTY_NOTICES.md`). Nama usaha, orang, mitra, dan testimoni di template adalah contoh fiktif: ganti dengan data asli Anda sebelum website diterbitkan.
+Sample images, icons, and 3D objects in the templates are made in-house by OneWebDev and follow the terms in this file. Fonts (Google Fonts, SIL OFL / Apache 2.0) and JavaScript libraries (MIT/ISC) follow their own licenses (see `THIRD_PARTY_NOTICES.md`). Business names, people, partners, and testimonials in the templates are fictional examples: replace them with your real data before publishing the website.
 
-## 5. Ruang lingkup
+## 5. Scope
 
-Aturan di berkas ini berlaku untuk isi folder `src/pages/webTemplates/` dan setiap website hasil ekspor. Bagian lain repositori tetap memakai AGPL-3.0.
+The terms in this file apply to the contents of the `src/pages/webTemplates/` folder and to every exported website. The rest of the repository remains under the AGPL-3.0.
 
-_Ringkasan ini ditulis dalam bahasa sederhana dan bukan nasihat hukum._
+_This summary is written in plain language and is not legal advice._

@@ -4,11 +4,11 @@ import type { DragPayload } from "../engine/helpers/dnd";
 import { isRow, isSection } from "./pageDoc";
 
 /* ================================================================== */
-/* Menentukan tempat jatuh di canvas dari posisi pointer                */
+/* Decides the drop location on the canvas from the pointer position    */
 /*                                                                    */
-/* Fungsi murni: input = pohon + kotak (rect) tiap node yang dilaporkan  */
-/* iframe + posisi pointer; output = induk, indeks sisip, dan geometri   */
-/* penanda untuk digambar.                                              */
+/* Pure function: input = the tree + the box (rect) of each node reported */
+/* iframe + pointer position; output = parent, insert index, and geometry */
+/* of the marker to draw.                                               */
 /* ================================================================== */
 
 export interface Rect {
@@ -21,9 +21,9 @@ export type RectMap = Record<NodeId, Rect>;
 
 export interface DropResolution {
   parentId: NodeId;
-  /** Indeks sisip (sebelum node yang dipindah dicabut — sama seperti moveNode). */
+  /** Insertion index (before the moved node is removed, same as moveNode). */
   index: number;
-  /** "line" = garis sisip; "box" = seluruh kontainer disorot (kosong / append). */
+  /** "line" = insertion line; "box" = the whole container highlighted (empty / append). */
   indicator: { kind: "line" | "box"; rect: Rect };
 }
 
@@ -34,7 +34,7 @@ const dist = (r: Rect, x: number, y: number) => {
   return Math.hypot(dx, dy);
 };
 
-/** Apakah payload ini sebuah section (dan karenanya hanya boleh jatuh di root)? */
+/** Is this payload a section (and therefore only droppable on the root)? */
 function payloadIsSection(root: BoxNode, payload: DragPayload): boolean {
   if (payload.kind === "section") return true;
   if (payload.kind === "node") {
@@ -44,7 +44,7 @@ function payloadIsSection(root: BoxNode, payload: DragPayload): boolean {
   return false;
 }
 
-/** Apakah payload ini sebuah Row (hanya boleh jatuh di antara Row dalam section)? */
+/** Is this payload a Row (only droppable between Rows inside a section)? */
 function payloadIsRow(root: BoxNode, payload: DragPayload): boolean {
   if (payload.kind === "row") return true;
   if (payload.kind === "node") {
@@ -63,7 +63,7 @@ export function resolveDrop(
   const dragged: ComponentNode | null = payload.kind === "node" ? findNode(root, payload.id) : null;
   if (payload.kind === "node" && (!dragged || dragged.id === root.id)) return null;
 
-  /* ---------- mode section: hanya di antara section ---------- */
+  /* ---------- section mode: only between sections ---------- */
   if (payloadIsSection(root, payload)) {
     const secs = root.children.filter((c) => rects[c.id]);
     if (!secs.length) {
@@ -78,7 +78,7 @@ export function resolveDrop(
         break;
       }
     }
-    // `index` dihitung terhadap daftar bersih; petakan ke indeks anak sebenarnya.
+    // `index` is computed against the clean list; map it to the real child index.
     const realIndex = index < secs.length ? root.children.indexOf(secs[index]) : root.children.length;
     const width = Math.max(...secs.map((c) => rects[c.id].x + rects[c.id].w));
     const y =
@@ -90,7 +90,7 @@ export function resolveDrop(
     };
   }
 
-  /* ---------- mode Row: di antara Row dalam satu section ---------- */
+  /* ---------- Row mode: between Rows within one section ---------- */
   if (payloadIsRow(root, payload)) {
     const secs = root.children.filter((c) => isBox(c) && rects[c.id]) as BoxNode[];
     if (!secs.length) return null;
@@ -130,7 +130,7 @@ export function resolveDrop(
     };
   }
 
-  /* ---------- mode isi: kontainer terdalam di bawah pointer ---------- */
+  /* ---------- content mode: the innermost container under the pointer ---------- */
   const depth: Record<NodeId, number> = {};
   const boxes: BoxNode[] = [];
   const visit = (n: ComponentNode, d: number) => {
@@ -143,7 +143,7 @@ export function resolveDrop(
   visit(root, 0);
 
   const allowed = (b: BoxNode) => {
-    if (b.id === root.id) return false; // root hanya menerima section
+    if (b.id === root.id) return false; // root only accepts sections
     if (!rects[b.id]) return false;
     if (dragged && (dragged.id === b.id || (isBox(dragged) && isDescendant(dragged, b.id)))) return false;
     return true;
@@ -155,7 +155,7 @@ export function resolveDrop(
     if (!target || depth[b.id] > depth[target.id]) target = b;
   }
   if (!target) {
-    // Di luar semua kontainer (celah antar section): pakai section terdekat.
+    // Outside every container (gaps between sections): use the nearest section.
     let best = Infinity;
     for (const s of root.children) {
       if (!isBox(s) || !allowed(s)) continue;
@@ -167,7 +167,7 @@ export function resolveDrop(
     }
   }
   if (!target) return null;
-  // Konten yang jatuh di section dibungkus Row otomatis (placeNode); Row/section tak boleh masuk konten.
+  // Content dropped on a section is wrapped in a Row automatically (placeNode); Rows/sections may not go into content.
   if (dragged && (isSection(dragged) || isRow(dragged))) return null;
 
   const kids = target.children.filter((c) => rects[c.id]);
@@ -179,7 +179,7 @@ export function resolveDrop(
     };
   }
 
-  // Anak terdekat → sisip sebelum/sesudahnya menurut sumbu layout.
+  // Nearest child → insert before/after it along the layout axis.
   let near = kids[0];
   let nd = Infinity;
   for (const k of kids) {

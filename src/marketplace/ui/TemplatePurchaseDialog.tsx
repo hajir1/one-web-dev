@@ -16,8 +16,8 @@ import { promoPrice } from "../promo";
 import { PromoCountdown, PromoPriceTag } from "./Promo";
 
 /**
- * Konfirmasi pembelian template Premium dengan kredit akun (server).
- * Menampilkan harga, saldo, dan item Premium bawaan sebelum membeli.
+ * Confirms a Premium template purchase with account credits (server).
+ * Shows the price, balance, and built-in Premium items before buying.
  */
 export default function TemplatePurchaseDialog({
   tpl,
@@ -97,7 +97,7 @@ export default function TemplatePurchaseDialog({
           <dd className="font-semibold text-gray-800 dark:text-gray-100">{t("market.credits", { count: balance })}</dd>
         </div>
       </dl>
-      {/* Template Kode (v21.2): satu berkas HTML, tanpa section/elemen Page Maker bawaan. */}
+      {/* Code Template (v21.2): one HTML file, no built-in Page Maker sections/elements. */}
       {!tpl.code && <IncludedItems tpl={tpl} catalog={catalog} compact />}
       <div className="mt-3 space-y-2">
         {!tpl.code && <Notice tone="info">{t("market.included.scope")}</Notice>}

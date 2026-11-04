@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Sekar Aksara · Penulis</title>
 <meta name="description" content="Portofolio penulis dengan buku 3D: sampul terbuka saat digulir, halaman kanan menuliskan biodata sebagai kode, lalu halaman-halaman membalik di bagian cerita.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -33,7 +33,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   }
   function easeOf(name) {
     if (typeof name === "function") return name;
-    if (!name) return power(2, "out"); /* bawaan = power1.out (n=2 di sini setara kuadrat) */
+    if (!name) return power(2, "out"); /* default = power1.out (n=2 here equals quadratic) */
     if (name === "none" || name === "linear") return function (t) { return t; };
     var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
     if (!m) return power(2, "out");
@@ -52,13 +52,13 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
   function isEl(o) { return o && o.nodeType === 1; }
 
-  /* Ambil angka-angka di dalam teks (mis. clipPath "inset(0 100% 0 0)") agar bisa di-interpolasi. */
+  /* Pull the numbers out of the text (e.g. clipPath "inset(0 100% 0 0)") so they can be interpolated. */
   function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
   function mixStr(a, b, k) {
     var na = nums(a), i = 0;
     return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
   }
-  /* Nilai transform awal diambil dari CSS (mis. scaleX(0) pada garis progres). */
+  /* Initial transform values are read from CSS (e.g. scaleX(0) on the progress bar). */
   function stateOf(el) {
     if (el.__owds) return el.__owds;
     var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
@@ -85,7 +85,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
   }
 
-  /* Satu tween = satu target, nilai awal & akhir, posisi dalam rentang 0..1. */
+  /* One tween = one target, start & end values, position within the 0..1 range. */
   function makeTween(target, from, to, offset, span) {
     var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
     var el = isEl(target);
@@ -108,7 +108,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     };
   }
 
-  /* Posisi "<tepi elemen> <tepi layar>" → piksel scroll. */
+  /* Position "<element edge> <screen edge>" → scroll pixels. */
   function edge(word, size) {
     if (word === "top" || word === undefined) return 0;
     if (word === "center") return size / 2;
@@ -153,7 +153,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     var active = y >= this.start && y <= this.end;
     if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
   };
-  /* Majukan progres (scrub angka = menyusul pelan). Hasil: true bila berubah. */
+  /* Advance progress (numeric scrub = catches up slowly). Returns true when it changed. */
   ST.prototype.advance = function (dt, force) {
     if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
     else this.progress = this.target;
@@ -164,7 +164,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   };
   ST.prototype.render = function () {
     var first = this.shown < 0;
-    /* Seperti GSAP: tween yang belum pernah dimulai (progres 0) tidak menimpa nilai awal halaman. */
+    /* Like GSAP: a tween that has never started (progress 0) does not overwrite the page's initial values. */
     if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
     this.shown = this.progress;
     this.tweens.forEach(function (t) { t.render(this.progress); }, this);
@@ -188,10 +188,10 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     return st;
   }
 
-  /* Beberapa trigger boleh menggerakkan objek yang sama (pose per bab). Agar hasilnya   */
-  /* selalu "bab yang sedang dibaca", urutan gambar dibuat pasti: trigger yang kembali ke */
-  /* 0 digambar dari belakang ke depan, lalu semua yang sedang/sudah jalan (progres > 0)  */
-  /* digambar dari depan ke belakang, sehingga bab paling akhir yang aktif menang.         */
+  /* Several triggers may move the same object (a pose per chapter). So the result is    */
+  /* always "the chapter being read", the draw order is fixed: triggers that are back at  */
+  /* 0 are drawn from last to first, then all running/finished ones (progress > 0)       */
+  /* are drawn from first to last, so the latest active chapter wins.                     */
   function frame(now) {
     var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
@@ -239,7 +239,7 @@ document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
 </script>
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg: #f2ece1; /* Latar halaman */
   --bg-2: #e6d6bb; /* Latar kedua (cahaya) */
@@ -272,7 +272,7 @@ a { color: inherit; }
 
 #gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity 1s; pointer-events: none; }
 html.webgl #gl { opacity: 1; }
-/* Loading: penanda kecil di bawah, konten tetap terbaca selama objek 3D dimuat (v19). */
+/* Loading: a small indicator at the bottom; content stays readable while the 3D object loads (v19). */
 .loader { position: fixed; left: 20px; bottom: 20px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
 html.loading .loader { display: flex; }
 .loader > div { display: flex; align-items: center; gap: 10px; }
@@ -330,11 +330,11 @@ html.typing .ln.on { opacity: 1; transform: none; }
 html.typing .ln.cur::after { content: ""; display: inline-block; width: .55em; height: 1.15em; margin-left: 2px; vertical-align: -.2em; background: var(--accent); animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Kalimat besar */
+/* Large statement */
 .statement { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 3.9vw, 54px); line-height: 1.14; letter-spacing: -.02em; color: var(--ink) !important; }
 .text-ch .panel { width: min(100%, 44rem); }
 
-/* Kartu & angka */
+/* Cards & numbers */
 .cards { display: grid; gap: 12px; margin: 22px 0 0; padding: 0; list-style: none; }
 .cards li { padding: 16px 18px; border-radius: 16px; background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid var(--line); }
 .cards b { display: block; font-family: var(--font-display); font-size: 19px; }
@@ -349,10 +349,10 @@ html.typing .ln.cur::after { content: ""; display: inline-block; width: .55em; h
 .mail { display: inline-block; margin: 6px 0 4px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 34px); color: var(--accent); word-break: break-word; text-underline-offset: 6px; }
 footer { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 28px var(--pad) 40px; font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 80%, transparent); }
 
-/* Layar objek menampilkan kode → panel kode HTML disembunyikan di layar lebar (tetap terbaca pembaca layar). */
+/* The object's screen shows code → the HTML code panel is hidden on wide screens (still read by screen readers). */
 @media (min-width: 821px) { html.webgl .code-win.mirror { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
 
-/* Tanpa WebGL: latar gradasi. */
+/* No WebGL: gradient background. */
 html.no-webgl body { background: radial-gradient(90% 70% at 75% 30%, color-mix(in srgb, var(--accent) 28%, var(--bg-2)), var(--bg) 70%) fixed; }
 html.no-webgl #gl { display: none; }
 
@@ -449,7 +449,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -460,10 +460,10 @@ const esm = (path) => race(path, (u) => import(u));
 const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
 const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, halaman tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the page still works. */
 await umd("motion@11.11.13/dist/motion.js").catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* ==== BIODATA & TEKS LAYAR: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== BIO & SCREEN TEXT: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Biodata &amp; layar" hide="bahasa"*/{
   "komentar": "Sekar Aksara, penulis",
   "variabel": "sekar",
@@ -483,12 +483,12 @@ const CONFIG = /*owd:data name="CONFIG" label="Biodata &amp; layar" hide="bahasa
   "layarSub": "Sekar Aksara"
 }/*owd:end*/;
 /* ========================================================================= */
-/* Nama merek di layar/objek 3D = teks merek di navigasi (ikut berubah bila diedit). */
+/* Brand name on the screen/3D object = the brand text in the navigation (updates when edited). */
 const BRAND = ((document.querySelector(".nav .brand") || {}).textContent || "").trim() || "Sekar Aksara";
-/* Pose kamera & objek per bab (urutan sama dengan section data-ch). */
+/* Camera & object pose per chapter (same order as the data-ch sections). */
 const POSES = [{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":2.3,"py":0,"pz":0,"rx":0.25,"ry":-0.5,"rz":0.05,"s":0.95,"open":0,"flip":0,"screen":"logo"},{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":1.55,"py":0,"pz":1.5,"rx":0.12,"ry":-0.1,"rz":0,"s":1,"open":1,"flip":0,"screen":"code"},{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":-2.2,"py":0,"pz":0,"rx":0.3,"ry":0.4,"rz":0,"s":0.75,"open":1,"flip":1,"screen":"text"},{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":2.4,"py":0,"pz":0,"rx":0.35,"ry":-0.5,"rz":0,"s":0.75,"open":1,"flip":0,"screen":"text"},{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":-2.3,"py":0,"pz":0,"rx":0.2,"ry":0.5,"rz":0,"s":0.7,"open":1,"flip":1,"screen":"text"},{"cx":0,"cy":0.6,"cz":11,"lx":0,"ly":0,"lz":0,"px":2.4,"py":0,"pz":0,"rx":0.2,"ry":-0.4,"rz":0,"s":0.9,"open":0,"flip":0,"screen":"text"}];
 function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-/* Baris kode berwarna dari CONFIG: [[kelas, teks], ...] per baris. Bahasa: js, py, json. */
+/* Colored code lines from CONFIG: [[class, text], ...] per line. Languages: js, py, json. */
 function bioLines(cfg) {
   var c = cfg || {}, p = c.profil && typeof c.profil === "object" ? c.profil : {};
   var lang = c.bahasa === "py" || c.bahasa === "json" ? c.bahasa : "js";
@@ -526,7 +526,7 @@ function bioHtml(cfg) {
   }).join("");
 }
 
-/* Objek 3D (prosedural, tanpa model/tekstur eksternal). */
+/* 3D object (procedural, no external models/textures). */
 function rrShape(THREE, w, h, r) {
   const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
   s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -535,7 +535,7 @@ function rrShape(THREE, w, h, r) {
   s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
   return s;
 }
-/* Lempeng bersudut bulat (lebar w, tinggi h, tebal d) berpusat di titik asal. */
+/* Rounded slab (width w, height h, depth d) centered at the origin. */
 function slabGeo(THREE, w, h, d, r, b) {
   const g = new THREE.ExtrudeGeometry(rrShape(THREE, w - 2 * b, h - 2 * b, Math.max(0.002, r - b)), { depth: Math.max(0.002, d - 2 * b), bevelEnabled: b > 0, bevelThickness: b, bevelSize: b, bevelSegments: 3, curveSegments: 8 });
   g.translate(0, 0, -(d - 2 * b) / 2);
@@ -561,7 +561,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture, brand }
   const spine = new THREE.Mesh(new THREE.CylinderGeometry(D / 2 + T, D / 2 + T, H, 20, 1, false, Math.PI, Math.PI), cloth); spine.position.set(0, 0, T / 2 + D / 2); inner.add(spine);
   const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.6, 0.01), mat(THREE, COL.accent, { roughness: 0.5 })); ribbon.position.set(0.5, -H / 2 - 0.2, T / 2 + D + 0.004); inner.add(ribbon);
 
-  /* Sampul depan berengsel di punggung buku (keadaan "open"). */
+  /* Front cover hinged at the book's spine ("open" state). */
   const cover = new THREE.Group(); cover.position.set(0, 0, T + D + T / 2); inner.add(cover);
   const front = new THREE.Mesh(slabGeo(THREE, W, H, T, 0.05, 0.012), cloth); front.position.x = W / 2; cover.add(front);
   const art = textTexture((g, w, h) => {
@@ -585,7 +585,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture, brand }
   const leftPage = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.14, H - 0.2), new THREE.MeshStandardMaterial({ map: leftTex, roughness: 0.95 }));
   leftPage.rotation.y = Math.PI; leftPage.position.set(W / 2 - 0.02, 0, -T / 2 - 0.052); cover.add(leftPage);
 
-  /* Halaman yang membalik (keadaan "flip"). */
+  /* Turning page ("flip" state). */
   const pageGeo = new THREE.PlaneGeometry(W - 0.12, H - 0.16, 8, 1); pageGeo.translate((W - 0.12) / 2, 0, 0);
   const pages = [0, 1, 2].map(() => { const p = new THREE.Group(); p.position.set(0, 0, T / 2 + D + 0.01); const m = new THREE.Mesh(pageGeo, new THREE.MeshStandardMaterial({ color: "#f7f1e4", roughness: 0.95, side: THREE.DoubleSide })); p.add(m); inner.add(p); return p; });
   const glow = glowSprite(THREE, glowTexture(), COL.accent, 6, 0.15); glow.position.z = -0.8; group.add(glow);
@@ -607,7 +607,7 @@ function buildObject({ THREE, COL, makeScreen, glowTexture, textTexture, brand }
 }
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, M = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -617,7 +617,7 @@ const navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav ul a
 const P = Object.assign({}, POSES[0]);
 let screenMode = POSES[0].screen, screenDirty = true, current = 0;
 
-/* 1) Biodata kode dari CONFIG; diketik mengikuti scroll. */
+/* 1) Bio code from CONFIG; typed along with the scroll. */
 const codeEl = document.getElementById("kode");
 if (codeEl) codeEl.innerHTML = bioHtml(CONFIG);
 const LINES = bioLines(CONFIG);
@@ -639,7 +639,7 @@ function setTyped(chars) {
 }
 const berkas = (document.getElementById("berkas") || {}).textContent || "biodata";
 
-/* 2) Pecah judul & kalimat besar jadi kata (untuk animasi per kata). */
+/* 2) Split headings & large sentences into words (for per-word animation). */
 function splitWords(el) {
   const words = el.textContent.trim().split(/\s+/);
   el.setAttribute("aria-label", el.textContent.trim());
@@ -651,7 +651,7 @@ const animated = !reduce && hasG && !!M;
 const heroWords = animated ? splitWords(document.querySelector("h1")) : [];
 const statements = animated ? Array.prototype.slice.call(document.querySelectorAll(".statement")).map(splitWords) : [];
 
-/* 3) OWD Scrub + Lenis: gulir halus, progres, kalimat muncul kata demi kata, pengetikan kode, pose objek per bab. */
+/* 3) OWD Scrub + Lenis: smooth scrolling, progress, statements appearing word by word, code typing, object pose per chapter. */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 if (animated) {
@@ -682,7 +682,7 @@ if (animated) {
   }
   sections.forEach((sec, i) => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%", onToggle: (st) => { if (st.isActive) setChapter(i); } }));
 } else {
-  // Tanpa animasi (kurangi gerak / library gagal dimuat): semua konten tampil, layar menunjukkan kode lengkap.
+  // No animation (reduced motion / library failed to load): all content shows, and the screen shows the full code.
   const ci = POSES.findIndex((p) => p.screen === "code");
   if (ci > 0 && !reduce) Object.assign(P, POSES[ci]);
   screenMode = ci >= 0 ? "code" : screenMode;
@@ -699,7 +699,7 @@ function setChapter(i) {
   screenDirty = true;
 }
 
-/* 4) Motion: judul per kata, panel muncul, kartu bertahap, angka menghitung, tombol magnetis. */
+/* 4) Motion: per-word headings, panels appear, staggered cards, counting numbers, magnetic buttons. */
 if (animated) {
   const { animate, inView, stagger } = M;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -749,7 +749,7 @@ function start() {
   const rim = new THREE.DirectionalLight(COL.accent, 2.6); rim.position.set(-6, 2, -5); scene.add(rim);
   const fill = new THREE.PointLight(COL.accent2, 18, 26, 1.6); fill.position.set(4, -1, 5); scene.add(fill);
 
-  /* Tekstur bantu: cahaya bulat & teks. */
+  /* Helper textures: round light & text. */
   const textures = [];
   function glowTexture() {
     const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -775,7 +775,7 @@ function start() {
   scene.add(api.group);
   const floor = typeof api.floor === "number" ? api.floor : -1.9;
 
-  /* Bayangan lembut & debu cahaya. */
+  /* Soft shadow & light dust. */
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ map: glowTexture(), color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; scene.add(shadow);
   const DUST = 420, dp = new Float32Array(DUST * 3);
@@ -784,7 +784,7 @@ function start() {
   const dust = new THREE.Points(dg, new THREE.PointsMaterial({ color: COL.accent, size: 0.05, map: glowTexture(), transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending }));
   scene.add(dust);
 
-  /* Layar: logo / kode / UI / teks. */
+  /* Screen: logo / code / UI / text. */
   const TK = { dark: { bg: "#0b1020", kw: "#c792ea", var: "#eef1ff", key: COL.accent, str: "#c3e88d", num: "#f78c6c", pun: "#8f9bb3", com: "#6f789b", ln: "#3c4566", bar: "rgba(255,255,255,.05)", ink: "#eef1ff" },
                paper: { bg: "#f4ecda", kw: "#7a3e9d", var: "#2a2420", key: "#a4442b", str: "#3d6f3a", num: "#a0522d", pun: "#7d7468", com: "#9a8f7e", ln: "#c9bca2", bar: "rgba(0,0,0,.05)", ink: "#2a2420" } };
   function wrap(g, text, maxW) { const words = String(text).split(/\s+/), out = []; let line = ""; words.forEach((w) => { const t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }); if (line) out.push(line); return out; }
@@ -809,7 +809,7 @@ function start() {
           if (left <= 0) break;
           let txt = tk[1].slice(0, Math.max(0, left)); left -= tk[1].length;
           g.fillStyle = k[tk[0]] || k.var;
-          /* Baris panjang dibungkus ke baris berikutnya (penting untuk layar tegak seperti HP). */
+          /* Long lines wrap to the next line (important for portrait screens such as phones). */
           if (txt.length > (maxX - x) / cw && txt.length <= (maxX - x0 - cw * 2) / cw && x > x0) { y += lh; x = x0 + cw * 2; }
           while (txt.length) {
             if (maxX - x < cw) { y += lh; x = x0 + cw * 2; }
@@ -865,7 +865,7 @@ function start() {
   const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
   io.observe(canvas);
 
-  /* Pose → kamera & objek. Layar sempit: objek ke tengah-atas, kamera mundur supaya muat. */
+  /* Pose → camera & object. Narrow screens: object to the top center, camera pulls back so it fits. */
   function applyPose(t) {
     const narrow = camera.aspect < 0.9, k = narrow ? Math.pow(0.9 / camera.aspect, 0.85) : 1;
     const lx = P.lx * (narrow ? 0.1 : 1), ly = P.ly - (narrow ? 0.8 + 0.55 * (k - 0.6) : 0);
@@ -881,14 +881,14 @@ function start() {
     shadow.scale.setScalar(P.s);
   }
 
-  /* v21: di desktop objek 3D tidak boleh menabrak panel teks. Kotak objek di layar dibandingkan
-     dengan panel yang terlihat; bila bertabrakan, objek digeser menjauh dari panel (dan dikecilkan
-     bila ruangnya kurang), dengan transisi halus. Panel di tengah & layar sempit tidak diubah. */
+  /* v21: on desktop the 3D object must not overlap the text panels. The object's on-screen box is compared
+     with the visible panels; if they overlap, the object moves away from the panel (and shrinks
+     when space is short), with a smooth transition. Centered panels & narrow screens are unchanged. */
   const panels = Array.prototype.slice.call(document.querySelectorAll("[data-ch] .panel"));
   const corner = new THREE.Vector3(), right = new THREE.Vector3();
   const avoid = { x: 0, s: 1, tx: 0, ts: 1 };
-  /* Kotak layar objek: sudut kotak lokal tiap mesh diproyeksikan langsung (lebih rapat daripada
-     kotak dunia gabungan, yang menggembung saat objek diputar). Halo/kilau transparan diabaikan. */
+  /* Object screen box: the corners of each mesh's local box are projected directly (tighter than the
+     combined world box, which grows when the object rotates). Transparent halos/glints are ignored. */
   function objRect() {
     api.group.updateMatrixWorld(true);
     let l = Infinity, r = -Infinity, tp = Infinity, b = -Infinity;
@@ -912,8 +912,8 @@ function start() {
     camera.updateMatrixWorld();
     const o = objRect(); if (!o) return;
     const W = innerWidth, gap = 32, edge = 12, w = o.r - o.l, c = (o.l + o.r) / 2;
-    /* Kandidat posisi: tetap, atau tepat di kiri/kanan tiap panel (diperkecil bila ruangnya sempit).
-       Dipilih yang paling sedikit menabrak SEMUA panel yang terlihat; seri → geser paling kecil. */
+    /* Candidate positions: fixed, or right to the left/right of each panel (shrunk when space is tight).
+       The one that overlaps ALL visible panels the least wins; ties → the smallest shift. */
     const rects = [];
     for (const p of panels) {
       const r = p.getBoundingClientRect();

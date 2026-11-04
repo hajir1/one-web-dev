@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Kopi Pagi</title>
 <meta name="description" content="Animasi ucapan pagi: cangkir kosong di meja, kopi dituang, uap mengepul lalu partikel uapnya menyusun satu kata yang bisa diganti.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #f4e1c6; /* Latar bawah */
   --bg-2: #f9eedd; /* Latar tengah */
@@ -98,7 +98,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi &amp; kata dari uap kopi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true,
@@ -121,27 +121,27 @@ function scene(api) {
     draw(t, B) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       if (!pts.length) build();
-      /* Sinar pagi dari jendela. */
+      /* Morning light from the window. */
       g.save(); g.globalAlpha = 0.18; g.fillStyle = "#ffffff"; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(W * (0.05 + i * 0.12), 0); g.lineTo(W * (0.12 + i * 0.12), 0); g.lineTo(W * (0.42 + i * 0.12), H * 0.75); g.lineTo(W * (0.3 + i * 0.12), H * 0.75); g.fill(); } g.restore();
       /* Meja. */
       const ty = H * (api.small ? 0.7 : 0.72);
       g.fillStyle = mix(COL["c-1"], "#5a3a24", 0.75); g.fillRect(0, ty, W, H - ty);
       g.fillStyle = rgba("#000000", 0.12); for (let i = 0; i < 5; i++) g.fillRect(0, ty + u * (3 + i * 5), W, 1);
-      /* Cangkir dan lepek. */
+      /* Cup and saucer. */
       const cx = W / 2, cs = u * (api.small ? 11 : 9.5), cy = ty - cs * 0.85;
       g.fillStyle = rgba("#000000", 0.15); g.beginPath(); g.ellipse(cx, ty + u * 0.6, cs * 1.9, cs * 0.32, 0, 0, 7); g.fill();
       g.fillStyle = mix(COL["c-1"], "#ffffff", 0.7); g.beginPath(); g.ellipse(cx, ty, cs * 1.7, cs * 0.28, 0, 0, 7); g.fill();
       g.strokeStyle = COL["c-1"]; g.lineWidth = cs * 0.18; g.beginPath(); g.ellipse(cx + cs * 1.05, cy + cs * 0.1, cs * 0.38, cs * 0.42, 0, -1.4, 1.4); g.stroke();
       g.fillStyle = COL["c-1"]; g.beginPath(); g.moveTo(cx - cs, cy - cs * 0.55); g.lineTo(cx + cs, cy - cs * 0.55); g.bezierCurveTo(cx + cs, cy + cs * 0.7, cx + cs * 0.55, cy + cs * 0.85, cx, cy + cs * 0.85); g.bezierCurveTo(cx - cs * 0.55, cy + cs * 0.85, cx - cs, cy + cs * 0.7, cx - cs, cy - cs * 0.55); g.fill();
       g.fillStyle = rgba("#ffffff", 0.18); g.fillRect(cx - cs * 0.75, cy - cs * 0.4, cs * 0.16, cs * 0.8);
-      /* Isi kopi naik saat dituang. */
+      /* Coffee level rises while pouring. */
       const fill = ease(seg(B, 0.15, 0.95));
       g.fillStyle = mix(COL["c-1"], "#000000", 0.25); g.beginPath(); g.ellipse(cx, cy - cs * 0.55, cs, cs * 0.22, 0, 0, 7); g.fill();
       if (fill > 0) { g.fillStyle = COL["c-2"]; g.beginPath(); g.ellipse(cx, cy - cs * 0.55, cs * 0.92 * Math.min(1, fill * 1.4), cs * 0.18 * Math.min(1, fill * 1.4), 0, 0, 7); g.fill(); g.fillStyle = rgba("#ffffff", 0.35 * fill); g.beginPath(); g.ellipse(cx - cs * 0.25, cy - cs * 0.58, cs * 0.3, cs * 0.05, 0, 0, 7); g.fill(); }
-      /* Aliran kopi dari teko di atas. */
+      /* Coffee stream from the kettle above. */
       const pour = seg(B, 0.05, 0.25) * (1 - seg(B, 0.85, 1.05));
       if (pour > 0) { g.strokeStyle = COL["c-2"]; g.lineWidth = u * 1.1; g.beginPath(); g.moveTo(cx + u * 2, cy - cs * 0.55 - H * 0.35 * pour); g.quadraticCurveTo(cx + u * 0.6, cy - cs * 1.2, cx, cy - cs * 0.6); g.stroke(); }
-      /* Uap: partikel naik bergelombang, lalu tertarik menyusun kata. */
+      /* Steam: particles rise in waves, then are drawn together to spell a word. */
       const steam = seg(B, 0.9, 1.6), form = ease(seg(B, 1.9, 2.8));
       if (steam > 0) {
         const sy = cy - cs * 0.7;
@@ -167,16 +167,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -195,7 +195,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -218,7 +218,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

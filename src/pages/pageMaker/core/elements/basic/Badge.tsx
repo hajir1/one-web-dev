@@ -11,7 +11,7 @@ import i18n from "../../../../../i18n";
 /* ------------------------------------------------------------------ */
 
 export interface BadgeState extends StyleState {
-  /** Titik status di depan teks (mis. "● Online"). */
+  /** Status dot before the text (e.g. "● Online"). */
   dotEnabled: boolean;
   dotColor: string;
   dotSize: number;
@@ -97,7 +97,7 @@ const DEFAULT_STATE: BadgeState = {
 const DEFAULT_CLASS_NAME = "custom-badge";
 
 /* ------------------------------------------------------------------ */
-/* Preset warna — satu klik mengatur bg, teks, border, & warna hover    */
+/* Color presets: one click sets the bg, text, border, & hover color    */
 /* ------------------------------------------------------------------ */
 
 type Tone = "blue" | "green" | "amber" | "red" | "gray" | "violet";
@@ -127,7 +127,7 @@ function presetPatch(tone: Tone, variant: Variant): Partial<BadgeState> {
 /* ------------------------------------------------------------------ */
 
 function badgeCss(s: BadgeState, cls: string, hasIcon: boolean): string {
-  // Badge dengan titik status selalu flex supaya titik & teks sejajar.
+  // Badges with a status dot are always flex so the dot & text line up.
   let css = generateCss(s, cls, hasIcon, hasIcon || s.dotEnabled);
   if (s.dotEnabled) {
     if (!hasIcon) css = css.replace(/gap: \d+px;/, `gap: ${s.iconGap}px;`);
@@ -237,7 +237,7 @@ function badgeSections(
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const badgeElement = defineElement<BadgeState>({

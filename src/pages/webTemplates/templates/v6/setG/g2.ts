@@ -2,9 +2,9 @@ import { page } from "./dsl";
 import type { GSpec } from "./spec";
 
 /* ================================================================== */
-/* Set G batch 2 (G21–G40): laundry, bimbel, kedai kopi, toko bangunan, */
+/* Set G batch 2 (G21–G40): laundry, tutoring, coffee shop, building supplies, */
 /* klinik kecantikan, dental, properti, SaaS faktur, podcast, esports,  */
-/* festival kuliner, kursus Jepang, desa wisata, foto produk, asuransi, */
+/* food festival, Japanese course, tourist village, product photography, insurance, */
 /* arsitek, florist, percetakan, klub lari, masjid.                     */
 /* ================================================================== */
 

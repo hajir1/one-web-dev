@@ -1,18 +1,18 @@
 // ─── hooks/useFileQueue.ts ───────────────────────────────────────────────────
-// Antrean file bersama untuk semua halaman Media yang memproses banyak file.
+// Shared file queue for every Media page that processes many files.
 //
-// Memperbaiki bug versi lama:
-// - Object URL (pratinjau & hasil) dicabut saat item dihapus, hasil diganti,
-//   "Hapus semua", dan saat halaman ditinggalkan (sebelumnya bocor).
-// - Tidak ada proses ganda: satu antrean berjalan pada satu waktu; item yang
-//   sedang diproses tidak bisa diproses lagi (klik ganda / "Proses semua"
-//   bersamaan dengan "Proses" per item).
-// - Bisa dibatalkan (AbortController); item yang dibatalkan kembali ke
-//   status sebelumnya, BUKAN "gagal".
-// - Hasil menyimpan format/nama file-nya sendiri, jadi mengganti pengaturan
-//   setelah konversi tidak membuat ekstensi unduhan salah. Hasil yang dibuat
-//   dengan pengaturan lama ditandai "usang" dan ikut diproses ulang.
-// - Item yang dihapus saat sedang diproses tidak "hidup lagi" ketika hasil
+// Fixes bugs from the old version:
+// - Object URLs (preview & result) are revoked when an item is removed, the result is replaced,
+//   "Remove all", and when leaving the page (previously leaked).
+// - No double processing: one queue runs at a time; items
+//   being processed cannot be processed again (double click / "Process all"
+//   at the same time as per-item "Process").
+// - Can be canceled (AbortController); canceled items go back to
+//   previous status, NOT "failed".
+// - Results store their own format/file name, so changing settings
+//   after conversion does not give downloads the wrong extension. Results made
+//   with old settings are marked "stale" and processed again.
+// - Items removed while processing do not "come back to life" when the result
 //   datang terlambat.
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -28,9 +28,9 @@ interface QueueResult {
   blob: Blob;
   url: string;
   fileName: string;
-  /** Label hasil, mis. "WebP" atau "PNG transparan". */
+  /** Result label, e.g. "WebP" or "transparent PNG". */
   label?: string;
-  /** settingsKey saat hasil dibuat. */
+  /** settingsKey at the time the result was made. */
   key: string;
   meta?: Record<string, unknown>;
 }
@@ -60,11 +60,11 @@ interface ProcessOutput {
 
 export interface UseFileQueueOptions {
   process: (item: QueueItem, ctx: ProcessContext) => Promise<ProcessOutput>;
-  /** Ringkasan pengaturan saat ini; hasil dengan kunci berbeda = usang. */
+  /** Summary of the current settings; results with a different key = stale. */
   settingsKey: string;
-  /** Buat object URL pratinjau untuk file (default true). */
+  /** Creates a preview object URL for the file (default true). */
   preview?: boolean;
-  /** Dipanggil saat antrean dihentikan oleh StopQueueError (mis. server belum tersedia). */
+  /** Called when the queue is stopped by a StopQueueError (e.g. the server is not available yet). */
   onStop?: (err: StopQueueError) => void;
 }
 
@@ -97,7 +97,7 @@ export function useFileQueue({ process, settingsKey, preview = true, onStop }: U
     if (it.result) URL.revokeObjectURL(it.result.url);
   };
 
-  // Halaman ditinggalkan: hentikan proses & cabut semua URL.
+  // Leaving the page: stop processing & revoke every URL.
   useEffect(
     () => () => {
       cancelRef.current = true;
@@ -147,7 +147,7 @@ export function useFileQueue({ process, settingsKey, preview = true, onStop }: U
     commit(() => []);
   }, [cancel, commit]);
 
-  /** Hapus semua hasil (file sumber tetap). */
+  /** Removes every result (source files stay). */
   const clearResults = useCallback(() => {
     if (runningRef.current) return;
     itemsRef.current.forEach((it) => it.result && URL.revokeObjectURL(it.result.url));
@@ -174,7 +174,7 @@ export function useFileQueue({ process, settingsKey, preview = true, onStop }: U
         for (const id of targets) {
           if (cancelRef.current) break;
           const item = itemsRef.current.find((x) => x.id === id);
-          if (!item) continue; // dihapus saat menunggu
+          if (!item) continue; // removed while waiting
           const before = { status: item.status, error: item.error };
           const ctrl = new AbortController();
           ctrlRef.current = { id, ctrl };
@@ -191,7 +191,7 @@ export function useFileQueue({ process, settingsKey, preview = true, onStop }: U
             if (ctrl.signal.aborted) throw new DOMException(i18n.t("media.errors.aborted"), "AbortError");
             if (!out.blob || out.blob.size === 0) throw new Error(i18n.t("media.errors.emptyResult"));
             const still = itemsRef.current.find((x) => x.id === id);
-            if (!still) continue; // dihapus saat diproses: buang hasil
+            if (!still) continue; // removed while processing: discard the result
             if (still.result) URL.revokeObjectURL(still.result.url);
             patch(id, {
               status: "done",
@@ -214,7 +214,7 @@ export function useFileQueue({ process, settingsKey, preview = true, onStop }: U
                 break;
               }
               if (cancelRef.current) break;
-              continue; // item ini saja yang dibatalkan (mis. dihapus)
+              continue; // only this item is canceled (e.g. removed)
             }
             if (still)
               patch(id, {

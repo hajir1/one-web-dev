@@ -1,16 +1,16 @@
 /* ================================================================== */
-/* Tipe konteks website untuk elemen (dipakai Menu Element)            */
-/* Dipisah dari helpers/site.ts supaya `core` tidak bergantung ke atas. */
+/* Website context types for elements (used by the Menu Element)       */
+/* Split from helpers/site.ts so `core` does not depend upward.        */
 /* ================================================================== */
 
 export interface SitePageInfo {
   designId: string;
-  /** Teks menu: label khusus, atau nama desain terkini. */
+  /** Menu text: a custom label, or the current design name. */
   label: string;
-  /** Slug URL yang valid & unik di website (mis. "tentang-kami"). */
+  /** A valid & unique URL slug within the website (e.g. "tentang-kami"). */
   slug: string;
   isHome: boolean;
-  /** v20: false = tidak tampil di menu otomatis (mis. halaman terima kasih). */
+  /** v20: false = not shown in the automatic menu (e.g. a thank-you page). */
   inMenu?: boolean;
 }
 
@@ -22,21 +22,21 @@ export interface SiteInfo {
 
 export interface SiteContext {
   sites: SiteInfo[];
-  /** Desain yang sedang dirender (untuk menandai menu aktif & memilih folder otomatis). */
+  /** The design being rendered (to mark the active menu item & pick the folder automatically). */
   currentDesignId?: string | null;
   /**
-   * "none" = link <a href="slug.html"> biasa (editor / ekspor satu halaman).
-   * "site" = ekspor website: link memakai router framework (Link, RouterLink, routerLink, #/).
+   * "none" = a plain <a href="slug.html"> link (editor / single-page export).
+   * "site" = website export: links use the framework router (Link, RouterLink, routerLink, #/).
    */
   routing: "none" | "site";
 }
 
-/** Konteks tambahan saat merender spec elemen. */
+/** Extra context when rendering an element spec. */
 export interface SpecContext {
   site?: SiteContext;
 }
 
-/** Path tautan halaman per target. */
+/** Page link path per target. */
 export function pageHref(p: Pick<SitePageInfo, "slug" | "isHome">, target: "html" | "router" | "hash"): string {
   if (target === "html") return p.isHome ? "index.html" : `${p.slug}.html`;
   if (target === "hash") return p.isHome ? "#/" : `#/${p.slug}`;

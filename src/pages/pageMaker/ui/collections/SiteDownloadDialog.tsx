@@ -20,9 +20,9 @@ import { DEFAULT_CRUD_STACK, frameworkForStack, isOfferedStack, stackForFramewor
 import CrudExportBar from "./CrudExportBar";
 
 /* ================================================================== */
-/* Website Saya › Unduh: seluruh website (semua halaman) sebagai zip,    */
-/* dengan opsi Include CRUD bila website punya koleksi data.             */
-/* Pilihan Include CRUD + stack sama dengan panel Kode di Studio.        */
+/* My Websites › Download: the whole website (every page) as a zip,     */
+/* with the Include CRUD option when the website has data collections.  */
+/* The Include CRUD + stack options are the same as the Code panel in Studio. */
 /* ================================================================== */
 
 const FRAMEWORKS: Framework[] = ["html", "blade", "react", "vue", "svelte", "angular"];
@@ -41,7 +41,7 @@ export default function SiteDownloadDialog({ site, designs, onClose }: { site: S
   const [crudStack, setCrudStack] = usePersistentState<CrudStack>("pm-crud-stack", DEFAULT_CRUD_STACK, isOfferedStack);
 
   const built = useMemo(() => buildSite(site, designs, { icons, fonts, baseFont, vars, allowPremiumElementsFor: premiumFor }), [site, designs, icons, fonts, baseFont, vars, premiumFor]);
-  /** Koleksi data di semua halaman website. */
+  /** Data collections across every page of the website. */
   const cols = useMemo(
     () =>
       resolvePages(normalizeSiteDoc(site.state), designs)

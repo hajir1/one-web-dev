@@ -1,8 +1,8 @@
 import type { Domain } from "./spec";
 
 /* ================================================================== */
-/* Isi domain dashboard (bagian 3): pemasaran, media sosial, DevOps,    */
-/* IoT/energi, aset kripto. Semua data adalah contoh.                   */
+/* Dashboard domain content (part 3): marketing, social media, DevOps,  */
+/* IoT/energy, crypto assets. All data is sample data.                  */
 /* ================================================================== */
 
 const M6 = ["Jan|Jan", "Feb|Feb", "Mar|Mar", "Apr|Apr", "Mei|May", "Jun|Jun"];

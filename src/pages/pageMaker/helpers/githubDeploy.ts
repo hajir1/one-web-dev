@@ -1,22 +1,22 @@
 /* ================================================================== */
-/* Deploy ekspor HTML ke GitHub Pages (v14)                             */
+/* Deploy the HTML export to GitHub Pages (v14)                         */
 /*                                                                    */
-/* Langsung dari browser ke API GitHub memakai token milik pengguna     */
-/* (tidak pernah dikirim ke server OneWebDev):                          */
-/*   1. GET  /user                          → pemilik token            */
+/* Straight from the browser to the GitHub API with the user's own token */
+/* (never sent to the OneWebDev server):                                */
+/*   1. GET  /user                          → token owner              */
 /*   2. GET  /repos/:o/:r  (404 → POST /user/repos, auto_init)          */
-/*   3. GET  git/ref/heads/:branch          → commit terakhir           */
-/*   4. POST git/trees (isi berkas langsung)  → POST git/commits         */
-/*      → PATCH git/refs/heads/:branch      (isi repo = hasil ekspor)   */
+/*   3. GET  git/ref/heads/:branch          → latest commit             */
+/*   4. POST git/trees (file content inline)  → POST git/commits         */
+/*      → PATCH git/refs/heads/:branch      (repo content = export output) */
 /*   5. GET  /repos/:o/:r/pages (404 → POST, sumber branch "/")          */
-/* Vercel: tanpa token, lewat tombol "Deploy" Vercel dari repo tadi.    */
-/* Hanya format HTML (situs statis tanpa build).                        */
+/* Vercel: no token, through Vercel's "Deploy" button from that repo.   */
+/* HTML format only (a static site without a build).                    */
 /* ================================================================== */
 
 export interface DeployFile {
   name: string;
   content: string;
-  /** v21: isi biner (gambar) dalam base64; bila ada, `content` diabaikan. */
+  /** v21: binary content (images) in base64; when present, `content` is ignored. */
   base64?: string;
 }
 
@@ -26,11 +26,11 @@ export interface GitHubDeployInput {
   token: string;
   repo: string;
   files: DeployFile[];
-  /** Pesan commit. */
+  /** Commit message. */
   message?: string;
   onStep?: (step: DeployStep) => void;
   fetch?: typeof fetch;
-  /** Jeda antar-percobaan saat repo baru belum siap (ms). */
+  /** Delay between attempts while a new repo is not ready yet (ms). */
   retryDelayMs?: number;
 }
 
@@ -39,13 +39,13 @@ export interface GitHubDeployResult {
   repo: string;
   repoUrl: string;
   pagesUrl: string;
-  /** Tombol "Deploy" Vercel untuk repo ini (impor & deploy, tanpa token). */
+  /** Vercel "Deploy" button for this repo (import & deploy, no token). */
   vercelUrl: string;
-  /** true = repo baru dibuat oleh deploy ini. */
+  /** true = the repo was just created by this deploy. */
   created: boolean;
 }
 
-/** Kode galat stabil (diterjemahkan di UI: pm.deploy.errors.<code>). */
+/** Stable error code (translated in the UI: pm.deploy.errors.<code>). */
 export type GitHubDeployErrorCode = "token" | "scope" | "rateLimit" | "repoName" | "notOwner" | "network" | "pages" | "unknown";
 
 export class GitHubDeployError extends Error {
@@ -61,7 +61,7 @@ export class GitHubDeployError extends Error {
 
 const API = "https://api.github.com";
 
-/** Nama repo yang valid di GitHub: huruf, angka, ".", "_", "-"; maks. 100. */
+/** A valid GitHub repo name: letters, digits, ".", "_", "-"; max. 100. */
 export function sanitizeRepoName(raw: string): string {
   return raw
     .trim()
@@ -72,14 +72,14 @@ export function sanitizeRepoName(raw: string): string {
     .slice(0, 100);
 }
 
-/** Berkas yang dikirim: hasil ekspor + `.nojekyll` (GitHub Pages tidak memproses ulang dengan Jekyll). */
+/** Files sent: the export output + `.nojekyll` (GitHub Pages does not reprocess with Jekyll). */
 export function deployFiles(files: readonly DeployFile[]): DeployFile[] {
   const out = files.filter((f) => f.name && !f.name.startsWith("/") && !f.name.split("/").includes(".."));
   if (!out.some((f) => f.name === ".nojekyll")) out.push({ name: ".nojekyll", content: "" });
   return out;
 }
 
-/** URL GitHub Pages bawaan untuk repo (situs pengguna `nama.github.io` ada di root). */
+/** The default GitHub Pages URL for the repo (the user site `name.github.io` is at the root). */
 export function pagesUrlOf(owner: string, repo: string): string {
   const host = `${owner.toLowerCase()}.github.io`;
   return repo.toLowerCase() === host ? `https://${host}/` : `https://${host}/${repo}/`;
@@ -127,12 +127,12 @@ export async function deployToGitHub(input: GitHubDeployInput): Promise<GitHubDe
     throw new GitHubDeployError("unknown", msg, res.status);
   };
 
-  // 1) Pemilik token.
+  // 1) Token owner.
   input.onStep?.("auth");
   const user = (await call<{ login: string }>("GET", "/user"))!;
   const owner = user.login;
 
-  // 2) Repo: pakai yang ada, atau buat baru (publik: GitHub Pages gratis hanya untuk repo publik).
+  // 2) Repo: use the existing one, or create a new one (public: free GitHub Pages is only for public repos).
   input.onStep?.("repo");
   const r = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
   let info = await call<{ default_branch: string; html_url: string; permissions?: { push?: boolean } }>("GET", r, undefined, true);
@@ -151,17 +151,17 @@ export async function deployToGitHub(input: GitHubDeployInput): Promise<GitHubDe
   const branch = info!.default_branch || "main";
   const repoUrl = info!.html_url || `https://github.com/${owner}/${repo}`;
 
-  // 3) Commit terakhir branch utama (repo baru kadang butuh beberapa detik).
+  // 3) The latest commit of the main branch (a new repo sometimes needs a few seconds).
   let head: { object: { sha: string } } | null = null;
   for (let i = 0; i < 5 && !head; i++) {
     head = await call<{ object: { sha: string } }>("GET", `${r}/git/ref/heads/${encodeURIComponent(branch)}`, undefined, true);
     if (!head && i < 4) await sleep(delay);
   }
 
-  // 4) Isi repo diganti seluruhnya dengan hasil ekspor (tree tanpa base_tree).
+  // 4) The repo content is fully replaced by the export output (a tree without base_tree).
   input.onStep?.("upload");
   const files = deployFiles(input.files);
-  // Berkas biner (gambar) dibuat sebagai blob base64 lebih dulu; teks langsung di tree.
+  // Binary files (images) are created as base64 blobs first; text goes directly into the tree.
   const entries: { path: string; mode: string; type: string; content?: string; sha?: string }[] = [];
   for (const f of files) {
     if (f.base64 === undefined) entries.push({ path: f.name, mode: "100644", type: "blob", content: f.content });
@@ -179,14 +179,14 @@ export async function deployToGitHub(input: GitHubDeployInput): Promise<GitHubDe
   if (head) await call("PATCH", `${r}/git/refs/heads/${encodeURIComponent(branch)}`, { sha: commit.sha, force: true });
   else await call("POST", `${r}/git/refs`, { ref: `refs/heads/${branch}`, sha: commit.sha });
 
-  // 5) GitHub Pages dari branch utama (root).
+  // 5) GitHub Pages from the main branch (root).
   input.onStep?.("pages");
   let pages = await call<{ html_url?: string }>("GET", `${r}/pages`, undefined, true);
   if (!pages) {
     try {
       pages = await call<{ html_url?: string }>("POST", `${r}/pages`, { source: { branch, path: "/" } });
     } catch (e) {
-      // 409 = sudah aktif (balapan); selain itu Pages gagal diaktifkan tetapi berkas sudah terkirim.
+      // 409 = already enabled (race); otherwise Pages failed to enable but the files were already sent.
       if (!(e instanceof GitHubDeployError && e.status === 409)) throw new GitHubDeployError("pages", e instanceof Error ? e.message : String(e), e instanceof GitHubDeployError ? e.status : 0);
     }
   }

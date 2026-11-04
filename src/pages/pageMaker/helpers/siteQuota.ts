@@ -6,21 +6,21 @@ import { SITE_TYPE } from "./site";
 /* ================================================================== */
 /* Kuota folder website (FREE_SITES + slot tambahan)                    */
 /*                                                                    */
-/* Semua jalur yang MEMBUAT folder website (folder baru, edit template)  */
-/* lewat `ensureSiteRoom`. Bila penuh, dialog memberi dua pilihan:       */
-/* bayar slot tambahan, atau hapus website lama (pengguna memilih sendiri;*/
-/* aplikasi tidak pernah menghapus otomatis).                            */
+/* Every path that CREATES a website folder (new folder, edit template) */
+/* goes through `ensureSiteRoom`. When full, the dialog offers two options: */
+/* pay for an extra slot, or delete an old website (the user chooses;  */
+/* the app never deletes automatically).                                 */
 /* ================================================================== */
 
 type SiteLimitReason = "create" | "template";
 
 export interface SiteLimitRequest {
   reason: SiteLimitReason;
-  /** Nama yang akan dibuat (mis. nama template) — konten, tidak diterjemahkan. */
+  /** The name to be created (e.g. the template name); content, not translated. */
   label?: string;
   /**
-   * Dipanggil setelah ruang tersedia. `paid` = slot baru saja dibuka server
-   * (nilai batas di klien bisa belum diperbarui, jadi pemanggil tidak cek ulang).
+   * Called once space is available. `paid` = a slot was just unlocked by the server
+   * (the client limit value may not be updated yet, so the caller does not recheck).
    */
   onRoom?: (paid?: boolean) => void;
 }
@@ -39,10 +39,10 @@ export const useSiteLimitDialog = create<SiteLimitState>((set) => ({
 
 const siteFolders = (): SavedDesign[] => useDesignStore.getState().designs[SITE_TYPE] ?? [];
 
-/** Masih ada slot folder website? */
+/** Are there website folder slots left? */
 const hasSiteRoom = (): boolean => siteFolders().length < siteLimit();
 
-/** true = boleh membuat folder website sekarang. false = dialog kuota website dibuka. */
+/** true = a website folder may be created now. false = the website quota dialog opens. */
 export function ensureSiteRoom(request: SiteLimitRequest): boolean {
   if (hasSiteRoom()) return true;
   useSiteLimitDialog.getState().open(request);

@@ -1,6 +1,6 @@
 import { specks, svg } from "./art";
 
-/* Ilustrasi 01 Tanah Liat Kasongan: gerabah di atas kertas kapur, garis tanah basah. */
+/* Illustration 01 Tanah Liat Kasongan: pottery on chalk paper, wet clay lines. */
 
 const K = { bg: "#efe4d3", ink: "#3B2A20", tera: "#B5532A", dark: "#8f3f1e", moss: "#5E7D5B", ash: "#8C7B6B" };
 
@@ -17,7 +17,7 @@ const VESSELS: Record<string, string> = {
   celengan: `${ground(520)}<path d="M180 470c-30-120 20-230 120-230 30-60 90-90 130-70-10 30-30 60-40 80 40 40 50 120 30 220z" fill="${K.tera}" ${stroke}/><path d="M410 180l30-50 20 60z" fill="#c8241b" ${stroke}/><circle cx="380" cy="250" r="9" fill="${K.ink}"/><path d="M250 300h80" stroke="${K.ink}" stroke-width="8" stroke-linecap="round"/><path d="M180 380c-40-20-70 0-80 30 30-10 50 0 80 10z" fill="${K.moss}" ${stroke}/>`,
 };
 
-/** Bengkel: tangan perajin di atas meja putar, dilihat dari samping (bentuk sederhana). */
+/** Workshop: a potter's hands at the wheel, seen from the side (simple shapes). */
 function bengkel(): string {
   return svg(
     800,

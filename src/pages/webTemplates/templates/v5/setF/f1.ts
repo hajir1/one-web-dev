@@ -41,11 +41,11 @@ import {
 
 /* ================================================================== */
 /* Template v5 F1–F4: Katering (Free), Resor, Rental mobil, Studio yoga. */
-/* Setiap template memakai section Lebar Penuh & Spesialisasi.          */
+/* Every template uses Full Width & Specialty sections.                 */
 /* ================================================================== */
 
 /* ------------- 1. Dapur Rasa Katering — catering (FREE, 4 hlm) ------------- */
-// Hanya elemen & preset gratis; library: AOS.
+// Only free elements & presets; library: AOS.
 
 const DP: Palette = { ink: "#3b1d0e", muted: "#7c5a45", primary: "#c2410c", primaryDark: "#9a3412", soft: "#ffedd5", line: "#fed7aa" };
 const D = lookD(DP, { head: "Fraunces", body: "Rubik", shape: "soft", radius: 18, bg: "#fffbf5", alt: "#fff1e2", inv: "#3b1d0e", fx: { aos: "fade-up" } });

@@ -2,10 +2,10 @@ import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata 25 template katalog v3 (bagian C). Konten: ./setC/.
- * 1 Free + 24 Premium, 4–10 halaman. Harga Premium mengikuti rumus
- * `templatePrice` (marketplace/templatePricing.ts): 3 kredit per halaman
- * + bonus kualitas; diuji di tests/pricing.test.ts.
+ * Metadata for the 25 catalog v3 templates (part C). Content: ./setC/.
+ * 1 Free + 24 Premium, 4–10 pages. Premium prices follow the
+ * `templatePrice` formula (marketplace/templatePricing.ts): 3 credits per page
+ * + a quality bonus; tested in tests/pricing.test.ts.
  */
 export const V3C_CATALOG: TemplateMeta[] = [
   { id: "bakery-roti-hangat", version: 1, category: "bakery", tier: "free", price: TEMPLATE_PRICE.free, accent: "#b45309", tags: ["roti", "bakery", "pesan antar"], isNew: true },

@@ -3,11 +3,11 @@ import { buildTourHtml, runtimeTour } from "../exportTour";
 import type { Tour } from "../model";
 
 /**
- * Pratinjau A-Frame di iframe sandbox. Runtime-nya sama persis dengan hasil
- * ekspor; data tur & berkas (Blob) dikirim lewat postMessage, iframe membuat
- * URL blob-nya sendiri.
- *   mode "edit": klik panorama → onPlace(yaw, pitch); klik hotspot → onPick(id)
- *   mode "view": perilaku seperti hasil ekspor (pindah scene, buka panel)
+ * A-Frame preview in a sandboxed iframe. Its runtime is exactly the same as the
+ * export; tour data & files (Blobs) are sent through postMessage, and the iframe creates
+ * its own blob URLs.
+ *   "edit" mode: click the panorama → onPlace(yaw, pitch); click a hotspot → onPick(id)
+ *   "view" mode: behaves like the export (switch scenes, open panels)
  */
 export default function TourPreview({
   tour,
@@ -34,7 +34,7 @@ export default function TourPreview({
   useEffect(() => {
     cb.current = { onPlace, onPick };
   }, [onPlace, onPick]);
-  // srcDoc tetap (tidak ikut berubah) supaya A-Frame tidak dimuat ulang tiap edit.
+  // srcDoc stays fixed (it does not change) so A-Frame is not reloaded on every edit.
   const srcDoc = useMemo(() => buildTourHtml({ title: "Tur 360°", lang }), [lang]);
 
   useEffect(() => {

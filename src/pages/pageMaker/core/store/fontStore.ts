@@ -14,25 +14,25 @@ import {
 
 interface FontStore {
   fonts: GlobalFont[];
-  /** Font dasar halaman (id font pustaka atau id font sistem), atau null = bawaan peramban. */
+  /** Base page font (a library font id or a system font id), or null = the browser default. */
   baseFontId: string | null;
-  /** Mengembalikan pesan galat, atau null kalau berhasil. */
+  /** Returns an error message, or null on success. */
   addFont: (input: FontInput) => string | null;
   updateFont: (id: string, patch: Partial<Pick<FontInput, "fallback" | "weights" | "url">>) => string | null;
   removeFont: (id: string) => void;
   setBaseFont: (id: string | null) => void;
 }
 
-/** Pesan galat validasi dalam bahasa aktif (aturan tetap dari validateFontInput). */
+/** Validation error message in the active language (the rules still come from validateFontInput). */
 function fontInputError(input: FontInput): string | null {
   if (!validateFontInput(input)) return null;
   return isValidFontName(input.name) ? i18n.t("gs.errors.fontUrl") : i18n.t("gs.errors.fontName");
 }
 
 /**
- * Pustaka font global — persist ke localStorage, sama seperti pustaka ikon.
- * Nama keluarga font tidak bisa diubah setelah dibuat karena elemen menyimpan
- * font sebagai string CSS (`"Nama", sans-serif`); ganti font = hapus + tambah.
+ * Global font library: persisted to localStorage, like the icon library.
+ * The font family name cannot be changed after creation because elements store
+ * fonts as CSS strings (`"Name", sans-serif`); changing a font = delete + add.
  */
 export const useFontStore = create<FontStore>()(
   persist(
@@ -85,7 +85,7 @@ export const useFontStore = create<FontStore>()(
     {
       name: "global-font-library",
       version: 1,
-      // Data di localStorage bisa rusak/diedit manual → bersihkan saat dimuat.
+      // Data in localStorage may be corrupt/hand-edited → sanitize on load.
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as { fonts?: unknown; baseFontId?: unknown };
         const fonts = sanitizeFonts(p.fonts);

@@ -12,7 +12,7 @@ import { useSession, type SessionUser } from "../auth/session";
 import { normalizeReferralInput } from "../auth/referralCapture";
 import { CREDITS_PATH } from "../config/menu";
 
-/** Salin teks ke clipboard (cadangan textarea untuk browser lama / non-HTTPS). */
+/** Copies text to the clipboard (textarea fallback for old browsers / non-HTTPS). */
 async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -44,7 +44,7 @@ function useCopied() {
 
 const idr = (n: number, lang: string) => new Intl.NumberFormat(lang === "en" ? "en-US" : "id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
-/** /:lang/profile — identitas akun + kode referral. */
+/** /:lang/profile — account identity + referral code. */
 export default function UserProfiles() {
   const { t } = useTranslation();
   const status = useSession((s) => s.status);
@@ -136,7 +136,7 @@ function ReferralBody({ info, lang, copied, copy, canShare }: { info: ReferralIn
     try {
       await navigator.share({ title: "OneWebDev", text: t("referral.shareText", { code: info.code }), url: invite });
     } catch {
-      /* dibatalkan pengguna */
+      /* cancelled by the user */
     }
   };
   return (

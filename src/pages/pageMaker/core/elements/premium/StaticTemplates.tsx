@@ -9,8 +9,8 @@ import i18n from "../../../../../i18n";
 import { boxImage } from "../placeholders";
 
 /* ================================================================== */
-/* Template elemen PREMIUM (statis): Progress Bar, Testimoni, Kartu     */
-/* Harga. Hanya HTML + CSS, jadi hasilnya sama di semua framework.       */
+/* PREMIUM element templates (static): Progress Bar, Testimonial, Card  */
+/* Pricing. Only HTML + CSS, so the output is identical in every framework. */
 /* ================================================================== */
 
 const col = (c: string, d: string) => safeColor(c) ?? d;
@@ -280,7 +280,7 @@ ${center ? "  justify-content: center;\n" : ""}}
   },
 });
 
-/* ---------------------------- Kartu Harga ---------------------------- */
+/* ---------------------------- Pricing Card ---------------------------- */
 
 export interface PricingState {
   plan: string;

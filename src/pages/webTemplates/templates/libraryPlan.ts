@@ -6,22 +6,22 @@ import { isSection } from "../../pageMaker/helpers/pageDoc";
 import { animate, aos, installLibs, tilt } from "./v3/libs";
 
 /* ================================================================== */
-/* Library untuk template Premium lama (katalog awal + v2)               */
+/* Libraries for old Premium templates (initial catalog + v2)           */
 /*                                                                    */
-/* Template Premium sebelumnya diberi library dari menu Element →        */
-/* Library supaya lebih hidup: AOS (animasi saat di-scroll) di semua     */
-/* template, Animate.css di judul hero sebagian template, dan Vanilla    */
-/* Tilt di gambar/kartu template yang bersifat visual. Efek dipasang     */
-/* per node sehingga bisa diubah/dilepas di Pengaturan → Library.        */
-/* Template v3 memasang library-nya sendiri dan tidak ada di daftar ini. */
+/* Earlier Premium templates got libraries from the Element menu →       */
+/* Libraries to make them livelier: AOS (scroll animations) on every    */
+/* template, Animate.css on the hero heading of some templates, and Vanilla */
+/* Tilt on images/cards of visual templates. Effects are applied        */
+/* per node so they can be changed/removed in Settings → Library.       */
+/* v3 templates install their own libraries and are not in this list.  */
 /* ================================================================== */
 
 interface LibraryPlan {
-  /** Efek AOS untuk isi section. */
+  /** AOS effect for section content. */
   aos: AosSettings["effect"];
-  /** Efek Animate.css untuk baris pertama hero. */
+  /** Animate.css effect for the first hero row. */
   hero?: AnimateSettings["effect"];
-  /** Vanilla Tilt pada gambar (atau kartu grid bila tak ada gambar). */
+  /** Vanilla Tilt on images (or grid cards when there are no images). */
   tilt?: boolean;
 }
 
@@ -98,7 +98,7 @@ function hasGrid(n: ComponentNode): boolean {
   return isBox(n) && (n.layout === "grid" || n.children.some(hasGrid));
 }
 
-/** Pasang AOS: kartu di grid muncul bertahap, baris lain muncul utuh. */
+/** Installs AOS: cards in a grid appear in sequence, other rows appear whole. */
 function revealIn(n: ComponentNode, effect: AosSettings["effect"]): void {
   if (!isBox(n)) return;
   if (n.layout === "grid") {
@@ -115,7 +115,7 @@ function collect(n: ComponentNode, pick: (x: ComponentNode, parent: BoxNode | nu
   return out;
 }
 
-/** Terapkan rencana library ke satu halaman template (tak berubah bila tak ada rencana). */
+/** Applies the library plan to one template page (unchanged when there is no plan). */
 export function applyLibraryPlan(templateId: string, doc: PageDoc): PageDoc {
   const plan = LIBRARY_PLAN[templateId];
   if (!plan || doc.root.libraries?.length) return doc;
@@ -123,7 +123,7 @@ export function applyLibraryPlan(templateId: string, doc: PageDoc): PageDoc {
   if (!content.length) return doc;
   const libs: LibraryId[] = ["aos"];
   const [hero, ...rest] = content;
-  // Halaman yang isinya hanya hero tetap memakai AOS (bukan Animate.css) agar efek scroll ada di setiap halaman.
+  // Pages whose content is only a hero still use AOS (not Animate.css) so every page has a scroll effect.
   if (plan.hero && hero.children[0] && rest.length) {
     animate(hero.children[0], plan.hero);
     libs.push("animate");

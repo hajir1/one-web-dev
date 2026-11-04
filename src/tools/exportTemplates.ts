@@ -1,18 +1,18 @@
-// @ts-nocheck — skrip Node (tsx), tidak ikut bundle aplikasi.
+// @ts-nocheck — Node script (tsx), not part of the app bundle.
 /* ================================================================== */
-/* Ekspor katalog & template frontend → data seed backend.              */
+/* Export the catalog & frontend templates → backend seed data.         */
 /*                                                                    */
 /*   npx tsx src/tools/exportTemplates.ts <folder-tujuan>               */
 /*                                                                    */
-/* Hasil:                                                              */
-/*   catalog-items.json        harga & tier section/elemen/event/fitur  */
-/*   templates/<id>.json       paket owd-template@1 per template:        */
-/*                             metadata + isi (id/en) + demo HTML statis */
-/*   v14: 37 Template Kode (undangan, animasi, 3D) ikut diekspor dengan   */
-/*   template.kind = "code": isi = satu berkas index.html.               */
-/* Lalu di backend: salin ke prisma/seed/ dan jalankan `npm run db:seed`.*/
-/* Setelah template ada di server, isi template tidak lagi dibutuhkan   */
-/* di bundle frontend (halaman Web Templates memuatnya dari API).       */
+/* Output:                                                             */
+/*   catalog-items.json        prices & tiers of sections/elements/events/features */
+/*   templates/<id>.json       owd-template@1 package per template:      */
+/*                             metadata + content (id/en) + static HTML demo */
+/*   v14: 37 Code Templates (invitations, animations, 3D) are exported too with */
+/*   template.kind = "code": content = one index.html file.             */
+/* Then in the backend: copy into prisma/seed/ and run `npm run db:seed`. */
+/* Once the templates are on the server, template content is no longer needed */
+/* in the frontend bundle (the Web Templates page loads it from the API). */
 /* ================================================================== */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -40,7 +40,7 @@ const icons = makeIconLookup([]);
 
 mkdirSync(join(out, "templates"), { recursive: true });
 
-// 1. Katalog item (harga & tier). Nama = label teknis; terjemahan tetap di frontend.
+// 1. The item catalog (prices & tiers). Name = a technical label; translations stay in the frontend.
 const sections = buildSectionCatalog();
 const elements = buildElementCatalog();
 const items = [
@@ -60,7 +60,7 @@ const items = [
 ];
 writeFileSync(join(out, "catalog-items.json"), JSON.stringify({ format: "owd-catalog@1", items }, null, 1));
 
-// 2. Template: metadata + isi + demo statis per bahasa.
+// 2. Templates: metadata + content + static demo per language.
 const meta = new Map(buildTemplateCatalog({ sections, elements }, WEB_TEMPLATES).map((t) => [t.refId, t]));
 let n = 0;
 let bytes = 0;
@@ -108,9 +108,9 @@ WEB_TEMPLATES.forEach((t, index) => {
   writeFileSync(join(out, "templates", `${t.id}.json`), json);
   n++;
 });
-// 3. v14: Template Kode. Isi = berkas HTML apa adanya (sama dengan unduhan zip);
-//    demo publik dibuat backend dari berkas yang sama. Harga awal = harga katalog
-//    (Premium); admin bisa menjadikannya gratis atau mengubah harganya di panel.
+// 3. v14: Code Templates. Content = the HTML file as is (same as the zip download);
+//    the public demo is built by the backend from the same file. Initial price = the catalog price
+//    (Premium); admins can make it free or change its price in the panel.
 let nCode = 0;
 CODE_TEMPLATE_CATALOG.forEach((t, index) => {
   if (only && !only.has(t.id)) return;
@@ -133,14 +133,14 @@ CODE_TEMPLATE_CATALOG.forEach((t, index) => {
       tags: t.tags ?? [],
       version: t.version ?? 1,
       isNew: !!t.isNew,
-      // Template kode tampil di atas template lain (sortOrder negatif); unggahan terakhir tetap paling atas.
+      // Code templates show above other templates (negative sortOrder); the last upload still stays on top.
       sortOrder: latestSortOrder(t.id, index - CODE_TEMPLATE_CATALOG.length),
       pages: [{ key: "home", home: true, name: { id: "Beranda", en: "Home" }, slug: { id: "index", en: "index" } }],
       libraries: [],
       fonts: [],
       sectionCount: 0,
     },
-    // Template kode berbahasa tunggal (teksnya bagian dari desain): satu isi untuk id & en.
+    // Code templates are single-language (their text is part of the design): one content for id & en.
     contents: { id: [{ key: "home", slug: "index", name: nameId, home: true, html }] },
   };
   const json = JSON.stringify(bundle);

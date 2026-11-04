@@ -1,17 +1,17 @@
 import { TEMPLATE_PROMO } from "../config/marketplace";
 
 /* ================================================================== */
-/* Promo template (murni): harga promo & sisa waktu countdown            */
+/* Template promo (pure): promo price & countdown time left              */
 /* ================================================================== */
 
 /**
- * Promo yang berlaku. Nilai awal dari config/marketplace.ts hanya cadangan;
- * begitu GET /templates terbaca, nilai SERVER (env TEMPLATE_PROMO_*) yang
- * dipakai (null = tidak ada promo), sehingga promo cukup diatur di backend.
+ * The promo in effect. The initial value from config/marketplace.ts is only a fallback;
+ * once GET /templates is read, the SERVER value (env TEMPLATE_PROMO_*) is
+ * used (null = no promo), so promos only need configuring in the backend.
  */
 let current: { percentOff: number; endsAt: number } = { percentOff: TEMPLATE_PROMO.percentOff, endsAt: Date.parse(TEMPLATE_PROMO.endsAt) };
 
-/** Dipanggil repository saat daftar template dari server diterima. */
+/** Called by the repository when the template list from the server is received. */
 export function setServerPromo(raw: unknown): void {
   const r = raw as { percentOff?: unknown; endsAt?: unknown } | null;
   const pct = typeof r?.percentOff === "number" ? r.percentOff : NaN;
@@ -19,28 +19,28 @@ export function setServerPromo(raw: unknown): void {
   current = Number.isFinite(pct) && pct > 0 && pct < 100 && Number.isFinite(end) ? { percentOff: pct, endsAt: end } : { percentOff: 0, endsAt: NaN };
 }
 
-/** Waktu berakhir promo (ms) — NaN bila tidak ada promo. */
+/** Promo end time (ms); NaN when there is no promo. */
 export const promoEndsAt = () => current.endsAt;
 
 export const promoActive = (now = Date.now()) => Number.isFinite(current.endsAt) && current.percentOff > 0 && now <= current.endsAt;
 
 export interface PromoPrice {
-  /** Harga awal (katalog). */
+  /** Original price (catalog). */
   original: number;
-  /** Harga yang dibayar sekarang. */
+  /** Price paid now. */
   price: number;
   active: boolean;
   percentOff: number;
 }
 
-/** Harga template setelah promo. 0 tetap 0; berbayar minimal 1 kredit. */
+/** Template price after the promo. 0 stays 0; paid ones cost at least 1 credit. */
 export function promoPrice(original: number, now = Date.now()): PromoPrice {
   const active = promoActive(now) && original > 0;
   const price = active ? Math.max(1, Math.round((original * (100 - current.percentOff)) / 100)) : original;
   return { original, price, active, percentOff: current.percentOff };
 }
 
-/** Sisa waktu promo dalam hari/jam/menit/detik (semua 0 bila sudah berakhir). */
+/** Remaining promo time in days/hours/minutes/seconds (all 0 once ended). */
 export function promoRemaining(now = Date.now()): { days: number; hours: number; minutes: number; seconds: number; ended: boolean } {
   const ms = Number.isFinite(current.endsAt) ? Math.max(0, current.endsAt - now) : 0;
   const s = Math.floor(ms / 1000);

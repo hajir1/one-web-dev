@@ -8,13 +8,13 @@ import i18n from "../../../../../i18n";
 import { cells, clamp, color, comparisonCell, formatStat, nonEmpty, parseMegaMenu, parsePlans, parseStat } from "./shared";
 
 /* ================================================================== */
-/* Elemen PREMIUM tambahan: Statistik Animasi, Harga Bulanan/Tahunan,    */
-/* Mega Menu, Tabel Perbandingan, Teks Mengetik (Typewriter).           */
+/* Extra PREMIUM elements: Animated Stats, Monthly/Yearly Pricing,       */
+/* Mega Menu, Comparison Table, Typing Text (Typewriter).               */
 /*                                                                    */
-/* Markup statis (h()) menampilkan keadaan akhir yang rapi — jadi        */
-/* canvas Desain, mesin pencari, dan pengunjung tanpa JS tetap melihat   */
-/* isi lengkap. Animasi/interaksi ditambahkan lewat `customCode` (runtime */
-/* Custom JS) di Pratinjau dan hasil ekspor kelima framework.           */
+/* Static markup (h()) shows a tidy final state, so                     */
+/* the Design canvas, search engines, and visitors without JS still see */
+/* the full content. Animation/interaction is added through `customCode` (the */
+/* Custom JS runtime) in Preview and in the exported output of all five frameworks. */
 /* ================================================================== */
 
 const tr = (k: string) => i18n.t(`el.x.${k}`);
@@ -206,7 +206,7 @@ if (!reduce && "IntersectionObserver" in window) {
   },
 });
 
-/* ---------------------- Harga bulanan/tahunan ----------------------- */
+/* ---------------------- Monthly/yearly pricing ----------------------- */
 
 export interface PricingSwitchState {
   monthlyLabel: string;
@@ -748,7 +748,7 @@ on(document, "keydown", function (e) {
   },
 });
 
-/* -------------------------- Tabel perbandingan ----------------------- */
+/* -------------------------- Comparison table ----------------------- */
 
 export interface ComparisonTableState {
   columns: string[];

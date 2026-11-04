@@ -1,7 +1,7 @@
 import { DataError } from "../../shared/errors";
 
 /* ================================================================== */
-/* Base64 (UTF-8 aman, varian URL-safe) & URL encode/decode.             */
+/* Base64 (UTF-8 safe, URL-safe variant) & URL encode/decode.            */
 /* ================================================================== */
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -12,7 +12,7 @@ function bytesToBase64(bytes: Uint8Array): string {
 }
 
 export function base64ToBytes(b64: string): Uint8Array {
-  // Terima varian URL-safe & tanpa padding; abaikan spasi/baris baru.
+  // Accept URL-safe variants & no padding; ignore spaces/newlines.
   let s = b64.replace(/\s+/g, "").replace(/-/g, "+").replace(/_/g, "/");
   if (s.startsWith("data:")) {
     const comma = s.indexOf(",");
@@ -43,7 +43,7 @@ export function encodeBase64(text: string, urlSafe = false): string {
   return urlSafe ? b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : b64;
 }
 
-/** Base64 → teks UTF-8. Data biner (bukan UTF-8 valid) ditolak dengan pesan jelas. */
+/** Base64 → UTF-8 text. Binary data (not valid UTF-8) is rejected with a clear message. */
 export function decodeBase64(b64: string): string {
   const bytes = base64ToBytes(b64);
   try {
@@ -67,7 +67,7 @@ export function decodeUrl(text: string, plusAsSpace = true): string {
   }
 }
 
-/** Uraikan query string (?a=1&b=2) menjadi pasangan kunci/nilai. */
+/** Parses a query string (?a=1&b=2) into key/value pairs. */
 export function parseQuery(text: string): [string, string][] {
   const q = text.includes("?") ? text.slice(text.indexOf("?") + 1) : text;
   return [...new URLSearchParams(q.split("#")[0]).entries()];

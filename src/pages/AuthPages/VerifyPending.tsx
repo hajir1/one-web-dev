@@ -6,9 +6,9 @@ import { ApiError } from "../../api/client";
 import { resendVerification } from "../../auth/session";
 
 /**
- * "Cek email Anda" + tombol kirim ulang dengan hitung mundur. Dipakai setelah
- * daftar, setelah login ditolak karena email belum diverifikasi, dan di
- * halaman verifikasi saat tautan kedaluwarsa.
+ * "Check your email" + a resend button with a countdown. Used after
+ * sign-up, after a login is rejected because the email is not verified, and on
+ * the verification page when the link has expired.
  */
 export default function VerifyPending({ email, cooldown = 60, intro }: { email: string; cooldown?: number; intro?: "signup" | "signin" | "expired" }) {
   const { t } = useTranslation();

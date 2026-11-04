@@ -1,8 +1,8 @@
 // ─── lib/fileSniff.ts ─────────────────────────────────────────────────────────
-// Deteksi jenis file dari ISI (magic bytes), bukan dari nama/MIME yang
-// dikirim browser. MIME dari OS sering kosong (mis. .heic, .mkv di Windows)
-// atau salah (file .png yang sebenarnya JPEG). Validasi berbasis isi
-// mencegah file "menyamar" lolos ke decoder.
+// Detects the file kind from its CONTENT (magic bytes), not from the name/MIME
+// sent by the browser. The OS MIME is often empty (e.g. .heic, .mkv on Windows)
+// or wrong (a .png file that is really a JPEG). Content-based validation
+// prevents "disguised" files from reaching the decoder.
 
 import i18n from "../../../i18n";
 
@@ -34,11 +34,11 @@ export type SniffedKind =
   | "unknown";
 
 const IMAGE_KINDS: SniffedKind[] = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "avif", "heic", "svg", "jxl", "qoi"];
-/** Audio murni (Ogg/WebM/MP4 juga bisa berisi audio; lihat AUDIO_SOURCE_KINDS di halaman Convert Audio). */
+/** Pure audio (Ogg/WebM/MP4 can also contain audio; see AUDIO_SOURCE_KINDS on the Convert Audio page). */
 export const AUDIO_KINDS: SniffedKind[] = ["mp3", "wav", "flac", "aac", "m4a", "aiff", "ogg"];
 export const VIDEO_KINDS: SniffedKind[] = ["mp4", "mov", "webm", "mkv", "avi", "ogg"];
 
-/** Format gambar yang bisa di-decode oleh browser modern (Chrome/Firefox/Safari terbaru). */
+/** Image formats modern browsers can decode (latest Chrome/Firefox/Safari). */
 export const BROWSER_DECODABLE_IMAGES: SniffedKind[] = ["png", "jpeg", "gif", "webp", "bmp", "ico", "avif", "svg"];
 
 const KIND_LABEL_BASE: Record<Exclude<SniffedKind, "unknown">, string> = {
@@ -68,12 +68,12 @@ const KIND_LABEL_BASE: Record<Exclude<SniffedKind, "unknown">, string> = {
   ogg: "Ogg",
 };
 
-/** Label format untuk UI; "unknown" mengikuti bahasa aktif. */
+/** Format label for the UI; "unknown" follows the active language. */
 export const KIND_LABEL: Record<SniffedKind, string> = new Proxy(KIND_LABEL_BASE as Record<SniffedKind, string>, {
   get: (target, key: string) => (key === "unknown" ? i18n.t("media.kinds.unknown") : target[key as SniffedKind]),
 });
 
-/** Berapa byte awal yang perlu dibaca untuk sniffing. */
+/** How many leading bytes need to be read for sniffing. */
 const SNIFF_BYTES = 4096;
 
 const ascii = (b: Uint8Array, start: number, len: number) => {
@@ -106,7 +106,7 @@ function looksLikeSvg(b: Uint8Array): boolean {
   return /<svg[\s>]/.test(t);
 }
 
-/** Jenis file dari byte awal (minimal 12 byte; idealnya SNIFF_BYTES). */
+/** File type from the leading bytes (at least 12 bytes; ideally SNIFF_BYTES). */
 export function sniffBytes(b: Uint8Array): SniffedKind {
   if (b.length < 4) return "unknown";
   if (startsWith(b, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return "png";
@@ -122,12 +122,12 @@ export function sniffBytes(b: Uint8Array): SniffedKind {
   if (ascii(b, 0, 4) === "fLaC") return "flac";
   if (ascii(b, 0, 4) === "FORM" && (ascii(b, 8, 4) === "AIFF" || ascii(b, 8, 4) === "AIFC")) return "aiff";
   if (ascii(b, 0, 4) === "qoif") return "qoi";
-  // JPEG XL: codestream FF 0A atau container ISO-BMFF "JXL ".
+  // JPEG XL: codestream FF 0A or ISO-BMFF container "JXL ".
   if (startsWith(b, [0xff, 0x0a]) || (startsWith(b, [0, 0, 0, 0x0c]) && ascii(b, 4, 4) === "JXL ")) return "jxl";
   if (ascii(b, 0, 3) === "ID3") return "mp3";
   if (ascii(b, 4, 4) === "ftyp") return sniffFtyp(b);
   if (startsWith(b, [0x1a, 0x45, 0xdf, 0xa3])) {
-    // EBML: DocType "webm" atau "matroska" ada di header awal.
+    // EBML: the DocType "webm" or "matroska" is in the early header.
     return ascii(b, 0, Math.min(b.length, 128)).includes("webm") ? "webm" : "mkv";
   }
   if (ascii(b, 0, 4) === "OggS") return "ogg";
@@ -135,7 +135,7 @@ export function sniffBytes(b: Uint8Array): SniffedKind {
   if (startsWith(b, [0x00, 0x00, 0x01, 0x00])) return "ico";
   if (startsWith(b, [0x49, 0x49, 0x2a, 0x00]) || startsWith(b, [0x4d, 0x4d, 0x00, 0x2a])) return "tiff";
   if (looksLikeSvg(b)) return "svg";
-  // ADTS AAC (sync 0xFFF, layer 00) sebelum MP3 (sync 0xFFE, layer ≠ 00).
+  // ADTS AAC (sync 0xFFF, layer 00) before MP3 (sync 0xFFE, layer ≠ 00).
   if (b[0] === 0xff && (b[1] & 0xf6) === 0xf0) return "aac";
   if (b[0] === 0xff && (b[1] & 0xe0) === 0xe0 && (b[1] & 0x06) !== 0) return "mp3";
   return "unknown";

@@ -1,6 +1,6 @@
 import { svg } from "./art";
 
-/* Ilustrasi 08 Roda Lawas: gambar teknik onthel bergaya katalog suku cadang lama (garis tinta, nomor bagian). */
+/* Illustration 08 Roda Lawas: a technical drawing of a vintage bicycle in an old spare parts catalog style (ink lines, part numbers). */
 
 const INK = "#1E4D3B";
 const RED = "#A3282B";
@@ -15,7 +15,7 @@ const wheel = (cx: number, cy: number) => `<circle cx="${cx}" cy="${cy}" r="150"
 
 const callout = (x: number, y: number, tx: number, ty: number, n: string) => `<path d="M${x} ${y}L${tx} ${ty}" stroke="${RED}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="5" fill="${RED}"/><circle cx="${tx}" cy="${ty}" r="22" fill="#F1E6C8" stroke="${RED}" stroke-width="3"/><text x="${tx}" y="${ty + 7}" font-family="Georgia,serif" font-size="20" font-weight="700" text-anchor="middle" fill="${RED}">${n}</text>`;
 
-/** Onthel dari samping dengan nomor bagian. */
+/** A vintage bicycle from the side with part numbers. */
 function onthel(): string {
   return svg(
     1200,
@@ -24,7 +24,7 @@ function onthel(): string {
   );
 }
 
-/** Dinding bengkel: velg tergantung dan papan alat. */
+/** Workshop wall: hanging rims and a tool board. */
 function bengkel(): string {
   const rim = (cx: number, cy: number, r: number) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#B9BCB8" stroke-width="10"/><circle cx="${cx}" cy="${cy}" r="${r - 10}" fill="none" stroke="#8d918d" stroke-width="2"/><path d="M${cx} ${cy - r - 30}V${cy - r}" stroke="#F1E6C8" stroke-width="3"/>`;
   const tools = Array.from({ length: 9 }, (_, i) => `<rect x="${640 + i * 54}" y="${180 + (i % 3) * 14}" width="16" height="${150 - (i % 4) * 20}" rx="6" fill="#B9BCB8" stroke="#1a1a1a" stroke-width="3"/>`).join("");

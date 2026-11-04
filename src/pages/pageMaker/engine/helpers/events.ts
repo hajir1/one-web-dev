@@ -2,17 +2,17 @@ import type { MElement, MNode } from "../../core/helpers/markup";
 import i18n from "../../../../i18n";
 
 /* ================================================================== */
-/* Event JavaScript pada elemen (Page Maker)                            */
+/* JavaScript events on elements (Page Maker)                           */
 /*                                                                    */
-/* Pengguna menulis ISI fungsi handler (variabel `event` tersedia).      */
+/* Users write the BODY of the handler function (the `event` variable is available). */
 /* compose() menerjemahkannya per framework:                            */
-/*   HTML    → function + addEventListener di script.js                 */
-/*   React   → function di komponen + onClick={handler}                */
-/*   Vue     → function di <script setup> + @click="handler"            */
-/*   Svelte  → function di <script> + on:click={handler}                */
+/*   HTML    → function + addEventListener in script.js                 */
+/*   React   → function in the component + onClick={handler}           */
+/*   Vue     → function in <script setup> + @click="handler"            */
+/*   Svelte  → function in <script> + on:click={handler}                */
 /*   Angular → method kelas + (click)="handler($event)"                 */
 /*                                                                    */
-/* Versi gratis: hanya onClick. Event lain = premium (butuh kredit).     */
+/* Free version: onClick only. Other events = premium (need credits).    */
 /* ================================================================== */
 
 export type EventName =
@@ -31,7 +31,7 @@ export type EventName =
 
 export interface ElementEvent {
   name: EventName;
-  /** Isi fungsi handler (JavaScript). */
+  /** The handler function body (JavaScript). */
   code: string;
 }
 
@@ -43,7 +43,7 @@ export interface EventInfo {
   free: boolean;
 }
 
-/** Label dibaca lewat getter supaya selalu mengikuti bahasa aktif. */
+/** Labels are read via a getter so they always follow the active language. */
 const ev = (name: EventName, dom: string, free: boolean): EventInfo => ({
   name,
   dom,
@@ -71,14 +71,14 @@ export const EVENTS: EventInfo[] = [
 export const EVENT_BY_NAME = Object.fromEntries(EVENTS.map((e) => [e.name, e])) as Record<EventName, EventInfo>;
 export const isFreeEvent = (n: EventName) => EVENT_BY_NAME[n]?.free === true;
 
-/** Elemen yang mendukung event (elemen interaktif tanpa logika framework sendiri). */
+/** Elements that support events (interactive elements without their own framework logic). */
 export const EVENT_ELEMENT_TYPES = ["button", "anchor", "image", "icon", "badge", "card", "product-card", "input", "select", "checkbox", "switch"];
 export const supportsEvents = (elementType: string) => EVENT_ELEMENT_TYPES.includes(elementType);
 
 export const MAX_EVENTS = EVENTS.length;
 const MAX_EVENT_CODE = 5000;
 
-/** Bersihkan `events` dari data tersimpan. */
+/** Clean `events` from saved data. */
 export function sanitizeEvents(v: unknown): ElementEvent[] | undefined {
   if (!Array.isArray(v)) return undefined;
   const out: ElementEvent[] = [];
@@ -93,15 +93,15 @@ export function sanitizeEvents(v: unknown): ElementEvent[] | undefined {
   return out.length ? out : undefined;
 }
 
-/** Cek sintaks isi handler tanpa menjalankannya. null = valid (atau tidak bisa dicek). */
+/** Syntax check of the handler body without running it. null = valid (or cannot be checked). */
 export function eventCodeError(code: string): string | null {
   try {
-    // Hanya MENGOMPILASI fungsi (tidak dipanggil).
+    // Only COMPILES the function (it is not called).
     new Function("event", code);
     return null;
   } catch (err) {
     if (err instanceof SyntaxError) return err.message;
-    return null; // mis. CSP melarang eval → anggap valid
+    return null; // e.g. a CSP forbids eval → treat as valid
   }
 }
 
@@ -120,8 +120,8 @@ const FORM_TYPES = new Set(["input", "select", "checkbox", "switch"]);
 const CONTROL_TAGS = new Set(["input", "select", "textarea"]);
 
 /**
- * Elemen markup penerima event: untuk elemen form = kontrolnya
- * (input/select), selain itu = elemen terluar.
+ * The markup element that receives the event: for form elements = the control
+ * (input/select), otherwise = the outermost element.
  */
 export function eventTarget(markup: MNode | MNode[] | undefined, elementType = ""): MElement | null {
   const list = (Array.isArray(markup) ? markup : [markup]).filter(
@@ -143,7 +143,7 @@ export function eventTarget(markup: MNode | MNode[] | undefined, elementType = "
   return find(root) ?? root;
 }
 
-/** Salinan markup dengan atribut tambahan pada `target` (tanpa mengubah aslinya). */
+/** A copy of the markup with extra attributes on `target` (without changing the original). */
 export function addAttrsTo(
   markup: MNode | MNode[] | undefined,
   target: MElement,
@@ -157,7 +157,7 @@ export function addAttrsTo(
   return Array.isArray(markup) ? markup.map(go) : markup ? go(markup) : markup;
 }
 
-/** Selector CSS untuk target di export HTML. */
+/** CSS selector for the target in the HTML export. */
 export function targetSelector(rootCls: string, target: MElement, isRoot: boolean): string {
   const cls = typeof target.attrs.class === "string" ? target.attrs.class.trim().split(/\s+/)[0] : "";
   if (cls) return `.${cls}`;
@@ -173,10 +173,10 @@ export const indentCode = (code: string, pad: string) =>
     .join("\n");
 
 /**
- * Fitur event per elemen dihapus dari mode edit: JavaScript tambahan kini
- * ditulis UTUH di Custom JavaScript. Event yang sudah tersimpan di desain
- * lama diubah menjadi kode Custom JS yang setara (runtime menyediakan
- * `element` dan `on(target, event, fn)`), jadi perilakunya tidak hilang.
+ * The per-element event feature was removed from edit mode: extra JavaScript is now
+ * written IN FULL in Custom JavaScript. Events already stored in old
+ * designs are converted into equivalent Custom JS code (the runtime provides
+ * `element` and `on(target, event, fn)`), so their behavior is not lost.
  */
 export function eventsToCustomJs(events: ElementEvent[], elementType = ""): string {
   const used = events.filter((e) => e.code.trim());

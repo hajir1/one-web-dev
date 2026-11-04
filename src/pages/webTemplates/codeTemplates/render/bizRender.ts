@@ -2,14 +2,14 @@ import type { RegionRenderer } from "../editModel";
 import { icon } from "../../../../tools/codeTemplates/umkmIcons";
 
 /* ================================================================== */
-/* Daftar yang bisa ditambah/dihapus/diurutkan di website 3D bisnis (v27).*/
+/* Lists that can be added to/removed/reordered on 3D business websites (v27). */
 /*                                                                    */
-/* Isi daftar (katalog, kategori, keunggulan, alur, ulasan, galeri,      */
-/* paket, jam buka, FAQ) disimpan di blok data DAFTAR. Fungsi di sini    */
-/* membangun HTML statisnya; dipakai generator (HTML awal) dan editor    */
-/* tanpa kode (bangun ulang setelah daftar diubah). Struktur kelas sama  */
-/* dengan v23 agar CSS identitas, filter katalog, tombol WhatsApp, dan   */
-/* foto galeri 3D tetap bekerja untuk item baru.                        */
+/* List contents (catalog, categories, highlights, steps, reviews, gallery, */
+/* packages, opening hours, FAQ) are stored in the DAFTAR data block. The functions here */
+/* build their static HTML; used by the generator (initial HTML) and the */
+/* no-code editor (rebuilt after a list changes). The class structure matches */
+/* v23 so the identity CSS, catalog filter, WhatsApp buttons, and       */
+/* 3D gallery photos keep working for new items.                        */
 /* ================================================================== */
 
 export interface BizItem { nama: string; deskripsi: string; harga: number; satuan: string; kategori: string; label: string; ikon: string }
@@ -26,7 +26,7 @@ export interface BizDaftar {
   jam: { hari: string; jam: string }[];
   faq: { tanya: string; jawab: string }[];
 }
-/** Kunci di DAFTAR yang tidak tampil di form (ikon dipilih desainer). */
+/** Keys in DAFTAR that are not shown in the form (icons are chosen by the designer). */
 export const BIZ_DAFTAR_HIDE = "ikon,katalog.ikon,keunggulan.ikon";
 
 const esc = (v: unknown) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -56,7 +56,7 @@ function daftarOf(data: Record<string, unknown>): BizDaftar {
 const priceHtml = (price: number, unit: string) =>
   price <= 0 ? `<span class="price"><span>${esc(cap(unit || "Tanya harga"))}</span></span>` : `<span class="price"><span>${rupiah(price)}</span><small>${esc(unit)}</small></span>`;
 
-/** Indeks kategori item: cocokkan nama (tanpa beda huruf besar/kecil); tidak cocok = kategori pertama. */
+/** An item's category index: matches the name (case-insensitive); no match = the first category. */
 const catIndex = (cats: string[], name: string) => Math.max(0, cats.findIndex((c) => c.trim().toLowerCase() === name.trim().toLowerCase()));
 
 const R = (fn: (d: BizDaftar, cfg: Record<string, unknown>) => string): RegionRenderer => (data) => fn(daftarOf(data), obj(data.CONFIG));
@@ -89,5 +89,5 @@ export const BIZ_REGIONS: Record<string, RegionRenderer> = {
   "biz-pilihan": R((d) => [...d.paket.map((p) => p.nama), ...d.kategori, "Lainnya"].filter(Boolean).map((o) => `<option>${esc(o)}</option>`).join("")),
 };
 
-/** Bungkus HTML awal sebuah wilayah dengan penanda agar editor bisa membangunnya ulang. */
+/** Wraps a region's initial HTML with markers so the editor can rebuild it. */
 export const bizRegion = (name: string, data: Record<string, unknown>) => `<!--owd:render name="${name}"-->${BIZ_REGIONS[name](data, {})}<!--owd:end-->`;

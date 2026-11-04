@@ -1,21 +1,21 @@
 /* ================================================================== */
-/* Storyboard per template untuk website 3D bisnis (v27.1).            */
+/* Per-template storyboards for the business 3D websites (v27.1).      */
 /*                                                                    */
-/* Sebelumnya ke-40 template memakai adegan yang sama: urai → lorong   */
-/* cincin → partikel nama, dengan latar bentuk acak yang sama pula.     */
-/* Sekarang setiap template punya:                                     */
-/*   - DUNIA sendiri saat kamera masuk ke objek (12 jenis, paling banyak */
-/*     4 template per jenis, dipilih sesuai bidang usahanya);           */
-/*   - URUTAN ADEGAN sendiri (8 rencana) dari 5 adegan: urai (exp),     */
-/*     orbit (orb), lapisan berpilin (lay), menyelam (dive), dan        */
-/*     partikel nama (dis), dengan bagian menyelam yang berpindah-pindah;*/
-/*   - bentuk melayang di latar yang sesuai dunianya.                    */
+/* Previously all 40 templates used the same scenes: explode → a ring   */
+/* tunnel → name particles, with the same random background shapes too. */
+/* Now every template has:                                             */
+/*   - its own WORLD when the camera enters the object (12 kinds, at most */
+/*     4 templates per type, picked by line of business);               */
+/*   - its own SCENE ORDER (8 plans) from 5 scenes: explode (exp),      */
+/*     orbit (orb), twisted layers (lay), dive (dive), and              */
+/*     name particles (dis), with the dive section moving around;       */
+/*   - floating background shapes that match its world.                */
 /* ================================================================== */
 
 export type WorldKind = "tunnel" | "rise" | "hex" | "grid" | "warp" | "weave" | "frames" | "helix" | "rain" | "waves" | "blocks" | "bloom";
 export type Beat = "exp" | "orb" | "lay" | "dive" | "dis";
 
-/** Rencana urutan adegan: bagian → adegan. Setiap rencana punya tepat satu "menyelam". */
+/** Scene order plan: section → scene. Every plan has exactly one "dive". */
 const PLANS: Record<string, Partial<Record<string, Beat>>> = {
   P1: { keunggulan: "exp", testimoni: "dive", kontak: "dis" },
   P2: { keunggulan: "orb", alur: "lay", testimoni: "dive", kontak: "dis" },
@@ -56,20 +56,20 @@ export function storyboardOf(model: string): { world: WorldKind; plan: Partial<R
   return { world: sb[0], plan: PLANS[sb[1]], variant: sb[2] ?? "" };
 }
 
-/** Kanal cerita satu bagian. */
+/** Story channels of one section. */
 export function storyChannels(model: string, sec: string) {
   const b = storyboardOf(model).plan[sec];
   return { bld: sec === "beranda" ? 0 : 1, exp: b === "exp" ? 1 : 0, orb: b === "orb" ? 1 : 0, lay: b === "lay" ? 1 : 0, dive: b === "dive" ? 1 : 0, dis: b === "dis" ? 1 : 0, beat: !!b };
 }
 
-/** Ringkasan storyboard (untuk komentar di berkas & laporan). */
+/** Storyboard summary (for comments in the file & reports). */
 export function storyboardText(model: string): string {
   const { world, plan } = storyboardOf(model);
   return `${Object.entries(plan).map(([k, b]) => `${k}: ${BEAT_LABEL[b!]}`).join(" → ")} | dunia: ${WORLD_LABEL[world]}`;
 }
 
 /* ------------------------------------------------------------------ */
-/* Bentuk melayang di latar (ekspresi JS: array geometri).              */
+/* Floating shapes in the background (JS expression: array of geometries). */
 /* ------------------------------------------------------------------ */
 export const FLOATERS: Record<WorldKind, string> = {
   tunnel: `[new THREE.IcosahedronGeometry(0.16, 0), new THREE.TorusGeometry(0.14, 0.05, 10, 24), new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.SphereGeometry(0.11, 16, 12)]`,
@@ -87,14 +87,14 @@ export const FLOATERS: Record<WorldKind, string> = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Dunia di dalam objek. Badan fungsi buildWorld(W); harus mengembalikan  */
-/* { tick(dt, t) }. Alat bantu di W (lihat STORY_ENGINE):                */
-/*   THREE, K, COL, world, ink, rnd, wmat(warna, o), wstd(warna, o),    */
-/*   wpts(Float32Array, ukuran, warna, o), wline(warna, o), stream(...),  */
-/*   loop(obj, kecepatan, dt, jarak, batas).                            */
+/* The world inside the object. The buildWorld(W) function body; must return */
+/* { tick(dt, t) }. Helpers in W (see STORY_ENGINE):                     */
+/*   THREE, K, COL, world, ink, rnd, wmat(color, o), wstd(color, o),    */
+/*   wpts(Float32Array, size, color, o), wline(color, o), stream(...),  */
+/*   loop(obj, speed, dt, distance, limit).                             */
 /* ------------------------------------------------------------------ */
 export const WORLDS: Record<WorldKind, string> = {
-  /* Lorong cincin + garis jalan putus-putus (kendaraan, kiriman, perjalanan kayu). */
+  /* Ring tunnel + dashed road line (vehicles, deliveries, wood journeys). */
   tunnel: `
   const g = new THREE.TorusGeometry(2.1, 0.025, 6, 72), ms = [W.wmat(W.COL.accent), W.wmat(W.COL.accent2), W.wmat(W.ink, 0.45)];
   const rs = []; for (let i = 0; i < 20; i++) { const m = new THREE.Mesh(g, ms[i % 3]); m.position.z = 6 - i * 1.5; m.rotation.z = i * 0.4; m.scale.setScalar(1 + (i % 4) * 0.08); W.world.add(m); rs.push(m); }
@@ -118,7 +118,7 @@ export const WORLDS: Record<WorldKind, string> = {
     ring.scale.setScalar(1 + Math.sin(t * 0.9) * 0.06);
   } };`,
 
-  /* Sarang segi enam: cincin heksagon, dinding sarang di ujung, tetes madu turun. */
+  /* Honeycomb: hexagon rings, a comb wall at the end, honey drops falling. */
   hex: `
   const g = new THREE.TorusGeometry(2.25, 0.045, 4, 6), ms = [W.wmat(W.COL.accent), W.wmat(W.COL.accent2, 0.7)];
   const rs = []; for (let i = 0; i < 16; i++) { const m = new THREE.Mesh(g, ms[i % 2]); m.position.z = 6 - i * 1.8; m.rotation.z = Math.PI / 6 + (i % 2) * 0.12; W.world.add(m); rs.push(m); }
@@ -134,7 +134,7 @@ export const WORLDS: Record<WorldKind, string> = {
     d.geometry.attributes.position.needsUpdate = true;
   } };`,
 
-  /* Lantai & langit-langit kisi digital, paket data melesat, garis pindai. */
+  /* Digital grid floor & ceiling, data packets zooming, scan lines. */
   grid: `
   const mk = (y) => { const v = []; for (let x = -6; x <= 6; x += 1) v.push(x, y, 8, x, y, -30); for (let z = 8; z >= -30; z -= 1) v.push(-6, y, z, 6, y, z); const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3)); return new THREE.LineSegments(g, W.wline(W.COL.accent, 0.55)); };
   const grids = new THREE.Group(); grids.add(mk(-1.7), mk(1.7)); W.world.add(grids);
@@ -143,7 +143,7 @@ export const WORLDS: Record<WorldKind, string> = {
   const scan = new THREE.Mesh(new THREE.PlaneGeometry(12, 0.03), W.wmat(W.COL.accent2, 0.9)); scan.position.z = -3; W.world.add(scan);
   return { tick(dt, t) { grids.position.z = (t * 3) % 1; pk.forEach((m) => W.loop(m, m.userData.v, dt, 38)); scan.position.y = Math.sin(t * 1.4) * 1.6; } };`,
 
-  /* Lompatan bintang: garis cahaya memanjang melesat ke arah kamera. */
+  /* Star jump: stretched light streaks rushing toward the camera. */
   warp: `
   const N = 640, v = new Float32Array(N * 6);
   for (let i = 0; i < N; i++) { const an = W.rnd() * Math.PI * 2, r = 0.35 + Math.pow(W.rnd(), 0.6) * 5, z = 8 - W.rnd() * 40, L = 0.4 + W.rnd() * 1.6; v[i * 6] = v[i * 6 + 3] = Math.cos(an) * r; v[i * 6 + 1] = v[i * 6 + 4] = Math.sin(an) * r; v[i * 6 + 2] = z; v[i * 6 + 5] = z - L; }
@@ -156,7 +156,7 @@ export const WORLDS: Record<WorldKind, string> = {
     g.attributes.position.needsUpdate = true; W.world.rotation.z = t * 0.12; tint.rotation.z = -t * 0.05;
   } };`,
 
-  /* Anyaman: lapisan benang lungsin & pakan bergantian mendekat, titik malam menetes. */
+  /* Weave: warp & weft thread layers approaching alternately, night dots dripping. */
   weave: `
   const th = new THREE.CylinderGeometry(0.014, 0.014, 11, 6), ms = [W.wmat(W.COL.accent, 0.7), W.wmat(W.COL.accent2, 0.6), W.wmat(W.ink, 0.35)], layers = [];
   for (let l = 0; l < 7; l++) {
@@ -171,7 +171,7 @@ export const WORLDS: Record<WorldKind, string> = {
   const dots = W.wpts(a, 0.12, W.COL.accent, 0.8);
   return { tick(dt, t) { layers.forEach((L, i) => { W.loop(L, 3.4, dt, 29.4, 2.4); L.rotation.z += dt * (i % 2 ? 0.08 : -0.06); }); dots.rotation.z = Math.sin(t * 0.3) * 0.4; } };`,
 
-  /* Bingkai rana persegi + pita film berlubang di kiri-kanan, kilat blitz. */
+  /* A square shutter frame + perforated film strips left and right, a flash burst. */
   frames: `
   const g = new THREE.TorusGeometry(2.4, 0.035, 4, 4), ms = [W.wmat(W.ink, 0.75), W.wmat(W.COL.accent)], fr = [];
   for (let i = 0; i < 15; i++) { const m = new THREE.Mesh(g, ms[i % 2]); m.position.z = 6 - i * 2; m.rotation.z = Math.PI / 4; m.scale.set(1.25, 0.9, 1); W.world.add(m); fr.push(m); }
@@ -188,7 +188,7 @@ export const WORLDS: Record<WorldKind, string> = {
     const ph = (t % 3.2) / 3.2; flash.material.userData.o = ph < 0.08 ? (1 - ph / 0.08) * 0.7 : 0;
   } };`,
 
-  /* Pilinan heliks: dua untai bola dengan anak tangga, berputar di sumbu mendatar. */
+  /* A twisted helix: two strands of spheres with rungs, rotating on the horizontal axis. */
   helix: `
   const N = 110, a = new Float32Array(N * 3), b = new Float32Array(N * 3), rung = [];
   for (let i = 0; i < N; i++) { const x = -11 + i * 0.2, an = i * 0.32; a[i * 3] = x; a[i * 3 + 1] = Math.cos(an) * 1.25; a[i * 3 + 2] = Math.sin(an) * 1.25; b[i * 3] = x; b[i * 3 + 1] = -a[i * 3 + 1]; b[i * 3 + 2] = -a[i * 3 + 2]; if (i % 2 === 0) rung.push(x, a[i * 3 + 1], a[i * 3 + 2], x, b[i * 3 + 1], b[i * 3 + 2]); }
@@ -213,7 +213,7 @@ export const WORLDS: Record<WorldKind, string> = {
     for (let i = 0; i < N; i++) { a[i * 3 + 1] -= dt * 0.35; if (a[i * 3 + 1] < -5) a[i * 3 + 1] += 10; } dust.geometry.attributes.position.needsUpdate = true;
   } };`,
 
-  /* Riak gelombang di lantai miring + batang equalizer melingkar (musik, perahu, roda putar). */
+  /* Wave ripples on a tilted floor + circular equalizer bars (music, boats, potter's wheel). */
   waves: `
   const floor = new THREE.Group(); floor.rotation.x = -1.2; floor.position.set(0, -1.3, -4); W.world.add(floor);
   const NR = 14, R = 7, rg = new THREE.TorusGeometry(1, 0.02, 4, 120), rings = [];
@@ -227,7 +227,7 @@ export const WORLDS: Record<WorldKind, string> = {
     core.scale.setScalar(3.4 + Math.sin(t * 6) * 0.4);
   } };`,
 
-  /* Kota balok: deret balok naik-turun di kiri-kanan lorong (rumah, buku, sekolah, meja kerja). */
+  /* A block city: rows of rising and falling blocks on both sides of the corridor (houses, books, schools, desks). */
   blocks: `
   const N = 520, mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.8, 1, 0.8), W.wstd("#ffffff", 1), N);
   const pos = [], dm = new THREE.Object3D(), cA = new THREE.Color(W.COL.accent), cB = new THREE.Color(W.COL.accent2), cC = new THREE.Color(W.COL.surface);
@@ -239,7 +239,7 @@ export const WORLDS: Record<WorldKind, string> = {
     mesh.instanceMatrix.needsUpdate = true; st(dt);
   } };`,
 
-  /* Kelopak mekar berpusar keluar dari pusat (spiral sudut emas). */
+  /* Petals blooming outward in a swirl from the center (golden angle spiral). */
   bloom: `
   const N = 220, geo = new THREE.SphereGeometry(0.22, 12, 8).scale(1, 0.22, 0.5), ms = [W.wstd(W.COL.accent, 1), W.wstd(W.COL.accent2, 1)];
   const meshes = ms.map((m) => { const im = new THREE.InstancedMesh(geo, m, N / 2); im.frustumCulled = false; W.world.add(im); return im; });

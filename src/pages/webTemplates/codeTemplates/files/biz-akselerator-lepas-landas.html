@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Lepas Landas | Akselerator startup tahap awal</title>
 <meta name="description" content="Lepas Landas, akselerator startup tahap awal di Malang. Dua belas minggu, satu tanggal peluncuran, pelanggan pertama sebelum demo day.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -33,7 +33,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   }
   function easeOf(name) {
     if (typeof name === "function") return name;
-    if (!name) return power(2, "out"); /* bawaan = power1.out (n=2 di sini setara kuadrat) */
+    if (!name) return power(2, "out"); /* default = power1.out (n=2 here equals quadratic) */
     if (name === "none" || name === "linear") return function (t) { return t; };
     var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
     if (!m) return power(2, "out");
@@ -52,13 +52,13 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
   function isEl(o) { return o && o.nodeType === 1; }
 
-  /* Ambil angka-angka di dalam teks (mis. clipPath "inset(0 100% 0 0)") agar bisa di-interpolasi. */
+  /* Pull the numbers out of the text (e.g. clipPath "inset(0 100% 0 0)") so they can be interpolated. */
   function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
   function mixStr(a, b, k) {
     var na = nums(a), i = 0;
     return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
   }
-  /* Nilai transform awal diambil dari CSS (mis. scaleX(0) pada garis progres). */
+  /* Initial transform values are read from CSS (e.g. scaleX(0) on the progress bar). */
   function stateOf(el) {
     if (el.__owds) return el.__owds;
     var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
@@ -85,7 +85,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
   }
 
-  /* Satu tween = satu target, nilai awal & akhir, posisi dalam rentang 0..1. */
+  /* One tween = one target, start & end values, position within the 0..1 range. */
   function makeTween(target, from, to, offset, span) {
     var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
     var el = isEl(target);
@@ -108,7 +108,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     };
   }
 
-  /* Posisi "<tepi elemen> <tepi layar>" → piksel scroll. */
+  /* Position "<element edge> <screen edge>" → scroll pixels. */
   function edge(word, size) {
     if (word === "top" || word === undefined) return 0;
     if (word === "center") return size / 2;
@@ -153,7 +153,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     var active = y >= this.start && y <= this.end;
     if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
   };
-  /* Majukan progres (scrub angka = menyusul pelan). Hasil: true bila berubah. */
+  /* Advance progress (numeric scrub = catches up slowly). Returns true when it changed. */
   ST.prototype.advance = function (dt, force) {
     if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
     else this.progress = this.target;
@@ -164,7 +164,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   };
   ST.prototype.render = function () {
     var first = this.shown < 0;
-    /* Seperti GSAP: tween yang belum pernah dimulai (progres 0) tidak menimpa nilai awal halaman. */
+    /* Like GSAP: a tween that has never started (progress 0) does not overwrite the page's initial values. */
     if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
     this.shown = this.progress;
     this.tweens.forEach(function (t) { t.render(this.progress); }, this);
@@ -188,10 +188,10 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     return st;
   }
 
-  /* Beberapa trigger boleh menggerakkan objek yang sama (pose per bab). Agar hasilnya   */
-  /* selalu "bab yang sedang dibaca", urutan gambar dibuat pasti: trigger yang kembali ke */
-  /* 0 digambar dari belakang ke depan, lalu semua yang sedang/sudah jalan (progres > 0)  */
-  /* digambar dari depan ke belakang, sehingga bab paling akhir yang aktif menang.         */
+  /* Several triggers may move the same object (a pose per chapter). So the result is    */
+  /* always "the chapter being read", the draw order is fixed: triggers that are back at  */
+  /* 0 are drawn from last to first, then all running/finished ones (progress > 0)       */
+  /* are drawn from first to last, so the latest active chapter wins.                     */
   function frame(now) {
     var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
@@ -239,7 +239,7 @@ document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
 </script>
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg: #e7e5de; /* Latar halaman */
   --surface: #f5f4ef; /* Latar kartu */
@@ -333,7 +333,7 @@ html:not(.webgl) .hint { display: none; }
 .chip i { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--c1) 50%, var(--c2) 50%); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
 .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
 
-/* bagian samping: teks di satu sisi, objek di sisi lain */
+/* side section: text on one side, object on the other */
 .side .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
 .side.r .copy { grid-column: 2; }
 .side .copy { min-width: 0; }
@@ -348,7 +348,7 @@ html:not(.webgl) .hint { display: none; }
 .founder blockquote { margin: 0 0 10px; font: 500 18px/1.5 var(--fd), system-ui, sans-serif; }
 .founder figcaption { font-size: 14px; color: var(--soft); }
 
-/* katalog */
+/* catalog */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: -10px 0 26px; }
 .tab { min-height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 14px/1 var(--ft), system-ui, sans-serif; cursor: pointer; }
 .tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -387,7 +387,7 @@ html:not(.webgl) .hint { display: none; }
 .testi .who b { display: block; }
 .testi .who span { font-size: 13px; color: var(--soft); }
 
-/* galeri: foto dirender dari objek 3D */
+/* gallery: photos rendered from the 3D object */
 .gal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
 .gal li { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--r); background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 30%, var(--surface)), color-mix(in srgb, var(--accent-2) 30%, var(--bg))); background-size: cover; background-position: center; }
 .gal li:nth-child(1) { grid-row: span 2; aspect-ratio: auto; }
@@ -395,7 +395,7 @@ html:not(.webgl) .hint { display: none; }
 .gal li.shot .ico { display: none; }
 .gal figcaption { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 86%, transparent); font-size: 14px; font-weight: 500; }
 
-/* harga */
+/* pricing */
 .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
 .plan { display: flex; flex-direction: column; padding: 26px; }
 .plan.hot { border: 2px solid var(--accent); box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--accent) 70%, transparent); position: relative; }
@@ -617,7 +617,7 @@ main > section { counter-increment: tm -1; }
 </div></footer>
 <a class="fab" href="https://wa.me/6281227180208?text=Halo%20Lepas%20Landas%2C%20saya%20mau%20tanya." target="_blank" rel="noopener" data-wa aria-label="Chat WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg></a>
 <script>
-/* ==== DATA USAHA: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== BUSINESS DATA: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan usaha (WhatsApp, jam buka, varian 3D)"*/{
   "whatsapp": "6281227180208",
   "zonaWaktu": 7,
@@ -648,7 +648,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Pengaturan usaha (WhatsApp, jam b
   ],
   "putarOtomatis": true
 }/*owd:end*/;
-/* Daftar isi: tambah, hapus, urutkan, atau duplikat item lewat editor OneWebDev (HTML di bawah dibangun ulang dari sini). */
+/* Contents: add, remove, reorder, or duplicate items in the OneWebDev editor (the HTML below is rebuilt from here). */
 const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasan, FAQ, ...)" hide="ikon,katalog.ikon,keunggulan.ikon"*/{
   "ikon": "bolt",
   "kategori": [
@@ -896,7 +896,7 @@ const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasa
   function waLink(text) { return "https://wa.me/" + wa + "?text=" + encodeURIComponent(text); }
   var rp = function (v) { return "Rp" + v.toLocaleString("id-ID").replace(/,/g, "."); };
   document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = waLink("Halo " + nama + ", saya mau tanya."); });
-  /* Tombol Pesan / Pilih paket: pesan tersusun dari teks yang tampil (ikut berubah bila diedit). */
+  /* Order / Choose package buttons: the message is built from the visible text (updates when it is edited). */
   document.querySelectorAll("[data-order]").forEach(function (a) {
     a.addEventListener("click", function () { var it = a.closest(".item"), h = it.querySelector("h3").textContent.trim(), p = it.querySelector(".price").textContent.replace(/\s+/g, " ").trim(); a.href = waLink(CONFIG.pesanPembuka + "\n- " + h + " (" + p + ")\n\nNama:\nCatatan:"); });
   });
@@ -905,11 +905,11 @@ const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasa
   });
   var y = document.querySelector("[data-year]"); if (y) y.textContent = new Date().getFullYear();
 
-  /* Menu ponsel. */
+  /* Mobile menu. */
   var nav = document.querySelector(".nav"), mb = document.querySelector(".menu-btn");
   if (mb) { mb.addEventListener("click", function () { var o = nav.classList.toggle("open"); mb.setAttribute("aria-expanded", o); }); nav.querySelectorAll("ul a").forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); mb.setAttribute("aria-expanded", "false"); }); }); }
 
-  /* Status buka sekarang (waktu usaha = UTC + zonaWaktu). */
+  /* Open-now status (business time = UTC + zonaWaktu). */
   function mins(s) { var p = String(s).split(/[.:]/); return (+p[0] || 0) * 60 + (+p[1] || 0); }
   function status() {
     var now = new Date(Date.now() + (Number(CONFIG.zonaWaktu) || 7) * 3600e3), d = now.getUTCDay(), m = now.getUTCHours() * 60 + now.getUTCMinutes();
@@ -918,11 +918,11 @@ const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasa
   }
   status(); setInterval(status, 60000);
 
-  /* Saring katalog. */
+  /* Filter the catalog. */
   var tabs = document.querySelectorAll(".tab"), items = document.querySelectorAll(".item");
   tabs.forEach(function (t) { t.addEventListener("click", function () { var f = t.getAttribute("data-f"); tabs.forEach(function (x) { x.setAttribute("aria-pressed", String(x === t)); }); items.forEach(function (it) { it.hidden = f !== "all" && it.getAttribute("data-c") !== f; if (!it.hidden) it.classList.add("in"); }); }); });
 
-  /* Chip varian dari CONFIG.varian; objek 3D mendengarkan event owd:varian. */
+  /* Variant chips from CONFIG.varian; the 3D object listens for the owd:varian event. */
   var vbox = document.querySelector("[data-variants]");
   if (vbox && Array.isArray(CONFIG.varian) && CONFIG.varian.length) {
     vbox.querySelectorAll(".chip").forEach(function (c) { c.remove(); });
@@ -935,7 +935,7 @@ const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasa
     });
   }
 
-  /* Formulir kontak → pesan WhatsApp. */
+  /* Contact form → WhatsApp message. */
   var form = document.querySelector("[data-form]");
   if (form) form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -945,12 +945,12 @@ const DAFTAR = /*owd:data name="DAFTAR" label="Daftar isi (katalog, paket, ulasa
     window.open(waLink(lines.join("\n")), "_blank", "noopener");
   });
 
-  /* Muncul saat digulir. */
+  /* Appears on scroll. */
   var rv = document.querySelectorAll("[data-rv]");
   if (window.OWD_THUMB || reduce || !("IntersectionObserver" in window)) rv.forEach(function (el) { el.classList.add("in"); });
   else { var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" }); rv.forEach(function (el) { io.observe(el); }); }
 
-  /* Menu aktif sesuai bagian yang sedang dibaca. */
+  /* Active menu item for the section being read. */
   var links = document.querySelectorAll(".nav ul a");
   if ("IntersectionObserver" in window) { var io2 = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id); }); }); }, { rootMargin: "-45% 0px -50% 0px" }); document.querySelectorAll("main > section").forEach(function (s) { io2.observe(s); }); }
 })();
@@ -964,7 +964,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -975,17 +975,17 @@ const esm = (path) => race(path, (u) => import(u));
 const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
 const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, situs tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the site still works. */
 await umd("motion@11.11.13/dist/motion.js").catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* Pose objek per bagian (urutan = section data-pose) & sudut foto galeri. */
+/* Object pose per section (order = data-pose sections) & gallery photo angles. */
 const POSES = [{"x":0.5,"y":-0.39999999999999997,"s":1,"ry":-0.55,"rx":0.05,"o":1,"ny":1.05,"ns":0.62,"no":1,"bld":0,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.56,"y":-0.27999999999999997,"s":0.9,"ry":0.8,"rx":0.05,"o":1,"ny":1,"ns":0.5,"no":0.3,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.7,"y":0.14,"s":0.5,"ry":2,"rx":0.05,"o":0.16,"ny":0.4,"ns":0.45,"no":0.08,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.56,"y":-0.18999999999999995,"s":0.95,"ry":3.3,"rx":0.05,"o":1,"ny":1,"ns":0.5,"no":0.3,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.56,"y":-0.019999999999999962,"s":0.85,"ry":4.3,"rx":0.05,"o":1,"ny":1,"ns":0.5,"no":0.32,"bld":1,"exp":0,"orb":1,"lay":0,"dive":0,"dis":0},{"x":0,"y":0.25000000000000006,"s":1.3,"ry":5.4,"rx":0.05,"o":0.6,"ny":0.3,"ns":0.7,"no":0.32,"bld":1,"exp":0,"orb":0,"lay":0,"dive":1,"dis":0},{"x":0,"y":0.07000000000000006,"s":0.6,"ry":6.2,"rx":0.05,"o":0.06,"ny":0,"ns":0.4,"no":0.05,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.66,"y":0.3400000000000001,"s":0.55,"ry":7,"rx":0.05,"o":0.14,"ny":0.4,"ns":0.45,"no":0.08,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.66,"y":0.31000000000000005,"s":0.6,"ry":7.8,"rx":0.05,"o":0.18,"ny":0.4,"ns":0.45,"no":0.1,"bld":1,"exp":0,"orb":0,"lay":0,"dive":0,"dis":0},{"x":0.56,"y":0.28000000000000014,"s":0.9,"ry":8.7,"rx":0.05,"o":1,"ny":1,"ns":0.5,"no":0.32,"bld":1,"exp":1,"orb":0,"lay":0,"dive":0,"dis":0},{"x":-0.52,"y":0.3500000000000001,"s":1.05,"ry":9.6,"rx":0.05,"o":1,"ny":1,"ns":0.55,"no":0.35,"bld":1,"exp":0,"orb":0,"lay":1,"dive":0,"dis":0}];
 const SHOTS = [{"ry":-0.6,"rx":0.2,"v":0,"z":6.4,"y":0.4},{"ry":0.9,"rx":0.35,"v":1,"z":5.6,"y":1.2},{"ry":2.4,"rx":0.05,"v":2,"z":6.8,"y":0},{"ry":-2.2,"rx":0.5,"v":0,"z":5.2,"y":2},{"ry":3.4,"rx":0.15,"v":1,"z":4.6,"y":0.3},{"ry":-1.2,"rx":-0.15,"v":2,"z":7.2,"y":-0.6}];
 /* Cerita scroll: benih di hero (percik cahaya) lalu objek tersusun dengan gaya "spiral". */
 /* Storyboard: alur: orbit → testimoni: menyelam → faq: urai → kontak: lapisan berpilin | dunia: lompatan bintang */
 const STORY = {"seed":"spark","act":"burst","build":"spiral","world":"warp","variant":""};
 
-/* ---- Objek 3D (prosedural, tanpa model/tekstur eksternal) ---- */
+/* ---- 3D object (procedural, no external models/textures) ---- */
 function buildModel(K, THREE, COL, BRAND) {
   const M = K.M;
   const rk = K.grp({ r: [0, 0, -.12] });
@@ -999,7 +999,7 @@ function buildModel(K, THREE, COL, BRAND) {
   const puffs = []; for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; puffs.push(K.sph(.24 + (i % 3) * .06, M.m3, { p: [Math.cos(a) * .7, -1.05, Math.sin(a) * .5] })); }
   K.tick = (t) => { fl.forEach((s, i) => s.scale.setScalar((i ? .6 : .9) + Math.sin(t * 18 + i) * .08)); rk.position.y = Math.sin(t * 1.3) * .06; puffs.forEach((p, i) => p.scale.setScalar(1 + Math.sin(t * 1.5 + i) * .08)); };
 }
-/* ---- Benih cerita (muncul di hero sebelum objek dirakit) ---- */
+/* ---- Story seed (appears in the hero before the object is assembled) ---- */
 function buildSeed(K, THREE, COL) {
   const M = K.M;
   const glow = K.std(COL.accent, { emissive: COL.accent, emissiveIntensity: 0.8, roughness: 0.3 });
@@ -1023,7 +1023,7 @@ function buildWorld(W) {
 function floatGeo(THREE) { return [new THREE.OctahedronGeometry(0.15, 0), new THREE.TetrahedronGeometry(0.16, 0), new THREE.IcosahedronGeometry(0.09, 0), new THREE.TorusGeometry(0.16, 0.015, 6, 32)]; }
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, Mo = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -1033,7 +1033,7 @@ const secs = Array.prototype.slice.call(document.querySelectorAll("[data-pose]")
 const S = Object.assign({}, POSES[0]);
 const animated = !reduce && hasG;
 
-/* 1) Gulir halus + pose objek per bagian (OWD Scrub). */
+/* 1) Smooth scrolling + object pose per section (OWD Scrub). */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 if (animated) {
@@ -1054,12 +1054,12 @@ if (animated) {
       .fromTo(S, Object.assign({}, POSES[i - 1]), Object.assign({}, POSES[i], { ease: "none", immediateRender: false }));
   }
 } else if ("IntersectionObserver" in window) {
-  /* Tanpa mesin scroll / kurangi gerak: pose melompat ke bagian yang sedang dibaca. */
+  /* No scroll engine / reduced motion: the pose jumps to the section being read. */
   const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) Object.assign(S, POSES[secs.indexOf(e.target)]); }), { rootMargin: "-50% 0px -50% 0px" });
   secs.forEach((s) => io.observe(s));
 }
 
-/* 2) Motion: judul hero per kata, angka berjalan, tombol magnetis. */
+/* 2) Motion: per-word hero heading, counting numbers, magnetic buttons. */
 if (!reduce && Mo && !window.OWD_THUMB) {
   const { animate, inView, stagger } = Mo;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -1104,7 +1104,7 @@ function start() {
   const textures = [], disposables = [];
   const track = (x) => { disposables.push(x); return x; };
 
-  /* Lingkungan pantulan buatan (tanpa HDR eksternal). */
+  /* Generated reflection environment (no external HDR). */
   const pm = new THREE.PMREMGenerator(renderer), env = new THREE.Scene();
   env.add(new THREE.Mesh(new THREE.BoxGeometry(12, 12, 12), new THREE.MeshBasicMaterial({ color: 0x6f6f74, side: THREE.BackSide })));
   const panel = (c, k, p, w, h) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(p[0], p[1], p[2]); m.lookAt(0, 0, 0); env.add(m); };
@@ -1133,7 +1133,7 @@ function start() {
     if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat, repeat); }
     textures.push(t); return t;
   }
-  /* Pola abu-abu: warna bahan (varian) yang mewarnainya. */
+  /* Gray pattern: the material colors (variants) that tint it. */
   const PATTERNS = {
     batik: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.fillStyle = "#6a6a6a"; for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { const cx = x * 64 + 32, cy = y * 64 + 32; for (let k = 0; k < 4; k++) { g.save(); g.translate(cx, cy); g.rotate(k * Math.PI / 2 + Math.PI / 4); g.beginPath(); g.ellipse(0, -16, 9, 15, 0, 0, 7); g.fill(); g.restore(); } g.beginPath(); g.arc(cx, cy, 4, 0, 7); g.fill(); } },
     parang: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.strokeStyle = "#5c5c5c"; g.lineWidth = 12; for (let i = -4; i < 8; i++) { g.beginPath(); for (let t = 0; t <= 1; t += .05) { const x = i * 48 + t * 256, y = t * 256 + Math.sin(t * Math.PI * 6) * 12; t ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } },
@@ -1197,7 +1197,7 @@ function start() {
   K.g = model;
   buildModel(K, THREE, COL, BRAND);
 
-  /* Ukuran & titik tengah objek diseragamkan. */
+  /* The object's size & center are normalized. */
   model.updateMatrixWorld(true);
   const bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), mid = bb.getCenter(new THREE.Vector3());
   const k = 2.7 / Math.max(size.x, size.y, size.z);
@@ -1207,7 +1207,7 @@ function start() {
   const shadow = new THREE.Mesh(track(new THREE.PlaneGeometry(1, 1)), track(new THREE.MeshBasicMaterial({ map: GLOW, color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false })));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -size.y * k / 2 - 0.08; shadow.scale.set(3.4, 3.4, 1); pivot.add(shadow);
 
-  /* Partikel latar: bentuk kecil melayang. */
+  /* Background particles: small floating shapes. */
   const floaters = new THREE.Group(); scene.add(floaters);
   const fm = [std(COL.accent, { roughness: 0.4 }), std(COL.accent2, { roughness: 0.4 }), track(M.m3.clone())].map((x) => { x.transparent = true; x.opacity = 0.55; x.depthWrite = false; return x; });
   const fg = floatGeo(THREE).map(track);
@@ -1215,7 +1215,7 @@ function start() {
 
 /* ---- Cerita scroll: benih → rakit → urai → menyelam → partikel nama ---- */
   const sm = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
-  /* Benih di hero (dinormalkan, ikut diputar). */
+  /* Seed in the hero (normalized, rotates along). */
   const seedG = new THREE.Group();
   K.target(seedG); buildSeed(K, THREE, COL); K.target(model);
   seedG.updateMatrixWorld(true);
@@ -1223,8 +1223,8 @@ function start() {
   const seedFit = new THREE.Group(); seedFit.add(seedG); seedG.position.sub(smid); seedFit.scale.setScalar(2.1 / Math.max(ssz.x, ssz.y, ssz.z));
   const seedSpin = new THREE.Group(); seedSpin.add(seedFit); spin.add(seedSpin);
 
-  /* Potongan objek: tiap mesh dibungkus dua grup supaya bisa digeser, diputar, dan diskalakan di titik tengahnya
-     tanpa mengganggu animasi bawaan objek (K.tick). */
+  /* Object pieces: each mesh is wrapped in two groups so it can be moved, rotated, and scaled around its center
+     without disturbing the object's built-in animation (K.tick). */
   model.updateMatrixWorld(true);
   const invModel = new THREE.Matrix4().copy(model.matrixWorld).invert();
   const leaves = []; model.traverse((o) => { if ((o.isMesh || o.isSprite) && o !== model) leaves.push(o); });
@@ -1235,10 +1235,10 @@ function start() {
     const box = new THREE.Box3().setFromObject(o);
     if (box.isEmpty()) continue;
     const cw = box.getCenter(new THREE.Vector3());
-    const cm = cw.clone().applyMatrix4(invModel).sub(mid);               /* pusat di ruang objek (relatif titik tengah) */
+    const cm = cw.clone().applyMatrix4(invModel).sub(mid);               /* center in object space (relative to the center point) */
     const A = new THREE.Matrix4().copy(par.matrixWorld).invert().multiply(model.matrixWorld);
     const A3 = new THREE.Matrix3().setFromMatrix4(A);
-    const cl = cw.clone().applyMatrix4(new THREE.Matrix4().copy(par.matrixWorld).invert()); /* pusat di ruang induk */
+    const cl = cw.clone().applyMatrix4(new THREE.Matrix4().copy(par.matrixWorld).invert()); /* center in parent space */
     const w1 = new THREE.Group(), w2 = new THREE.Group();
     w1.position.copy(cl); w2.position.copy(cl).negate();
     const idx = par.children.indexOf(o); par.remove(o); w2.add(o); w1.add(w2); par.add(w1);
@@ -1251,9 +1251,9 @@ function start() {
   parts.forEach((p, i) => (p.oa = (i / Math.max(1, parts.length)) * Math.PI * 2));
   parts.forEach((p) => { p.rank = STORY.build === "drop" ? (p.cm.y - minY) / spanY * 0.85 + p.r * 0.15 : STORY.build === "grow" ? p.cm.length() / Math.max(1e-3, maxR) * 0.7 + p.r * 0.3 : p.r; });
   const tmp = new THREE.Vector3();
-  const U = 1 / k; /* satu satuan layar (objek dinormalkan 2,7) dalam satuan objek */
+  const U = 1 / k; /* one screen unit (object normalized to 2.7) in object units */
 
-  /* Partikel: titik dari permukaan objek, berubah menjadi nama usaha. */
+  /* Particles: points from the object's surface that turn into the business name. */
   const NP = 3200;
   const base = new Float32Array(NP * 3), txt = new Float32Array(NP * 3), pos = new Float32Array(NP * 3), del = new Float32Array(NP);
   {
@@ -1274,14 +1274,14 @@ function start() {
     const n = Math.max(1, tp.length / 2), sc = 3.2 / W;
     for (let i = 0; i < NP; i++) { const j = ((i * 7919) % n) * 2; txt[i * 3] = (tp[j] - W / 2) * sc + (K.rnd() - 0.5) * 0.02; txt[i * 3 + 1] = -(tp[j + 1] - H / 2) * sc; txt[i * 3 + 2] = (K.rnd() - 0.5) * 0.12; }
   }
-  /* Latar gelap: titik bercahaya (aditif); latar terang: titik biasa supaya tetap kontras. */
+  /* Dark background: glowing points (additive); light background: plain points so they keep contrast. */
   const darkBg = new THREE.Color(COL.bg).getHSL({ h: 0, s: 0, l: 0 }).l < 0.4;
   const blend = darkBg ? THREE.AdditiveBlending : THREE.NormalBlending;
   const pgeo = track(new THREE.BufferGeometry()); pgeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   const pmat = track(new THREE.PointsMaterial({ size: darkBg ? 0.09 : 0.07, map: GLOW, color: new THREE.Color(COL.accent).lerp(new THREE.Color("#ffffff"), darkBg ? 0.45 : 0), transparent: true, opacity: 0, depthWrite: false, sizeAttenuation: true, blending: blend, toneMapped: false }));
   const points = new THREE.Points(pgeo, pmat); points.visible = false; points.frustumCulled = false; pivot.add(points);
 
-  /* Dunia di dalam objek: berbeda per template (buildWorld, lihat bizWorlds.ts). */
+  /* The world inside the object: different per template (buildWorld, see bizWorlds.ts). */
   const world = new THREE.Group(); world.visible = false; scene.add(world);
   const ink = darkBg ? "#ffffff" : COL.ink, wm = [];
   const fade = (m, o) => { m.transparent = true; m.opacity = 0; m.depthWrite = false; m.userData.o = o == null ? 0.85 : o; wm.push(track(m)); return m; };
@@ -1301,7 +1301,7 @@ function start() {
   const FIXED = { bld: 1, exp: 0, orb: 0, lay: 0, dive: 0, dis: 0 };
   const qv = new THREE.Quaternion(), ev = new THREE.Euler();
   let lastKey = "";
-  /** Terapkan kanal cerita ke potongan, benih, partikel, dan dunia. */
+  /** Apply the story channels to the pieces, seed, particles, and world. */
   function story(C, t, dt) {
     const bld = C.bld, exp = C.exp, dis = C.dis, orb = C.orb || 0, lay = C.lay || 0;
     const key = bld.toFixed(4) + exp.toFixed(4) + dis.toFixed(4) + orb.toFixed(4) + lay.toFixed(4) + (orb > 0.001 ? t.toFixed(3) : "");
@@ -1316,7 +1316,7 @@ function start() {
         if (exp > 0) { const L = p.cm.length() || 1, f = exp * (0.38 + p.r * 0.32); ox += p.cm.x / L * f; oy += p.cm.y / L * f * 0.9 + exp * (p.cm.y > 0 ? 0.12 : -0.12); oz += p.cm.z / L * f; rx += exp * p.rx * 0.25; rz += exp * p.rz * 0.25; }
         /* Orbit: potongan berputar mengelilingi pusat seperti korsel. */
         if (orb > 0) { const a = p.oa + t * 0.45, R = 2.2 + p.r * 0.5; ox += orb * (Math.cos(a) * R - p.cm.x / U); oy += orb * ((p.r - 0.5) * 0.7 + Math.sin(a * 2) * 0.18 - p.cm.y / U); oz += orb * (Math.sin(a) * R - p.cm.z / U); rx += orb * a * 0.5; s *= 1 - orb * 0.3; }
-        /* Lapisan berpilin: potongan terpisah per ketinggian lalu tiap lapis diputar. */
+        /* Twisted layers: pieces split by height, then each layer is rotated. */
         let ry = 0;
         if (lay > 0) { const ly = (p.cm.y - minY) / spanY - 0.5; oy += lay * ly * 2.4; ox += lay * (p.r - 0.5) * 0.35; ry = lay * ly * 2.2; }
         if (dis > 0) s *= 1 - sm(0.02 + p.r * 0.18, 0.2 + p.r * 0.18, dis);
@@ -1327,16 +1327,16 @@ function start() {
         p.w1.visible = s > 0.002;
       }
     }
-    /* Benih: diam di hero, lalu beraksi dan menghilang. */
+    /* Seed: rests in the hero, then acts and disappears. */
     const sk = Math.min(1, bld / 0.42), seedVis = 1 - sm(0.28, 0.5, bld);
     seedSpin.visible = seedVis > 0.002;
     if (seedSpin.visible) {
       if (STORY.act === "strike") { seedSpin.rotation.set(0, 0, sk > 0 ? Math.sin(sk * Math.PI * 5) * 0.9 : 0); seedSpin.position.set(-0.6 * sk, 0.3 * sk, 0.4 * sk); seedSpin.scale.setScalar(Math.max(1e-4, seedVis)); }
       else { const pop = 1 + sm(0, 0.55, sk) * 0.45; seedSpin.rotation.set(0, sk * 4, 0); seedSpin.position.set(0, 0, 0); seedSpin.scale.setScalar(Math.max(1e-4, pop * seedVis)); }
-      /* Benih selalu menghadap layar (tidak ikut putar otomatis), tetap bisa digeser. */
+      /* The seed always faces the screen (does not auto-rotate), but can still be dragged. */
       seedFit.rotation.y = -(spin.rotation.y - user.ry) + (dt ? Math.sin(t * 0.8) * 0.55 : 0.35);
     }
-    /* Partikel nama usaha. */
+    /* Business name particles. */
     points.visible = dis > 0.01;
     if (points.visible) {
       pmat.opacity = sm(0.02, 0.22, dis) * (0.85 + 0.15 * Math.sin(t * 3));
@@ -1351,7 +1351,7 @@ function start() {
       }
       pgeo.attributes.position.needsUpdate = true;
     }
-    /* Menyelam: kamera masuk ke objek, lalu lorong cahaya. */
+    /* Dive: the camera enters the object, then a tunnel of light. */
     const wv = sm(0.45, 0.85, C.dive);
     world.visible = wv > 0.01;
     if (world.visible) { W3.tick(dt || 0, t); for (const m of wm) m.opacity = wv * m.userData.o; }
@@ -1361,7 +1361,7 @@ function start() {
   const tris = (() => { let n = 0; scene.traverse((o) => { if (o.isMesh) { const gg = o.geometry; n += (gg.index ? gg.index.count : gg.attributes.position.count) / 3; } }); return Math.round(n); })();
   window.__OWD_STATS = { triangles: tris, budget: 120000, contexts: 1 };
 
-  /* Warna varian: m1/m2 + bahan turunan (m1b, m2b) bergeser halus ke warna tujuan. */
+  /* Variant colors: m1/m2 + derived materials (m1b, m2b) shift smoothly to the target color. */
   const v1 = [M.m1, M.m1b].filter(Boolean), v2 = [M.m2, M.m2b].filter(Boolean);
   const want = { a: new THREE.Color(VAR[0].warna1), b: new THREE.Color(VAR[0].warna2) };
   function paintVariant(v, instant) {
@@ -1371,7 +1371,7 @@ function start() {
   let current = 0;
   document.addEventListener("owd:varian", (e) => { current = e.detail % VAR.length; paintVariant(VAR[current], reduce); spinKick(); });
 
-  /* Putar dengan geser (hero). */
+  /* Rotate by dragging (hero). */
   const stage = document.querySelector(".stage");
   const user = { ry: 0, rx: 0, vy: 0, drag: false, lx: 0, ly: 0 };
   function spinKick() { if (!reduce) user.vy += 0.12; }
@@ -1404,7 +1404,7 @@ function start() {
     canvas.style.opacity = String(narrow ? S.no : S.o);
   }
 
-  /* Galeri: setiap foto dirender dari objek yang sama (sudut & varian berbeda). */
+  /* Gallery: every photo is rendered from the same object (different angles & variants). */
   let shotsDone = false;
   function shots() {
     if (shotsDone) return; shotsDone = true;

@@ -8,8 +8,8 @@ import { Link } from "./LocaleLink";
 import type { DocTopicId } from "../../config/docs";
 
 /* ================================================================== */
-/* Tombol "Bantuan" → laci dokumentasi menu ini (tanpa meninggalkan      */
-/* halaman), dengan tautan ke halaman dokumentasi lengkap.               */
+/* "Help" button → documentation drawer for this menu (without leaving   */
+/* the page), with a link to the full documentation page.               */
 /* ================================================================== */
 
 function DocsDrawer({ topic, onClose }: { topic: DocTopicId; onClose: () => void }) {

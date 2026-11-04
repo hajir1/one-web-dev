@@ -2,7 +2,7 @@ import { h } from "./dsl";
 import { HR, INVENTORY, PROJECT, SAAS, SUPPORT } from "./domainsB";
 import type { HSpec } from "./spec";
 
-/* Batch 2 (20): manajemen proyek, metrik SaaS, SDM, inventaris, layanan pelanggan. */
+/* Batch 2 (20): project management, SaaS metrics, HR, inventory, customer service. */
 export const H2: HSpec[] = [
   h("dash-papan-kerja", "Papan Kerja", PROJECT, { shell: "side-light", card: "flat", kpi: "tint", pal: ["#1c1917", "#78716c", "#8b5cf6", "#6d28d9", "#ede9fe", "#e7e5e4"], font: ["Outfit", "Inter"], r: 12, bg: "#fafaf9", login: "split", pages: 3, home: 6, fx: "aos" }),
   h("dash-tenggat", "Tenggat", PROJECT, { tier: "free", shell: "topnav", card: "shadow", kpi: "plain", pal: ["#0f172a", "#64748b", "#0891b2", "#0e7490", "#cffafe", "#e2e8f0"], font: ["Rubik", "Rubik"], r: 10, bg: "#f8fafc", login: "center", pages: 1, home: 7 }),

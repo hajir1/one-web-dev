@@ -31,7 +31,7 @@ export interface TableState
     ShadowStyle,
     Pick<TypographyStyle, "fontSize" | "textColor"> {
   columns: { id: string; label: string }[];
-  /** Data contoh untuk preview & kode export. */
+  /** Sample data for the preview & export code. */
   rows: string[][];
   caption: string;
 
@@ -207,7 +207,7 @@ function buildMarkup(s: TableState, cls: string) {
           h(
             "tr",
             {},
-            // Samakan jumlah sel dengan jumlah kolom supaya tabel tidak "bolong".
+            // Match the cell count to the column count so the table has no "holes".
             Array.from({ length: colCount }, (_, i) => h("td", {}, row[i] ?? "")),
           ),
         ),
@@ -217,7 +217,7 @@ function buildMarkup(s: TableState, cls: string) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Editor data (kolom & baris)                                         */
+/* Data editor (columns & rows)                                        */
 /* ------------------------------------------------------------------ */
 
 const SEP = " | ";
@@ -357,7 +357,7 @@ function tableSections(s: TableState, update: Updater<TableState>): PanelSection
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const tableElement = defineElement<TableState>({

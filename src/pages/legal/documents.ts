@@ -1,13 +1,13 @@
 // ─── pages/legal/documents.ts ───────────────────────────────────────────────
-// Isi Syarat & Ketentuan, Kebijakan Privasi, Kebijakan Refund, dan Kontak.
-// DRAF yang disusun mengikuti UU ITE, PP 71/2019 (PSTE), PP 80/2019 (PMSE),
-// UU 27/2022 (Pelindungan Data Pribadi), dan UU 8/1999 (Perlindungan
-// Konsumen). Perlu ditinjau ahli hukum sebelum dipakai. Teks dalam
-// [kurung siku] = placeholder (lihat config/legal.ts).
+// Content of the Terms & Conditions, Privacy Policy, Refund Policy, and Contact.
+// DRAFT prepared following the ITE Law, GR 71/2019 (PSTE), GR 80/2019 (PMSE),
+// Law 27/2022 (Personal Data Protection), and Law 8/1999 (Consumer
+// Consumer Protection). Must be reviewed by a lawyer before use. Text in
+// [square brackets] = placeholder (see config/legal.ts).
 //
-// Format: setiap bagian berisi paragraf (string) atau daftar butir (string[]).
-// Dokumen hanya dalam Bahasa Indonesia (UU 24/2009: perjanjian dengan pihak
-// Indonesia wajib berbahasa Indonesia); halaman /en menampilkan catatan itu.
+// Format: each section holds paragraphs (string) or bullet lists (string[]).
+// Documents are in Indonesian only (Law 24/2009: agreements with Indonesian
+// parties must be in Indonesian); the /en pages show that note.
 
 import { BUSINESS as B, LEGAL_EFFECTIVE_DATE, LEGAL_VERSION, type LegalDocId } from "../../config/legal";
 

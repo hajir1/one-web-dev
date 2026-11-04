@@ -2,10 +2,10 @@ import { useSession } from "../../../../auth/session";
 import { isDemoMode } from "../../../../demo/demoMode";
 
 /**
- * Tempat perubahan tersimpan (v20), untuk label yang jujur di editor:
- *   "account" = masuk → disinkronkan ke akun (designSync.ts), ikut ke perangkat lain;
- *   "device"  = belum masuk → hanya di browser ini (diunggah saat masuk);
- *   "demo"    = mode demo tanpa server → hanya di browser ini.
+ * Where changes are saved (v20), for an honest label in the editor:
+ *   "account" = signed in → synced to the account (designSync.ts), available on other devices;
+ *   "device"  = not signed in → only in this browser (uploaded on sign-in);
+ *   "demo"    = demo mode without a server → only in this browser.
  */
 export type SaveTarget = "account" | "device" | "demo";
 

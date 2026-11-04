@@ -1,23 +1,24 @@
 import type { InviteSpec } from "./invite";
 
 /* ================================================================== */
-/* 17 undangan baru (v22). Mesin, fitur, dan penanda edit sama dengan   */
-/* undangan lain (AOS, Swiper, konfeti, ?to=, .ics, RSVP WhatsApp).     */
-/* Yang baru: tiap undangan punya ANIMASI PEMBUKA sendiri saat tombol   */
-/* "Buka Undangan" ditekan: amplop terbuka, tirai tersibak, pintu       */
+/* 17 new invitations (v22). Engine, features, and edit markers are the same as */
+/* other invitations (AOS, Swiper, confetti, ?to=, .ics, WhatsApp RSVP). */
+/* What is new: each invitation has its own OPENING ANIMATION when the button */
+/* "Buka Undangan" is pressed: the envelope opens, the curtain parts, the door */
 /* berayun, gulungan tergulung, kado dibuka, kepingan puzzle lepas, dll.*/
-/* Sampul tidak lagi bergeser ke atas; potongan-potongannya yang pergi. */
-/* Semua nama, alamat, nomor, dan rekening fiktif.                     */
+/* The cover no longer slides up; its pieces leave instead.             */
+/* All names, addresses, numbers, and bank accounts are fictional.     */
 /* ================================================================== */
 
 export const C4 = (c1: string, c2: string, c3: string, c4: string) => ({ c1, c2, c3, c4 });
 
 /* ---------------------- kerangka animasi pembuka -------------------- */
 
-/** CSS bersama: sampul transparan, isi sampul memudar, potongan (.op) membawa warna sampul. */
+/** Shared CSS: a transparent cover, the cover content fades out, pieces (.op) carry the cover color. */
 export const OPEN_BASE = `
 .cover { background: none; perspective: 1400px; }
 .cover.open { transform: none; opacity: 1; }
+.cover[hidden] { display: none; }
 .op { position: absolute; z-index: 0; background: var(--cover-bg); will-change: transform; }
 .cover-inner { transition: opacity .35s ease, transform .35s ease; }
 .cover.open .cover-inner { opacity: 0; transform: translateY(-14px) scale(.98); }
@@ -26,7 +27,7 @@ export const OPEN_BASE = `
 
 export interface Opening { html: string; css: string }
 
-/** Amplop: tutup segitiga berputar terbuka, lalu amplop turun keluar layar. */
+/** Envelope: the triangular flap swings open, then the envelope slides off screen. */
 const AMPLOP: Opening = {
   html: `<div class="op env" aria-hidden="true"><i class="env-v"></i><i class="env-flap"></i><b class="env-seal"></b></div>`,
   css: `
@@ -41,7 +42,7 @@ const AMPLOP: Opening = {
 `,
 };
 
-/** Tirai panggung: dua tirai bergelombang tersibak ke samping, lambrekin naik. */
+/** Stage curtains: two wavy curtains part to the sides, the valance rises. */
 const TIRAI: Opening = {
   html: `<div class="op cur cur-l" aria-hidden="true"></div><div class="op cur cur-r" aria-hidden="true"></div><div class="op val" aria-hidden="true"></div>`,
   css: `
@@ -56,7 +57,7 @@ const TIRAI: Opening = {
 `,
 };
 
-/** Pintu kayu berukir: dua daun pintu berayun ke dalam. */
+/** Carved wooden door: two door leaves swing inward. */
 const PINTU: Opening = {
   html: `<div class="op door door-l" aria-hidden="true"><i></i><i></i></div><div class="op door door-r" aria-hidden="true"><i></i><i></i></div>`,
   css: `
@@ -71,7 +72,7 @@ const PINTU: Opening = {
 `,
 };
 
-/** Ombak: sampul naik membawa tepi gelombang, gelembung naik. */
+/** Waves: the cover rises carrying a wave edge, bubbles rise. */
 const OMBAK: Opening = {
   html: `<div class="op sea" aria-hidden="true"><svg viewBox="0 0 1200 80" preserveAspectRatio="none"><path d="M0 0H1200V40C1100 80 1000 0 900 40S700 80 600 40 400 0 300 40 100 80 0 40Z"/></svg></div>`,
   css: `
@@ -82,7 +83,7 @@ const OMBAK: Opening = {
 `,
 };
 
-/** Kelopak: sampul terbelah menjadi 8 kelopak yang berputar menjauh dari tengah. */
+/** Petals: the cover splits into 8 petals that spin away from the center. */
 const KELOPAK: Opening = (() => {
   const pts = ["50% -50%", "150% -50%", "150% 50%", "150% 150%", "50% 150%", "-50% 150%", "-50% 50%", "-50% -50%"];
   const html = pts.map((_, i) => `<div class="op pet p${i}" aria-hidden="true"></div>`).join("");
@@ -102,7 +103,7 @@ ${css}
   };
 })();
 
-/** Diagonal: sampul terbelah miring, dua segitiga bergeser berlawanan arah. */
+/** Diagonal: the cover splits diagonally, two triangles slide in opposite directions. */
 const DIAGONAL: Opening = {
   html: `<div class="op dg dg-a" aria-hidden="true"></div><div class="op dg dg-b" aria-hidden="true"></div>`,
   css: `
@@ -115,7 +116,7 @@ const DIAGONAL: Opening = {
 `,
 };
 
-/** Rol film: sampul berlubang sproket meluncur ke kiri seperti film yang ditarik. */
+/** Film roll: a sprocket-holed cover slides left like film being pulled. */
 const FILM: Opening = {
   html: `<div class="op film" aria-hidden="true"><i class="sp t"></i><i class="sp b"></i></div>`,
   css: `
@@ -126,7 +127,7 @@ const FILM: Opening = {
 `,
 };
 
-/** Gulungan: lembar tergulung ke atas, batang gulungan ikut naik. */
+/** Scroll: the sheet rolls up, the scroll rods rise along with it. */
 const GULUNG: Opening = {
   html: `<div class="op scroll" aria-hidden="true"></div><div class="op rod" aria-hidden="true"></div>`,
   css: `
@@ -137,7 +138,7 @@ const GULUNG: Opening = {
 `,
 };
 
-/** Gelembung: lubang bundar membesar dari tengah, gelembung-gelembung terbang. */
+/** Bubble: a round hole grows from the center, bubbles fly off. */
 const GELEMBUNG: Opening = {
   html: `<div class="op hole" aria-hidden="true"></div><div class="bub" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>`,
   css: `
@@ -153,7 +154,7 @@ const GELEMBUNG: Opening = {
 `,
 };
 
-/** Kado: pita lepas, tutup kotak melambung, badan kotak jatuh. */
+/** Gift: the ribbon comes off, the box lid flies up, the box body drops. */
 const KADO: Opening = {
   html: `<div class="op box" aria-hidden="true"></div><div class="op lid" aria-hidden="true"><b class="bow"></b></div><div class="op rib rib-v" aria-hidden="true"></div><div class="op rib rib-h" aria-hidden="true"></div>`,
   css: `
@@ -169,7 +170,7 @@ const KADO: Opening = {
 `,
 };
 
-/** Tenda sirkus: dua kain tenda bergaris terangkat ke pojok atas. */
+/** Circus tent: two striped tent flaps lift to the top corners. */
 const TENDA: Opening = {
   html: `<div class="op tent tent-l" aria-hidden="true"></div><div class="op tent tent-r" aria-hidden="true"></div><div class="op flag" aria-hidden="true"></div>`,
   css: `
@@ -185,7 +186,7 @@ const TENDA: Opening = {
 `,
 };
 
-/** Puzzle: sampul terbagi 24 keping yang lepas satu per satu. */
+/** Puzzle: the cover splits into 24 pieces that fall away one by one. */
 const PUZZLE: Opening = (() => {
   const cols = 4, rows = 6;
   const tiles: string[] = [];
@@ -207,7 +208,7 @@ ${css.join("\n")}
   };
 })();
 
-/** Peta: tiga lipatan peta menutup ke samping bergantian seperti peta dilipat. */
+/** Map: three map folds close to the sides in turn like a folded map. */
 const PETA: Opening = {
   html: `<div class="op map" aria-hidden="true"><i></i><i></i><i></i></div>`,
   css: `
@@ -222,7 +223,7 @@ const PETA: Opening = {
 `,
 };
 
-/** Buku: sampul buku berputar membuka dari punggung kiri. */
+/** Book: the book cover swings open from the left spine. */
 const BUKU: Opening = {
   html: `<div class="op book" aria-hidden="true"><i class="spine"></i><i class="frame"></i></div>`,
   css: `
@@ -233,7 +234,7 @@ const BUKU: Opening = {
 `,
 };
 
-/** Krepyak jendela: bilah-bilah horizontal berputar terbuka bergantian dari atas. */
+/** Window louvers: horizontal slats rotate open in turn from the top. */
 const KREPYAK: Opening = (() => {
   const n = 10;
   return {
@@ -246,7 +247,7 @@ const KREPYAK: Opening = (() => {
   };
 })();
 
-/** Awan: gumpalan awan menyingkir ke kiri dan kanan. */
+/** Clouds: clumps of clouds move aside to the left and right. */
 const AWAN: Opening = {
   html: `<div class="op sky" aria-hidden="true"></div><div class="clouds" aria-hidden="true"><i class="cl a"></i><i class="cl b"></i><i class="cl c"></i><i class="cl d"></i><i class="cl e"></i><i class="cl f"></i></div>`,
   css: `
@@ -282,7 +283,7 @@ const LENTERA: Opening = {
 
 export const SPRIG = `<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 110C40 80 70 50 110 10"/><path d="M36 84c-14-2-22-10-24-24 12 2 22 10 24 24ZM60 60c-14-2-22-10-24-24 12 2 22 10 24 24ZM84 36c-12-2-20-8-22-20 12 2 20 8 22 20Z" fill="currentColor" fill-opacity=".2"/><path d="M36 84c2-14 10-22 24-24-2 12-10 22-24 24ZM60 60c2-14 10-22 24-24-2 12-10 22-24 24Z" fill="currentColor" fill-opacity=".12"/></g></svg>`;
 
-/** Ornamen kecil di sampul (di atas potongan, di bawah teks). */
+/** Small cover ornaments (above the pieces, below the text). */
 export const deco = (cls: string, svg: string) => `<div class="deco ${cls}" aria-hidden="true">${svg}</div>`;
 export const DECO_CSS = `
 .deco { position: absolute; z-index: 0; pointer-events: none; color: var(--accent); transition: opacity .3s; }
@@ -371,7 +372,7 @@ export const NADA_D = [293.66, 349.23, 440, 392, 349.23, 329.63, 293.66, 261.63]
 
 export const RSVP_NIKAH = "Assalamu'alaikum. Saya {nama} ingin mengonfirmasi kehadiran di acara {acara}: {hadir}, jumlah tamu {jumlah} orang. Terima kasih.";
 
-/* ------------------------------ 17 undangan ------------------------- */
+/* ------------------------------ 17 invitations ------------------------- */
 
 export const INVITE_SPECS_V22: InviteSpec[] = [
   {

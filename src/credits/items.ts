@@ -3,10 +3,10 @@ import { useSession } from "../auth/session";
 import { useBilling } from "../pages/media/processing/billing";
 
 /* ================================================================== */
-/* Kunci item berbayar Web Maker (dibuka per akun oleh backend)          */
+/* Paid Web Maker item keys (unlocked per account by the backend)        */
 /*                                                                    */
-/* Item hanya dianggap dimiliki bila `account.items` dari SERVER        */
-/* memuatnya. Frontend tidak pernah menambahkan item sendiri.           */
+/* An item only counts as owned when `account.items` from the SERVER    */
+/* contains it. The frontend never adds items on its own.               */
 /* ================================================================== */
 
 export const itemKey = {
@@ -15,20 +15,20 @@ export const itemKey = {
   element: (type: string) => `element:${type}`,
   event: (name: string) => `event:${name}`,
   /**
-   * Slot website ke-N (habis pakai). Nomor slot membuat kunci unik sehingga
-   * klik ganda / pengulangan permintaan tidak memotong kredit dua kali;
-   * backend menaikkan `extraSiteSlots` saat item ini dibuka.
+   * The N-th website slot (consumable). The slot number makes the key unique so
+   * double clicks / repeated requests do not charge credits twice;
+   * the backend raises `extraSiteSlots` when this item is unlocked.
    */
   siteSlot: (n: number) => `site-slot:${Math.max(1, Math.floor(n))}`,
 };
 
-/** Hook: fungsi `owns(key)` yang ikut diperbarui saat akun dari server berubah. */
+/** Hook: an `owns(key)` function that updates when the server account changes. */
 export function useOwnedItems(): (key: string) => boolean {
   const items = useBilling((s) => s.account?.items);
-  // v6: admin (sesi tervalidasi server) memakai semua item Premium tanpa membeli.
+  // v6: admins (server-validated session) use every Premium item without buying.
   const adminFree = useSession((s) => s.user?.adminFree === true);
   return useCallback((key: string) => adminFree || !!items?.includes(key), [items, adminFree]);
 }
 
-/** Slot website tambahan yang sudah dibeli (dari server). */
+/** Extra website slots already purchased (from the server). */
 export const useExtraSiteSlots = () => useBilling((s) => s.account?.extraSiteSlots ?? 0);

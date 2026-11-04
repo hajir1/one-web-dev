@@ -11,9 +11,9 @@ import AuthLayout from "./AuthPageLayout";
 import VerifyPending from "./VerifyPending";
 
 /**
- * Halaman tujuan tautan di email: /:lang/verify-email?token=…
- * Token dikirim SEKALI ke backend (StrictMode memanggil efek dua kali);
- * sukses → akun aktif dan langsung masuk.
+ * Landing page for the email link: /:lang/verify-email?token=…
+ * The token is sent to the backend ONCE (StrictMode runs effects twice);
+ * success → the account is activated and signed in.
  */
 export default function VerifyEmail() {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export default function VerifyEmail() {
     verifyEmail(token)
       .then(() => {
         setState("ok");
-        // Hapus token dari URL/riwayat, lalu ke beranda.
+        // Remove the token from the URL/history, then go home.
         window.history.replaceState(null, "", window.location.pathname);
         setTimeout(() => navigate("/", { replace: true }), 1500);
       })

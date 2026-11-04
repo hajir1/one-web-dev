@@ -5,7 +5,7 @@ import type { AccessReason, ItemId, Tier } from "../types";
 import { PieceAccessContext, usePieceAccess, type PieceAccess } from "./pieceAccess";
 import { isDemoMode } from "../../demo/demoMode";
 
-/** Pasang di Page Maker: menentukan label akses & harga di pustaka. */
+/** Mount in Page Maker: sets the access labels & prices in the library. */
 
 export function PieceAccessProvider({ value, children }: { value: PieceAccess; children: ReactNode }) {
   return <PieceAccessContext.Provider value={value}>{children}</PieceAccessContext.Provider>;
@@ -19,14 +19,14 @@ const TONE: Record<AccessReason, string> = {
 };
 
 /**
- * Label akses kecil: Premium + harga (terkunci), Dimiliki, Dari template.
- * Item Free tidak diberi label kecuali `showFree`.
+ * Small access label: Premium + price (locked), Owned, From template.
+ * Free items get no label unless `showFree`.
  */
 export function AccessBadge({ itemId, tier, className = "", showFree = false }: { itemId: ItemId; tier: Tier; className?: string; showFree?: boolean }) {
   const { t } = useTranslation();
   const access = usePieceAccess();
   const reason = access.reason(itemId, tier);
-  // Mode demo (v15): tanpa label "Gratis".
+  // Demo mode (v15): no "Free" label.
   if (reason === "free" && (!showFree || isDemoMode())) return null;
   const price = access.priceOf(itemId);
   const Icon = reason === "locked" ? Lock : reason === "template" ? Layers : reason === "owned" ? BadgeCheck : Gift;

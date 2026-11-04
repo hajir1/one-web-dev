@@ -2,10 +2,10 @@ import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata 25 template katalog v3 (bagian D). Konten: ./setD/.
- * 1 Free + 24 Premium, 4–10 halaman. Harga Premium mengikuti rumus
- * `templatePrice` (marketplace/templatePricing.ts): 3 kredit per halaman
- * + bonus kualitas; diuji di tests/pricing.test.ts.
+ * Metadata for the 25 catalog v3 templates (part D). Content: ./setD/.
+ * 1 Free + 24 Premium, 4–10 pages. Premium prices follow the
+ * `templatePrice` formula (marketplace/templatePricing.ts): 3 credits per page
+ * + a quality bonus; tested in tests/pricing.test.ts.
  */
 export const V3D_CATALOG: TemplateMeta[] = [
   { id: "blog-catatan-kuliner", version: 1, category: "blog", tier: "free", price: TEMPLATE_PRICE.free, accent: "#c2410c", tags: ["kuliner", "resep", "blog"], isNew: true },

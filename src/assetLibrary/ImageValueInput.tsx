@@ -6,7 +6,7 @@ import ImagePickerDialog from "./ImagePickerDialog";
 import { assetIdOf } from "./refs";
 import { useAssets } from "./store";
 
-/** Teks singkat sumber gambar: nama aset, nama berkas dari URL, atau "unggahan lama". */
+/** Short text describing the image source: asset name, file name from the URL, or "old upload". */
 export function useImageLabel() {
   const { t } = useTranslation();
   const assets = useAssets((s) => s.assets);
@@ -20,8 +20,8 @@ export function useImageLabel() {
 }
 
 /**
- * Kolom gambar: pratinjau kecil + "Pilih gambar"/"Ganti" (membuka pemilih
- * Aset saya / Unggah / URL) + hapus. Nilai: `aset:<id>` atau URL.
+ * Image field: small preview + "Choose image"/"Replace" (opens the picker:
+ * My assets / Upload / URL) + remove. Value: `aset:<id>` or a URL.
  */
 export default function ImageValueInput({ id, value, onChange, allowEmpty = true }: { id?: string; value: string; onChange: (v: string) => void; allowEmpty?: boolean }) {
   const { t } = useTranslation();

@@ -1,9 +1,9 @@
 import i18n from "../../../i18n";
 import type { BgDtype, BgRequest, BgResponse } from "./bgRemovalWorker";
 
-/* Klien worker hapus-latar: satu worker dipakai bergantian (model tetap di
- * memori). Antrean dijalankan berurutan oleh useFileQueue; abort menghentikan
- * worker sehingga pemanggilan berikutnya membuat worker baru. */
+/* Background removal worker client: one worker is reused (the model stays in
+ * memory). The queue runs sequentially via useFileQueue; abort terminates the
+ * worker so the next call creates a new one. */
 
 let worker: Worker | null = null;
 let seq = 0;

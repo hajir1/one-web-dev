@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Arka Pradipta · Creative Developer</title>
 <meta name="description" content="Portofolio 3D creative developer bernuansa gelap: blob organik interaktif, kartu proyek miring, detail proyek di halaman yang sama. Three.js + Lenis.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -24,7 +24,7 @@ document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
 </script>
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg: #0b0c10; /* Latar halaman */
   --surface: #14161d; /* Latar kartu */
@@ -110,7 +110,7 @@ h2 { margin: 0 0 28px; font-family: var(--font-display); font-weight: 700; font-
 .card-year { font-size: 13px; color: var(--accent); font-weight: 600; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 
-/* Detail proyek: dengan JS hanya yang dituju (#proyek-…) yang tampil; tanpa JS semua tampil berurutan. */
+/* Project details: with JS only the target (#proyek-…) shows; without JS all show in order. */
 .details { margin-top: 48px; display: grid; gap: 40px; }
 .detail { padding: clamp(20px, 3vw, 36px); border-radius: 26px; background: var(--surface); border: 1px solid var(--line); scroll-margin-top: 90px; }
 .detail .art { border-radius: 18px; width: 100%; height: auto; }
@@ -196,7 +196,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -208,7 +208,7 @@ const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw 
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
 const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
 
-/* ==== DATA PROYEK: ubah di sini (judul, deskripsi, tautan, tag, gambar) ==== */
+/* ==== PROJECT DATA: edit here (title, description, link, tags, image) ==== */
 const PROJECTS = /*owd:data name="PROJECTS" label="Daftar proyek" hide="slug"*/[
   {
     "slug": "arus-kopi",
@@ -281,7 +281,7 @@ const PROJECTS = /*owd:data name="PROJECTS" label="Daftar proyek" hide="slug"*/[
 ]/*owd:end*/;
 /* ========================================================================== */
 function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-/* Gambar proyek: placeholder SVG (ganti dengan <img> bila punya gambar). */
+/* Project image: SVG placeholder (replace with an <img> if you have a picture). */
 function safeImg(u) { u = String(u || "").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);)/i.test(u) ? u : ""; }
 function projectArt(p, i, c1, c2) {
   if (safeImg(p.gambar)) return '<img class="art" src="' + escHtml(safeImg(p.gambar)) + '" alt="Gambar proyek ' + escHtml(p.judul) + '" loading="lazy">';
@@ -293,7 +293,7 @@ function projectArt(p, i, c1, c2) {
     '<path d="M0 ' + (200 - (i * 13) % 40) + ' Q 200 ' + (150 + (i * 31) % 60) + ' 400 ' + (210 - (i * 7) % 30) + ' V260 H0Z" fill="#000" fill-opacity=".14"/>' +
     '</svg>';
 }
-/* Kunci jangkar proyek: slug, atau dibuat dari judul (proyek baru dari editor). */
+/* Project anchor key: slug, or generated from the title (new projects from the editor). */
 function slugOf(p, i) { var s = String(p.slug || p.judul || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); return (s || "proyek") + (p.slug ? "" : "-" + (i + 1)); }
 function listOf(v) { return Array.isArray(v) ? v : []; }
 function renderCards(list, c1, c2) {
@@ -347,7 +347,7 @@ function buildHero({ THREE, scene, A1, A2 }) {
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
 
-/* 1) Proyek: render ulang dari PROJECTS (HTML statis tetap ada bila JS mati). */
+/* 1) Projects: re-rendered from PROJECTS (the static HTML stays if JS is off). */
 const css = getComputedStyle(root);
 const A1 = css.getPropertyValue("--accent").trim(), A2 = css.getPropertyValue("--accent-2").trim();
 document.getElementById("daftar-proyek").innerHTML = renderCards(PROJECTS, A1, A2);
@@ -355,7 +355,7 @@ document.getElementById("detail-proyek").innerHTML = renderDetails(PROJECTS, A1,
 function focusTarget() { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t && t.classList.contains("detail")) t.focus({ preventScroll: true }); }
 addEventListener("hashchange", focusTarget);
 
-/* 2) Kartu miring mengikuti kursor (hanya pointer halus, tanpa kurangi-gerak). */
+/* 2) Cards tilt toward the cursor (fine pointers only, not with reduced motion). */
 if (!reduce && matchMedia("(pointer: fine)").matches) {
   document.addEventListener("pointermove", (e) => {
     const card = e.target.closest && e.target.closest("[data-tilt]");
@@ -370,7 +370,7 @@ if (!reduce && matchMedia("(pointer: fine)").matches) {
   }, { passive: true });
 }
 
-/* 3) Gulir halus. */
+/* 3) Smooth scrolling. */
 let lenis = null;
 if (!reduce) {
   lenis = new Lenis({ lerp: 0.1, smoothWheel: true });

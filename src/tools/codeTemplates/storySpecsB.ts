@@ -4,7 +4,7 @@ import { SCENE_GEMBOK, SCENE_KOPI, SCENE_POHON, SCENE_RUMAH } from "./storyScene
 const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
 
 export const STORY_SPECS_B: StorySpec[] = [
-  /* Palu mengetuk tanah → fondasi → bata tersusun baris demi baris → atap turun → lampu menyala → taman tumbuh. */
+  /* Hammer taps the ground → foundation → bricks laid row by row → roof comes down → lights on → garden grows. */
   {
     id: "story-palu-rumah",
     title: "Bangun Karya · Kontraktor Rumah Tinggal",
@@ -28,7 +28,7 @@ export const STORY_SPECS_B: StorySpec[] = [
     wa: "6281200001003",
     scene: SCENE_RUMAH,
   },
-  /* Biji melayang → jatuh ke tanah → batang & cabang tumbuh → daun & buah → satu buah jatuh → hutan tumbuh di sekeliling. */
+  /* A floating seed → falls to the ground → stem & branches grow → leaves & fruit → one fruit falls → a forest grows all around. */
   {
     id: "story-biji-hutan",
     title: "Benih Bumi · Gerakan Tanam Pohon",
@@ -52,7 +52,7 @@ export const STORY_SPECS_B: StorySpec[] = [
     wa: "6281200001004",
     scene: SCENE_POHON,
   },
-  /* Uap dari cangkir → tetes jatuh → riak → kamera menyelam ke permukaan kopi → lereng gunung & kebun → label asal kopi → kembali ke cangkir. */
+  /* Steam from a cup → a drop falls → ripples → the camera dives into the coffee surface → mountain slopes & a farm → the coffee origin label → back to the cup. */
   {
     id: "story-tetes-kopi",
     title: "Kopi Lereng · Roastery & Kedai",
@@ -75,7 +75,7 @@ export const STORY_SPECS_B: StorySpec[] = [
     wa: "6281200001005",
     scene: SCENE_KOPI,
   },
-  /* Kunci melayang → masuk ke lubang → diputar → belenggu terangkat & berayun → perisai heksagon menyebar dari tengah. */
+  /* A floating key → enters the keyhole → turns → the shackle lifts & swings → hexagon shields spread from the center. */
   {
     id: "story-kunci-gembok",
     title: "Benteng Siber · Keamanan Digital",

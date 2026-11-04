@@ -20,7 +20,7 @@ import type { TplLang } from "../types";
 
 type SectionBox = { tag?: string; name: string };
 
-/* Katalog v4 bagian E: 20 template (1 Free + 19 Premium), 4–9 halaman, 7 template data memakai elemen Chart. */
+/* Catalog v4 part E: 20 templates (1 Free + 19 Premium), 4–9 pages, 7 data templates use the Chart element. */
 
 const LANGS: TplLang[] = ["id", "en"];
 const PAGES: Record<string, number> = {
@@ -58,7 +58,7 @@ function walk(n: ComponentNode, f: (n: ComponentNode) => void): void {
   if (isBox(n)) n.children.forEach((c) => walk(c, f));
 }
 
-/** Item Premium (preset section & elemen) yang dipakai template. */
+/** Premium items (section presets & elements) used by the template. */
 function premiumItems(tpl: WebTemplate): string[] {
   const { sectionIds, elementIds } = templateContents(tpl);
   return [
@@ -118,7 +118,7 @@ test("setiap halaman dibangun di ID & EN: section saja di root, header + isi + f
     const shapes = byLang.id.map((p) => (p.doc.root.children as unknown as SectionBox[]).map((s) => s.name).join("|"));
     assert.equal(new Set(shapes).size, shapes.length, `${tpl.id}: susunan section tiap halaman berbeda`);
     assert.notEqual(JSON.stringify(byLang.id.map((p) => p.name)), JSON.stringify(byLang.en.map((p) => p.name)), `${tpl.id}: nama halaman dwibahasa`);
-    // Isi halaman beranda juga berbeda antarbahasa.
+    // The home page content also differs between languages.
     assert.notEqual(JSON.stringify(byLang.id[0].doc).replace(/"id":"[^"]+"/g, ""), JSON.stringify(byLang.en[0].doc).replace(/"id":"[^"]+"/g, ""), `${tpl.id}: isi beranda dwibahasa`);
   }
 });
@@ -213,7 +213,7 @@ test("aset v4e: nama berawalan, SVG ASCII kecil tanpa URL eksternal, dipakai tem
     assert.ok(svg.length < 8000, `${n}: ${svg.length} byte`);
     assert.doesNotMatch(svg.replace('xmlns="http://www.w3.org/2000/svg"', ""), /https?:/, `${n}: URL eksternal`);
   }
-  // Template tidak memuat gambar dari luar (Unsplash dsb.).
+  // Templates do not load external images (Unsplash etc.).
   for (const tpl of templates()) {
     const json = JSON.stringify(buildTemplatePages(tpl, "id").map((p) => p.doc));
     assert.doesNotMatch(json, /unsplash|placehold\.co/, `${tpl.id}: gambar eksternal`);

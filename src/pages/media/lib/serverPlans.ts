@@ -1,6 +1,6 @@
 // ─── lib/serverPlans.ts ──────────────────────────────────────────────────────
-// Validasi & ringkasan parameter untuk fitur yang diproses di server.
-// Fungsi murni (diuji di Node). Backend WAJIB memvalidasi ulang.
+// Validation & parameter summaries for features processed on the server.
+// Pure functions (tested in Node). The backend MUST validate again.
 
 import i18n from "../../../i18n";
 
@@ -38,7 +38,7 @@ const CRF: Record<CompressCodec, Record<CompressInput["quality"], number>> = {
   vp9: { high: 28, balanced: 33, small: 38 },
 };
 
-/** Parameter kompresi + validasi. Bitrate target dihitung dari ukuran & durasi. */
+/** Compression parameters + validation. The target bitrate is computed from size & duration. */
 export function compressPlan(i: CompressInput) {
   const MB = 1024 * 1024;
   const container = i.codec === "vp9" ? "webm" : "mp4";

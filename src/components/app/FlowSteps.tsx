@@ -4,16 +4,16 @@ import { Link } from "./LocaleLink";
 import { TEMPLATES_PATH, WEBSITE_HUB_PATH } from "../../config/menu";
 
 /* ================================================================== */
-/* Penunjuk alur Pembuat Website (v17): 1 Pilih awal → 2 Modifikasi →    */
-/* 3 Deploy. Ditampilkan di Template, Editor, dan Susun & Deploy supaya  */
-/* pengguna selalu tahu sedang di langkah mana dan ke mana berikutnya.   */
+/* Website Builder flow indicator (v17): 1 Choose start → 2 Modify →     */
+/* 3 Deploy. Shown in Templates, Editor, and Compose & Deploy so that    */
+/* users always know which step they are on and where to go next.       */
 /* ================================================================== */
 
 export type FlowStep = 1 | 2 | 3;
 
 export interface FlowStepsProps {
   current: FlowStep;
-  /** Tujuan tiap langkah (path tanpa prefix bahasa) atau aksi. Langkah 1 bawaan: katalog template. */
+  /** Destination of each step (path without the language prefix) or an action. Default step 1: the template catalog. */
   to?: Partial<Record<FlowStep, string | (() => void)>>;
   className?: string;
 }

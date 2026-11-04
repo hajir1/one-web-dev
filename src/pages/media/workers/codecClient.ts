@@ -1,8 +1,8 @@
 // ─── workers/codecClient.ts ──────────────────────────────────────────────────
-// Klien worker codec WASM. Satu worker dipakai ulang untuk banyak file
-// (modul WASM cukup dimuat sekali). Membatalkan satu tugas menghentikan
-// worker seketika; tugas lain di worker yang sama ikut dibatalkan dan
-// worker baru dibuat saat dibutuhkan lagi.
+// WASM codec worker client. One worker is reused for many files
+// (WASM modules only need to load once). Cancelling one task stops
+// worker immediately; other tasks in the same worker are canceled too and
+// a new worker is created when needed again.
 
 import i18n from "../../../i18n";
 import type { CodecEncodeOptions, CodecRequest, CodecResponse, DecodeFormat, EncodeFormat } from "./codecWorker";
@@ -38,7 +38,7 @@ function getWorker(): Worker {
   return w;
 }
 
-/** Hentikan worker (dan semua tugasnya). */
+/** Stops the worker (and all its tasks). */
 function stopCodecWorker(reason: unknown = aborted()) {
   worker?.terminate();
   worker = null;
@@ -61,14 +61,14 @@ function run(req: Req, transfer: Transferable[], signal?: AbortSignal): Promise<
   });
 }
 
-/** Encode piksel RGBA ke format tujuan di worker. `data` dipindahkan (tidak bisa dipakai lagi). */
+/** Encodes RGBA pixels to the target format in the worker. `data` is transferred (cannot be used again). */
 export async function encodeInWorker(format: EncodeFormat, width: number, height: number, data: Uint8ClampedArray, options: CodecEncodeOptions, signal?: AbortSignal): Promise<ArrayBuffer> {
   const r = await run({ op: "encode", format, width, height, data, options }, [data.buffer], signal);
   if (!r.bytes) throw new Error(i18n.t("media.codec.failed", { reason: "empty" }));
   return r.bytes;
 }
 
-/** Decode berkas (JXL/QOI/TIFF, atau AVIF/WebP bila browser tidak bisa) menjadi piksel RGBA. */
+/** Decodes a file (JXL/QOI/TIFF, or AVIF/WebP when the browser cannot) into RGBA pixels. */
 export async function decodeInWorker(format: DecodeFormat, bytes: ArrayBuffer, signal?: AbortSignal) {
   const r = await run({ op: "decode", format, bytes }, [bytes], signal);
   if (!r.image) throw new Error(i18n.t("media.codec.failed", { reason: "empty" }));

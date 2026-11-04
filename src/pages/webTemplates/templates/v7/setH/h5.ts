@@ -2,7 +2,7 @@ import { h } from "./dsl";
 import { DONATION, EVENTS, FARM, GYM, PROPERTY } from "./domainsE";
 import type { HSpec } from "./spec";
 
-/* Batch 5 (20): properti & sewa, gym, pertanian, yayasan & donasi, penyelenggara acara. */
+/* Batch 5 (20): property & rentals, gym, agriculture, foundations & donations, event organizers. */
 export const H5: HSpec[] = [
   h("dash-unit-sewa", "Unit Sewa", PROPERTY, { cat: "realestate", shell: "side-light", card: "accent", kpi: "split", pal: ["#1c2b36", "#64748b", "#2d6a8f", "#1e4d69", "#dceaf3", "#e2e8ee"], font: ["Montserrat", "Inter"], r: 10, bg: "#f5f8fa", login: "split", pages: 4, home: 1, fx: "aos" }),
   h("dash-kosan", "Kosan", PROPERTY, { tier: "free", shell: "topnav", card: "shadow", kpi: "plain", pal: ["#292524", "#78716c", "#b5532a", "#8c3d1d", "#f8e3d9", "#e7e5e4"], font: ["Rubik", "Rubik"], r: 14, bg: "#fcf8f5", login: "center", pages: 2, home: 6 }),

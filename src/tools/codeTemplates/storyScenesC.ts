@@ -1,15 +1,15 @@
 /* ================================================================== */
-/* Adegan 3D Cerita Scroll (v22), bagian C: kertas → pesawat kertas,     */
-/* bola lampu → jaringan saraf, jam pasir → lini waktu melingkar.       */
+/* 3D Scroll Story scenes (v22), part C: paper → paper plane,            */
+/* light bulb → neural network, hourglass → circular timeline.          */
 /* ================================================================== */
 
-/** 7. Kertas datar → sudut dilipat → dilipat jadi pesawat → terbang melewati cincin kata → mendarat. */
+/** 7. Flat paper → corner folded → folded into a plane → flies through word rings → lands. */
 export const SCENE_PESAWAT = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, mat, seg, lerp, paint, glow } = ctx;
   const desk = new THREE.Mesh(new THREE.BoxGeometry(7, 0.18, 5), mat(COL.obj2, { roughness: 0.8 })); desk.position.y = -0.1; scene.add(desk);
   const pencil = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.6, 6), mat(COL.accent)); pencil.rotation.set(0, 0.7, Math.PI / 2); pencil.position.set(2.2, 0.05, 1.3); scene.add(pencil);
-  /* Lembar kertas: setiap segitiga punya posisi datar dan posisi terlipat; diinterpolasi bertahap dengan lengkung. */
+  /* Paper sheet: each triangle has a flat and a folded position; interpolated step by step along a curve. */
   const V = (x, y, z) => [x, y, z];
   const N = V(0, 0, -1.6), K = V(0, -0.42, 1.4), T = V(0, 0, 1.4);
   const pieces = [];
@@ -36,7 +36,7 @@ function scene(ctx) {
     });
     pg.attributes.position.needsUpdate = true; pg.computeVertexNormals(); edges.geometry.attributes.position.needsUpdate = true;
   }
-  /* Jalur terbang dan cincin kata yang dilewati. */
+  /* Flight path and the word rings it passes through. */
   const path = new THREE.CatmullRomCurve3([[0, 0.6, 0], [-2, 2.5, -4], [-6, 4.5, -10], [0, 6, -18], [7, 5, -12], [5, 3.2, -4], [1, 1.2, 0.5]].map((p) => new THREE.Vector3(p[0], p[1], p[2])));
   const words = CONFIG.kata || [];
   const rings = words.slice(0, 4).map((w, i) => {
@@ -47,7 +47,7 @@ function scene(ctx) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: lab.tex, transparent: true, depthWrite: false })); s.scale.set(2.4, 0.6, 1); s.position.y = 1.55; g.add(s);
     scene.add(g); return { g, f };
   });
-  /* Jejak: garis titik-titik di belakang pesawat. */
+  /* Trail: a dotted line behind the plane. */
   const TR = 80, trail = new THREE.Line(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(new Float32Array(TR * 3), 3)), new THREE.LineDashedMaterial({ color: COL.accent, dashSize: 0.18, gapSize: 0.14, transparent: true, opacity: 0.8 }));
   scene.add(trail);
   /* Awan: gugus bola putih. */
@@ -76,7 +76,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 8. Bola lampu gelap → filamen menyala → kamera masuk ke filamen → filamen pecah jadi jaringan saraf yang berdenyut. */
+/** 8. A dark light bulb → the filament lights up → the camera enters the filament → the filament breaks into a pulsing neural network. */
 export const SCENE_LAMPU = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow, rnd } = ctx;
@@ -87,7 +87,7 @@ function scene(ctx) {
   const thread = []; for (let i = 0; i <= 18; i++) { const y = -0.72 - i * 0.05; thread.push(new THREE.Vector2(0.44 + (i % 2 ? 0.05 : 0), y)); }
   thread.push(new THREE.Vector2(0.3, -1.72), new THREE.Vector2(0.12, -1.8), new THREE.Vector2(0, -1.82));
   bulb.add(new THREE.Mesh(new THREE.LatheGeometry(thread, 40), mat(COL.obj, { metalness: 0.9, roughness: 0.3 })));
-  /* Filamen: kumparan heliks di antara dua kawat penyangga. */
+  /* Filament: a helical coil between two support wires. */
   const coil = []; for (let i = 0; i <= 140; i++) { const a = i / 140; coil.push(new THREE.Vector3(lerp(-0.42, 0.42, a), 0.95 + Math.sin(a * Math.PI) * 0.12 + Math.cos(a * 64) * 0.04, Math.sin(a * 64) * 0.04)); }
   const filMat = new THREE.MeshBasicMaterial({ color: "#3a2410" });
   const fil = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coil), 280, 0.012, 5), filMat); bulb.add(fil);
@@ -96,7 +96,7 @@ function scene(ctx) {
   const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.2, 0.6, 16), new THREE.MeshStandardMaterial({ color: "#dfefff", transparent: true, opacity: 0.25 })); stem.position.y = -0.45; bulb.add(stem);
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow(), color: "#ffcf7a", transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); halo.position.y = 0.98; bulb.add(halo);
   const lamp = new THREE.PointLight("#ffcf7a", 0, 12, 1.5); lamp.position.y = 1; bulb.add(lamp);
-  /* Jaringan: simpul dalam bola, sisi ke 3 tetangga terdekat, denyut berjalan di sisi. */
+  /* Network: nodes inside a sphere, edges to the 3 nearest neighbors, pulses traveling along the edges. */
   const NN = 170, nodes = [];
   for (let i = 0; i < NN; i++) { const u = rnd() * 2 - 1, a = rnd() * 6.28, r = 2 + Math.cbrt(rnd()) * 7; const s = Math.sqrt(1 - u * u); nodes.push(new THREE.Vector3(Math.cos(a) * s * r, u * r * 0.7 + 1, Math.sin(a) * s * r)); }
   const edges = [];
@@ -130,7 +130,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 9. Jam pasir → pasir turun → tutup terbuka → butir pasir terbang membentuk cincin lini waktu → kamera berjalan di cincin. */
+/** 9. Hourglass → sand falls → lid opens → sand grains fly into a timeline ring → the camera travels along the ring. */
 export const SCENE_JAMPASIR = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, mat, seg, lerp, glow, paint, rnd } = ctx;
@@ -145,13 +145,13 @@ function scene(ctx) {
   const upper = new THREE.Mesh(new THREE.ConeGeometry(0.68, 1.1, 32), sand); upper.rotation.x = Math.PI; hg.add(upper);
   const lower = new THREE.Mesh(new THREE.ConeGeometry(0.75, 0.9, 32), sand); hg.add(lower);
   const stream = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.5, 6), sand); stream.position.y = -0.78; hg.add(stream);
-  /* Butir pasir yang terbang membentuk cincin lini waktu. */
+  /* Sand grains that fly into a timeline ring. */
   const GN = 2400, gpos = new Float32Array(GN * 3), gd = [];
   const R = 6.5;
   for (let i = 0; i < GN; i++) { const a = rnd() * 6.283; gd.push({ a, r: R + (rnd() - 0.5) * 0.6, y: (rnd() - 0.5) * 0.3, d: rnd() * 0.5, sw: rnd() * 6 }); }
   const grains = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(gpos, 3)), new THREE.PointsMaterial({ size: 0.12, map: glow(), color: COL.accent, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
   scene.add(grains);
-  /* Penanda tahun: tugu kecil + label kanvas di sepanjang cincin. */
+  /* Year markers: a small pillar + canvas label along the ring. */
   const years = CONFIG.tonggak || [];
   const marks = years.map((y, i) => {
     const a = (i / years.length) * Math.PI * 2 + Math.PI / 2, g = new THREE.Group(); g.position.set(Math.cos(a) * R, -1.6, Math.sin(a) * R);

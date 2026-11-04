@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
-/** Keadaan kosong standar: ikon, judul, teks, aksi opsional. */
+/** Standard empty state: icon, title, text, optional action. */
 export default function EmptyState({ icon: Icon, title, text, action, testId }: { icon: LucideIcon; title: ReactNode; text?: ReactNode; action?: ReactNode; testId?: string }) {
   return (
     <div className="flex flex-col items-center gap-2 px-6 py-10 text-center" data-testid={testId}>

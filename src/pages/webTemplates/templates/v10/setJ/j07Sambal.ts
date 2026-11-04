@@ -1,12 +1,12 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 07 · Sambal Bu Rum: sambal rumahan dalam jar. Ide besar: situs = papan nama warung yang dicat tangan; menu = papan harga kapur. */
+/* 07 · Sambal Bu Rum: homemade sambal in jars. Big idea: the site = a hand-painted stall sign; the menu = a chalk price board. */
 
 const C = { cabai: "#C8241B", terasi: "#F2B705", daun: "#2F5D3A", kertas: "#FFF8EC", arang: "#1A1A1A" };
 export const L07 = lookJ({ ink: C.arang, muted: "#3d3632", primary: C.cabai, primaryDark: "#9a1b13", soft: "#fbe7b0", line: C.arang, bg: C.kertas, head: "Dela Gothic One", body: "Zilla Slab", r: 6 });
 const L = L07;
 
-/** Huruf papan: kertas di atas merah, bayangan arang seperti cat dua lapis. */
+/** Sign lettering: paper on red, a charcoal shadow like two coats of paint. */
 const PAINT = `text-shadow: 4px 4px 0 ${C.arang};`;
 const PLANK = `border: 6px solid ${C.arang}; border-radius: 6px; box-shadow: 8px 8px 0 ${C.arang};`;
 
@@ -17,7 +17,7 @@ const SAMBAL: { name: B; level: number; note: B; price: string; size: string }[]
   { name: ["Sambal Cumi", "Squid Sambal"], level: 5, note: ["Cumi asin Juwana dipotong kecil. Isinya banyak, bukan hiasan.", "Salted Juwana squid, cut small. Plenty of it, not garnish."], price: "Rp52.000", size: "200 g" },
 ];
 
-/** Batang level pedas: lima kotak, terisi sesuai level. Tanpa ikon. */
+/** Spice level bar: five boxes, filled per level. No icons. */
 function heat(level: number, on: string, off: string): BoxNode {
   return box(
     [Lbl(L, `Pedas ${level}/5`, on, { size: 12 }), line(Array.from({ length: 5 }, (_, i) => box([], { name: "Kotak", css: `width: 18px; height: 12px; border: 2px solid ${on}; ${i < level ? `background: ${on};` : `background: ${off};`}` })), { gap: 4, stack: false, name: "Batang" })],
@@ -48,7 +48,7 @@ function foot(j: J): BoxNode {
 
 function homePage(j: J): BoxNode[] {
   const { t, href } = j;
-  // Papan nama selebar layar, di atas "etalase".
+  // A screen-wide sign above the "display case".
   const sign = sec(
     "Papan nama",
     [
@@ -86,7 +86,7 @@ function homePage(j: J): BoxNode[] {
   );
   const words: B[] = [["dimasak Senin", "cooked Monday"], ["dimasak Kamis", "cooked Thursday"], ["tanpa pengawet", "no preservatives"], ["tanpa MSG", "no MSG"], ["minyak kelapa", "coconut oil"], ["terasi Rembang", "Rembang shrimp paste"], ["cumi Juwana", "Juwana squid"]];
   const strip = sec("Pita warung", [fx(line(words.map((w) => H(L, `${t(w)} ✕`, "h3", { size: 30, color: C.kertas, full: false, upper: true, css: "white-space: nowrap;" })), { gap: 28, stack: false, name: "Kata" }), "marquee", 26)], { bg: C.daun, padY: 16, width: 1600, css: `overflow: hidden; border-top: 6px solid ${C.arang}; border-bottom: 6px solid ${C.arang};` });
-  // Papan menu kapur: tiap baris naik satu per satu.
+  // Chalk menu board: each line rises one by one.
   const row = (s: (typeof SAMBAL)[number], i: number) =>
     fx(
       grid(

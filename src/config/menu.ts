@@ -30,27 +30,27 @@ import type { DocTopicId } from "./docs";
 import { isDemoHiddenPath, isDemoMode } from "../demo/demoMode";
 
 /* ================================================================== */
-/* Menu aplikasi — SATU sumber untuk sidebar dan Dashboard             */
+/* App menu: the ONE source for the sidebar and the Dashboard           */
 /*                                                                    */
-/* Menambah alat baru cukup menambah satu baris di sini; sidebar dan   */
-/* kartu Dashboard ikut otomatis. Teks menu ada di locales:             */
+/* Adding a new tool only takes one line here; the sidebar and          */
+/* Dashboard cards follow automatically. Menu text lives in the locales: */
 /*   nav.sections.<id>.{name,description}                              */
 /*   nav.items.<key>.{name,description}                                */
-/* Path ditulis TANPA prefix bahasa; prefix /id atau /en ditambahkan    */
-/* oleh LocaleLink.                                                     */
+/* Paths are written WITHOUT a language prefix; the /id or /en prefix is */
+/* by LocaleLink.                                                       */
 /* ================================================================== */
 
 export interface MenuLeaf {
-  /** Kunci teks di locales (nav.items.<key>). */
+  /** Text key in the locales (nav.items.<key>). */
   key: string;
   path: string;
   icon: LucideIcon;
   new?: boolean;
-  /** Fitur ini memakai kredit (sebagian/seluruhnya). */
+  /** This feature uses credits (partly or fully). */
   credit?: boolean;
-  /** "prefix": aktif juga untuk sub-rute (mis. /data-tools/utilities/jwt). Default "exact". */
+  /** "prefix": also active for sub-routes (e.g. /data-tools/utilities/jwt). Default "exact". */
   match?: "exact" | "prefix";
-  /** Topik dokumentasi menu ini. */
+  /** Documentation topic for this menu. */
   doc?: DocTopicId;
 }
 
@@ -62,22 +62,22 @@ export interface MenuSection {
 
 export const GLOBAL_SETTING_PATH = "/global-setting";
 export const CREDITS_PATH = "/credits";
-/** v11: paket langganan Media & Data. */
+/** v11: Media & Data subscription plans. */
 export const PLANS_PATH = "/plans";
 export const DOCS_PATH = "/docs";
 export const JOB_HISTORY_PATH = "/job-history";
 export const TEAM_PATH = "/team";
 export const TEMPLATES_PATH = "/web-templates";
-/** v17: beranda Pembuat Website (alur Pilih → Modifikasi → Deploy). */
+/** v17: Website Builder home (Choose → Modify → Deploy flow). */
 export const WEBSITE_HUB_PATH = "/website-builder";
 /** Susun & Deploy (folder website). */
 export const SITE_PATH = "/website";
-/** v20: Studio = editor satu website (semua halaman, Situs, Kiriman, Deploy). */
+/** v20: Studio = single-website editor (all pages, Site, Submissions, Deploy). */
 export const STUDIO_PATH = "/studio";
 export const studioPath = (siteId: string, pageId?: string) => `${STUDIO_PATH}/${encodeURIComponent(siteId)}${pageId ? `?page=${encodeURIComponent(pageId)}` : ""}`;
-/** v17: editor tanpa kode untuk proyek Template Kode. */
+/** v17: no-code editor for Code Template projects. */
 export const codeEditorPath = (projectId: string) => `${WEBSITE_HUB_PATH}/code/${encodeURIComponent(projectId)}`;
-/** Paket desain, saldo demo, dan item Premium (simulasi lokal). */
+/** Design packs, demo balance, and Premium items (local simulation). */
 export const MARKET_PATH = "/web-market";
 
 /** Menu VR: pembuat tur 360°. */
@@ -118,8 +118,8 @@ export const MENU_SECTIONS: MenuSection[] = [
     id: "web-maker",
     icon: Blocks,
     items: [
-      // v20: alur disederhanakan: Website Saya (proyek → Studio) dan Template. Editor Halaman,
-      // Susun & Deploy, dan Pengaturan Global kini ada di dalam Studio (tautan lama dialihkan).
+      // v20: simplified flow: My Websites (project → Studio) and Templates. Page Editor,
+      // Compose & Deploy, and Global Settings now live inside Studio (old links redirect).
       { key: "websiteHub", path: WEBSITE_HUB_PATH, icon: Rocket, new: true, match: "prefix", doc: "website" },
       { key: "webTemplates", path: TEMPLATES_PATH, icon: LayoutTemplate, match: "prefix", doc: "templates" },
       { key: "webMarket", path: MARKET_PATH, icon: Store, new: true, credit: true, doc: "templates" },
@@ -133,15 +133,15 @@ export const MENU_SECTIONS: MenuSection[] = [
 ];
 
 /**
- * Menu yang tampil. Mode demo (v12): alat yang hanya berjalan di server
- * (berbayar) dan Toko disembunyikan, dan tanda "memakai kredit" dihapus.
+ * Visible menu items. Demo mode (v12): server-only (paid) tools and the Store
+ * are hidden, and the "uses credits" marker is removed.
  */
 export function visibleMenuSections(): MenuSection[] {
   if (!isDemoMode()) return MENU_SECTIONS;
   return MENU_SECTIONS.map((s) => ({ ...s, items: s.items.filter((l) => !isDemoHiddenPath(l.path)).map((l) => ({ ...l, credit: false })) })).filter((s) => s.items.length > 0);
 }
 
-/** Apakah `pathname` (tanpa prefix bahasa) termasuk menu ini. */
+/** Whether `pathname` (without the language prefix) belongs to this menu item. */
 export function isLeafActive(leaf: Pick<MenuLeaf, "path" | "match">, pathname: string): boolean {
   if (pathname === leaf.path) return true;
   return leaf.match === "prefix" && pathname.startsWith(`${leaf.path}/`);

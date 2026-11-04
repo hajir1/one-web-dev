@@ -1,21 +1,21 @@
 // ─── workers/audioWorker.ts ──────────────────────────────────────────────────
-// Konversi audio di Web Worker (satu worker per file; dihentikan saat batal).
-// File tidak pernah diunggah: dibaca langsung dari Blob di memori browser.
+// Audio conversion in a Web Worker (one worker per file; stopped on cancel).
+// Files are never uploaded: read directly from the Blob in browser memory.
 //
 // Jalur cepat: mediabunny membaca kontainer (MP3, WAV, OGG, FLAC, AAC, M4A,
-// WebM, MKV, MP4…), men-decode (WebCodecs), mengubah kanal/sample rate, lalu
-// meng-encode. Encoder WASM didaftarkan hanya bila browser tidak punya
-// encoder bawaan untuk kodek itu, dan dimuat hanya saat dipakai.
+// WebM, MKV, MP4…), decodes (WebCodecs), changes channels/sample rate, then
+// encodes. WASM encoders are registered only when the browser has no
+// built-in encoder for that codec, and loaded only when used.
 //
-// Jalur cadangan: bila worker tidak bisa men-decode sumber (mis. browser
-// tanpa WebCodecs audio, atau format seperti AIFF), worker meminta PCM ke
-// halaman utama (decodeAudioData) lalu meng-encode PCM itu.
+// Fallback path: when the worker cannot decode the source (e.g. a browser
+// without WebCodecs audio, or formats like AIFF), the worker asks the main page
+// for PCM (decodeAudioData) and then encodes that PCM.
 //
-// Lisensi (aman untuk produk komersial, lihat LAPORAN.md):
-// - mediabunny & @mediabunny/*-encoder : MPL-2.0 (copyleft per file; tidak diubah)
-// - LAME (di @mediabunny/mp3-encoder)   : LGPL, modul WASM terpisah, tidak diubah
-// - FFmpeg AAC (di @mediabunny/aac-encoder): LGPL, modul WASM terpisah, tidak diubah
-// - libFLAC (di @mediabunny/flac-encoder): BSD-3
+// Licenses (safe for commercial products, see LAPORAN.md):
+// - mediabunny & @mediabunny/*-encoder : MPL-2.0 (per-file copyleft; unmodified)
+// - LAME (in @mediabunny/mp3-encoder)   : LGPL, separate WASM module, unmodified
+// - FFmpeg AAC (in @mediabunny/aac-encoder): LGPL, separate WASM module, unmodified
+// - libFLAC (in @mediabunny/flac-encoder): BSD-3
 // - libvorbis/libogg (wasm-media-encoders): BSD-3, pembungkus MIT
 
 import type { AudioCodec, AudioSample, OutputFormat } from "mediabunny";
@@ -34,7 +34,7 @@ export type AudioWorkerRequest =
 
 export type AudioWorkerResponse =
   | { type: "progress"; value: number }
-  /** Minta PCM dari halaman utama (sudah di-resample ke rate/kanal ini; null = asli). */
+  /** Requests PCM from the main page (already resampled to this rate/channels; null = original). */
   | { type: "needPcm"; sampleRate: number | null; channels: number | null }
   | { type: "done"; bytes: ArrayBuffer; info: AudioInfo }
   | { type: "error"; error: string; code?: "UNSUPPORTED_TARGET" | "NO_AUDIO" };
@@ -87,9 +87,9 @@ async function outputFormat(id: Exclude<AudioTargetId, "ogg">): Promise<OutputFo
   }
 }
 
-/** Encoder Vorbis (libvorbis WASM) yang menerima potongan PCM planar. */
+/** Vorbis encoder (libvorbis WASM) that accepts planar PCM chunks. */
 async function createVorbis() {
-  // Paket ini menyisipkan WASM-nya sendiri (base64), jadi tidak ada file .wasm terpisah.
+  // This package inlines its own WASM (base64), so there is no separate .wasm file.
   const { createOggEncoder } = await import("wasm-media-encoders");
   const enc = await createOggEncoder();
   const parts: Uint8Array[] = [];
@@ -102,7 +102,7 @@ async function createVorbis() {
     get configured() {
       return configured;
     },
-    // Hasil encode masih milik encoder → wajib disalin.
+    // The encode output still belongs to the encoder → it must be copied.
     push(planes: Float32Array[]) {
       const out = enc.encode(planes);
       if (out.length) parts.push(out.slice());
@@ -131,7 +131,7 @@ function planesOf(sample: AudioSample): Float32Array[] {
 }
 
 /* ------------------------------------------------------------------ */
-/* Jalur cepat: baca + decode di worker                                  */
+/* Fast path: read + decode in the worker                                */
 /* ------------------------------------------------------------------ */
 
 async function convertDirect(file: Blob, target: AudioTarget, s: AudioConvertSettings): Promise<{ bytes: ArrayBuffer; info: AudioInfo }> {
@@ -147,8 +147,8 @@ async function convertDirect(file: Blob, target: AudioTarget, s: AudioConvertSet
     const info = { seconds, sampleRate, channels };
 
     if (target.id === "ogg") {
-      // Vorbis tidak ada di WebCodecs: mediabunny men-decode/resample, PCM-nya
-      // diteruskan ke libvorbis. Keluaran mediabunny sendiri (WAV 8-bit) dibuang.
+      // Vorbis is not in WebCodecs: mediabunny decodes/resamples, and its PCM
+      // is passed to libvorbis. mediabunny's own output (8-bit WAV) is discarded.
       const vorbis = await createVorbis();
       vorbis.configure(sampleRate, channels, s.bitrate);
       const sink = new WritableStream({ write() {} });
@@ -183,7 +183,7 @@ async function convertDirect(file: Blob, target: AudioTarget, s: AudioConvertSet
         numberOfChannels: channels,
         sampleRate,
         ...(target.lossless ? {} : { bitrate: outputBitrate(target, s.bitrate, channels) }),
-        // Selalu encode ulang agar pengaturan bitrate/kanal dipakai.
+        // Always re-encode so the bitrate/channel settings are applied.
         forceTranscode: true,
       },
       showWarnings: false,
@@ -204,7 +204,7 @@ async function convertDirect(file: Blob, target: AudioTarget, s: AudioConvertSet
 }
 
 /* ------------------------------------------------------------------ */
-/* Jalur cadangan: PCM dari halaman utama                                */
+/* Fallback path: PCM from the main page                                */
 /* ------------------------------------------------------------------ */
 
 let pcmWaiter: { resolve: (v: { channels: Float32Array[]; sampleRate: number }) => void; reject: (e: Error) => void } | null = null;
@@ -218,18 +218,18 @@ function requestPcm(sampleRate: number | null, channels: number | null) {
 
 async function encodePcm(target: AudioTarget, s: AudioConvertSettings, input: Float32Array[], inputRate: number): Promise<{ bytes: ArrayBuffer; info: AudioInfo }> {
   if (!input.length || !input[0]?.length) throw Object.assign(new Error("no-audio"), { code: "NO_AUDIO" as const });
-  // Kanal & sample rate akhir (pilihan pengguna, dibatasi kemampuan encoder).
+  // Final channels & sample rate (the user's choice, limited by the encoder).
   const channels = outputChannels(target, s.channels, input.length);
   const rate = outputSampleRate(target, s.sampleRate, inputRate);
   const info = { seconds: input[0].length / inputRate, sampleRate: rate, channels };
 
   if (target.id === "ogg") {
-    // libvorbis menerima PCM apa adanya → kanal & rate disesuaikan di sini.
+    // libvorbis takes PCM as is → channels & rate are adjusted here.
     let planes = downmix(input, channels);
     if (planes.length < channels) planes = Array.from({ length: channels }, (_, i) => planes[i] ?? planes[0]);
     if (rate !== inputRate) planes = planes.map((p) => resampleLinear(p, inputRate, rate));
     const frames = planes[0].length;
-    const CHUNK = rate; // ±1 detik per potongan
+    const CHUNK = rate; // ±1 second per chunk
     const vorbis = await createVorbis();
     vorbis.configure(rate, channels, s.bitrate);
     for (let i = 0; i < frames; i += CHUNK) {
@@ -243,7 +243,7 @@ async function encodePcm(target: AudioTarget, s: AudioConvertSettings, input: Fl
   const codec = CODEC[target.id];
   await ensureEncoder(codec);
   const out = new mb.Output({ format: await outputFormat(target.id), target: new mb.BufferTarget() });
-  // mediabunny me-remix & me-resample sendiri (transform) sebelum encode.
+  // mediabunny remixes & resamples by itself (transform) before encoding.
   const src = new mb.AudioSampleSource({
     codec,
     ...(target.lossless ? {} : { bitrate: outputBitrate(target, s.bitrate, channels) }),
@@ -274,7 +274,7 @@ async function encodePcm(target: AudioTarget, s: AudioConvertSettings, input: Fl
 async function convert(file: Blob, id: AudioTargetId, s: AudioConvertSettings) {
   const target = audioTarget(id);
   progress(2);
-  // AIFF: dibaca sendiri (PCM mentah), tidak didukung decoder browser.
+  // AIFF: read ourselves (raw PCM), not supported by browser decoders.
   if (isAiff(new Uint8Array(await file.slice(0, 12).arrayBuffer()))) {
     const pcm = parseAiff(await file.arrayBuffer());
     progress(50);
@@ -284,10 +284,10 @@ async function convert(file: Blob, id: AudioTargetId, s: AudioConvertSettings) {
     return await convertDirect(file, target, s);
   } catch (e) {
     if (e instanceof TargetUnsupported) throw e;
-    // Apa pun selain "format tujuan tidak didukung" → coba jalur cadangan.
+    // Anything other than "target format not supported" → try the fallback path.
   }
   progress(10);
-  // Halaman utama men-decode (dan me-resample bila pengguna memilih rate); kanal & batas encoder diatur di encodePcm.
+  // The main page decodes (and resamples when the user picks a rate); channels & encoder limits are set in encodePcm.
   const pcm = await requestPcm(target.id === "opus" ? 48000 : s.sampleRate, null);
   return encodePcm(target, s, pcm.channels, pcm.sampleRate);
 }

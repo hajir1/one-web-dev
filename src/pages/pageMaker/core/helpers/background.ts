@@ -1,11 +1,11 @@
 /* ================================================================== */
-/* Background lengkap — dipakai elemen (state) dan kontainer (section,  */
-/* Row, grup). Logika murni (tanpa React) supaya bisa dites.            */
+/* Full background: used by elements (state) and containers (section,   */
+/* Row, group). Pure logic (no React) so it can be tested.              */
 /*                                                                    */
-/* Satu nilai shorthand `background:` yang mendukung:                   */
-/*   none · warna solid · gradient (linear/radial, 2–3 warna) ·         */
-/*   gambar (URL / unggahan) + ukuran, posisi, ulangi, lampiran         */
-/*   (parallax), warna dasar, dan overlay warna transparan.             */
+/* One `background:` shorthand value that supports:                     */
+/*   none · solid color · gradient (linear/radial, 2–3 colors) ·        */
+/*   image (URL / upload) + size, position, repeat, attachment          */
+/*   (parallax), base color, and a transparent color overlay.           */
 /* ================================================================== */
 
 export type BgKind = "none" | "solid" | "gradient" | "image";
@@ -28,7 +28,7 @@ export const BG_POSITIONS = [
 ] as const;
 type BgPosition = (typeof BG_POSITIONS)[number];
 
-/** Field background (nama sama untuk elemen & kontainer). Field tambahan opsional → data lama tetap valid. */
+/** Background fields (same names for elements & containers). Extra fields are optional → old data stays valid. */
 export interface BgFields {
   bgType: BgKind;
   bgColor: string;
@@ -36,16 +36,16 @@ export interface BgFields {
   gradientTo: string;
   gradientAngle: number;
   gradientKind?: GradientKind;
-  /** Warna tengah gradient; kosong = hanya dua warna. */
+  /** Gradient middle color; empty = two colors only. */
   gradientVia?: string;
   bgImage?: string;
   bgSize?: BgSize;
   bgPosition?: BgPosition;
   bgRepeat?: BgRepeat;
   bgAttachment?: BgAttachment;
-  /** Warna overlay di atas gambar. */
+  /** Overlay color over the image. */
   bgOverlayColor?: string;
-  /** 0–100; 0 = tanpa overlay. */
+  /** 0–100; 0 = no overlay. */
   bgOverlayOpacity?: number;
 }
 
@@ -61,10 +61,10 @@ export const BG_DEFAULTS: Required<Omit<BgFields, "bgType" | "bgColor" | "gradie
   bgOverlayOpacity: 0,
 };
 
-/** Batas ukuran gambar unggahan (data URL) supaya desain tersimpan tidak membengkak. */
+/** Size limit for uploaded images (data URLs) so saved designs do not bloat. */
 export const MAX_UPLOAD_BYTES = 1.5 * 1024 * 1024;
 
-/** URL gambar yang aman ditaruh di `url("…")`: http(s), path relatif, atau data:image. */
+/** An image URL that is safe inside `url("…")`: http(s), relative paths, or data:image. */
 export function isSafeBgImage(u: string | undefined): u is string {
   if (!u) return false;
   return (
@@ -74,7 +74,7 @@ export function isSafeBgImage(u: string | undefined): u is string {
   );
 }
 
-/** Warna aman untuk CSS (hex, rgb/hsl, nama, transparent). Selain itu → null. */
+/** A safe CSS color (hex, rgb/hsl, name, transparent). Anything else → null. */
 export function safeColor(c: string | undefined): string | null {
   if (!c) return null;
   const v = c.trim();
@@ -84,7 +84,7 @@ export function safeColor(c: string | undefined): string | null {
   return null;
 }
 
-/** Hex → rgba dengan opasitas 0–100 (warna non-hex memakai color-mix). */
+/** Hex → rgba with 0–100 opacity (non-hex colors use color-mix). */
 export function withOpacity(color: string, opacity: number): string {
   const a = Math.max(0, Math.min(100, opacity)) / 100;
   const m = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
@@ -98,7 +98,7 @@ export function withOpacity(color: string, opacity: number): string {
 
 type BgLike = Partial<BgFields> & { bgType?: string };
 
-/** Nilai gradient saja (linear/radial, 2–3 warna). */
+/** The gradient value only (linear/radial, 2–3 colors). */
 export function gradientCss(b: BgLike): string {
   const stops = [b.gradientFrom ?? "#ffffff", b.gradientVia?.trim() || null, b.gradientTo ?? "#000000"]
     .filter((c): c is string => !!c)
@@ -110,8 +110,8 @@ export function gradientCss(b: BgLike): string {
 }
 
 /**
- * Nilai shorthand `background`. Selalu menghasilkan string valid:
- * `none`, warna, gradient, atau lapisan [overlay,] gambar + warna dasar.
+ * The `background` shorthand value. Always produces a valid string:
+ * `none`, a color, a gradient, or layers [overlay,] image + base color.
  */
 export function backgroundCss(b: BgLike): string {
   const color = safeColor(b.bgColor) ?? "transparent";
@@ -139,7 +139,7 @@ export function backgroundCss(b: BgLike): string {
   }
 }
 
-/** Normalisasi field background dari data tersimpan (nilai tak dikenal → bawaan). */
+/** Normalizes background fields from stored data (unknown values → defaults). */
 export function sanitizeBg(v: Record<string, unknown>, fallbackType: BgKind): Partial<BgFields> {
   const pick = <T extends string>(x: unknown, list: readonly T[], d: T): T => (list.includes(x as T) ? (x as T) : d);
   const out: Partial<BgFields> = {

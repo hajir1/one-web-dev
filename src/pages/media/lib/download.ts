@@ -1,13 +1,13 @@
 // ─── lib/download.ts ─────────────────────────────────────────────────────────
-// Unduhan yang benar-benar menghasilkan file (bukan sekadar tampil di UI).
+// Downloads that really produce a file (not just shown in the UI).
 //
-// Perbaikan dari versi lama:
-// - <a> dimasukkan ke DOM sebelum click (Firefox lama mengabaikan click pada
-//   elemen yang tidak terpasang).
-// - Object URL ZIP tidak dicabut SEGERA setelah click — di beberapa browser
-//   unduhan belum sempat membaca blob sehingga file 0 byte / gagal.
-// - ZIP memakai STORE (tanpa kompresi ulang): gambar/frame sudah terkompresi,
-//   kompresi DEFLATE hanya membuang waktu & CPU.
+// Fixes from the old version:
+// - <a> is attached to the DOM before click (old Firefox ignored clicks on
+//   detached elements).
+// - The ZIP object URL is not revoked RIGHT after click; in some browsers
+//   the download had not read the blob yet, so the file was 0 bytes / failed.
+// - ZIP uses STORE (no recompression): images/frames are already compressed,
+//   DEFLATE compression only wastes time & CPU.
 
 import JSZip from "jszip";
 import i18n from "../../../i18n";
@@ -26,7 +26,7 @@ function triggerDownload(url: string, filename: string): void {
   a.remove();
 }
 
-/** Unduh Blob; URL sementara dicabut otomatis setelah jeda aman. */
+/** Download a Blob; the temporary URL is revoked automatically after a safe delay. */
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   triggerDownload(url, filename);
@@ -38,7 +38,7 @@ export interface ZipEntry {
   blob: Blob;
 }
 
-/** Buat ZIP (nama di dalamnya dibersihkan & dibuat unik). */
+/** Builds a ZIP (names inside are sanitized & made unique). */
 async function buildZip(entries: ZipEntry[], onProgress?: (pct: number) => void): Promise<Blob> {
   if (!entries.length) throw new Error(i18n.t("media.errors.zipEmpty"));
   const zip = new JSZip();

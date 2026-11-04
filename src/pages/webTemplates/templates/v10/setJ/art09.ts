@@ -1,12 +1,12 @@
 import { svg } from "./art";
 
-/* Ilustrasi 09 Ombak Kidul: cetak risograf dua warna (teal + oranye) dengan raster titik dan registrasi meleset. */
+/* Illustration 09 Ombak Kidul: a two-color risograph print (teal + orange) with dot halftone and off-register. */
 
 const TEAL = "#00838A";
 const ORANGE = "#FF6C2F";
 const PAPER = "#F6F1E7";
 
-/** Raster titik (halftone) di area persegi. */
+/** Halftone dot raster in a rectangle. */
 function dots(x0: number, y0: number, w: number, h: number, step: number, color: string, grow = 0): string {
   let out = "";
   for (let y = y0; y < y0 + h; y += step)
@@ -17,7 +17,7 @@ function dots(x0: number, y0: number, w: number, h: number, step: number, color:
   return out;
 }
 
-/** Ombak dan peselancar, lapisan oranye digeser 6px seperti salah registrasi. */
+/** Waves and a surfer, the orange layer shifted 6px like a misregistration. */
 function ombak(): string {
   const wave = (dx: number, dy: number, c: string) =>
     `<g transform="translate(${dx} ${dy})" style="mix-blend-mode:multiply"><path d="M0 520C160 420 260 300 470 300c170 0 230 120 160 200-40 46-120 40-130-20 120 10 110-120-10-120-150 0-250 120-330 210-60 70-120 120-160 130z" fill="${c}" opacity=".92"/></g>`;
@@ -28,7 +28,7 @@ function ombak(): string {
   );
 }
 
-/** Papan busa berjajar di pasir. */
+/** Foam boards lined up on the sand. */
 function papan(): string {
   const board = (x: number, c: string, r: number) => `<g transform="translate(${x} 520) rotate(${r})"><rect x="-55" y="-420" width="110" height="440" rx="55" fill="${c}" style="mix-blend-mode:multiply"/><path d="M0 -400V0" stroke="${PAPER}" stroke-width="5"/></g>`;
   return svg(

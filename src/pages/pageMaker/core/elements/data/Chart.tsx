@@ -7,12 +7,12 @@ import { safeColor } from "../../helpers/background";
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* Chart — grafik batang/garis/pai/donat memakai Chart.js (CDN).        */
+/* Chart — bar/line/pie/donut charts using Chart.js (CDN).              */
 /*                                                                    */
-/* Elemen ini meminta library "chartjs": saat dipakai, compose()       */
-/* otomatis memasang <script> Chart.js di hasil ekspor (HTML) dan      */
+/* This element requests the "chartjs" library: when used, compose()   */
+/* automatically adds the Chart.js <script> to the exported output (HTML) and */
 /* LIBRARIES.md (React/Vue/Svelte/Angular). Kode grafik menunggu       */
-/* window.Chart tersedia, lalu menggambar; grafik lama dihancurkan.    */
+/* window.Chart is available, then draws; the old chart is destroyed.  */
 /* ================================================================== */
 
 type ChartType = "bar" | "line" | "pie" | "doughnut";
@@ -20,9 +20,9 @@ type ChartType = "bar" | "line" | "pie" | "doughnut";
 export interface ChartState {
   chartType: ChartType;
   title: string;
-  /** Nama seri dipisah koma (maks. 2), mis. "Penjualan, Target". */
+  /** Series names separated by commas (max. 2), e.g. "Sales, Target". */
   series: string;
-  /** Satu baris per label: "Jan, 12, 8". */
+  /** One line per label: "Jan, 12, 8". */
   rows: string[];
   color1: string;
   color2: string;
@@ -60,7 +60,7 @@ export interface ChartData {
   series: { name: string; values: number[] }[];
 }
 
-/** Ubah isian panel jadi data grafik (label & angka dibersihkan). */
+/** Turns the panel input into chart data (labels & numbers sanitized). */
 export function parseChartData(s: Pick<ChartState, "series" | "rows">): ChartData {
   const names = (s.series || "")
     .split(",")
@@ -116,14 +116,14 @@ export function chartConfig(s: ChartState) {
   };
 }
 
-/** Ringkasan teks data untuk pembaca layar. */
+/** Text summary of the data for screen readers. */
 export function chartSummary(s: ChartState): string {
   const { labels, series } = parseChartData(s);
   const rows = labels.map((l, i) => `${l}: ${series.map((sr) => `${sr.name} ${sr.values[i]}`).join(", ")}`);
   return `${s.title ? `${s.title}. ` : ""}${rows.join("; ")}`;
 }
 
-/** Tunggu window.Chart (CDN), lalu gambar; mengembalikan fungsi pembersih. */
+/** Waits for window.Chart (CDN), then draws; returns a cleanup function. */
 const WAIT_FN = `function whenChartReady(run) {
   let tries = 0;
   let timer = null;
@@ -228,7 +228,7 @@ useEffect(() => {
     vue: {
       script: `import { ref, onMounted, onBeforeUnmount } from "vue";
 
-// Butuh Chart.js dari CDN (lihat LIBRARIES.md).
+// Needs Chart.js from a CDN (see LIBRARIES.md).
 const CONFIG = ${cfg};
 ${WAIT_FN}
 
@@ -245,7 +245,7 @@ onBeforeUnmount(() => stop && stop());`,
     svelte: {
       script: `import { onMount } from "svelte";
 
-// Butuh Chart.js dari CDN (lihat LIBRARIES.md).
+// Needs Chart.js from a CDN (see LIBRARIES.md).
 const CONFIG = ${cfg};
 ${WAIT_FN}
 

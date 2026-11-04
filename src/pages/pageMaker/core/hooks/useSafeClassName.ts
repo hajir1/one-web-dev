@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 
 /**
- * Nama class yang benar-benar dipakai untuk render & export. Kalau input
- * kosong atau bukan identifier CSS sederhana yang valid, jatuh balik ke
- * `defaultName` supaya preview & kode yang di-generate tidak rusak.
+ * The class name actually used for rendering & export. When the input is
+ * empty or not a valid simple CSS identifier, it falls back to
+ * `defaultName` so the preview & generated code do not break.
  *
- * Aturan yang dipakai sengaja ketat: harus diawali huruf atau underscore,
- * kemudian hanya boleh berisi huruf, angka, underscore, atau tanda hubung.
+ * The rule is deliberately strict: it must start with a letter or underscore,
+ * followed only by letters, digits, underscores, or hyphens.
  */
 export function useSafeClassName(defaultName: string) {
   const [className, setClassName] = useState<string>(defaultName);

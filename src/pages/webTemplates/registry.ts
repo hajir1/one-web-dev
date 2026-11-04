@@ -53,7 +53,7 @@ export const toTplLang = (lng: string | undefined): TplLang => (lng?.startsWith(
 
 export { buildTemplatePages, type BuiltTemplatePage };
 
-/** Folder website + desain sementara (TIDAK disimpan) untuk pratinjau & unduhan. */
+/** A temporary website folder + designs (NOT saved) for preview & download. */
 export function templateSite(t: WebTemplate, lang: TplLang, siteName: string): { site: SavedDesign; designs: SavedDesign[]; pages: BuiltTemplatePage[] } {
   const pages = buildTemplatePages(t, lang);
   const now = Date.now();

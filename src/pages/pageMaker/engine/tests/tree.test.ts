@@ -59,7 +59,7 @@ test("remove tidak bisa menghapus root", () => {
 
 test("moveNode: pindah antar induk", () => {
   const { root, box1, A, B } = sample();
-  const r = moveNode(root, A.id, box1.id, 1); // A masuk box1 di antara B dan C
+  const r = moveNode(root, A.id, box1.id, 1); // A goes into box1 between B and C
   const b1 = findNode(r, box1.id) as BoxNode;
   assert.deepEqual(names(b1), ["B", "A", "C"]);
   assert.deepEqual(names(r), ["box1", "D"]);
@@ -68,11 +68,11 @@ test("moveNode: pindah antar induk", () => {
 
 test("moveNode: reorder satu induk memakai indeks sebelum pencabutan", () => {
   const { root, A } = sample();
-  // A ke setelah box1 (index 2 sebelum dicabut) → [box1, A, D]
+  // A after box1 (index 2 before removal) → [box1, A, D]
   assert.deepEqual(names(moveNode(root, A.id, root.id, 2)), ["box1", "A", "D"]);
-  // A ke paling akhir
+  // A to the very end
   assert.deepEqual(names(moveNode(root, A.id, root.id, 3)), ["box1", "D", "A"]);
-  // posisi yang sama = tidak berubah (referensi sama)
+  // the same position = unchanged (same reference)
   assert.equal(moveNode(root, A.id, root.id, 0), root);
   assert.equal(moveNode(root, A.id, root.id, 1), root);
 });
@@ -85,7 +85,7 @@ test("moveNode: tidak boleh ke dalam diri sendiri / turunan / root dipindah", ()
   const r = insertNode(root, box1.id, 0, nested);
   assert.equal(canMoveInto(r, box1.id, nested.id), false);
   assert.equal(moveNode(r, box1.id, nested.id, 0), r);
-  // ke dalam elemen (bukan box) ditolak
+  // dropping into an element (not a box) is rejected
   assert.equal(canMoveInto(r, box1.id, B.id), false);
 });
 
@@ -102,7 +102,7 @@ test("duplicate memberi id baru dan salinan dalam", () => {
   assert.ok(newId);
   assert.deepEqual(names(r), ["A", "box1", "box1 (salinan)", "D"]);
   const copy = findNode(r, newId!) as BoxNode;
-  // state elemen tidak dipakai bersama
+  // element state is not shared
   const e0 = collectElements(copy)[0];
   e0.state.text = "diubah";
   assert.notEqual((collectElements(findNode(r, box1.id)!)[0].state as { text: string }).text, "diubah");
@@ -132,5 +132,5 @@ test("updateNode hanya menyalin jalur yang berubah", () => {
   const { root, box1, A } = sample();
   const r = updateNode(root, box1.id, (n) => ({ ...n, name: "baru" }));
   assert.equal(findNode(r, box1.id)?.name, "baru");
-  assert.equal(findNode(r, A.id), findNode(root, A.id)); // saudara tidak disalin
+  assert.equal(findNode(r, A.id), findNode(root, A.id)); // siblings are not copied
 });

@@ -31,16 +31,16 @@ export default function ExcelToJsonConverter() {
   const [items, setItems] = useState<ConvertItem[]>([]);
   const itemsRef = useRef<ConvertItem[]>([]);
   const [opts, setOpts] = useState<Options>({ headerRow: true, pretty: true, outputFormat: "json" });
-  // Opsi terbaru dibaca SETELAH file selesai dibaca → tidak ada hasil dengan opsi basi
-  // (bug lama: mengubah opsi saat file besar masih dibaca menghasilkan output lama).
+  // The latest options are read AFTER the file finishes reading → no results with stale options
+  // (old bug: changing options while a large file was still reading produced old output).
   const optsRef = useRef(opts);
   optsRef.current = opts;
-  // Token per item: hasil konversi lama tidak menimpa hasil yang lebih baru.
+  // Token per item: an old conversion result does not overwrite a newer one.
   const tokens = useRef<Record<string, number>>({});
   const [isZipping, setIsZipping] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // Hanya memakai ref + setter state (stabil), jadi aman di-memo tanpa dependensi.
+  // Only uses a ref + state setters (stable), so it is safe to memoize without dependencies.
   const commit = useCallback((fn: (prev: ConvertItem[]) => ConvertItem[]) => {
     itemsRef.current = fn(itemsRef.current);
     setItems(itemsRef.current);
@@ -124,7 +124,7 @@ export default function ExcelToJsonConverter() {
     [commit, processItem, t],
   );
 
-  // Opsi berubah → konversi ulang item yang sudah selesai (workbook sudah di memori).
+  // Options changed → reconvert finished items (the workbook is already in memory).
   const firstRun = useRef(true);
   useEffect(() => {
     if (firstRun.current) {

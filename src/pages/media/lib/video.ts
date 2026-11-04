@@ -1,6 +1,6 @@
 // ─── lib/video.ts ────────────────────────────────────────────────────────────
-// Bantuan video di browser: muat metadata (dengan batas waktu & pesan codec),
-// perbaiki durasi Infinity, dan seek yang tidak bisa menggantung selamanya.
+// Video helpers in the browser: load metadata (with a time limit & codec messages),
+// fix Infinity durations, and seeks that can never hang forever.
 
 import i18n from "../../../i18n";
 
@@ -49,7 +49,7 @@ export interface VideoMeta {
   duration: number;
   width: number;
   height: number;
-  /** Durasi awalnya Infinity dan sudah dihitung ulang. */
+  /** The duration started as Infinity and has been recomputed. */
   durationFixed: boolean;
 }
 
@@ -62,7 +62,7 @@ export async function loadVideoMeta(video: HTMLVideoElement, url: string, signal
 
   let durationFixed = false;
   if (!Number.isFinite(video.duration)) {
-    // Trik umum untuk WebM tanpa durasi: lompat ke akhir agar browser menghitungnya.
+    // Common trick for WebM without a duration: jump to the end so the browser computes it.
     video.currentTime = 1e101;
     await waitEvent(video, ["durationchange", "timeupdate", "seeked"], 8_000, signal).catch(() => "");
     durationFixed = Number.isFinite(video.duration);
@@ -73,7 +73,7 @@ export async function loadVideoMeta(video: HTMLVideoElement, url: string, signal
   return { duration: video.duration, width: video.videoWidth, height: video.videoHeight, durationFixed };
 }
 
-/** Seek dengan batas waktu; seek ke posisi yang sama tidak menunggu event. */
+/** Seek with a time limit; seeking to the same position does not wait for an event. */
 export async function seekTo(video: HTMLVideoElement, time: number, signal?: AbortSignal): Promise<void> {
   if (signal?.aborted) throw abortErr();
   if (Math.abs(video.currentTime - time) < 1e-4 && video.readyState >= 2) return;

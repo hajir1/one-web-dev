@@ -39,7 +39,7 @@ import {
 } from "./kitB";
 
 /* ================================================================== */
-/* Set B · bagian 3: Toko Mainan, Pet Shop, Kebun Kopi, Kargo, Esports.  */
+/* Set B · part 3: Toy Store, Pet Shop, Coffee Farm, Cargo, Esports.     */
 /* ================================================================== */
 
 /* --------------------- 11. kids-toystore (PREMIUM, 5) -------------- */

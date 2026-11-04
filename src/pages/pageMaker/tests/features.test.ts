@@ -52,7 +52,7 @@ test("Custom CSS di-scope ke node: deklarasi, &, turunan, @media, dan pembersiha
   assert.match(mix, /^\.n \{\n {2}border: 1px solid;\n {2}padding: 4px;\n\}/);
   assert.match(mix, /\.n > \*:not\(:first-child\) \{/);
   assert.match(mix, /\.n \{\n {2}color: red;\n\}\n$/);
-  // tidak bisa keluar dari scope / menutup <style>
+  // cannot escape the scope / close <style>
   assert.match(scopeCustomCss("body { color: red }", ".n"), /^\.n \{/);
   assert.doesNotMatch(scopeCustomCss("@import url(x.css); </style><script>x</script> a { b: c }", ".n") ?? "", /@import|<\/style/);
   assert.equal(scopeCustomCss("a { b: c", ".n"), null);
@@ -91,7 +91,7 @@ test("CSS ID ganda dalam satu halaman → akhiran otomatis + peringatan; ID tida
   assert.ok(out.warnings.some((w) => /dipakai lebih dari sekali/.test(w.message)));
   assert.ok(out.warnings.some((w) => /tidak valid/.test(w.message) && /1bad/.test(w.message)));
   assert.ok(out.warnings.some((w) => /Class tidak valid.*9x/.test(w.message)));
-  // ID & class juga sampai ke komponen anak (elemen interaktif)
+  // the ID & class also reach child components (interactive elements)
   const t = el("tabs");
   t.advanced = { cssId: "tab-utama", cssClass: "tabku" };
   const o2 = build(page(t).root);
@@ -119,7 +119,7 @@ test("Custom JS: runtime + init di HTML; tidak di canvas desain; wiring per fram
   assert.match(react, /useEffect\(\(\) => initCustomCode\(rootRef\.current\), \[\]\);/);
   assert.match(react, /<main className="pg" ref=\{rootRef\}>/);
   assert.match(file(out, "react", /^customCode\.js$/), /^export function initCustomCode/);
-  // Vue: CSS kustom di <style> global (menembus komponen anak)
+  // Vue: custom CSS in a global <style> (reaches child components)
   const vue = file(out, "vue", /^Pg\.vue$/);
   assert.match(vue, /<main class="pg" ref="rootRef">/);
   assert.match(vue, /onMounted\(\(\) => \{\n {2}destroyCustomCode = initCustomCode\(rootRef\.value\);/);
@@ -137,7 +137,7 @@ test("Custom JS: runtime + init di HTML; tidak di canvas desain; wiring per fram
   assert.match(ngTs, /encapsulation: ViewEncapsulation\.None/);
   assert.match(file(out, "angular", /^pg\.component\.html$/), /<main class="pg" #pmRoot>/);
   assert.match(file(out, "angular", /^custom-code\.ts$/), /@ts-nocheck[\s\S]*export function initCustomCode/);
-  // tanpa Custom JS → keluaran tidak berubah (tidak ada ref/runtime)
+  // without Custom JS → the output does not change (no ref/runtime)
   const plain = build(page(el("button")).root);
   assert.doesNotMatch(file(plain, "react", /^Pg\.jsx$/), /rootRef|initCustomCode/);
   assert.equal(plain.files("react").some((f) => f.name === "customCode.js"), false);
@@ -151,7 +151,7 @@ test("Custom JS: sintaks salah diabaikan + peringatan; runtime tidak menumpuk li
   assert.equal(out.html.script.includes("initCustomCode"), false);
   assert.equal(jsSyntaxError("on(element, 'x', () => 1)"), null);
 
-  // eksekusi runtime pada DOM tiruan
+  // runtime execution on a fake DOM
   const listeners = new Set();
   const fakeEl = {
     addEventListener: (t, h) => listeners.add(h),
@@ -170,7 +170,7 @@ test("Custom JS: sintaks salah diabaikan + peringatan; runtime tidak menumpuk li
     const init = new Function(`${src}; return initCustomCode;`)();
     init(root);
     assert.equal(listeners.size, 1);
-    init(root); // render ulang / StrictMode: inisialisasi lama dibersihkan dulu
+    init(root); // re-render / StrictMode: the old initialization is cleaned up first
     assert.equal(listeners.size, 1);
     assert.equal(root.cleaned, 1);
     const destroy = init(root);
@@ -216,7 +216,7 @@ test("Code Element: HTML mentah, <script> dibuang, CSS di-scope, JS lewat runtim
   assert.match(file(out, "react", /^CodeBlock1\.jsx$/), /dangerouslySetInnerHTML=\{\{ __html:/);
   const vue = file(out, "vue", /^CodeBlock1\.vue$/);
   assert.match(vue, /<div class="pg__code-1" v-html="html"><\/div>/);
-  assert.match(vue, /const html = ".*<\\\/p>/); // "</" di-escape di dalam <script>
+  assert.match(vue, /const html = ".*<\\\/p>/); // "</" is escaped inside <script>
   assert.match(file(out, "svelte", /^CodeBlock1\.svelte$/), /\{@html html\}/);
   const ng = file(out, "angular", /^code-block1\.component\.ts$/);
   assert.match(ng, /import \{ DomSanitizer, SafeHtml \} from '@angular\/platform-browser';/);
@@ -259,12 +259,12 @@ test("Page Composer: urutan terjaga, desain sumber tidak berubah, ID bentrok dig
   walk(merged.root, (n) => n.advanced?.cssId && ids.push(n.advanced.cssId));
   assert.deepEqual(ids, ["hero", "judul", "hero-2", "judul-2"]);
   assert.equal(merged.warnings.filter((w) => /diganti/.test(w)).length, 2);
-  // id node baru (tidak berbagi id dengan snapshot) → mengedit halaman tidak menyentuh salinan
+  // new node ids (no ids shared with the snapshot) → editing the page does not touch the copy
   assert.equal(findNode(merged.root, c.items[0].snapshot.root.children[0].id), null);
-  // hasil bisa diekspor tanpa ID ganda
+  // the result can be exported without duplicate IDs
   const out = build(merged.root);
   assert.equal((out.html.body.match(/id="hero"/g) ?? []).length, 1);
-  // urutkan ulang, ganti, hapus
+  // reorder, replace, delete
   c = moveItem(c, c.items[1].uid, 0);
   assert.deepEqual(c.items.map((i) => i.designId), ["d2", "d1"]);
   const d3 = design("d3", "Desain 3", [el("badge")]);
@@ -272,7 +272,7 @@ test("Page Composer: urutan terjaga, desain sumber tidak berubah, ID bentrok dig
   assert.deepEqual(c.items.map((i) => i.designId), ["d2", "d3"]);
   c = removeItem(c, c.items[0].uid);
   assert.deepEqual(c.items.map((i) => i.designId), ["d3"]);
-  // sumber berubah → bisa diperbarui
+  // source changed → can be refreshed
   const d3b = { ...design("d3", "Desain 3", [el("badge"), el("button")]), updatedAt: 99 };
   assert.ok(isStale(c.items[0], [d3b]));
   c = refreshItem(c, c.items[0].uid, d3b);
@@ -296,7 +296,7 @@ test("Page Composer: data tersimpan dinormalisasi, desain kosong diberi peringat
   assert.deepEqual(normalizeComposition("x"), createComposition());
 });
 
-/* --------------------------- Elemen premium -------------------------- */
+/* --------------------------- Premium elements -------------------------- */
 
 test("elemen premium: ditandai, tidak ikut tanpa kredit, lengkap di 5 framework dengan kredit", () => {
   const prem = ELEMENT_DEFINITIONS.filter((d) => d.premium).map((d) => d.type);
@@ -314,7 +314,7 @@ test("elemen premium: ditandai, tidak ikut tanpa kredit, lengkap di 5 framework 
   assert.match(file(paid, "angular", /^slider1\.component\.ts$/), /implements OnInit, OnDestroy/);
   assert.match(file(paid, "react", /^Slider1\.jsx$/), /clearInterval/);
   assert.match(paid.html.body, /role="progressbar" aria-valuenow="72"/);
-  // countdown: tanggal tidak valid → bawaan
+  // countdown: invalid date → default
   const bad = el("countdown", { target: "javascript:alert(1)" });
   const o = build(page(bad).root, { allowPremiumElements: true });
   assert.match(o.html.script, /new Date\("2026-12-31T23:59"\)/);

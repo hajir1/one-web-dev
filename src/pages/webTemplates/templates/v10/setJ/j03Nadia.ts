@@ -1,6 +1,6 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 03 · Nadia Pramesti (portofolio fotografer dokumenter). Ide besar: foto "dicuci" di depan pengunjung (mask). */
+/* 03 · Nadia Pramesti (documentary photographer portfolio). Big idea: photos "developed" in front of the visitor (mask). */
 
 const C = { gelap: "#141210", merah: "#B23A2B", kertas: "#E9E2D3", abu: "#6E665C", film: "#D9A441" };
 export const L03 = lookJ({ ink: C.kertas, muted: "#b9b1a3", primary: C.merah, primaryDark: "#8e2c20", soft: "#2a2622", line: "#3a3530", bg: C.gelap, head: "Newsreader", body: "DM Mono", r: 2 });
@@ -34,7 +34,7 @@ function foot(j: J): BoxNode {
   });
 }
 
-/** Satu bingkai di contact sheet: nomor, foto, tanda pilih merah. */
+/** One frame on a contact sheet: number, photo, red selection mark. */
 function frame(j: J, [code, name, meta, art]: (typeof STORIES)[number], i: number): BoxNode {
   const { t } = j;
   const picked = i % 2 === 0;

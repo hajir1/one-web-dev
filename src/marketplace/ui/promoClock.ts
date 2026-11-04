@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-/* Satu detak per detik untuk semua countdown promo (bukan satu interval per kartu). */
+/* One tick per second for every promo countdown (not one interval per card). */
 
 const listeners = new Set<() => void>();
 let now = Date.now();
@@ -24,5 +24,5 @@ function subscribe(fn: () => void) {
   };
 }
 
-/** Waktu sekarang (ms), diperbarui tiap detik selama ada komponen yang memakai. */
+/** Current time (ms), updated every second while any component uses it. */
 export const usePromoNow = () => useSyncExternalStore(subscribe, () => now, () => now);

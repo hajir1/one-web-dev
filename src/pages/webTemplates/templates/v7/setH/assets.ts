@@ -1,10 +1,10 @@
 import { V7H_SPECS } from "./specs";
 
 /* ================================================================== */
-/* Gambar set H (SVG buatan sendiri, ASCII, tanpa lisensi pihak ketiga): */
+/* Set H images (in-house SVG, ASCII, no third-party licenses):        */
 /*   v7h-<id>-mark   logo merek 64×64 (bentuk geometris, 6 varian)      */
-/*   v7h-<id>-login  ilustrasi dashboard 800×560 untuk halaman Masuk    */
-/*                   (3 varian grafik), memakai palet template.         */
+/*   v7h-<id>-login  an 800×560 dashboard illustration for the Sign-in page */
+/*                   (3 chart variants), using the template palette.    */
 /* ================================================================== */
 
 type Spec = (typeof V7H_SPECS)[number];
@@ -38,7 +38,7 @@ function loginArt(s: Spec): string {
   const card = (x: number, y: number, w: number, h: number) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="${surface}" stroke="${line}" stroke-width="2"/>`;
   const bar = (x: number, y: number, w: number, c: string, o = 1) => `<rect x="${x}" y="${y}" width="${w}" height="10" rx="5" fill="${c}" opacity="${o}"/>`;
   let body = `<rect width="800" height="560" fill="${soft}"/><circle cx="700" cy="70" r="90" fill="${p}" opacity=".18"/><circle cx="90" cy="510" r="70" fill="${pd}" opacity=".14"/>`;
-  // Kerangka aplikasi: bilah samping + kartu KPI.
+  // App frame: sidebar + KPI cards.
   body += card(60, 60, 680, 440) + `<rect x="60" y="60" width="150" height="440" rx="16" fill="${pd}"/>`;
   for (let i = 0; i < 6; i++) body += bar(84, 110 + i * 34, i === 1 ? 100 : 80, "#ffffff", i === 1 ? 0.95 : 0.45);
   body += `<circle cx="96" cy="84" r="10" fill="#ffffff"/>`;
@@ -57,7 +57,7 @@ function loginArt(s: Spec): string {
     body += `<polyline points="${pts}" fill="none" stroke="${p}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>`;
     vals.forEach((h, i) => (body += `<circle cx="${262 + i * 38}" cy="${base - h}" r="6" fill="${surface}" stroke="${pd}" stroke-width="3"/>`));
   }
-  // Donat + daftar.
+  // Donut + list.
   body += card(564, 188, 152, 288);
   const C = 2 * Math.PI * 44;
   const a = 0.35 + (hash(s.id) % 30) / 100;

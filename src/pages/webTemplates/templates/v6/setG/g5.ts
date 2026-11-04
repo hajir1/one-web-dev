@@ -3,7 +3,7 @@ import type { GSpec } from "./spec";
 
 /* ================================================================== */
 /* Set G batch 5 (G81–G100): CV pribadi, komunitas sepeda, kontraktor   */
-/* baja, studio foto keluarga, advokat, keramik, salon, WO, renovasi,   */
+/* steel, family photo studio, lawyer, ceramics, salon, wedding organizer, renovation, */
 /* futsal, gereja, roastery, gaming center, kos, refleksi, cuci sofa,   */
 /* kursus coding, rental mobil, apotek, studio tato.                    */
 /* ================================================================== */

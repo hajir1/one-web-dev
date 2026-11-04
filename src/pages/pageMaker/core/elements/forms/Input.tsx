@@ -18,7 +18,7 @@ import i18n from "../../../../../i18n";
 
 export interface InputState extends StyleState {
   inputType: InputType;
-  /** Label <label for> di atas input — penting untuk aksesibilitas. */
+  /** <label for> label above the input; important for accessibility. */
   labelEnabled: boolean;
   labelText: string;
   required: boolean;
@@ -82,8 +82,8 @@ const DEFAULT_STATE: InputState = {
   transitionDuration: 150,
   transitionEasing: "ease",
 
-  // Field "Hover" di panel dipakai juga sebagai state :focus untuk Input
-  // (lihat catatan di generateInputCss) — default-nya efek focus-ring biru.
+  // The "Hover" field in the panel is also used as the :focus state for Input
+  // (see the note in generateInputCss) — the default is a blue focus-ring effect.
   hoverEnabled: true,
   hoverBgColor: "#ffffff",
   hoverTextColor: "#111827",
@@ -121,7 +121,7 @@ export interface InputClassNames {
   label: string;
 }
 
-/** Turunkan nama class wrapper, ikon, & label dari satu nama class dasar. */
+/** Derive the wrapper, icon, & label class names from one base class name. */
 function deriveClassNames(base: string): InputClassNames {
   return {
     input: base,
@@ -137,10 +137,10 @@ function deriveClassNames(base: string): InputClassNames {
 /* ------------------------------------------------------------------ */
 
 /**
- * Input tidak memakai `generateCss()` bersama karena <input>:
- *  - butuh state :focus (bukan cuma :hover) sebagai feedback utama
- *  - ikon diposisikan absolute di dalam pembungkus (input = void element)
- * Field "Hover" di panel dipakai untuk :hover DAN :focus.
+ * Input does not use the shared `generateCss()` because <input>:
+ *  - needs a :focus state (not just :hover) as the main feedback
+ *  - the icon is positioned absolutely inside a wrapper (input = void element)
+ * The "Hover" field in the panel is used for :hover AND :focus.
  */
 function generateInputCss(
   s: InputState,
@@ -219,7 +219,7 @@ ${hoverShadowLine}}`
 .${cls.input}:focus-visible {
   outline: 2px solid ${s.hoverBorderColor};
   outline-offset: 2px;
-}`; // tanpa gaya fokus, input tetap harus terlihat saat difokus keyboard
+}`; // without a focus style, the input must still be visible on keyboard focus
 
   const iconRules = hasIcon
     ? `
@@ -306,7 +306,7 @@ function inputSections(s: InputState, update: Updater<InputState>): PanelSection
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const inputElement = defineElement<InputState>({

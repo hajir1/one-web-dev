@@ -6,7 +6,7 @@ import { Link, useLocaleNavigate } from "../components/app/LocaleLink";
 import { CREDITS_PATH, JOB_HISTORY_PATH, PLANS_PATH, TEAM_PATH } from "../config/menu";
 import { isAdmin, loadSession, signOut, useSession } from "../auth/session";
 
-/** Tombol Masuk, atau menu akun (kredit, admin, keluar) bila sudah login. */
+/** Sign-in button, or the account menu (credits, admin, sign out) when signed in. */
 export default function UserMenu() {
   const { t } = useTranslation();
   const { pathname, search } = useLocation();

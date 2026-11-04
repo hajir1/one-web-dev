@@ -3,8 +3,8 @@ import { badge, button, col, el, eyebrow, grid, heading, image, inline, linkButt
 import type { TemplateContent, Tr } from "../types";
 import { productCard, type DemoProduct } from "./shopStarter";
 
-/* Toko Online — PREMIUM: butik fashion, 4 halaman (Beranda, Katalog, Detail Produk, Kontak).
-   Harga, keranjang, dan tombol hanya tampilan: TIDAK ada transaksi sungguhan. */
+/* Online Store, PREMIUM: a fashion boutique, 4 pages (Home, Catalog, Product Detail, Contact).
+   Prices, the cart, and buttons are display only: there are NO real transactions. */
 
 const P: Palette = { ink: "#0f172a", muted: "#475569", primary: "#0f766e", primaryDark: "#134e4a", soft: "#ccfbf1", line: "#e2e8f0" };
 const BRAND = "Moda Rupa";

@@ -22,7 +22,7 @@ export interface CheckboxState {
   labelText: string;
   gap: number;
   defaultChecked: boolean;
-  /** Atribut name (opsional) — dipakai saat dikirim lewat form. */
+  /** name attribute (optional), used when submitted through a form. */
   name: string;
 
   /* Typography */
@@ -116,7 +116,7 @@ const DEFAULT_STATE: CheckboxState = {
 
 const DEFAULT_CLASS_NAME = "custom-checkbox";
 
-/** SVG → data URI yang di-encode penuh (aman untuk semua browser). */
+/** SVG → a fully encoded data URI (safe in every browser). */
 export function svgDataUri(svg: string): string {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
@@ -144,7 +144,7 @@ function generateCheckboxCss(s: CheckboxState, cls: string): string {
   user-select: none;
 }`);
 
-  // Input asli tetap ada (bisa difokus & dibaca screen reader), hanya disembunyikan visual.
+  // The real input still exists (focusable & read by screen readers), only visually hidden.
   rules.push(`.${cls}-input {
   position: absolute;
   width: 1px;
@@ -312,7 +312,7 @@ function checkboxSections(s: CheckboxState, update: Updater<CheckboxState>): Pan
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const checkboxElement = defineElement<CheckboxState>({

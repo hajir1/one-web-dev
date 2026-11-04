@@ -6,17 +6,17 @@ import { collectionsScript, crudNames, isNumeric, searchFields, seedRow, tableFi
 /* CRUD Laravel per koleksi                                              */
 /*                                                                    */
 /* Model, Migration, FormRequest, Controller admin (search + paginate),  */
-/* Controller API (dipakai halaman publik), Seeder, view Blade admin,    */
-/* dan rute. Login memakai auth bawaan Laravel (starter kit Breeze):     */
-/* semua rute admin di balik middleware `auth`.                          */
+/* API controller (used by the public pages), Seeder, Blade admin views, */
+/* and routes. Login uses Laravel's built-in auth (Breeze starter kit): */
+/* every admin route sits behind the `auth` middleware.                */
 /* ================================================================== */
 
 const php = (s: string) => `'${s.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 
-/** Teks di komentar PHP/JS. */
+/** Text inside PHP/JS comments. */
 const cmt = (s: string) => s.replace(/\*\//g, "* /").replace(/[\r\n]+/g, " ");
 
-/** Teks aman di view Blade (HTML + tanpa sintaks Blade). */
+/** Text that is safe in a Blade view (HTML + no Blade syntax). */
 const bt = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/@/g, "&#64;").replace(/\{/g, "&#123;");
 
@@ -36,7 +36,7 @@ function column(f: CollectionField): string {
     case "category":
       return `$table->string(${php(f.key)}, 40)->nullable()->index();`;
     case "image":
-      // Teks: path unggahan (storage), path aset, URL, atau data URI dari template.
+      // Text: an upload path (storage), an asset path, a URL, or a data URI from the template.
       return `$table->text(${php(f.key)})->nullable();`;
     case "price":
       return f.required ? `$table->unsignedBigInteger(${php(f.key)});` : `$table->unsignedBigInteger(${php(f.key)})->nullable();`;
@@ -109,7 +109,7 @@ ${search.map((k, i) => `            $w->${i ? "orWhere" : "where"}(${php(k)}, 'l
         });
     }
 
-    /** URL gambar: unggahan (disk public), path aset situs, URL, atau data URI. */
+    /** Image URL: upload (public disk), site asset path, URL, or data URI. */
     public function getImageUrlAttribute(): ?string
     {
         $v = (string) ($this->image ?? '');
@@ -123,7 +123,7 @@ ${search.map((k, i) => `            $w->${i ? "orWhere" : "where"}(${php(k)}, 'l
             return asset($v);
         }
 
-        // Unggahan di storage/app/public (butuh php artisan storage:link).
+        // Uploads in storage/app/public (needs php artisan storage:link).
         return asset('storage/'.ltrim($v, '/'));
     }
 
@@ -184,14 +184,14 @@ class ${n.model}Request extends FormRequest
         return $this->user() !== null;
     }
 
-    /** "Rp95.000" / "95.000" → 95000; kolom angka kosong → 0. */
+    /** "Rp95.000" / "95.000" → 95000; empty number field → 0. */
     protected function prepareForValidation(): void
     {
         $clean = [];
         foreach (${`[${prices.map(php).join(", ")}]`} as $key) {
             $v = $this->input($key);
             $digits = preg_replace('/\\D/', '', (string) $v);
-            // Kosong → null; teks tanpa angka dibiarkan supaya aturan integer menolaknya.
+            // Empty → null; text without digits is left as is so the integer rule rejects it.
             $clean[$key] = $digits === '' ? (($v === null || $v === '') ? null : $v) : (int) $digits;
         }
         foreach (${`[${zero.map(php).join(", ")}]`} as $key) {
@@ -306,7 +306,7 @@ class ${n.model}Controller extends Controller
         return $request->hasFile('image') ? $request->file('image')->store(${php(n.slug)}, 'public') : null;
     }
 
-    /** Hanya unggahan di disk public yang dihapus (bukan URL / aset / data URI). */
+    /** Only uploads on the public disk are deleted (not URLs / assets / data URIs). */
     private function deleteImage(?string $path): void
     {
         if ($path && ! preg_match('#^(https?://|data:|/|assets/)#i', $path)) {
@@ -522,7 +522,7 @@ function formView(c: CollectionDef): string {
         return `  <div class="adm-field">\n    ${label}\n    <input id="f-${f.key}" type="text" name="${f.key}" maxlength="${f.type === "label" ? 30 : 160}" value="{{ old(${php(f.key)}, $item->${f.key}) }}"${req} />\n    ${err}\n  </div>`;
     }
   };
-  return `{{-- Form bersama untuk tambah & ubah. --}}
+  return `{{-- Shared form for create & edit. --}}
 @csrf
 <div class="adm-grid">
 ${c.fields.map(input).join("\n")}
@@ -551,7 +551,7 @@ function createView(c: CollectionDef, n: CrudNames, edit: boolean): string {
 `;
 }
 
-export const ADMIN_CSS = `/* Dashboard CRUD (dibuat OneWebDev). Tanpa framework CSS. */
+export const ADMIN_CSS = `/* CRUD dashboard (made by OneWebDev). No CSS framework. */
 *,*::before,*::after{box-sizing:border-box}
 body.adm{margin:0;display:flex;min-height:100vh;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1c1917;background:#f5f5f4}
 .adm-side{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;padding:20px 12px;background:#1c1917;color:#e7e5e4}
@@ -598,14 +598,14 @@ input,select,textarea{width:100%;padding:9px 11px;border:1px solid #d6d3d1;borde
 @media (max-width:720px){body.adm{flex-direction:column}.adm-side{width:auto;flex-direction:row;flex-wrap:wrap;align-items:center}.adm-side nav{flex-direction:row;flex-wrap:wrap}.adm-logout{margin:0 0 0 auto}.adm-brand{padding:4px 10px}}
 `;
 
-/** Rute CRUD yang ditambahkan ke routes/web.php. */
+/** CRUD routes added to routes/web.php. */
 export function laravelRoutes(cols: CollectionDef[]): string {
   const names = cols.map(crudNames);
   return `
 /*
-| CRUD koleksi data (dibuat OneWebDev).
-| /admin/* butuh login (auth bawaan Laravel, mis. starter kit Breeze).
-| /api/<koleksi> dipakai halaman publik untuk memuat kartu dari database.
+| Data collection CRUD (made by OneWebDev).
+| /admin/* requires login (Laravel's built-in auth, e.g. the Breeze starter kit).
+| /api/<collection> is used by the public pages to load cards from the database.
 */
 ${names.map((n) => `Route::get(${php(`/api/${n.slug}`)}, \\App\\Http\\Controllers\\Api\\${n.model}ApiController::class)->name(${php(`api.${n.slug}`)});`).join("\n")}
 
@@ -614,18 +614,18 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 ${names.map((n) => `    Route::resource(${php(n.slug)}, \\App\\Http\\Controllers\\Admin\\${n.model}Controller::class)->except('show')->parameters([${php(n.slug)} => 'item']);`).join("\n")}
 });
 
-// Rute login/daftar dari starter kit Breeze (bila sudah dipasang).
+// Login/register routes from the Breeze starter kit (if installed).
 if (file_exists(__DIR__.'/auth.php')) {
     require __DIR__.'/auth.php';
 }
-// Breeze mengarahkan ke rute "dashboard" setelah login: teruskan ke /admin.
+// Breeze redirects to the "dashboard" route after login: forward to /admin.
 if (! Route::has('dashboard')) {
     Route::get('/dashboard', fn () => redirect('/admin'))->middleware('auth')->name('dashboard');
 }
 `;
 }
 
-/** Semua berkas CRUD Laravel untuk daftar koleksi. */
+/** Every Laravel CRUD file for the collection list. */
 export function laravelCrudFiles(cols: CollectionDef[], siteName: string): GeneratedFile[] {
   const files: GeneratedFile[] = [];
   const names = cols.map(crudNames);
@@ -680,7 +680,7 @@ composer -V
 \`\`\`bash
 composer create-project laravel/laravel situs
 cd situs
-# Login admin memakai auth bawaan Laravel (lewati bila proyek sudah punya login)
+# Admin login uses Laravel's built-in auth (skip if the project already has login)
 composer require laravel/breeze --dev
 php artisan breeze:install blade
 \`\`\`

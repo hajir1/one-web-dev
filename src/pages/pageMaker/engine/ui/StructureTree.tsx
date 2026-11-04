@@ -38,7 +38,7 @@ import {
 import { BOX_ICON, elementIcon } from "../helpers/elementIcons";
 
 /* ================================================================== */
-/* Struktur — pohon komponen dengan drag & drop                         */
+/* Structure — component tree with drag & drop                          */
 /* ================================================================== */
 
 interface Row extends TreeRowInfo {
@@ -75,16 +75,16 @@ interface TreeActions {
   onDuplicate: (id: NodeId) => void;
   onMove: (id: NodeId, delta: -1 | 1) => void;
   onRename: (id: NodeId, name: string) => void;
-  /** Tambah box baru (klik chip) ke target aktif. */
+  /** Adds a new box (chip click) to the active target. */
   onAddBox: (layout: BoxLayout) => void;
 }
 
 interface StructureTreeProps extends TreeActions {
   root: BoxNode;
   selectedId: NodeId;
-  /** Id node yang baru ditambah/dipindah (berkedip sebentar). */
+  /** Id of the node just added/moved (blinks briefly). */
   flashId: NodeId | null;
-  /** Ringkasan teks elemen untuk baris (mis. isi tombol). */
+  /** Short text summary of an element for its row (e.g. the button content). */
   describe: (n: ComponentNode) => { sub: string; linked?: boolean; broken?: boolean };
 }
 
@@ -115,7 +115,7 @@ export default function StructureTree({
 
   const rows = useMemo(() => flatten(root, collapsed), [root, collapsed]);
 
-  /* Buka cabang induk saat node terpilih dari tempat lain (mis. klik di preview). */
+  /* Expand the parent branches when a node is selected elsewhere (e.g. a click in the preview). */
   useEffect(() => {
     const ancestors = pathTo(root, selectedId).slice(0, -1);
     if (ancestors.some((a) => collapsed.has(a.id))) {
@@ -128,7 +128,7 @@ export default function StructureTree({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, root]);
 
-  /* Gulir baris terpilih ke dalam tampilan. */
+  /* Scroll the selected row into view. */
   useEffect(() => {
     const el = scrollRef.current?.querySelector<HTMLElement>(`[data-row-id="${CSS.escape(selectedId)}"]`);
     el?.scrollIntoView({ block: "nearest" });
@@ -171,7 +171,7 @@ export default function StructureTree({
     autoScroll(e);
     if (!drop || drop.rowId !== d.rowId || drop.mode !== d.mode || drop.index !== d.index) {
       setDrop(d);
-      // Tahan di atas box tertutup → buka otomatis.
+      // Hovering over a collapsed box → it expands automatically.
       if (expandTimer.current) window.clearTimeout(expandTimer.current);
       expandTimer.current = null;
       if (d.mode === "inside" && row.isBox && !row.expanded) {
@@ -261,7 +261,7 @@ export default function StructureTree({
       case "Backspace":
         if (!row.isRoot) {
           e.preventDefault();
-          // Fokus pindah ke baris sebelumnya supaya keyboard tetap di pohon.
+          // Focus moves to the previous row so the keyboard stays in the tree.
           const prev = rows[idx - 1];
           onDelete(row.id);
           if (prev) focusRow(prev.id);
@@ -361,7 +361,7 @@ export default function StructureTree({
         </div>
       </header>
 
-      {/* Kontainer baru: seret ke pohon, atau klik */}
+      {/* New container: drag into the tree, or click */}
       <div className="flex shrink-0 flex-wrap items-center gap-1.5 px-3 pb-2">
         <span className="text-[11px] text-gray-400">{t("pm.tree.containers")}</span>
         {BOX_CHIPS.map((layout) => {
@@ -519,7 +519,7 @@ export default function StructureTree({
           );
         })}
 
-        {/* Zona jatuh di akhir komponen */}
+        {/* Drop zone at the end of the component */}
         <div
           onDragOver={onEndDragOver}
           className={`relative mt-1 flex h-9 items-center justify-center rounded-md border border-dashed text-[11px] transition-colors ${

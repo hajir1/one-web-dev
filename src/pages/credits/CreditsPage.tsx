@@ -49,13 +49,13 @@ import { AccessChip } from "../media/components/FeatureAccess";
 import { currentLang, LANG_LABEL } from "../../i18n";
 
 /* ================================================================== */
-/* Halaman Credits: saldo, paket bertingkat, tarif fitur, riwayat.      */
-/* Semua angka saldo/riwayat berasal dari backend. Tanpa backend,       */
-/* halaman menjelaskan dengan jujur bahwa pembayaran belum tersedia     */
-/* dan TIDAK membuat transaksi apa pun.                                 */
+/* Credits page: balance, tiered packs, feature rates, history.         */
+/* Every balance/history number comes from the backend. Without a backend, */
+/* the page explains honestly that payment is not available yet         */
+/* and does NOT create any transaction.                                 */
 /* ================================================================== */
 
-/** Fitur Web Maker yang bertarif tetap (urutan tampilan). */
+/** Web Maker features with a fixed rate (display order). */
 const WEB_FEATURES: CreditFeature[] = ["export", "site-slot", "premium-template", "premium-preset", "premium-element"];
 
 type TxState = { status: "idle" | "loading" | "ready" | "error" | "unavailable"; items: CreditTransaction[]; error?: unknown };
@@ -98,8 +98,8 @@ export default function CreditsPage() {
   const backend = isBackendConfigured();
   const locale = LANG_LABEL[currentLang()].locale;
 
-  // Riwayat transaksi lewat TanStack Query: cache 30 detik, dimuat ulang
-  // otomatis setelah pembelian (invalidateQueries di billing.ts).
+  // Transaction history via TanStack Query: 30-second cache, reloaded
+  // automatically after a purchase (invalidateQueries in billing.ts).
   const txQuery = useTransactions(50, backend);
   const tx: TxState = !backend
     ? { status: "unavailable", items: [] }
@@ -115,12 +115,12 @@ export default function CreditsPage() {
     void txQuery.refetch();
   }, [txQuery]);
 
-  // Saat halaman dibuka: pakai data yang masih segar, muat bila basi.
+  // When the page opens: use data that is still fresh, load when stale.
   useEffect(() => {
     void ensureBilling();
   }, []);
 
-  // Kembali dari payment gateway: status DIVERIFIKASI ke backend, bukan dari URL.
+  // Back from the payment gateway: the status is VERIFIED with the backend, not taken from the URL.
   const session = params.get("session");
   useEffect(() => {
     if (!session) return;
@@ -138,7 +138,7 @@ export default function CreditsPage() {
       })
       .catch((e) => setAlert({ tone: "warn", text: e instanceof BillingUnavailableError ? t("creditsPage.checkout.cannotVerify") : e instanceof Error ? e.message : t("errors.unknown") }))
       .finally(() => {
-        // Hapus ?session dari URL agar refresh tidak memverifikasi ulang.
+        // Remove ?session from the URL so a refresh does not verify again.
         const next = new URLSearchParams(params);
         next.delete("session");
         setParams(next, { replace: true });
@@ -270,7 +270,7 @@ export default function CreditsPage() {
           </Link>
         </Notice>
 
-        {/* Paket kredit bertingkat */}
+        {/* Tiered credit packs */}
         <Panel title={t("creditsPage.packages.title")} description={t("creditsPage.packages.description", { best: formatMoney(pricePerCredit(best)) })}>
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5" data-testid="packages">
             {packages.map((pk) => {
@@ -396,7 +396,7 @@ export default function CreditsPage() {
         </Panel>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
-          {/* Riwayat transaksi */}
+          {/* Transaction history */}
           <Panel
             title={t("creditsPage.history.title")}
             description={t("creditsPage.history.description")}

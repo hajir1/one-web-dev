@@ -1,9 +1,9 @@
 /* ================================================================== */
-/* Adegan 3D Cerita Scroll (v22), bagian D: kapal dalam botol, kubus     */
-/* rubik, roda gigi → ban berjalan, peta kertas → gunung.               */
+/* 3D Scroll Story scenes (v22), part D: ship in a bottle, Rubik's       */
+/* cube, gears → conveyor belt, paper map → mountain.                   */
 /* ================================================================== */
 
-/** 10. Kapal dalam botol → gabus lepas → kamera masuk lewat leher botol → botol lenyap, laut di dalamnya meluas → kapal berlayar di antara pulau. */
+/** 10. A ship in a bottle → the cork comes off → the camera enters through the bottle neck → the bottle vanishes, the sea inside expands → the ship sails between islands. */
 export const SCENE_BOTOL = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, rnd } = ctx;
@@ -12,7 +12,7 @@ function scene(ctx) {
   const glassM = new THREE.MeshStandardMaterial({ color: "#cfeee6", transparent: true, opacity: 0.22, roughness: 0.04, metalness: 0.1, side: THREE.DoubleSide, depthWrite: false });
   bottle.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 48), glassM));
   const cork = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.27, 0.6, 20), mat("#b98a55", { roughness: 0.9 })); cork.position.y = 2.95; bottle.add(cork);
-  /* Dunia mini: laut + kapal + pulau. Saat "bebas", dunia ini membesar 14 kali. */
+  /* Mini world: sea + ship + island. When "free", this world grows 14 times larger. */
   const world = new THREE.Group(); scene.add(world);
   const SG = new THREE.PlaneGeometry(4.2, 1.7, 84, 34); SG.rotateX(-Math.PI / 2);
   const sea = new THREE.Mesh(SG, mat(COL.obj, { roughness: 0.55, metalness: 0.0 })); sea.position.y = -0.45; world.add(sea);
@@ -59,7 +59,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 11. Kubus rubik teracak → diselesaikan putaran demi putaran mengikuti scroll → meledak jadi 26 keping → rapat lagi. */
+/** 11. Scrambled Rubik's cube → solved turn by turn with the scroll → explodes into 26 pieces → comes together again. */
 export const SCENE_RUBIK = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp } = ctx;
@@ -98,7 +98,7 @@ function scene(ctx) {
       for (let i = 0; i < SOLVE.length; i++) { const k = Math.max(0, Math.min(1, n - i)); if (k <= 0) break; const e = k < 1 ? k * k * (3 - 2 * k) : 1; if (e > 0) turn(cubies, SOLVE[i], e); }
       const ex = S.explode;
       cubies.forEach((c, i) => {
-        /* Putaran parsial membuat posisi tidak bulat; ledakan memakai arah rumah keping. */
+        /* Partial rotations leave positions off-grid; the explosion uses each piece's home direction. */
         c.g.position.copy(c.p).addScaledVector(dirs[i], ex * (1.6 + (i % 5) * 0.25));
         c.g.quaternion.copy(c.q);
         if (ex > 0) c.g.rotateOnAxis(dirs[i], ex * (t * 0.6 + i));
@@ -108,7 +108,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 12. Satu roda gigi → roda lain datang dan saling mengunci → mesin berputar → ban berjalan mengeluarkan paket. */
+/** 12. One gear → other gears arrive and mesh → the machine turns → the conveyor belt delivers parcels. */
 export const SCENE_GIGI = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp } = ctx;
@@ -125,7 +125,7 @@ function scene(ctx) {
     const g = new THREE.ExtrudeGeometry(s, { depth: 0.28, bevelEnabled: true, bevelSize: 0.025, bevelThickness: 0.025, bevelSegments: 1, curveSegments: 10 });
     g.translate(0, 0, -0.14); return g;
   }
-  /* Jari-jari jarak (pitch) sebanding jumlah gigi → semua roda saling mengunci. */
+  /* Pitch radius proportional to the tooth count → all gears mesh. */
   const P = 0.0625;
   const spec = [[16, 0, 0], [10, 0, 0], [24, 0, 0], [12, 0, 0], [20, 0, 0]];
   const angles = [0, 0.35, -0.6, 0.9, -0.2];
@@ -139,11 +139,11 @@ function scene(ctx) {
     const g = new THREE.Group(); g.add(m, axle); scene.add(g);
     gears.push({ g, m, N, r, x, y, dir: i % 2 ? -1 : 1 });
   });
-  /* Fase agar gigi tidak bertabrakan: tiap roda diputar setengah gigi relatif terhadap sebelumnya pada garis pusat. */
+  /* Phase so the teeth don't collide: each wheel is turned half a tooth relative to the previous one along the center line. */
   gears.forEach((g, i) => { if (!i) { g.ph = 0; return; } const pv = gears[i - 1], a = Math.atan2(g.y - pv.y, g.x - pv.x); g.ph = -(pv.ph - a) * (pv.N / g.N) + a + Math.PI + Math.PI / g.N; });
   const cx = gears.reduce((a, g) => a + g.x, 0) / gears.length, cy = gears.reduce((a, g) => a + g.y, 0) / gears.length;
   gears.forEach((g) => { g.x -= cx; g.y -= cy; });
-  /* Ban berjalan di bawah, digerakkan roda terakhir. */
+  /* Conveyor belt below, driven by the last wheel. */
   const belt = new THREE.Group(); belt.position.set(0, -3.2, 0.8); scene.add(belt);
   const bodyB = new THREE.Mesh(new THREE.BoxGeometry(9, 0.18, 1.3), mat("#262b31", { roughness: 0.7 })); belt.add(bodyB);
   [-4.5, 4.5].forEach((x) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.32, 16), mat("#5a626c", { metalness: 0.6 })); r.rotation.x = Math.PI / 2; r.position.x = x; belt.add(r); });
@@ -175,7 +175,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 13. Peta kertas datar → kontur terangkat jadi gunung (relief kertas) → jalur pendakian tergambar → pendaki naik → bendera di puncak. */
+/** 13. A flat paper map → contours rise into mountains (paper relief) → a hiking trail is drawn → a hiker climbs → a flag at the summit. */
 export const SCENE_PETA = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, mat, seg, lerp, paint, glow } = ctx;
@@ -186,7 +186,7 @@ function scene(ctx) {
   const map = paint(1400, 980, (g, w, h) => {
     g.fillStyle = "#f3e9d2"; g.fillRect(0, 0, w, h);
     g.strokeStyle = "rgba(120,90,50,.18)"; g.lineWidth = 1; for (let x = 0; x < w; x += 70) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (let y = 0; y < h; y += 70) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
-    /* Garis kontur: titik yang tingginya dekat kelipatan 0,25. */
+    /* Contour lines: points whose height is near a multiple of 0.25. */
     const img = g.getImageData(0, 0, w, h), d = img.data;
     for (let py = 0; py < h; py += 1) for (let px = 0; px < w; px += 1) {
       const x = (px / w - 0.5) * W, z = (py / h - 0.5) * D, v = height(x, z) / 0.25, f = v - Math.floor(v);

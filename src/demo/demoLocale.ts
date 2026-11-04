@@ -1,8 +1,8 @@
 // ─── demo/demoLocale.ts ──────────────────────────────────────────────────────
-// Mode demo (v15): semua fitur terbuka, jadi teks yang menonjolkan "gratis",
-// kredit, atau paket diganti dengan versi netral. Ditimpa di atas bundle bahasa
-// setiap kali bundle itu dimuat (EN dimuat belakangan, lihat i18n.activateLanguage).
-// Kunci khusus demo sendiri ada di `demo.*` pada berkas locale.
+// Demo mode (v15): every feature is unlocked, so text that highlights "free",
+// credits, or plans is replaced with a neutral version. Applied on top of the language bundle
+// every time that bundle loads (EN loads later, see i18n.activateLanguage).
+// Demo-only keys live under `demo.*` in the locale files.
 
 import type { i18n as I18n } from "i18next";
 
@@ -102,7 +102,7 @@ export const DEMO_LOCALE: Record<"id" | "en", Tree> = {
   },
 };
 
-/** Pasang teks demo di atas setiap bundle bahasa yang sudah atau akan dimuat. */
+/** Applies demo text on top of every language bundle that is or will be loaded. */
 export function installDemoLocale(i18n: I18n): void {
   let applying = false;
   const apply = (lng: string) => {

@@ -1,22 +1,22 @@
 /* ================================================================== */
-/* Model edit TEMPLATE KODE tanpa ngoding (v17).                         */
+/* No-code editing model for CODE TEMPLATES (v17).                       */
 /*                                                                    */
-/* Template kode menandai bagian yang boleh diubah lewat form:           */
-/*   1. Teks      : elemen ber-atribut data-owd-text="kunci"             */
-/*                  (label: data-owd-label, banyak baris: data-owd-multi).*/
-/*                  Kunci yang sama di beberapa elemen = satu field.      */
-/*   2. Tautan    : data-owd-href="kunci" (label: data-owd-href-label).   */
-/*   3. Warna/gaya: <style id="owd-theme"> berisi :root { --nama: nilai; */
+/* Code templates mark the parts that may be changed through the form:  */
+/*   1. Text      : elements with the data-owd-text="key" attribute      */
+/*                  (label: data-owd-label, multi-line: data-owd-multi).*/
+/*                  The same key on several elements = one field.       */
+/*   2. Links    : data-owd-href="key" (label: data-owd-href-label).      */
+/*   3. Color/style: <style id="owd-theme"> holding :root { --name: value; */
 /*                  /* Label [min,maks,langkah] *\/ }                     */
-/*   4. Data      : JSON di antara penanda di skrip:                     */
+/*   4. Data      : JSON between markers in the script:                  */
 /*                  /*owd:data name="CONFIG" label="..." hide="a,b.c"*\/ */
 /*                  { ... } /*owd:end*\/                                  */
-/*   5. Wilayah   : HTML statis yang dibangun ulang dari data (untuk      */
-/*                  pembaca tanpa JS): <!--owd:render name="x"-->…        */
+/*   5. Regions   : static HTML rebuilt from data (for                   */
+/*                  readers without JS): <!--owd:render name="x"-->…      */
 /*                  <!--owd:end-->                                       */
 /*                                                                    */
-/* Semua fungsi di sini berupa operasi string murni (jalan di browser    */
-/* dan di Node untuk pengujian). Teks pengguna selalu di-escape.         */
+/* Every function here is a pure string operation (runs in the browser  */
+/* and in Node for tests). User text is always escaped.                 */
 /* ================================================================== */
 
 export interface CodeEdits {
@@ -31,7 +31,7 @@ export interface TextField {
   label: string;
   value: string;
   multiline: boolean;
-  /** Jumlah elemen yang memakai kunci ini. */
+  /** Number of elements using this key. */
   uses: number;
 }
 export interface LinkField {
@@ -52,7 +52,7 @@ export interface DataBlock {
   name: string;
   label: string;
   value: unknown;
-  /** Jalur kunci yang disembunyikan dari form (mis. "id", "musik.nada", "adegan"). */
+  /** Key paths hidden from the form (e.g. "id", "musik.nada", "adegan"). */
   hidden: string[];
 }
 export interface CodeModel {
@@ -62,7 +62,7 @@ export interface CodeModel {
   data: DataBlock[];
 }
 
-/** Pembangun ulang wilayah statis: (data semua blok, nilai variabel tema) → HTML. */
+/** Static region rebuilder: (data of every block, theme variable values) → HTML. */
 export type RegionRenderer = (data: Record<string, unknown>, vars: Record<string, string>) => string;
 
 /* ------------------------------ util ------------------------------ */
@@ -83,9 +83,9 @@ const attrOf = (tag: string, name: string): string | null => {
   return m ? decodeEntities(m[1]) : null;
 };
 
-/** Elemen teks: <tag ... data-owd-text="k" ...>isi</tag> (isi = teks polos, tanpa tag bersarang). */
+/** Text element: <tag ... data-owd-text="k" ...>content</tag> (content = plain text, no nested tags). */
 const TEXT_RE = /<([a-z][a-z0-9]*)\b([^>]*\sdata-owd-text="([\w.-]+)"[^>]*)>([^<]*)<\/\1>/gi;
-/** Tag pembuka yang punya data-owd-href. */
+/** Opening tags that have data-owd-href. */
 const HREF_RE = /<a\b[^>]*\sdata-owd-href="([\w.-]+)"[^>]*>/gi;
 const THEME_RE = /<style id="owd-theme">([\s\S]*?)<\/style>/;
 const VAR_RE = /(--[\w-]+)\s*:\s*([^;]+);[ \t]*(?:\/\*\s*([^*[]*?)\s*(?:\[([^\]]*)\])?\s*\*\/)?/g;
@@ -94,7 +94,7 @@ const REGION_RE = /<!--owd:render name="([\w-]+)"-->([\s\S]*?)<!--owd:end-->/g;
 
 const isHex = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim());
 
-/** JSON aman di dalam <script> dan di antara penanda komentar. */
+/** JSON that is safe inside a <script> and between comment markers. */
 export function jsonForScript(value: unknown): string {
   return JSON.stringify(value, null, 2)
     .replace(/</g, "\\u003c")
@@ -147,7 +147,7 @@ export function readModel(html: string): CodeModel {
     try {
       data.push({ name, label: decodeEntities(label), value: JSON.parse(json), hidden: hide ? hide.split(",").map((s) => s.trim()).filter(Boolean) : [] });
     } catch {
-      /* blok rusak: lewati (tidak bisa diedit lewat form) */
+      /* corrupt block: skip it (cannot be edited through the form) */
     }
   }
   return { texts: [...texts.values()], links: [...links.values()], vars, data };
@@ -155,7 +155,7 @@ export function readModel(html: string): CodeModel {
 
 /* ------------------------------ tulis ----------------------------- */
 
-/** Terapkan perubahan ke HTML template dasar. Kunci yang tidak dikenal diabaikan. */
+/** Applies the changes to the base template HTML. Unknown keys are ignored. */
 export function applyEdits(html: string, edits: CodeEdits, renderers: Record<string, RegionRenderer> = {}): string {
   let out = html;
   const texts = edits.texts ?? {};
@@ -199,12 +199,12 @@ export function applyEdits(html: string, edits: CodeEdits, renderers: Record<str
   return out;
 }
 
-/** Nilai CSS dari form: tanpa karakter yang bisa keluar dari deklarasi/blok style. */
+/** A CSS value from the form: no characters that could escape the style declaration/block. */
 export function cleanCssValue(v: string): string {
   return v.replace(/[;{}<>\\]/g, "").replace(/\/\*|\*\//g, "").trim().slice(0, 200);
 }
 
-/** Tautan dari form: hanya http(s), mailto, tel, wa.me, atau jangkar (#…). */
+/** A link from the form: only http(s), mailto, tel, wa.me, or anchors (#…). */
 export function safeHref(v: string): string {
   const s = v.trim();
   if (/^(https?:|mailto:|tel:)/i.test(s) || s.startsWith("#")) return s;
@@ -225,7 +225,7 @@ export function getAt(obj: unknown, path: Path): unknown {
   return cur;
 }
 
-/** Salinan baru dengan nilai di `path` diganti (struktur lain tetap dibagi). */
+/** A new copy with the value at `path` replaced (the rest of the structure stays shared). */
 export function setAt<T>(obj: T, path: Path, value: unknown): T {
   if (!path.length) return value as T;
   const [head, ...rest] = path;
@@ -238,10 +238,10 @@ export function setAt<T>(obj: T, path: Path, value: unknown): T {
   return { ...base, [head]: setAt(base[head as string], rest, value) } as T;
 }
 
-/** Jalur tanpa indeks array, untuk dicocokkan dengan daftar `hide` ("acara.mulai"). */
+/** A path without array indexes, to match against the `hide` list ("acara.mulai"). */
 export const pathKey = (path: Path) => path.filter((p) => typeof p === "string").join(".");
 
-/** Item baru untuk daftar: salin item terakhir, kosongkan teks dan gambar. */
+/** A new list item: copies the last item, clearing text and images. */
 export function blankLike(sample: unknown): unknown {
   if (typeof sample === "string") return "";
   if (typeof sample === "number") return sample;
@@ -251,7 +251,7 @@ export function blankLike(sample: unknown): unknown {
   return null;
 }
 
-/** Ringkasan perubahan (untuk label "n perubahan"). */
+/** Change summary (for the "n changes" label). */
 export function countEdits(e: CodeEdits): number {
   return Object.keys(e.texts ?? {}).length + Object.keys(e.links ?? {}).length + Object.keys(e.vars ?? {}).length + Object.keys(e.data ?? {}).length;
 }

@@ -2,13 +2,13 @@ import type {  } from "../../../ui/PanelStyling";
 import i18n from "../../../../../../i18n";
 
 /* ================================================================== */
-/* Elemen GRATIS v3: Input Label Mengambang, Kolom Pencarian, Input      */
-/* Angka, Unggah Berkas, Tombol Segmen, Avatar, Kutipan, Paginasi,       */
+/* FREE elements v3: Floating Label Input, Search Field, Input           */
+/* Number, File Upload, Segmented Buttons, Avatar, Quote, Pagination,    */
 /* Langkah Proses, Peta, Skeleton Loading.                               */
 /*                                                                    */
-/* Sebagian besar murni HTML + CSS. Input Angka & Unggah Berkas memakai  */
-/* sedikit JS (runtime Custom JS) yang hanya menambah kenyamanan; tanpa  */
-/* JS keduanya tetap berfungsi sebagai input bawaan browser.            */
+/* Mostly pure HTML + CSS. Number Input & File Upload use               */
+/* a little JS (the Custom JS runtime) that only adds convenience; without */
+/* JS both still work as the browser's built-in inputs.                 */
 /* ================================================================== */
 
 export const tr = (k: string) => i18n.t(`el.y.${k}`);

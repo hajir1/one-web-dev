@@ -7,29 +7,29 @@ import type { TemplatePageDef } from "../../../types";
 import { listingCard, pageWith, theme } from "../../pro/kit";
 
 /* ================================================================== */
-/* Perangkat section untuk 25 template v2 bagian B.                      */
+/* Section kit for the 25 v2 templates part B.                           */
 /*                                                                    */
-/* Setiap fungsi menghasilkan SATU section (Section → Row → isi) dengan  */
-/* isi & gaya dari pemanggil. Template memilih, mengurutkan, dan mengisi */
-/* section sendiri; preset Pro (sectionPresetsPro) dipakai langsung di   */
-/* file template supaya presetId tercatat di katalog.                   */
+/* Each function produces ONE section (Section → Row → content) with    */
+/* content & styles from the caller. Templates choose, order, and fill  */
+/* their own sections; Pro presets (sectionPresetsPro) are used directly in */
+/* the template files so the presetId is recorded in the catalog.       */
 /* ================================================================== */
 
 export { asset };
 
-/** Identitas visual satu template. */
+/** Visual identity of one template. */
 export interface Look {
   p: Palette;
   t: ProTheme;
-  /** Font teks (root halaman). */
+  /** Body text font (page root). */
   font: string;
-  /** Font judul. */
+  /** Heading font. */
   hf: string;
   r: number;
   bg: string;
   alt: string;
   dark: string;
-  /** Teks redup di latar gelap. */
+  /** Muted text on a dark background. */
   onDark: string;
 }
 
@@ -41,13 +41,13 @@ export function look(p: Palette, o: { font: string; hf?: string; r: number; dark
 
 export type Btn = [label: string, href: string];
 
-/** Susun halaman `key`: header + isi halaman + footer (halaman tak dikenal = beranda). */
+/** Builds page `key`: header + page content + footer (unknown pages = home). */
 export function render(L: Look, key: string, head: BoxNode, foot: BoxNode, pages: Record<string, () => BoxNode[]>): PageDoc {
   const build = pages[key] ?? pages.home;
   return pageWith([head, ...build(), foot], L.font, L.bg);
 }
 
-/** Definisi halaman ringkas. */
+/** Compact page definition. */
 export const P = (key: string, id: string, en: string, slugId: string, slugEn: string, home = false): TemplatePageDef => ({ key, name: { id, en }, slug: { id: slugId, en: slugEn }, ...(home ? { home: true } : {}) });
 
 function addCss(node: ElementNode | BoxNode, decl: string): void {
@@ -55,14 +55,14 @@ function addCss(node: ElementNode | BoxNode, decl: string): void {
   node.advanced = { ...node.advanced, customCss: cur.includes("{") ? `${cur}\n& { ${decl} }` : `${cur}${cur ? "\n" : ""}${decl}` };
 }
 
-/** Judul dengan font judul template. */
+/** Heading with the template heading font. */
 function H(L: Look, text: string, tag: "h1" | "h2" | "h3" | "h4", o: Parameters<typeof heading>[2] = {}): ElementNode {
   const n = heading(text, tag, { color: L.p.ink, ...o });
   addCss(n, `font-family: ${L.hf};`);
   return n;
 }
 
-/** Deretan tombol; tombol pertama utama. */
+/** A row of buttons; the first button is primary. */
 function btns(L: Look, list: Btn[], o: { dark?: boolean; justify?: "start" | "center" } = {}): BoxNode {
   return inline(
     list.map(([l, h], i) => linkButton(l, h, i === 0 ? "primary" : o.dark ? "light" : "outline", L.p)),
@@ -70,7 +70,7 @@ function btns(L: Look, list: Btn[], o: { dark?: boolean; justify?: "start" | "ce
   );
 }
 
-/** Judul section (eyebrow + judul + teks). */
+/** Section heading (eyebrow + heading + text). */
 function intro(L: Look, o: { ey?: string; title: string; text?: string; align?: "left" | "center"; light?: boolean }): BoxNode {
   const align = o.align ?? "center";
   return stack(
@@ -107,7 +107,7 @@ export interface HeroOpts {
   size?: number;
 }
 
-/** Hero dua kolom: teks + gambar. */
+/** Two-column hero: text + image. */
 export function heroSplit(L: Look, o: HeroOpts): BoxNode {
   const text = col(
     [
@@ -128,7 +128,7 @@ export function heroSplit(L: Look, o: HeroOpts): BoxNode {
   });
 }
 
-/** Hero dengan gambar latar penuh + lapisan warna. */
+/** A hero with a full background image + a color layer. */
 export function heroImage(L: Look, o: { ey?: string; title: string; text: string; btns: Btn[]; image: string; overlay?: string; opacity?: number; center?: boolean; minHeight?: number; extra?: (ElementNode | BoxNode)[] }): BoxNode {
   const align = o.center ? "center" : "left";
   const s = section(
@@ -158,7 +158,7 @@ export function heroImage(L: Look, o: { ey?: string; title: string; text: string
   return s;
 }
 
-/** Hero teks rata tengah, gambar lebar opsional. */
+/** A centered text hero, with an optional wide image. */
 export function heroCenter(L: Look, o: { badge?: string; title: string; text: string; btns: Btn[]; image?: string; alt?: string; dark?: boolean; bg?: string; gradient?: [string, string, number?]; size?: number; extra?: (ElementNode | BoxNode)[] }): BoxNode {
   const rows: BoxNode[] = [
     stack(
@@ -176,7 +176,7 @@ export function heroCenter(L: Look, o: { badge?: string; title: string; text: st
   return section("Hero Tengah", rows, { ...(o.gradient ? { gradient: o.gradient } : { bg: bgOf(L, o.dark, o.bg) }), padY: 104, width: 1040 });
 }
 
-/** Hero dengan teks mengetik (Premium: typewriter). */
+/** A hero with typing text (Premium: typewriter). */
 export function heroType(L: Look, o: { ey?: string; prefix: string; words: string[]; text: string; btns: Btn[]; image: string; alt: string; dark?: boolean; size?: number }): BoxNode {
   return section(
     "Hero Mengetik",
@@ -202,7 +202,7 @@ export function heroType(L: Look, o: { ey?: string; prefix: string; words: strin
   );
 }
 
-/** Slider lebar (Premium: slider). */
+/** Wide slider (Premium: slider). */
 export function sliderSec(L: Look, slides: [string, string, string][], o: { height?: number; bg?: string; padY?: number } = {}): BoxNode {
   return section("Slider", [stack([el("slider", { slides: slides.map(([title, text, bg]) => ({ title, text, bg })), height: o.height ?? 380, radius: L.r, autoplay: true, interval: 6 }, "Slider")], { align: "stretch" })], {
     bg: o.bg ?? L.bg,
@@ -210,7 +210,7 @@ export function sliderSec(L: Look, slides: [string, string, string][], o: { heig
   });
 }
 
-/** Judul halaman dalam (dengan breadcrumbs opsional). */
+/** Inner page title (with optional breadcrumbs). */
 export function pageHead(L: Look, o: { ey?: string; title: string; text?: string; crumbs?: Btn[]; dark?: boolean; bg?: string; image?: string; center?: boolean }): BoxNode {
   const align = o.center ? "center" : "left";
   const crumbs = o.crumbs
@@ -244,7 +244,7 @@ export function pageHead(L: Look, o: { ey?: string; title: string; text?: string
   return section("Judul Halaman", [row], { bg: o.bg ?? (o.dark ? L.dark : L.alt), padY: 72, width: o.center ? 860 : 1120 });
 }
 
-/* ------------------------------ isi -------------------------------- */
+/* ------------------------------ content -------------------------------- */
 
 export interface CardItem {
   icon?: string;
@@ -260,7 +260,7 @@ function glyph(L: Look, g: string, dark?: boolean): ElementNode {
   return n;
 }
 
-/** Kartu informasi: style card (berbingkai), plain (tanpa bingkai), line (garis atas). */
+/** Info cards: style card (framed), plain (no frame), line (top line). */
 export function cards(L: Look, o: { ey?: string; title?: string; text?: string; items: CardItem[]; cols?: number; dark?: boolean; bg?: string; style?: "card" | "plain" | "line"; align?: "left" | "center" }): BoxNode {
   const style = o.style ?? "card";
   const cell = (c: CardItem) => {
@@ -296,7 +296,7 @@ export interface ImgItem {
   tag?: string;
 }
 
-/** Kartu bergambar (artikel, kamar, proyek, armada). */
+/** Image cards (articles, rooms, projects, fleet). */
 export function imgCards(L: Look, o: { ey?: string; title?: string; text?: string; items: ImgItem[]; cols?: number; ratio?: string; bg?: string; dark?: boolean; boxed?: boolean }): BoxNode {
   const cell = (c: ImgItem) =>
     col(
@@ -316,7 +316,7 @@ export function imgCards(L: Look, o: { ey?: string; title?: string; text?: strin
   return section("Kartu Gambar", rows, { bg: bgOf(L, o.dark, o.bg), padY: 88 });
 }
 
-/** Teks + gambar berdampingan (tentang, cerita, keunggulan). */
+/** Text + image side by side (about, story, strengths). */
 export function split(L: Look, o: { ey?: string; title: string; paras: string[]; bullets?: string[]; image: string; alt: string; reverse?: boolean; dark?: boolean; bg?: string; btn?: Btn; ratio?: string }): BoxNode {
   const text = col(
     [
@@ -340,7 +340,7 @@ export function split(L: Look, o: { ey?: string; title: string; paras: string[];
   return section("Teks & Gambar", [grid(o.reverse ? [pic, text] : [text, pic], 2, { gap: 56, align: "center" })], { bg: bgOf(L, o.dark, o.bg), padY: 96 });
 }
 
-/** Langkah bernomor (proses kerja, cara pesan). */
+/** Numbered steps (work process, how to order). */
 export function steps(L: Look, o: { ey?: string; title: string; text?: string; items: [string, string][]; dark?: boolean; bg?: string }): BoxNode {
   return section(
     "Langkah",
@@ -371,7 +371,7 @@ export function timeline(L: Look, o: { ey?: string; title: string; text?: string
   return section("Linimasa", [intro(L, { ey: o.ey, title: o.title, text: o.text, align: "left", light: o.dark }), stack(o.items.map(item), { gap: 22, align: "stretch" })], { bg: bgOf(L, o.dark, o.bg), padY: 88, width: 900 });
 }
 
-/** Tabel (jadwal, daftar harga, spesifikasi). */
+/** Table (schedules, price lists, specifications). */
 export function tableSec(L: Look, o: { ey?: string; title: string; text?: string; columns: string[]; rows: string[][]; bg?: string; caption?: string }): BoxNode {
   return section(
     "Tabel",
@@ -405,7 +405,7 @@ export function tableSec(L: Look, o: { ey?: string; title: string; text?: string
   );
 }
 
-/** Tab (detail layanan, kurikulum, kebijakan). */
+/** Tabs (service details, curriculum, policies). */
 export function tabsSec(L: Look, o: { ey?: string; title: string; text?: string; tabs: [string, string][]; bg?: string; variant?: "underline" | "pills" }): BoxNode {
   return section(
     "Tab",
@@ -437,7 +437,7 @@ export function tabsSec(L: Look, o: { ey?: string; title: string; text?: string;
   );
 }
 
-/** Akordeon satu kolom (rata tengah). */
+/** Single-column accordion (centered). */
 export function accordionSec(L: Look, o: { ey?: string; title: string; text?: string; items: [string, string][]; bg?: string }): BoxNode {
   return section(
     "Akordeon",
@@ -469,7 +469,7 @@ export function accordionSec(L: Look, o: { ey?: string; title: string; text?: st
   );
 }
 
-/** Kutipan besar. */
+/** Large quote. */
 export function quote(L: Look, o: { text: string; name: string; role: string; dark?: boolean; bg?: string }): BoxNode {
   return section(
     "Kutipan",
@@ -487,7 +487,7 @@ export function quote(L: Look, o: { text: string; name: string; role: string; da
   );
 }
 
-/** Galeri gambar. */
+/** Image gallery. */
 export function gallery(L: Look, o: { ey?: string; title?: string; text?: string; images: [string, string][]; cols?: number; ratio?: string; bg?: string; dark?: boolean }): BoxNode {
   const rows: BoxNode[] = [];
   if (o.title) rows.push(intro(L, { ey: o.ey, title: o.title, text: o.text, light: o.dark }));
@@ -532,7 +532,7 @@ export function formSec(L: Look, o: { ey?: string; title: string; text?: string;
   return section("Formulir", [grid(o.formFirst ? [form, info] : [info, form], "minmax(0, 1fr) minmax(0, 1.1fr)", { gap: 48, align: "start" })], { bg: bgOf(L, o.dark, o.bg ?? L.alt), padY: 96 });
 }
 
-/** Artikel panjang (halaman blog / berita). */
+/** Long article (blog / news page). */
 export function article(L: Look, o: { meta: string; title: string; lead: string; image: string; body: string[]; sub?: string; list?: string[]; pull?: string; author: [string, string, string]; tags?: string[] }): BoxNode[] {
   const head = section(
     "Kepala Artikel",
@@ -564,7 +564,7 @@ export function article(L: Look, o: { meta: string; title: string; lead: string;
   return [head, section("Isi Artikel", [stack(bodyEls, { gap: 18, align: "stretch" })], { bg: L.bg, padY: 24, width: 760 })];
 }
 
-/** Daftar harga / menu bergrup. */
+/** Grouped price list / menu. */
 export function priceList(L: Look, o: { ey?: string; title: string; text?: string; groups: { name: string; items: [string, string, string][] }[]; dark?: boolean; bg?: string; note?: string }): BoxNode {
   const group = (g: { name: string; items: [string, string, string][] }) =>
     col(
@@ -595,7 +595,7 @@ export function logos(L: Look, o: { title: string; names: string[]; bg?: string;
   );
 }
 
-/** Pita info singkat (jam buka, alamat, telepon). */
+/** Short info band (opening hours, address, phone). */
 export function infoBar(L: Look, items: [string, string][], o: { dark?: boolean; bg?: string } = {}): BoxNode {
   return section(
     "Info Singkat",
@@ -604,7 +604,7 @@ export function infoBar(L: Look, items: [string, string][], o: { dark?: boolean;
   );
 }
 
-/** Daftar baris (lowongan, jadwal acara, unduhan): teks kiri, tombol kanan. */
+/** A list of rows (jobs, event schedules, downloads): text on the left, button on the right. */
 export function rowsList(L: Look, o: { ey?: string; title: string; text?: string; items: { title: string; meta: string; text: string; link: Btn }[]; bg?: string }): BoxNode {
   const item = (it: { title: string; meta: string; text: string; link: Btn }) => {
     const n = inline(
@@ -617,7 +617,7 @@ export function rowsList(L: Look, o: { ey?: string; title: string; text?: string
   return section("Daftar", [intro(L, { ey: o.ey, title: o.title, text: o.text, align: "left" }), stack(o.items.map(item), { gap: 0, align: "stretch" })], { bg: o.bg ?? L.bg, padY: 88, width: 960 });
 }
 
-/** Pita CTA dua kolom. */
+/** Two-column CTA band. */
 export function ctaSplit(L: Look, o: { title: string; text: string; btns: Btn[]; bg?: string }): BoxNode {
   return section(
     "CTA",
@@ -645,7 +645,7 @@ export function newsletter(L: Look, o: { title: string; text: string; ph: string
   );
 }
 
-/** Kartu produk (Product Card gratis). */
+/** Product cards (free Product Card). */
 export function products(L: Look, o: { ey?: string; title?: string; text?: string; items: { image: string; title: string; text: string; price: string; compare?: string; badge?: string; rating?: number; reviews?: string }[]; cta: string; href: string; cols?: number; bg?: string }): BoxNode {
   const rows: BoxNode[] = [];
   if (o.title) rows.push(intro(L, { ey: o.ey, title: o.title, text: o.text }));
@@ -653,7 +653,7 @@ export function products(L: Look, o: { ey?: string; title?: string; text?: strin
   return section("Produk", rows, { bg: o.bg ?? L.bg, padY: 88 });
 }
 
-/** Detail produk: gambar, harga, rating, tab info. */
+/** Product detail: image, price, rating, info tabs. */
 export function productDetail(L: Look, o: { crumbs?: Btn[]; image: string; thumbs: string[]; tag?: string; title: string; price: string; compare?: string; rating: number; reviews: string; text: string; options?: Field[]; btns: Btn[]; tabs: [string, string][]; accordion?: boolean }): BoxNode {
   const left = col(
     [image(asset(o.image), o.title, { ratio: "1 / 1", radius: L.r }), inline(o.thumbs.map((t) => col([image(asset(t), o.title, { ratio: "1 / 1", radius: Math.max(4, L.r - 8) })], { name: "Thumb", width: 96 })), { gap: 10 })],
@@ -678,7 +678,7 @@ export function productDetail(L: Look, o: { crumbs?: Btn[]; image: string; thumb
   return section("Detail Produk", [grid([left, right], "minmax(0, 1fr) minmax(0, 1.1fr)", { gap: 48, align: "start" })], { bg: L.bg, padY: 64 });
 }
 
-/* --------------------------- premium elemen ------------------------ */
+/* --------------------------- premium elements ------------------------ */
 
 /** Statistik animasi (Premium: stats-counter). */
 export function counters(L: Look, items: [string, string][], o: { title?: string; ey?: string; dark?: boolean; bg?: string } = {}): BoxNode {
@@ -706,7 +706,7 @@ export function countdownSec(L: Look, o: { ey?: string; title: string; text: str
   );
 }
 
-/** Tabel perbandingan (Premium: comparison-table). */
+/** Comparison table (Premium: comparison-table). */
 export function compareSec(L: Look, o: { ey?: string; title: string; text?: string; columns: string[]; rows: string[]; highlight?: number; caption?: string; bg?: string }): BoxNode {
   return section(
     "Perbandingan",
@@ -715,7 +715,7 @@ export function compareSec(L: Look, o: { ey?: string; title: string; text?: stri
   );
 }
 
-/** Harga bulanan/tahunan (Premium: pricing-switch). */
+/** Monthly/yearly pricing (Premium: pricing-switch). */
 export function priceSwitch(L: Look, o: { ey?: string; title: string; text?: string; plans: string[]; monthly: string; yearly: string; save: string; pm: string; py: string; featured?: number; href: string; bg?: string }): BoxNode {
   return section(
     "Harga",
@@ -738,7 +738,7 @@ export interface PriceCard {
   badge?: string;
 }
 
-/** Kartu harga (Premium: pricing). */
+/** Pricing card (Premium: pricing). */
 export function priceCards(L: Look, o: { ey?: string; title: string; text?: string; plans: PriceCard[]; bg?: string }): BoxNode {
   return section(
     "Kartu Harga",
@@ -765,7 +765,7 @@ export function priceCards(L: Look, o: { ey?: string; title: string; text?: stri
   );
 }
 
-/** Kartu testimoni (Premium: testimonial). */
+/** Testimonial card (Premium: testimonial). */
 export function testiCards(L: Look, o: { ey?: string; title: string; items: { quote: string; author: string; role: string; avatar: string; rating?: number }[]; dark?: boolean; bg?: string }): BoxNode {
   return section(
     "Testimoni",
@@ -786,7 +786,7 @@ export function testiCards(L: Look, o: { ey?: string; title: string; items: { qu
   );
 }
 
-/** Bilah progres + teks (Premium: progress). */
+/** Progress bar + text (Premium: progress). */
 export function progressSec(L: Look, o: { ey?: string; title: string; text: string; items: [string, number][]; image?: string; alt?: string; btn?: Btn; bg?: string; striped?: boolean }): BoxNode {
   const bars = col(
     [
@@ -804,12 +804,12 @@ export function progressSec(L: Look, o: { ey?: string; title: string; text: stri
 
 /* ----------------------------- header ------------------------------ */
 
-/** Mega menu (Premium) untuk header. */
+/** Mega menu (Premium) for the header. */
 export function mega(L: Look, items: string[], ctaText: string, ctaHref: string, o: { dark?: boolean } = {}): ElementNode {
   return el("mega-menu", { items, ctaText, ctaHref, textColor: o.dark ? "#f1f5f9" : L.p.ink, hoverColor: L.p.primary, panelBg: "#ffffff", ctaBg: L.p.primary, align: "end" }, "Mega Menu");
 }
 
-/** Tambah pita pengumuman di atas header. */
+/** Adds an announcement ribbon above the header. */
 export function withTopbar(head: BoxNode, L: Look, text: string, o: { badge?: string; link?: Btn; bg?: string } = {}): BoxNode {
   const bar = stack(
     [el("banner", { badge: o.badge ?? "", text, linkText: o.link?.[0] ?? "", href: o.link?.[1] ?? "#", align: "center", dismissible: false, bgColor: o.bg ?? L.p.primaryDark, textColor: "#ffffff", badgeBg: "#ffffff", badgeText: L.p.primaryDark, linkColor: L.p.line, radius: Math.min(L.r, 10), paddingY: 8 }, "Pengumuman")],
@@ -820,7 +820,7 @@ export function withTopbar(head: BoxNode, L: Look, text: string, o: { badge?: st
   return head;
 }
 
-/** Footer satu baris: logo + tautan + hak cipta (latar gelap atau terang). */
+/** One-line footer: logo + links + copyright (dark or light background). */
 export function footerSlim(L: Look, brand: string, links: Btn[], copy: string, o: { bg?: string; light?: boolean } = {}): BoxNode {
   const c = o.light ? L.p.ink : "#ffffff";
   return section(

@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Kotak Nada · Kelas Musik Anak</title>
+<meta name="description" content="Kelas musik anak: tutup kotak musik terbuka saat digulir, penari kecil naik dan berputar, not balok melayang ke atas, lalu ruangan berubah menjadi langit berbintang.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#1b1838">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap"></noscript>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.mjs">
+<link rel="preload" as="fetch" href="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js" crossorigin>
+<script>window.OWDScrub = (function () {
+  "use strict";
+  var all = [], tickers = [], t0 = 0, last = 0, running = false, dirty = true;
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  function power(n, mode) {
+    return function (t) {
+      if (mode === "in") return Math.pow(t, n);
+      if (mode === "inOut") return t < 0.5 ? Math.pow(2 * t, n) / 2 : 1 - Math.pow(2 - 2 * t, n) / 2;
+      return 1 - Math.pow(1 - t, n);
+    };
+  }
+  function easeOf(name) {
+    if (typeof name === "function") return name;
+    if (!name) return power(2, "out"); /* default = power1.out (n=2 here equals quadratic) */
+    if (name === "none" || name === "linear") return function (t) { return t; };
+    var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
+    if (!m) return power(2, "out");
+    if (m[1] === "sine") {
+      var mode = m[3] || "out";
+      return mode === "in" ? function (t) { return 1 - Math.cos((t * Math.PI) / 2); } : mode === "inOut" ? function (t) { return -(Math.cos(Math.PI * t) - 1) / 2; } : function (t) { return Math.sin((t * Math.PI) / 2); };
+    }
+    return power(Number(m[2]) + 1, m[3] || "out");
+  }
+  function els(t) {
+    if (typeof t === "string") return Array.prototype.slice.call(document.querySelectorAll(t));
+    if (t && typeof t.length === "number" && !t.nodeType) return Array.prototype.slice.call(t);
+    return [t];
+  }
+  var SPECIAL = { scrollTrigger: 1, ease: 1, stagger: 1, immediateRender: 1, duration: 1, transformOrigin: 1 };
+  var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
+  function isEl(o) { return o && o.nodeType === 1; }
+
+  /* Pull the numbers out of the text (e.g. clipPath "inset(0 100% 0 0)") so they can be interpolated. */
+  function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
+  function mixStr(a, b, k) {
+    var na = nums(a), i = 0;
+    return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
+  }
+  /* Initial transform values are read from CSS (e.g. scaleX(0) on the progress bar). */
+  function stateOf(el) {
+    if (el.__owds) return el.__owds;
+    var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
+    var tr = getComputedStyle(el).transform;
+    if (tr && tr !== "none" && window.DOMMatrixReadOnly) {
+      var m = new DOMMatrixReadOnly(tr);
+      st.x = m.m41; st.y = m.m42;
+      st.scaleX = Math.hypot(m.a, m.b); st.scaleY = Math.hypot(m.c, m.d);
+      st.rotate = (Math.atan2(m.b, m.a) * 180) / Math.PI;
+    }
+    return (el.__owds = st);
+  }
+  function readEl(el, key) {
+    var st = stateOf(el);
+    if (key in TRANSFORM) return st[key];
+    var v = getComputedStyle(el)[key];
+    return key === "opacity" ? parseFloat(v) : v;
+  }
+  function writeEl(el, key, v) {
+    var st = stateOf(el);
+    if (key in TRANSFORM) {
+      st[key] = v;
+      el.style.transform = "translate(" + st.x + "px," + st.y + "px)" + (st.rotate ? " rotate(" + st.rotate + "deg)" : "") + (st.rotateX ? " rotateX(" + st.rotateX + "deg)" : "") + (st.rotateY ? " rotateY(" + st.rotateY + "deg)" : "") + " scale(" + st.scale * st.scaleX + "," + st.scale * st.scaleY + ")";
+    } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
+  }
+
+  /* One tween = one target, start & end values, position within the 0..1 range. */
+  function makeTween(target, from, to, offset, span) {
+    var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
+    var el = isEl(target);
+    if (el && to.transformOrigin) target.style.transformOrigin = to.transformOrigin;
+    if (el && from && from.transformOrigin) target.style.transformOrigin = from.transformOrigin;
+    var a = {}, b = {};
+    keys.forEach(function (k) { a[k] = from && k in from ? from[k] : el ? readEl(target, k) : target[k]; b[k] = to[k]; });
+    var ease = easeOf(to.ease);
+    return {
+      render: function (p) {
+        var k = ease(clamp((p - offset) / span, 0, 1));
+        keys.forEach(function (key) {
+          var va = a[key], vb = b[key], v;
+          if (typeof va === "number" && typeof vb === "number") v = va + (vb - va) * k;
+          else if (typeof vb === "string" && /\d/.test(vb) && /\d/.test(String(va))) v = k >= 1 ? vb : k <= 0 ? va : mixStr(va, vb, k);
+          else v = k >= 0.5 ? vb : va;
+          if (el) writeEl(target, key, v); else target[key] = v;
+        });
+      },
+    };
+  }
+
+  /* Position "<element edge> <screen edge>" → scroll pixels. */
+  function edge(word, size) {
+    if (word === "top" || word === undefined) return 0;
+    if (word === "center") return size / 2;
+    if (word === "bottom") return size;
+    if (/%$/.test(word)) return (parseFloat(word) / 100) * size;
+    return parseFloat(word) || 0;
+  }
+  function pos(spec, trigger, isEnd) {
+    var max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    if (typeof spec === "number") return spec;
+    if (spec === "max") return max;
+    if (!trigger) return isEnd ? max : 0;
+    var parts = String(spec || (isEnd ? "bottom top" : "top bottom")).split(/\s+/);
+    var r = trigger.getBoundingClientRect(), top = r.top + scrollY;
+    return top + edge(parts[0], r.height) - edge(parts[1], innerHeight);
+  }
+
+  function ST(cfg) {
+    var self = this;
+    this.vars = cfg;
+    this.trigger = typeof cfg.trigger === "string" ? document.querySelector(cfg.trigger) : cfg.trigger || null;
+    this.tweens = [];
+    this.progress = 0;
+    this.shown = -1;
+    this.target = 0;
+    this.isActive = false;
+    this.lag = cfg.scrub === true || cfg.scrub === undefined ? 0 : Number(cfg.scrub) || 0;
+    this.kill = function () { var i = all.indexOf(self); if (i >= 0) all.splice(i, 1); };
+    this.refresh();
+    all.push(this);
+    dirty = true;
+    start();
+  }
+  ST.prototype.refresh = function () {
+    this.start = pos(this.vars.start, this.trigger, false);
+    this.end = pos(this.vars.end, this.trigger, true);
+    if (this.end <= this.start) this.end = this.start + 1;
+  };
+  ST.prototype.measure = function () {
+    var y = scrollY;
+    this.target = clamp((y - this.start) / (this.end - this.start), 0, 1);
+    var active = y >= this.start && y <= this.end;
+    if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
+  };
+  /* Advance progress (numeric scrub = catches up slowly). Returns true when it changed. */
+  ST.prototype.advance = function (dt, force) {
+    if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
+    else this.progress = this.target;
+    if (Math.abs(this.target - this.progress) < 0.0005) this.progress = this.target;
+    if (this.progress === this.shown && !force) return false;
+    this.changed = true;
+    return true;
+  };
+  ST.prototype.render = function () {
+    var first = this.shown < 0;
+    /* Like GSAP: a tween that has never started (progress 0) does not overwrite the page's initial values. */
+    if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
+    this.shown = this.progress;
+    this.tweens.forEach(function (t) { t.render(this.progress); }, this);
+  };
+  ST.prototype.step = function (dt, force) {
+    if (!this.advance(dt, force)) return;
+    this.render();
+    this.changed = false;
+    if (this.vars.onUpdate) this.vars.onUpdate(this);
+  };
+
+  function add(targets, from, to) {
+    var cfg = to.scrollTrigger || {};
+    var st = cfg instanceof ST ? cfg : new ST(typeof cfg === "string" ? { trigger: cfg } : cfg);
+    var list = isEl(targets) || typeof targets === "string" || (targets && typeof targets.length === "number") ? els(targets) : [targets];
+    var n = list.length, gap = Number(to.stagger) || 0, dur = 0.5, total = dur + gap * (n - 1);
+    list.forEach(function (t, i) { st.tweens.push(makeTween(t, from, to, n > 1 ? (i * gap) / total : 0, n > 1 ? dur / total : 1)); });
+    if (from && to.immediateRender === false) st.lazy = true;
+    if (!from) st.lazy = true;
+    st.step(0, true);
+    return st;
+  }
+
+  /* Several triggers may move the same object (a pose per chapter). So the result is    */
+  /* always "the chapter being read", the draw order is fixed: triggers that are back at  */
+  /* 0 are drawn from last to first, then all running/finished ones (progress > 0)       */
+  /* are drawn from first to last, so the latest active chapter wins.                     */
+  function frame(now) {
+    var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+    last = now;
+    if (!t0) t0 = now;
+    tickers.slice().forEach(function (fn) { fn((now - t0) / 1000); });
+    var any = false, i, s;
+    for (i = 0; i < all.length; i++) { s = all[i]; if (dirty) s.measure(); if (s.advance(dt, false)) any = true; }
+    dirty = false;
+    if (any) {
+      for (i = all.length - 1; i >= 0; i--) { s = all[i]; if (s.changed && s.progress === 0) s.render(); }
+      for (i = 0; i < all.length; i++) { s = all[i]; if (s.progress > 0 && s.tweens.length) s.render(); }
+      for (i = 0; i < all.length; i++) { s = all[i]; if (s.changed) { s.changed = false; if (s.vars.onUpdate) s.vars.onUpdate(s); } }
+    }
+    requestAnimationFrame(frame);
+  }
+  function start() { if (!running) { running = true; requestAnimationFrame(frame); } }
+  function refreshAll() { all.forEach(function (s) { s.refresh(); }); dirty = true; }
+  addEventListener("scroll", function () { dirty = true; }, { passive: true });
+  addEventListener("resize", refreshAll);
+  addEventListener("load", refreshAll);
+  if (window.ResizeObserver) new ResizeObserver(refreshAll).observe(document.documentElement);
+
+  var api = {
+    registerPlugin: function () {},
+    to: function (t, v) { return add(t, null, v); },
+    fromTo: function (t, a, b) { return add(t, a, b); },
+    timeline: function (v) {
+      var cfg = (v && v.scrollTrigger) || {};
+      var st = new ST(cfg);
+      var tl = { fromTo: function (t, a, b) { add(t, a, Object.assign({}, b, { scrollTrigger: st })); return tl; }, to: function (t, b) { add(t, null, Object.assign({}, b, { scrollTrigger: st })); return tl; }, scrollTrigger: st };
+      return tl;
+    },
+    ticker: { add: function (fn) { tickers.push(fn); start(); }, remove: function (fn) { var i = tickers.indexOf(fn); if (i >= 0) tickers.splice(i, 1); }, lagSmoothing: function () {} },
+    ScrollTrigger: {
+      create: function (cfg) { var st = new ST(cfg); st.step(0, true); return st; },
+      update: function () { dirty = true; },
+      refresh: refreshAll,
+      getAll: function () { return all.slice(); },
+    },
+  };
+  return api;
+})();</script>
+<script>
+document.documentElement.classList.add("js", "loading");
+setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
+</script>
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg: #1b1838; /* Latar halaman */
+  --bg-2: #3c3270; /* Latar kedua (cahaya) */
+  --panel: #241f48; /* Latar panel teks */
+  --ink: #fff7ec; /* Teks utama */
+  --ink-soft: #c9c1e6; /* Teks sekunder */
+  --accent: #ffb547; /* Warna aksen */
+  --accent-2: #ff7eb6; /* Warna aksen kedua */
+  --line: rgba(255,247,236,.14); /* Garis */
+  --on-accent: #0b0b0b; /* Teks di tombol aksen */
+  --obj: #ffffff; /* Warna objek 3D */
+  --obj-2: #a8603b; /* Warna objek 3D kedua */
+  --veil: #1b1838; /* Warna saat kamera masuk ke objek */
+}
+</style>
+<style>
+:root { --font-display: "Baloo 2", system-ui, sans-serif; --font-text: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; --pad: clamp(18px, 4vw, 56px); }
+* { box-sizing: border-box; }
+html { background: var(--bg); color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.62 var(--font-text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 60; padding: 10px 14px; border-radius: 8px; background: var(--accent); color: var(--on-accent); }
+.skip:focus { left: 8px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+#gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity 1s; pointer-events: none; }
+html.webgl #gl { opacity: 1; }
+/* Color curtain: used when the camera "enters" the object (screen, eye, cup), then the text appears from there. */
+#veil { position: fixed; inset: 0; z-index: 1; background: var(--veil); opacity: 0; pointer-events: none; }
+.loader { position: fixed; left: 20px; bottom: 20px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
+html.loading .loader { display: flex; }
+.loader i { display: block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: rot .9s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; gap: 16px; padding: 14px var(--pad); background: color-mix(in srgb, var(--bg) 50%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 18px; text-decoration: none; letter-spacing: -.01em; }
+.nav ul { display: flex; gap: 2px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav ul a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 999px; text-decoration: none; font-size: 14px; color: var(--ink-soft); transition: color .2s, background .2s; }
+.nav ul a:hover, .nav ul a.active { color: var(--ink); background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transform-origin: 0 50%; transform: scaleX(0); }
+
+main { position: relative; z-index: 2; }
+.act { position: relative; display: flex; align-items: flex-start; min-height: var(--h, 160vh); padding: 14vh var(--pad) 4vh; }
+.act.k-hero { min-height: 100vh; align-items: center; }
+.act > .inner { position: sticky; top: 12vh; width: 100%; display: flex; }
+.k-quote > .inner { top: 30vh; }
+.s-left > .inner { justify-content: flex-start; }
+.s-right > .inner { justify-content: flex-end; }
+.s-center > .inner { justify-content: center; text-align: center; }
+.panel { position: relative; width: min(100%, 31rem); padding: clamp(22px, 3vw, 34px); border-radius: 24px; background: color-mix(in srgb, var(--panel) 76%, transparent); border: 1px solid var(--line); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 30px 60px -40px rgba(0,0,0,.55); }
+.k-hero .panel, .k-quote .panel { width: min(100%, 44rem); padding: 0; background: none; border: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.kicker { margin: 0 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+h1, h2 { margin: 0 0 16px; font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.03; }
+h1 { font-size: clamp(44px, 7vw, 100px); }
+h2 { font-size: clamp(30px, 4.2vw, 56px); }
+.k-quote h2 { font-size: clamp(32px, 5vw, 72px); line-height: 1.08; }
+.panel p { margin: 0 0 12px; color: var(--ink-soft); }
+.lead { font-size: clamp(17px, 1.5vw, 20px); max-width: 46ch; }
+.s-center .lead { margin-left: auto; margin-right: auto; }
+.w, .c { display: inline-block; }
+.wd { display: inline-block; white-space: nowrap; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.s-center .ctas { justify-content: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 600; text-decoration: none; border: 0; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.hint { position: absolute; left: 50%; bottom: 4vh; transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; }
+.hint span { display: block; width: 22px; height: 36px; border-radius: 12px; border: 1.5px solid var(--ink-soft); position: relative; }
+.hint span::after { content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: var(--accent); animation: wheel 1.6s ease-in-out infinite; }
+@keyframes wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
+.cards { display: grid; gap: 12px; margin: 20px 0 0; padding: 0; list-style: none; }
+.cards li { padding: 16px 18px; border-radius: 16px; background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid var(--line); text-align: left; }
+.cards b { display: block; font-family: var(--font-display); font-size: 19px; }
+.cards span { display: block; font-size: 15px; color: var(--ink-soft); }
+.cards small { display: inline-block; margin-bottom: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--on-accent); background: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0 0; }
+.stats div { padding: 16px 4px; border-radius: 16px; border: 1px solid var(--line); text-align: center; }
+.stats dt { font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 1.9vw, 30px); white-space: nowrap; line-height: 1.05; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stats dd { margin: 6px 0 0; font-size: 13px; color: var(--ink-soft); }
+.mail { display: inline-block; margin: 6px 0 4px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 32px); color: var(--accent); word-break: break-word; text-underline-offset: 6px; }
+footer { position: relative; z-index: 2; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 28px var(--pad) 40px; font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 82%, transparent); }
+
+html.no-webgl body { background: radial-gradient(90% 70% at 70% 30%, color-mix(in srgb, var(--accent) 26%, var(--bg-2)), var(--bg) 70%) fixed; }
+html.no-webgl #gl, html.no-webgl #veil { display: none; }
+
+@media (max-width: 820px) {
+  .nav ul { display: none; }
+  .act { align-items: flex-end; padding: 50vh 16px 10vh; }
+  .act.k-hero { align-items: flex-end; padding-top: 54vh; padding-bottom: 8vh; }
+  .act > .inner { top: auto; bottom: 6vh; }
+  .s-left > .inner, .s-right > .inner { justify-content: center; }
+  .panel { width: 100%; }
+  h1 { font-size: clamp(38px, 11vw, 52px); }
+  .stats dd { font-size: 12px; }
+  .k-hero .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #gl { transition: none; }
+  .hint span::after, .loader i { animation: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#konten">Lewati ke konten</a>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="veil" aria-hidden="true"></div>
+<div class="loader" aria-hidden="true"><i></i>Memuat</div>
+<header class="nav">
+  <a class="brand" href="#kotak" data-owd-text="merek" data-owd-label="Nama merek">Kotak Nada</a>
+  <nav aria-label="Navigasi utama"><ul><li><a href="#buka" data-owd-text="menu1" data-owd-label="Menu 1">Kelas</a></li><li><a href="#program" data-owd-text="menu2" data-owd-label="Menu 2">Program</a></li><li><a href="#angka" data-owd-text="menu3" data-owd-label="Menu 3">Angka</a></li><li><a href="#kontak" data-owd-text="menu4" data-owd-label="Menu 4">Daftar</a></li></ul></nav>
+  <div class="progress" aria-hidden="true"><i></i></div>
+</header>
+<main id="konten">
+<section class="act k-hero s-left" id="kotak" data-act data-fx="chars" aria-labelledby="kotak-t">
+  <div class="inner"><div class="panel"><p class="kicker" data-owd-text="kotak-kicker" data-owd-label="Babak 1: label kecil">Kelas musik anak</p><h1 id="kotak-t" data-owd-text="kotak-judul" data-owd-label="Babak 1: judul">Ada lagu di dalam kotak ini.</h1><p class="lead" data-owd-text="kotak-teks1" data-owd-label="Babak 1: paragraf 1" data-owd-multi>Gulir pelan untuk membukanya.</p></div></div><a class="hint" href="#buka" aria-label="Gulir ke bawah"><span></span>Gulir</a>
+</section>
+<section class="act k-text s-right" id="buka" data-act data-fx="type" aria-labelledby="buka-t">
+  <div class="inner"><div class="panel"><p class="kicker" data-owd-text="buka-kicker" data-owd-label="Babak 2: label kecil">Belajar sambil main</p><h2 id="buka-t" data-owd-text="buka-judul" data-owd-label="Babak 2: judul">Tutupnya terbuka, rasa ingin tahu ikut keluar.</h2><p class="lead" data-owd-text="buka-teks1" data-owd-label="Babak 2: paragraf 1" data-owd-multi>Anak belajar ritme lewat lagu, tepuk tangan, dan alat musik kecil.</p></div></div>
+</section>
+<section class="act k-quote s-center" id="nada" data-act data-fx="rise" aria-labelledby="nada-t" style="--h:200vh">
+  <div class="inner"><div class="panel"><h2 id="nada-t" data-owd-text="nada-judul" data-owd-label="Babak 3: judul">Setiap anak punya nadanya sendiri.</h2></div></div>
+</section>
+<section class="act k-cards s-left" id="program" data-act data-fx="flip" aria-labelledby="program-t">
+  <div class="inner"><div class="panel"><p class="kicker" data-owd-text="program-kicker" data-owd-label="Babak 4: label kecil">Sesuai usia</p><h2 id="program-t" data-owd-text="program-judul" data-owd-label="Babak 4: judul">Tiga kotak, tiga usia.</h2><ul class="cards" data-stagger><li><small data-owd-text="program-tag1" data-owd-label="Kartu 1: label">3-4 th</small><b data-owd-text="program-kartu1" data-owd-label="Kartu 1: judul">Si Kecil Bernyanyi</b><span data-owd-text="program-isi1" data-owd-label="Kartu 1: isi" data-owd-multi>Bersama orang tua, 45 menit setiap minggu.</span></li><li><small data-owd-text="program-tag2" data-owd-label="Kartu 2: label">5-7 th</small><b data-owd-text="program-kartu2" data-owd-label="Kartu 2: judul">Ritme &amp; Warna</b><span data-owd-text="program-isi2" data-owd-label="Kartu 2: isi" data-owd-multi>Pianika, perkusi, dan membaca not bergambar.</span></li><li><small data-owd-text="program-tag3" data-owd-label="Kartu 3: label">8-10 th</small><b data-owd-text="program-kartu3" data-owd-label="Kartu 3: judul">Band Mini</b><span data-owd-text="program-isi3" data-owd-label="Kartu 3: isi" data-owd-multi>Main bersama dan tampil di akhir semester.</span></li></ul></div></div>
+</section>
+<section class="act k-stats s-right" id="angka" data-act data-fx="slide" aria-labelledby="angka-t">
+  <div class="inner"><div class="panel"><p class="kicker" data-owd-text="angka-kicker" data-owd-label="Babak 5: label kecil">Di bawah bintang</p><h2 id="angka-t" data-owd-text="angka-judul" data-owd-label="Babak 5: judul">Lagu yang sudah dinyanyikan.</h2><dl class="stats"><div><dt data-count data-owd-text="angka-angka1" data-owd-label="Angka 1">520</dt><dd data-owd-text="angka-label1" data-owd-label="Label angka 1">murid kecil</dd></div><div><dt data-count data-owd-text="angka-angka2" data-owd-label="Angka 2">14</dt><dd data-owd-text="angka-label2" data-owd-label="Label angka 2">guru</dd></div><div><dt data-count data-owd-text="angka-angka3" data-owd-label="Angka 3">6</dt><dd data-owd-text="angka-label3" data-owd-label="Label angka 3">tahun</dd></div></dl></div></div>
+</section>
+<section class="act k-contact s-center" id="kontak" data-act data-fx="rise" aria-labelledby="kontak-t">
+  <div class="inner"><div class="panel"><p class="kicker" data-owd-text="kontak-kicker" data-owd-label="Babak 6: label kecil">Kelas percobaan</p><h2 id="kontak-t" data-owd-text="kontak-judul" data-owd-label="Babak 6: judul">Ajak si kecil mencoba.</h2><p class="lead" data-owd-text="kontak-teks1" data-owd-label="Babak 6: paragraf 1" data-owd-multi>Kelas percobaan gratis setiap Sabtu pagi.</p><a class="mail" href="mailto:halo@kotaknada.id" data-owd-href="email" data-owd-href-label="Alamat email" data-owd-text="emailTeks" data-owd-label="Teks email">halo@kotaknada.id</a><div class="ctas"><a class="btn" href="https://wa.me/6281200001027?text=Halo%20Kotak%20Nada%2C%20saya%20ingin%20bertanya." target="_blank" rel="noopener" data-owd-href="whatsapp" data-owd-href-label="Tautan WhatsApp" data-owd-text="kontak-tombol1" data-owd-label="Babak 6: tombol 1">Chat WhatsApp</a><a class="btn ghost" href="#kotak" data-owd-text="kontak-tombol2" data-owd-label="Babak 6: tombol 2">Tutup kotaknya</a></div></div></div>
+</section>
+</main>
+<footer><span data-owd-text="merek" data-owd-label="Nama merek">Kotak Nada</span><span data-owd-text="catatanKaki" data-owd-label="Catatan kaki">Kotak Nada · Depok · Kelas musik untuk usia 3 sampai 10 tahun</span></footer>
+<script type="module">
+/* ---- Pemuat library: CDN utama + cadangan ---- */
+const CDN = ["https://cdn.jsdelivr.net/npm/","https://unpkg.com/"];
+function race(path, get) {
+  const order = CDN.slice();
+  return new Promise((ok, no) => {
+    let i = 0, fails = 0, done = false;
+    const next = () => {
+      const cdn = order[i++], url = cdn + path;
+      /* The CDN that wins is tried first for the next library. */
+      get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
+      if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
+    };
+    next();
+  });
+}
+const esm = (path) => race(path, (u) => import(u));
+const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
+const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
+const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the page still works. */
+await umd("motion@11.11.13/dist/motion.js").catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
+
+/* ==== TEXT INSIDE THE 3D SCENE: edit here (or in the OneWebDev editor) ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan adegan"*/{}/*owd:end*/;
+/* ============================================================================ */
+const BRAND = ((document.querySelector(".nav .brand") || {}).textContent || "").trim() || "Kotak Nada";
+/* Scene state per act (same order as the data-act sections). cam/look = camera. */
+const KEYS = [{"veil":0,"sway":0.4,"cx":2.4,"cy":2.6,"cz":5.4,"lx":-0.7,"ly":0.8,"lz":0,"open":0,"rise":0,"notes":0,"sky":0},{"veil":0,"sway":0.4,"cx":-2,"cy":2.4,"cz":4.6,"lx":0.6,"ly":1.1,"lz":0,"open":1,"rise":1,"notes":0,"sky":0},{"veil":0,"sway":0.4,"cx":0,"cy":2,"cz":5.5,"lx":0,"ly":2.6,"lz":0,"open":1,"rise":1,"notes":1,"sky":0},{"veil":0,"sway":0.4,"cx":4,"cy":3.5,"cz":7,"lx":-1,"ly":2,"lz":0,"open":1,"rise":1,"notes":1,"sky":0.5},{"veil":0,"sway":0.4,"cx":-3.5,"cy":1,"cz":7.5,"lx":1,"ly":3,"lz":0,"open":1,"rise":1,"notes":1,"sky":1},{"veil":0,"sway":0.4,"cx":0,"cy":0.5,"cz":9,"lx":0,"ly":4,"lz":0,"open":1,"rise":1,"notes":1,"sky":1}];
+const THUMB = 0;
+
+/* ---- 3D scene (procedural, no external models/textures) ---- */
+function scene_(ctx) {
+  const { THREE, scene, COL, mat, seg, lerp, glow, rnd, paint, hemi, key } = ctx;
+  const box = new THREE.Group(); scene.add(box);
+  const wood = mat(COL.obj2, { roughness: 0.6 }), trim = mat(COL.accent, { metalness: 0.6, roughness: 0.3 });
+  const base = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1, 1.6), wood); base.position.y = 0.5; box.add(base);
+  const band = new THREE.Mesh(new THREE.BoxGeometry(2.46, 0.08, 1.66), trim); band.position.y = 0.95; box.add(band);
+  const lidPivot = new THREE.Group(); lidPivot.position.set(0, 1, -0.8); box.add(lidPivot);
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.2, 1.6), wood); lid.position.set(0, 0.1, 0.8); lidPivot.add(lid);
+  const mirror = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.3), mat("#cfd8e6", { metalness: 0.9, roughness: 0.1 })); mirror.position.set(0, -0.01, 0.8); mirror.rotation.x = Math.PI / 2; lidPivot.add(mirror);
+  /* Dancer: lathe body, cone skirt, sphere head. */
+  const dancer = new THREE.Group(); box.add(dancer);
+  const skirt = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.4, 24, 1, true), mat(COL.accent, { side: THREE.DoubleSide })); skirt.position.y = 0.45; dancer.add(skirt);
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 0.4, 12), mat("#f1d7c8")); torso.position.y = 0.75; dancer.add(torso);
+  const headM = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), mat("#f1d7c8")); headM.position.y = 1.02; dancer.add(headM);
+  const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6), mat("#f1d7c8")); armL.position.set(0, 0.95, 0); armL.rotation.z = 1.2; dancer.add(armL);
+  const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.45, 6), mat("#f1d7c8")); leg.position.y = 0.22; dancer.add(leg);
+  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.06, 24), trim); dancer.add(plinth);
+  /* Music notes drawn on a canvas, used as sprites. */
+  const noteTex = paint(64, 64, (g) => { g.fillStyle = "#fff"; g.font = "bold 52px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("♪", 32, 34); }).tex;
+  const notes = []; for (let i = 0; i < 26; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: noteTex, color: i % 2 ? COL.accent : COL.accent2, transparent: true, depthWrite: false })); s.userData = { k: rnd(), a: rnd() * 6.28, r: 0.4 + rnd() * 1.6 }; s.scale.setScalar(0.35); scene.add(s); notes.push(s); }
+  /* Star dome that fades in at the end. */
+  const SN = 900, sp = new Float32Array(SN * 3); for (let i = 0; i < SN; i++) { const u = rnd() * 2 - 1, a = rnd() * 6.28, r = 30, s = Math.sqrt(1 - u * u); sp.set([Math.cos(a) * s * r, Math.abs(u) * r - 2, Math.sin(a) * s * r], i * 3); }
+  const stars = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(sp, 3)), new THREE.PointsMaterial({ size: 0.5, map: glow(), color: "#fff6dd", transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(stars);
+  const hemi0 = hemi.intensity, key0 = key.intensity;
+  return {
+    update(S, t) {
+      lidPivot.rotation.x = -lerp(0, 1.9, S.open);
+      dancer.position.y = lerp(0.3, 1.05, S.rise); dancer.visible = S.rise > 0.01; dancer.rotation.y = t * 1.6 * (0.3 + S.rise);
+      armL.rotation.z = 1.2 + Math.sin(t * 2) * 0.2;
+      notes.forEach((n) => { const k = (n.userData.k + t * 0.12) % 1, a = n.userData.a + t * 0.4; n.position.set(Math.cos(a) * n.userData.r * (0.4 + k), 1.2 + k * 5, Math.sin(a) * n.userData.r * (0.4 + k)); n.material.opacity = S.notes * Math.sin(k * Math.PI); n.visible = S.notes > 0.01; });
+      stars.material.opacity = S.sky; stars.rotation.y = t * 0.01; stars.visible = S.sky > 0.01;
+      hemi.intensity = lerp(hemi0, hemi0 * 0.35, S.sky); key.intensity = lerp(key0, key0 * 0.5, S.sky);
+    },
+  };
+}
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const root = document.documentElement;
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
+const G = window.OWDScrub, ST = G && G.ScrollTrigger, M = window.Motion;
+const hasG = !!(G && ST);
+const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+const COL = { bg: cssv("--bg"), bg2: cssv("--bg-2"), ink: cssv("--ink"), accent: cssv("--accent"), accent2: cssv("--accent-2"), obj: cssv("--obj"), obj2: cssv("--obj-2"), veil: cssv("--veil"), panel: cssv("--panel") };
+const acts = Array.prototype.slice.call(document.querySelectorAll("[data-act]"));
+const navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav ul a"));
+const veil = document.getElementById("veil");
+/* Current story state (tweened by OWD Scrub between KEYS). */
+const S = Object.assign({}, KEYS[0]);
+const animated = !reduce && hasG && !!M;
+
+/* 1) Text: split into words / letters. */
+function splitWords(el) {
+  const words = el.textContent.trim().split(/\s+/);
+  el.setAttribute("aria-label", el.textContent.trim());
+  el.textContent = "";
+  words.forEach((w, i) => { const s = document.createElement("span"); s.className = "w"; s.setAttribute("aria-hidden", "true"); s.textContent = w; el.appendChild(s); if (i < words.length - 1) el.appendChild(document.createTextNode(" ")); });
+  return Array.prototype.slice.call(el.querySelectorAll(".w"));
+}
+function splitChars(el) {
+  const words = el.textContent.trim().split(/\s+/);
+  el.setAttribute("aria-label", el.textContent.trim());
+  el.textContent = "";
+  words.forEach((w, i) => {
+    const wd = document.createElement("span"); wd.className = "wd"; wd.setAttribute("aria-hidden", "true");
+    Array.from(w).forEach((ch) => { const c = document.createElement("span"); c.className = "c"; c.textContent = ch; wd.appendChild(c); });
+    el.appendChild(wd); if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
+  });
+  return Array.prototype.slice.call(el.querySelectorAll(".c"));
+}
+
+/* 2) Smooth scrolling + progress + scene state per act. */
+let lenis = null;
+if (hasG) G.registerPlugin(ST);
+function setNav(i) { navLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + acts[i].id)); }
+if (animated) {
+  lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  lenis.on("scroll", ST.update);
+  G.ticker.add((time) => lenis.raf(time * 1000));
+  G.ticker.lagSmoothing(0);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    const el = a && document.getElementById(a.getAttribute("href").slice(1));
+    if (!el) return;
+    e.preventDefault();
+    lenis.scrollTo(el, { offset: 0, duration: 1.6 });
+  });
+  G.to(".progress i", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: true } });
+  /* The state of act i is reached as act i rises from the bottom of the screen to 20% from the top. */
+  for (let i = 1; i < acts.length; i++) {
+    G.timeline({ scrollTrigger: { trigger: acts[i], start: "top bottom", end: "top 20%", scrub: 1 } })
+      .fromTo(S, Object.assign({}, KEYS[i - 1]), Object.assign({}, KEYS[i], { ease: "none", immediateRender: false }));
+  }
+  acts.forEach((sec, i) => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%", onToggle: (st) => { if (st.isActive) setNav(i); } }));
+} else if ("IntersectionObserver" in window) {
+  /* No scroll engine / reduced motion: the state jumps to the act being read. */
+  const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { const i = acts.indexOf(e.target); Object.assign(S, KEYS[i]); setNav(i); } }), { rootMargin: "-50% 0px -50% 0px" });
+  acts.forEach((s) => io.observe(s));
+}
+
+/* 3) Text effects per act (data-fx). */
+if (animated) {
+  const { animate, inView, stagger } = M;
+  const ease = [0.2, 0.7, 0.2, 1];
+  acts.forEach((sec) => {
+    const fx = sec.getAttribute("data-fx"), panel = sec.querySelector(".panel"), head = sec.querySelector("h1, h2");
+    if (!panel || !head) return;
+    const rest = Array.prototype.slice.call(panel.querySelectorAll(".kicker, p, .ctas, .cards, .stats, .mail"));
+    rest.forEach((el) => { el.style.opacity = "0"; });
+    const showRest = (d) => animate(rest, { opacity: [0, 1], y: [18, 0] }, { delay: stagger(0.08, { startDelay: d || 0 }), duration: 0.7, ease });
+    if (fx === "rise") {
+      const w = splitWords(head); w.forEach((x) => { x.style.opacity = "0"; });
+      inView(sec, () => { animate(w, { opacity: [0, 1], y: [44, 0], rotate: [5, 0] }, { delay: stagger(0.06), duration: 0.9, ease }); showRest(0.3); }, { amount: 0.25 });
+    } else if (fx === "chars") {
+      const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
+      inView(sec, () => { animate(c, { opacity: [0, 1], y: [-30, 0], rotate: [-14, 0] }, { delay: stagger(0.02), duration: 0.55, ease }); showRest(0.4); }, { amount: 0.25 });
+    } else if (fx === "type") {
+      /* Typing with the scroll (as if coming out of the screen). */
+      const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
+      let shown = -1;
+      ST.create({ trigger: sec, start: "top 70%", end: "top 15%", scrub: true, onUpdate: (st) => { const n = Math.round(st.progress * c.length); if (n === shown) return; shown = n; c.forEach((x, k) => { x.style.opacity = k < n ? "1" : "0"; }); } });
+      inView(head, () => showRest(0.2), { amount: 0.9 });
+    } else if (fx === "zoom") {
+      /* The panel grows from the center of the screen (from inside the object). */
+      G.fromTo(panel, { scale: 0.18, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: sec, start: "top 85%", end: "top 25%", scrub: true } });
+      rest.forEach((el) => { el.style.opacity = ""; });
+    } else if (fx === "wipe") {
+      G.fromTo(head, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", ease: "none", scrollTrigger: { trigger: sec, start: "top 75%", end: "top 30%", scrub: true } });
+      inView(sec, () => showRest(0.3), { amount: 0.3 });
+    } else if (fx === "slide") {
+      const dir = sec.classList.contains("s-right") ? 1 : -1;
+      G.fromTo(panel, { x: dir * 160, opacity: 0 }, { x: 0, opacity: 1, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 80%", end: "top 35%", scrub: true } });
+      rest.forEach((el) => { el.style.opacity = ""; });
+    } else if (fx === "flip") {
+      panel.style.opacity = "0";
+      inView(sec, () => { animate(panel, { opacity: [0, 1], rotateX: [65, 0], y: [60, 0] }, { duration: 1, ease }); showRest(0.35); }, { amount: 0.25 });
+    }
+  });
+  document.querySelectorAll("[data-stagger]").forEach((el) => {
+    const kids = Array.prototype.slice.call(el.children);
+    kids.forEach((k) => { k.style.opacity = "0"; });
+    inView(el, () => { animate(kids, { opacity: [0, 1], y: [26, 0], scale: [0.95, 1] }, { delay: stagger(0.1, { startDelay: 0.3 }), duration: 0.7, ease }); }, { amount: 0.2 });
+  });
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const m = /^(\D*)(\d+(?:[.,]\d+)?)(.*)$/.exec(el.textContent.trim());
+    if (!m) return;
+    const target = parseFloat(m[2].replace(",", ".")), dec = (m[2].split(/[.,]/)[1] || "").length, sep = m[2].indexOf(",") >= 0 ? "," : ".";
+    inView(el, () => { animate(0, target, { duration: 1.8, ease, onUpdate: (v) => { el.textContent = m[1] + v.toFixed(dec).replace(".", sep) + m[3]; } }); }, { amount: 0.6 });
+  });
+  if (matchMedia("(pointer: fine)").matches) document.querySelectorAll(".btn").forEach((b) => {
+    b.addEventListener("pointermove", (e) => { const r = b.getBoundingClientRect(); animate(b, { x: (e.clientX - r.left - r.width / 2) * 0.22, y: (e.clientY - r.top - r.height / 2) * 0.3 }, { type: "spring", stiffness: 320, damping: 18 }); });
+    b.addEventListener("pointerleave", () => { animate(b, { x: 0, y: 0 }, { type: "spring", stiffness: 260, damping: 14 }); });
+  });
+}
+
+/* 4) Three.js */
+function fail(reason) { root.classList.add("no-webgl"); root.classList.remove("loading"); console.warn("[owd] 3D tidak aktif:", reason); }
+function hasWebGL() { try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; } }
+const canvas = document.getElementById("gl");
+if (!hasWebGL()) fail("WebGL tidak tersedia");
+else { try { start(); } catch (e) { fail(e && e.message ? e.message : String(e)); } }
+
+function start() {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(COL.bg, 18, 60);
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.04, 200);
+  const look = new THREE.Vector3();
+  const hemi = new THREE.HemisphereLight(0xffffff, COL.bg2 || 0x222233, 1.1); scene.add(hemi);
+  const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(4, 8, 6); scene.add(key);
+  const rim = new THREE.DirectionalLight(COL.accent, 2.2); rim.position.set(-6, 3, -5); scene.add(rim);
+
+  /* Scene helpers. */
+  const textures = [];
+  function glow() {
+    const c = document.createElement("canvas"); c.width = c.height = 128;
+    const g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    r.addColorStop(0, "rgba(255,255,255,1)"); r.addColorStop(0.35, "rgba(255,255,255,.35)"); r.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c); textures.push(t); return t;
+  }
+  /* Canvases that can be redrawn (screen, map, labels). */
+  function paint(w, h, draw) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d"), tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; textures.push(tex);
+    const o = { c, g, tex, w, h, draw: (fn) => { (fn || draw)(g, w, h); tex.needsUpdate = true; } };
+    if (draw) o.draw();
+    return o;
+  }
+  const mat = (color, o) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.55, metalness: 0.05 }, o || {}));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  /* Progress slice: 0 before a, 1 after b, smooth in between. */
+  const seg = (v, a, b) => { const x = clamp((v - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
+  const lerp = (a, b, k) => a + (b - a) * k;
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const ctx = { THREE, scene, camera, renderer, COL, CONFIG, BRAND, glow, paint, mat, clamp, seg, lerp, rnd, key, rim, hemi, reduce };
+  const api = scene_(ctx) || {};
+
+  const tris = (() => { let n = 0; scene.traverse((o) => { if (o.isMesh) { const gg = o.geometry; n += ((gg.index ? gg.index.count : gg.attributes.position.count) / 3) * (o.isInstancedMesh ? o.count : 1); } }); return Math.round(n); })();
+  window.__OWD_STATS = { triangles: tris, budget: 50000, contexts: 1 };
+
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (!reduce && matchMedia("(pointer: fine)").matches) addEventListener("pointermove", (e) => { pointer.tx = e.clientX / innerWidth - 0.5; pointer.ty = e.clientY / innerHeight - 0.5; }, { passive: true });
+  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener("resize", resize); resize();
+  let visible = true;
+  const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
+  io.observe(canvas);
+
+  /* Camera from the state: cam (position) & look (look-at point). Narrow screens: pull back & center. */
+  function applyCamera() {
+    const narrow = camera.aspect < 0.9, k = narrow ? Math.pow(0.9 / camera.aspect, 0.8) : 1;
+    const lx = S.lx * (narrow ? 0.15 : 1);
+    look.set(lx, S.ly, S.lz);
+    camera.position.set(lx + (S.cx - S.lx) * k, S.ly + (S.cy - S.ly) * k, S.lz + (S.cz - S.lz) * k);
+    camera.position.x += pointer.x * S.sway; camera.position.y -= pointer.y * S.sway * 0.6;
+    camera.lookAt(look);
+    if (S.roll) camera.rotateZ(S.roll);
+    if (S.fov && S.fov !== camera.fov) { camera.fov = S.fov; camera.updateProjectionMatrix(); }
+  }
+  function sync() { if (veil) veil.style.opacity = String(clamp(S.veil || 0, 0, 1)); }
+
+  const clock = new THREE.Clock();
+  let raf = 0, first = true, frames = 0, slow = 0;
+  function frame() {
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(clock.getDelta(), 0.1), t = clock.elapsedTime;
+    if (!visible || document.hidden) return;
+    pointer.x += (pointer.tx - pointer.x) * Math.min(1, dt * 3); pointer.y += (pointer.ty - pointer.y) * Math.min(1, dt * 3);
+    applyCamera(); sync();
+    if (api.update) api.update(S, reduce ? 1 : t, reduce ? 0 : dt);
+    renderer.render(scene, camera);
+    if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
+    frames++; if (dt > 0.022) slow++;
+    if (frames === 90) { if (slow > 45 && dpr > 1) { dpr = Math.max(1, dpr - 0.5); renderer.setPixelRatio(dpr); resize(); } frames = 0; slow = 0; }
+  }
+  if (window.OWD_THUMB) { Object.assign(S, KEYS[THUMB]); applyCamera(); sync(); for (let i = 0; i < 3; i++) if (api.update) api.update(S, 1.5 + i * 0.016, 0.016); renderer.render(scene, camera); root.classList.add("webgl"); root.classList.remove("loading"); return; }
+  raf = requestAnimationFrame(frame);
+
+  function dispose() {
+    cancelAnimationFrame(raf);
+    io.disconnect();
+    if (hasG) ST.getAll().forEach((s) => s.kill());
+    if (lenis) lenis.destroy();
+    scene.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const m = o.material;
+      if (m) (Array.isArray(m) ? m : [m]).forEach((x) => x.dispose());
+    });
+    textures.forEach((x) => x.dispose());
+    renderer.dispose();
+    renderer.forceContextLoss();
+  }
+  addEventListener("pagehide", dispose, { once: true });
+}
+</script>
+</body>
+</html>

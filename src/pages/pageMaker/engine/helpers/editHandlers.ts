@@ -10,7 +10,7 @@ import type { InspectorHandlers } from "../ui/Inspector";
 
 export interface EditDeps {
   editRoot: (fn: (root: BoxNode) => BoxNode, key?: string) => void;
-  /** Reset kontainer ke bawaan; default: box biasa / root komponen. */
+  /** Reset the container to defaults; default: plain box / component root. */
   resetBox?: (box: BoxNode, isRoot: boolean) => BoxNode;
 }
 

@@ -2,7 +2,7 @@ import { asset } from "../assets";
 import { badge, button, col, el, eyebrow, grid, heading, image, inline, linkButton, page, para, section, siteFooter, siteHeader, stack, type Palette } from "../build";
 import type { TemplateContent, Tr } from "../types";
 
-/* Landing Page / Company Profile — PREMIUM: agensi digital, 3 halaman. */
+/* Landing Page / Company Profile — PREMIUM: digital agency, 3 pages. */
 
 const P: Palette = { ink: "#0f172a", muted: "#475569", primary: "#4f46e5", primaryDark: "#3730a3", soft: "#eef2ff", line: "#e0e7ff" };
 const BRAND = "Arunika Digital";

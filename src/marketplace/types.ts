@@ -1,10 +1,10 @@
 import type { LibraryId } from "../pages/pageMaker/engine/helpers/libraries";
 /* ================================================================== */
-/* Tipe data katalog & hak akses (frontend)                              */
+/* Catalog data types & access rights (frontend)                         */
 /*                                                                    */
-/* Bentuk data sengaja dibuat datar dan serializable (tanpa fungsi) agar */
-/* nanti bisa dipetakan 1:1 dari respons API. ID item SELALU berupa      */
-/* kunci unik berawalan jenis — tidak pernah memakai nama tampilan:       */
+/* Data shapes are deliberately flat and serializable (no functions) so  */
+/* they can later be mapped 1:1 from API responses. Item IDs are ALWAYS  */
+/* unique keys prefixed by kind, never display names:                   */
 /*                                                                    */
 /*   template:<templateId>   preset:<presetId>   element:<elementType>   */
 /* ================================================================== */
@@ -12,21 +12,21 @@ import type { LibraryId } from "../pages/pageMaker/engine/helpers/libraries";
 export type Tier = "free" | "premium";
 type CatalogKind = "template" | "section" | "element" | "feature";
 
-/** Kunci item katalog, mis. "template:saas-launch", "preset:pro-faq", "element:rating". */
+/** Catalog item key, e.g. "template:saas-launch", "preset:pro-faq", "element:rating". */
 export type ItemId = string;
 
 interface CatalogItemBase {
   id: ItemId;
   kind: CatalogKind;
-  /** ID mentah tanpa awalan (id template, id preset, tipe elemen). */
+  /** Raw ID without a prefix (template id, preset id, element type). */
   refId: string;
   name: string;
   description: string;
   category: string;
   tier: Tier;
-  /** Harga dalam kredit (lihat config/marketplace.ts). */
+  /** Price in credits (see config/marketplace.ts). */
   price: number;
-  /** Ditambahkan pada rilis katalog ini. */
+  /** Added in this catalog release. */
   isNew: boolean;
 }
 
@@ -38,7 +38,7 @@ export interface ElementCatalogItem extends CatalogItemBase {
   kind: "element";
 }
 
-/** Fitur yang dibuka sekali per akun (mis. Tur 360° Pro di menu VR). */
+/** Features unlocked once per account (e.g. 360° Tour Pro in the VR menu). */
 interface FeatureCatalogItem extends CatalogItemBase {
   kind: "feature";
 }
@@ -48,44 +48,44 @@ export type PieceCatalogItem = SectionCatalogItem | ElementCatalogItem | Feature
 interface TemplatePageInfo {
   key: string;
   name: string;
-  /** Slug & halaman beranda (dari server). */
+  /** Slug & home page (from the server). */
   slug?: string;
   home?: boolean;
 }
 
 export interface TemplateCatalogItem extends CatalogItemBase {
   kind: "template";
-  /** Warna aksen kartu katalog. */
+  /** Catalog card accent color. */
   accent: string;
-  /** Kata kunci tambahan untuk pencarian. */
+  /** Extra search keywords. */
   tags: string[];
   pages: TemplatePageInfo[];
-  /** Section preset yang dipakai (unik, urut kemunculan). */
+  /** Section presets used (unique, in order of appearance). */
   sectionIds: ItemId[];
-  /** Elemen yang dipakai (unik, urut kemunculan). */
+  /** Elements used (unique, in order of appearance). */
   elementIds: ItemId[];
-  /** Section & element PREMIUM yang ikut dibuka saat template dibeli. */
+  /** PREMIUM sections & elements unlocked when the template is purchased. */
   premiumItemIds: ItemId[];
-  /** Jumlah section di semua halaman (indikator kompleksitas). */
+  /** Number of sections across all pages (complexity indicator). */
   sectionCount: number;
-  /** Library CDN (menu Element → Library) yang dipakai di halaman template. */
+  /** CDN libraries (Element → Library menu) used in the template pages. */
   libraries: LibraryId[];
-  /** Harga promo yang dihitung server (bila ada). */
+  /** Promo price computed by the server (if any). */
   promoPrice?: number;
-  /** Halaman demo statis (HTML hasil render server, dibuka di iframe sandbox). */
+  /** Static demo pages (HTML rendered by the server, opened in a sandboxed iframe). */
   demoUrl?: string;
   thumbnailUrl?: string | null;
   version?: number;
-  /** Font Google bawaan template (dimuat otomatis). */
+  /** The template's built-in Google Fonts (loaded automatically). */
   fonts: string[];
-  /** v16: Template Kode (satu berkas HTML mandiri, tidak dibuka di Desain Halaman). */
+  /** v16: Code Template (one self-contained HTML file, not opened in Page Design). */
   code?: { group: string; budgetKb: number; libs: string[] };
 }
 
 export type CatalogItem = TemplateCatalogItem | SectionCatalogItem | ElementCatalogItem;
 
 /* ------------------------------------------------------------------ */
-/* Hak akses — tiga konsep yang dipisah                                 */
+/* Access rights — three separate concepts                              */
 /* ------------------------------------------------------------------ */
 
 /** 1. Kepemilikan template. */
@@ -96,14 +96,14 @@ interface TemplateOwnership {
   source: "simulation" | "server";
 }
 
-/** 2. Akses section/element yang DISERTAKAN dalam template (berlaku di desain dari template). */
+/** 2. Access to sections/elements INCLUDED in the template (applies in designs from the template). */
 interface TemplateAccessGrant {
   templateId: string;
   itemIds: ItemId[];
   grantedAt: number;
 }
 
-/** 3. Kepemilikan section/element secara individual (berlaku di semua desain). */
+/** 3. Individual ownership of sections/elements (applies in every design). */
 interface ItemOwnership {
   itemId: ItemId;
   acquiredAt: number;
@@ -117,22 +117,22 @@ export interface EntitlementSnapshot {
   items: ItemOwnership[];
 }
 
-/** Konteks pemakaian: desain dari template tertentu, atau desain dari nol. */
+/** Usage context: a design from a specific template, or a design from scratch. */
 export interface AccessContext {
   templateId?: string | null;
 }
 
 /**
- * Alasan sebuah item boleh dipakai:
- *   free      — item gratis
- *   owned     — dibeli individual
- *   template  — disertakan template yang dimiliki (hanya di desain dari template)
- *   locked    — belum punya akses
+ * Why an item may be used:
+ *   free      — free item
+ *   owned     — purchased individually
+ *   template  — included with an owned template (only in designs from that template)
+ *   locked    — no access yet
  */
 export type AccessReason = "free" | "owned" | "template" | "locked";
 
 /* ------------------------------------------------------------------ */
-/* Transaksi akun (dari server)                                         */
+/* Account transactions (from the server)                               */
 /* ------------------------------------------------------------------ */
 
 type TransactionKind = "template" | "item" | "design-pack" | "site-pack" | "topup" | "template-use" | "usage" | "adjustment";
@@ -144,9 +144,9 @@ export interface SimTransaction {
   credits: number;
   itemId?: ItemId;
   designs?: number;
-  /** Jumlah slot website (transaksi site-pack). */
+  /** Number of website slots (site-pack transaction). */
   sites?: number;
-  /** Keterangan dari server (ledger). */
+  /** Description from the server (ledger). */
   description?: string;
   at: number;
 }
@@ -155,15 +155,15 @@ export interface SiteQuote {
   sites: number;
   credits: number;
   lines: { packageId: string; sites: number; credits: number; count: number }[];
-  /** Harga bila semuanya dibeli satuan (1 website). */
+  /** Price if everything were bought individually (1 website). */
   listCredits: number;
 }
 
 export interface DesignQuote {
   designs: number;
   credits: number;
-  /** Rincian paket: [{ packageId, count }]. */
+  /** Pack breakdown: [{ packageId, count }]. */
   lines: { packageId: string; designs: number; credits: number; count: number }[];
-  /** Harga bila semuanya dibeli dengan paket terkecil (untuk menampilkan hemat). */
+  /** Price if everything were bought with the smallest pack (to show savings). */
   listCredits: number;
 }

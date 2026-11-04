@@ -19,18 +19,18 @@ import { runServerJob, StopQueueError } from "../processing/serverClient";
 export interface ServerJobSpec {
   params: Record<string, unknown>;
   usage: UsageInput;
-  /** Galat validasi; null = siap dijalankan. */
+  /** Validation error; null = ready to run. */
   error: string | null;
-  /** Ringkasan hasil yang akan dibuat (mis. "≈ 150 frame, 480×270"). */
+  /** Summary of the output to be created (e.g. "≈ 150 frames, 480×270"). */
   summary: ReactNode;
   outName: string;
 }
 
 /**
- * Kerangka alat video yang diproses di SERVER (Video to GIF, Kompres
- * Video): unggah + validasi, pratinjau, pengaturan, kartu akses/biaya, dan
- * tombol jalankan yang selalu melewati gerbang server. Tidak ada hasil
- * palsu: tanpa backend, gerbang menampilkan alert dan proses berhenti.
+ * Shell for video tools processed on the SERVER (Video to GIF, Compress
+ * Video): upload + validation, preview, settings, access/cost card, and
+ * a run button that always goes through the server gate. No fake
+ * results: without a backend, the gate shows an alert and processing stops.
  */
 export default function ServerVideoTool({
   tool,
@@ -47,7 +47,7 @@ export default function ServerVideoTool({
   runLabel: string;
   renderOptions: (v: VideoSource, disabled: boolean) => ReactNode;
   buildJob: (v: VideoSource) => ServerJobSpec;
-  /** Dipanggil sekali setiap video baru selesai dimuat (mis. set rentang bawaan). */
+  /** Called once each time a new video finishes loading (e.g. to set the default range). */
   onSource?: (v: VideoSource) => void;
 }) {
   const { t } = useTranslation();

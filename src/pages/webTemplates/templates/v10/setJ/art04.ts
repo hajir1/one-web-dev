@@ -1,12 +1,12 @@
 import { specks, svg } from "./art";
 
-/* Ilustrasi 04 Kongsi Pala Banda: peta gravir sepia dan kebun pala bergaris arsir. */
+/* Illustration 04 Kongsi Pala Banda: sepia engraved map and a hatched nutmeg grove. */
 
 const K = { paper: "#f1e6cc", ink: "#4A3426", red: "#9E2A2B", sea: "#21364A", nut: "#C9792B" };
 
 const hatch = (x: number, y: number, w: number, h: number, step = 8) => Array.from({ length: Math.floor(w / step) }, (_, i) => `<path d="M${x + i * step} ${y}l${-h * 0.4} ${h}" stroke="${K.ink}" stroke-width="1" opacity=".5"/>`).join("");
 
-/** Peta lama Kepulauan Banda: pulau, garis pantai ganda, mawar angin, kapal. */
+/** Old map of the Banda Islands: islands, double coastline, compass rose, ship. */
 function peta(): string {
   const island = (d: string) => `<path d="${d}" fill="#e6d3a9" stroke="${K.ink}" stroke-width="2.5"/><path d="${d}" fill="none" stroke="${K.ink}" stroke-width="1" transform="translate(0 0) scale(1)" opacity=".4" stroke-dasharray="3 5"/>`;
   const waves = Array.from({ length: 18 }, (_, i) => `<path d="M${40 + (i % 6) * 190} ${80 + Math.floor(i / 6) * 180}q12 -8 24 0t24 0" stroke="${K.sea}" stroke-width="1.5" fill="none" opacity=".6"/>`).join("");
@@ -26,7 +26,7 @@ function peta(): string {
   );
 }
 
-/** Kebun pala: batang, buah terbelah dengan fuli merah. */
+/** Nutmeg grove: trunks, split fruit with red mace. */
 function kebun(): string {
   const fruit = (x: number, y: number, r: number) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#e2c27a" stroke="${K.ink}" stroke-width="2"/><path d="M${x} ${y - r}v${2 * r}" stroke="${K.ink}" stroke-width="2"/><circle cx="${x + r * 0.2}" cy="${y}" r="${r * 0.5}" fill="${K.red}"/><circle cx="${x + r * 0.2}" cy="${y}" r="${r * 0.3}" fill="#5a3a24"/>`;
   return svg(

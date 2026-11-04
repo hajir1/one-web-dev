@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { LANG_LABEL, SUPPORTED_LANGS, splitLangPath, type Lang } from "../../i18n";
 
 /* ================================================================== */
-/* Metadata halaman sesuai bahasa aktif:                                */
+/* Page metadata for the active language:                               */
 /*   <title>, meta description, og:title/description/locale,            */
-/*   <link rel="alternate" hreflang> untuk /id dan /en, canonical.       */
-/* Atribut <html lang> diatur oleh activateLanguage() di i18n.ts.        */
+/*   <link rel="alternate" hreflang> for /id and /en, canonical.         */
+/* The <html lang> attribute is set by activateLanguage() in i18n.ts.    */
 /* ================================================================== */
 
 function upsertMeta(attr: "name" | "property", key: string, content: string) {
@@ -46,7 +46,7 @@ export default function AppMeta({ title, description }: { title: string; descrip
     upsertMeta("property", "og:description", desc);
     upsertMeta("property", "og:locale", LANG_LABEL[(i18n.language as Lang) ?? "id"]?.locale.replace("-", "_") ?? "id_ID");
     const { rest } = splitLangPath(pathname);
-    // v13: sertakan awalan path situs (mis. GitHub Pages "/repo").
+    // v13: include the site path prefix (e.g. GitHub Pages "/repo").
     const origin = window.location.origin + import.meta.env.BASE_URL.replace(/\/+$/, "");
     for (const l of SUPPORTED_LANGS) upsertLink("alternate", `${origin}/${l}${rest === "/" ? "" : rest}`, l);
     upsertLink("alternate", `${origin}/id${rest === "/" ? "" : rest}`, "x-default");

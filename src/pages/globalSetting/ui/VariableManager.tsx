@@ -25,15 +25,15 @@ import { ColorInput, Field, SelectInput, TextInput, type SelectOption } from "..
 
 /* ================================================================== */
 /* Tab "Variabel" Pengaturan Global (v7).                               */
-/* Variabel menjadi CSS custom property di :root (--nama: nilai).       */
-/* Ganti nama → semua referensi var(--lama) di desain ikut diperbarui.  */
-/* Hapus → referensi diganti nilai terakhirnya (tampilan tidak berubah). */
+/* Variables become CSS custom properties on :root (--name: value).     */
+/* Rename → every var(--old) reference in designs is updated too.       */
+/* Delete → references are replaced with the last value (appearance unchanged). */
 /* ================================================================== */
 
 const BTN = "inline-flex items-center gap-1.5 rounded bg-blue-800 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50";
 const BTN_GHOST = "inline-flex items-center gap-1.5 rounded border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-white/5";
 
-/** Pemakaian sebuah variabel di semua desain tersimpan. */
+/** Usage of a variable across all saved designs. */
 function varUsage(designs: Record<string, SavedDesign[]>, name: string): { refs: number; designs: number } {
   let refs = 0;
   let count = 0;
@@ -48,7 +48,7 @@ function varUsage(designs: Record<string, SavedDesign[]>, name: string): { refs:
   return { refs, designs: count };
 }
 
-/** Terapkan `fn` ke setiap desain; hanya desain yang berubah yang disimpan (ikut tersinkron). */
+/** Applies `fn` to each design; only changed designs are saved (and synced). */
 function rewriteDesigns(fn: (state: unknown) => { value: unknown; changed: boolean }) {
   const store = useDesignStore.getState();
   for (const [type, list] of Object.entries(store.designs))
@@ -58,7 +58,7 @@ function rewriteDesigns(fn: (state: unknown) => { value: unknown; changed: boole
     }
 }
 
-/* --------------------------- input nilai --------------------------- */
+/* --------------------------- value input --------------------------- */
 
 function useFontOptions(): SelectOption<string>[] {
   const fonts = useFontStore((s) => s.fonts);
@@ -72,7 +72,7 @@ function useFontOptions(): SelectOption<string>[] {
   );
 }
 
-/** Input nilai sesuai tipe: color picker, angka + satuan, pilihan font, atau teks. */
+/** Value input by type: color picker, number + unit, font choice, or text. */
 export function VarValueInput({ type, value, onChange }: { type: VarType; value: string; onChange: (v: string) => void }) {
   const fontOptions = useFontOptions();
   if (type === "color") return <ColorInput value={value} onChange={onChange} />;
@@ -110,7 +110,7 @@ export function VarValueInput({ type, value, onChange }: { type: VarType; value:
   return <TextInput value={value} onChange={onChange} placeholder='"Teks" atau nilai CSS' />;
 }
 
-/* ---------------------------- tambah ---------------------------- */
+/* ---------------------------- add ---------------------------- */
 
 function AddVarForm() {
   const { t } = useTranslation();
@@ -168,7 +168,7 @@ function AddVarForm() {
   );
 }
 
-/* ----------------------------- baris ----------------------------- */
+/* ----------------------------- row ----------------------------- */
 
 type Pending = { kind: "rename"; v: CssVar; to: string } | { kind: "delete"; v: CssVar };
 

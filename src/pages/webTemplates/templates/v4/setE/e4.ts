@@ -236,7 +236,7 @@ export const startupPitch: TemplateContent = {
     }),
 };
 
-/* ------ 19. Ruang Belajar Lintang — bimbel online (8 hlm) ----------- */
+/* ------ 19. Ruang Belajar Lintang — online tutoring (8 pages) ----------- */
 // Premium: mega-menu, typewriter, pro-pricing-cards, comparison-table, testimonial, countdown. Library: AOS + Animate + Tilt.
 
 const EP: Palette = { ink: "#1f0b3a", muted: "#5b4a78", primary: "#9333ea", primaryDark: "#7e22ce", soft: "#f3e8ff", line: "#e9d5ff" };

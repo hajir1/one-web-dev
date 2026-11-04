@@ -1,13 +1,13 @@
 // ─── lib/sharpen.ts ──────────────────────────────────────────────────────────
-// Unsharp mask (separable Gaussian) untuk Image Upscaler. Fungsi murni pada
-// buffer RGBA → bisa dijalankan di Web Worker dan diuji tanpa browser.
+// Unsharp mask (separable Gaussian) for Image Upscaler. Pure functions on
+// an RGBA buffer → can run in a Web Worker and be tested without a browser.
 
 export interface SharpenOptions {
-  /** Kekuatan 0–3 (0 = tanpa penajaman). */
+  /** Strength 0–3 (0 = no sharpening). */
   amount: number;
   /** Radius blur (sigma) dalam piksel, 0.5–3. */
   radius: number;
-  /** Abaikan perbedaan kecil (0–255) agar noise tidak ikut ditajamkan. */
+  /** Ignore small differences (0–255) so noise is not sharpened too. */
   threshold: number;
 }
 
@@ -24,7 +24,7 @@ function gaussianKernel(sigma: number): Float32Array {
   return k;
 }
 
-/** Blur Gaussian kanal RGB (alpha tidak diubah). Tepi gambar di-clamp. */
+/** Gaussian blur of the RGB channels (alpha unchanged). Image edges are clamped. */
 function gaussianBlurRGB(src: Uint8ClampedArray, w: number, h: number, sigma: number): Float32Array {
   const k = gaussianKernel(sigma);
   const r = (k.length - 1) / 2;
@@ -68,7 +68,7 @@ function gaussianBlurRGB(src: Uint8ClampedArray, w: number, h: number, sigma: nu
   return out;
 }
 
-/** Terapkan unsharp mask IN-PLACE pada buffer RGBA. */
+/** Apply an unsharp mask IN PLACE on an RGBA buffer. */
 export function unsharpMask(data: Uint8ClampedArray, w: number, h: number, opt: SharpenOptions): Uint8ClampedArray {
   const amount = Math.max(0, Math.min(3, opt.amount));
   if (amount === 0 || w < 3 || h < 3) return data;
@@ -83,18 +83,18 @@ export function unsharpMask(data: Uint8ClampedArray, w: number, h: number, opt: 
   return data;
 }
 
-/* ---------------------------- ukuran upscale ---------------------------- */
+/* ---------------------------- upscale size ---------------------------- */
 
-export const UPSCALE_MAX_PIXELS = 16_777_216; // aman di Safari/iOS
+export const UPSCALE_MAX_PIXELS = 16_777_216; // safe on Safari/iOS
 const UPSCALE_MAX_SIDE = 16_384;
 
-/** Ukuran hasil upscale; dijepit ke batas aman (rasio tetap). */
+/** Upscaled output size; clamped to the safe limit (fixed ratio). */
 export function upscaleTarget(w: number, h: number, scale: number): { width: number; height: number; scale: number; clamped: boolean; tooLarge: boolean } {
   let s = Math.max(1, scale);
   const byArea = Math.sqrt(UPSCALE_MAX_PIXELS / (w * h));
   const bySide = UPSCALE_MAX_SIDE / Math.max(w, h);
   const limit = Math.min(byArea, bySide);
-  // Sudah sebesar/lebih besar dari batas: tidak bisa diperbesar di browser.
+  // Already as large as/larger than the limit: cannot be enlarged in the browser.
   const tooLarge = limit <= 1.01;
   const clamped = s > limit;
   if (clamped) s = Math.max(1, limit);

@@ -1,48 +1,48 @@
-# Deploy mode demo (GitHub Pages / Vercel)
+# Deploying the demo mode (GitHub Pages / Vercel)
 
-Mode demo adalah frontend tanpa backend (`VITE_API_BASE_URL=off`): tanpa akun, kredit, dan paket; semua template katalog bawaan frontend dan semuanya gratis; hanya alat yang berjalan di browser. Hasil build berupa situs statis, jadi bisa di-host gratis di GitHub Pages atau Vercel.
+Demo mode is the frontend without a backend (`VITE_API_BASE_URL=off`): no accounts, credits, or plans; every template comes from the frontend's built-in catalog and all of them are free; only tools that run in the browser are available. The build output is a static site, so it can be hosted for free on GitHub Pages or Vercel.
 
-Panduan ini menganggap isi folder `fe/` adalah root repo (ada `package.json` di root).
+This guide assumes the contents of the `fe/` folder are the repository root (`package.json` is at the root).
 
-## Build lokal
+## Local build
 
 ```bash
 npm ci
-npm run build:demo      # memakai .env.demo → dist/
-npm run preview         # cek di http://localhost:4173
+npm run build:demo      # uses .env.demo → dist/
+npm run preview         # check at http://localhost:4173
 ```
 
 ## Vercel
 
-1. Buat **proyek Vercel baru** khusus demo: Add New → Project → pilih repo. Bila `package.json` ada di subfolder, isi **Root Directory** dengan `fe`.
-2. Di **Environment Variables**, tambahkan `VITE_API_BASE_URL` = `off`.
-3. Klik Deploy. `vercel.json` sudah mengatur build, rewrite SPA (semua rute ke `index.html`), dan header cache service worker.
+1. Create a **new Vercel project** just for the demo: Add New → Project → choose the repository. If `package.json` is in a subfolder, set **Root Directory** to `fe`.
+2. Under **Environment Variables**, add `VITE_API_BASE_URL` = `off`.
+3. Click Deploy. `vercel.json` already configures the build, the SPA rewrite (every route to `index.html`), and the service worker cache headers.
 
-Catatan: jangan mengubah Build Command di dashboard, karena `buildCommand` di `vercel.json` yang dipakai. Mode demo ditentukan oleh variabel lingkungan di langkah 2. Situs produksi tetap memakai proyek Vercel yang lain, dengan `VITE_API_BASE_URL` berisi URL backend.
+Note: do not change the Build Command in the dashboard, because the `buildCommand` in `vercel.json` is used. Demo mode is set by the environment variable in step 2. The production site keeps using a separate Vercel project, with `VITE_API_BASE_URL` set to the backend URL.
 
 ## GitHub Pages
 
-Workflow-nya sudah ada di `.github/workflows/deploy-pages.yml`.
+The workflow is already in `.github/workflows/deploy-pages.yml`.
 
-1. Push kode ke GitHub.
-2. Buka **Settings → Pages → Build and deployment → Source** dan pilih **GitHub Actions**.
-3. Buka tab **Actions → deploy-demo-pages → Run workflow**. Setelah selesai, situs ada di `https://<nama>.github.io/<repo>/`.
+1. Push the code to GitHub.
+2. Open **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**.
+3. Open **Actions → deploy-demo-pages → Run workflow**. When it finishes, the site is at `https://<name>.github.io/<repo>/`.
 
-Workflow ini menjalankan `npm test`, lalu `npm run build:demo`. Awalan path (`/<repo>/`) diisi otomatis dari GitHub. Karena GitHub Pages tidak punya rewrite, workflow menyalin `index.html` ke `404.html` supaya alamat seperti `/<repo>/id/page-maker` tetap terbuka saat dibuka langsung atau di-refresh.
+The workflow runs `npm test`, then `npm run build:demo`. The path prefix (`/<repo>/`) is filled in automatically from GitHub. Because GitHub Pages has no rewrites, the workflow copies `index.html` to `404.html` so that addresses such as `/<repo>/id/page-maker` still load when opened directly or refreshed.
 
-Pengaturan opsional (Settings → Secrets and variables → Actions → Variables):
+Optional settings (Settings → Secrets and variables → Actions → Variables):
 
-| Variabel | Fungsi |
+| Variable | Purpose |
 |---|---|
-| `DEMO_PAGES_AUTO` = `true` | Deploy otomatis setiap push ke `main`/`master`. Tanpa ini, deploy hanya lewat "Run workflow". |
-| `DEMO_BASE_PATH` | Menimpa awalan path, misalnya `/` untuk domain sendiri. |
+| `DEMO_PAGES_AUTO` = `true` | Deploy automatically on every push to `main`/`master`. Without it, deploys only run through "Run workflow". |
+| `DEMO_BASE_PATH` | Overrides the path prefix, for example `/` for a custom domain. |
 
-Bila `package.json` ada di subfolder `fe/`, pindahkan workflow ke `.github/workflows/` di root repo, lalu tambahkan `defaults: run: working-directory: fe` di job `build` dan ubah `path: dist` menjadi `path: fe/dist`.
+If `package.json` is in an `fe/` subfolder, move the workflow to `.github/workflows/` at the repository root, then add `defaults: run: working-directory: fe` to the `build` job and change `path: dist` to `path: fe/dist`.
 
-## Host lain
+## Other hosts
 
-Situs statis lain juga bisa (Netlify, Cloudflare Pages, Nginx): jalankan `npm run build:demo` lalu sajikan `dist/` dengan fallback SPA ke `index.html`. Bila situs tidak di root domain, isi `VITE_BASE_PATH=/subfolder/` saat build.
+Any other static host works too (Netlify, Cloudflare Pages, Nginx): run `npm run build:demo` and serve `dist/` with an SPA fallback to `index.html`. If the site is not at the domain root, set `VITE_BASE_PATH=/subfolder/` at build time.
 
-## Setelah template berubah
+## After templates change
 
-Bila katalog template bertambah atau isi template berubah, jalankan `npm run gen:demo` lalu commit hasilnya (`src/demo/*.generated.ts`). Uji `src/demo/tests/demo.test.ts` akan gagal bila lupa.
+When the template catalog grows or template content changes, run `npm run gen:demo` and commit the output (`src/demo/*.generated.ts`). The `src/demo/tests/demo.test.ts` test fails if you forget.

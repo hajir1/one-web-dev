@@ -43,9 +43,9 @@ import {
 import { queryClient } from "../../api/queryClient";
 
 /* ================================================================== */
-/* v11: /:lang/plans — paket langganan bulanan/tahunan Media & Data.     */
-/* Harga, potongan naik paket, dan masa berlaku DIHITUNG BACKEND          */
-/* (quote); halaman ini hanya menampilkan dan meneruskan pilihan.        */
+/* v11: /:lang/plans — monthly/yearly Media & Data subscription plans.   */
+/* Prices, upgrade discounts, and validity periods are COMPUTED BY THE BACKEND */
+/* (quote); this page only displays and forwards the choice.            */
 /* ================================================================== */
 
 const RANK: Record<PlanId, number> = { free: 0, basic: 1, pro: 2, team: 3 };
@@ -148,7 +148,7 @@ export default function PlansPage() {
     if (signedIn) void ensureBilling();
   }, [signedIn]);
 
-  // Kembali dari Midtrans: status diverifikasi ke backend, bukan dari URL.
+  // Back from Midtrans: the status is verified with the backend, not taken from the URL.
   const session = params.get("session");
   useEffect(() => {
     if (!session) return;
@@ -173,7 +173,7 @@ export default function PlansPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
-  // Harga final selalu dari backend (potongan sisa paket lama dihitung di sana).
+  // The final price always comes from the backend (the old plan's remaining credit is computed there).
   useEffect(() => {
     if (!choice) return;
     let live = true;
@@ -226,7 +226,7 @@ export default function PlansPage() {
     }
   };
 
-  /** Status tombol kartu paket untuk akun ini. */
+  /** Plan card button status for this account. */
   const cardAction = (p: PlanSpec): { label: string; disabled: boolean; hint?: string; to?: string; current?: boolean } => {
     if (!signedIn) return { label: t("plans.card.signIn"), disabled: false, to: `/signin?next=${encodeURIComponent("/plans")}` };
     const personal = summary?.personal ?? null;

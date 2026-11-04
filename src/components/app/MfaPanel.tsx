@@ -9,14 +9,14 @@ import { QueryError, Skeleton } from "./QueryState";
 import MfaQr from "./MfaQr";
 
 /**
- * Verifikasi dua langkah (TOTP: Google Authenticator, Microsoft Authenticator,
- * Aegis, 1Password, dll.). Tiga keadaan: belum aktif → daftar; aktif tetapi
- * sesi belum lolos → verifikasi; aktif & lolos → bisa dimatikan.
- * `onVerified` dipanggil setelah sesi lolos 2FA (dipakai panel admin).
+ * Two-step verification (TOTP: Google Authenticator, Microsoft Authenticator,
+ * Aegis, 1Password, etc.). Three states: not enabled → enroll; enabled but the
+ * session has not passed → verify; enabled & passed → can be turned off.
+ * `onVerified` is called after the session passes 2FA (used by the admin panel).
  */
 export default function MfaPanel({ onVerified, compact = false }: { onVerified?: () => void; compact?: boolean }) {
   const { t } = useTranslation();
-  // Status 2FA lewat TanStack Query (cache bersama panel Akun & Admin).
+  // 2FA status via TanStack Query (cache shared by the Account & Admin panels).
   const q = useMfaStatus();
   const status: MfaStatus | null = q.data ?? null;
   const [setup, setSetup] = useState<{ secret: string; otpauthUrl: string } | null>(null);
@@ -26,7 +26,7 @@ export default function MfaPanel({ onVerified, compact = false }: { onVerified?:
 
   const refresh = () => q.refetch();
 
-  /** v9: pesan yang jelas untuk kunci 2FA (bukan "Terlalu banyak permintaan") dan sisa percobaan. */
+  /** v9: clear messages for 2FA lockout (not "Too many requests") and remaining attempts. */
   const mfaErrorText = (e: unknown) => {
     if (!(e instanceof ApiError)) return t("errors.unknown");
     const wait = Number(e.body.retryAfterSeconds);

@@ -13,19 +13,19 @@ import { allSiteInfos, PAGE_DESIGN_TYPE, SITE_TYPE } from "../../../helpers/site
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* Menu — navigasi dinamis dari Folder Website                          */
+/* Menu — dynamic navigation from the Website Folder                    */
 /*                                                                    */
-/* Item menu = halaman di folder website (nama desain terkini atau label */
-/* khusus), tautan = slug yang valid (bukan nama desain mentah):        */
-/*   editor / ekspor satu halaman → <a href="slug.html">                */
-/*   ekspor website → Link (React) · RouterLink (Vue) · routerLink      */
+/* Menu items = pages in the website folder (the current design name or the label */
+/* special), links = valid slugs (not raw design names):                */
+/*   editor / single-page export → <a href="slug.html">                 */
+/*   website export → Link (React) · RouterLink (Vue) · routerLink      */
 /*                    (Angular) · #/slug (Svelte) · slug.html (HTML)    */
 /* ================================================================== */
 
 export interface MenuState {
-  /** "" = otomatis (folder yang memuat halaman ini, atau folder pertama). */
+  /** "" = automatic (the folder containing this page, or the first folder). */
   siteId: string;
-  /** Kosong = semua halaman folder; selain itu hanya halaman ini (urutan ikut folder). */
+  /** Empty = every page in the folder; otherwise only these pages (order follows the folder). */
   pageIds: string[];
   orientation: "horizontal" | "vertical";
   align: "start" | "center" | "end";
@@ -38,11 +38,11 @@ export interface MenuState {
   hoverColor: string;
   activeColor: string;
   showActive: boolean;
-  /** Lama (sebelum v5): diganti `mobileMenu`, tetap disimpan agar desain lama terbaca. */
+  /** Old (before v5): replaced by `mobileMenu`, still stored so old designs can be read. */
   stackOnMobile: boolean;
-  /** Tampilan di layar ≤ 768px: ikon hamburger (dropdown), bertumpuk, atau tetap mengalir. */
+  /** Display on screens ≤ 768px: hamburger icon (dropdown), stacked, or keep flowing. */
   mobileMenu: "burger" | "stack" | "wrap";
-  /** Latar dropdown hamburger; "" = otomatis (gelap bila teks menu terang). */
+  /** Hamburger dropdown background; "" = automatic (dark when the menu text is light). */
   panelBg: string;
 }
 
@@ -65,10 +65,10 @@ const DEFAULT_STATE: MenuState = {
   panelBg: "",
 };
 
-/** Batas lebar layar untuk menu hamburger: HP dan tablet (sama dengan Mega Menu). */
+/** Screen width limit for the hamburger menu: phones and tablets (same as the Mega Menu). */
 const MOBILE_MAX = 1024;
 
-/** Warna terang? (untuk memilih latar dropdown otomatis). */
+/** Is the color light? (to pick the automatic dropdown background). */
 function isLight(hex: string): boolean {
   const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return false;
@@ -83,7 +83,7 @@ const SAMPLE: SitePageInfo[] = [
   { designId: "", label: "Kontak", slug: "kontak", isHome: false },
 ];
 
-/** Folder yang dipakai menu: pilihan pengguna → folder yang memuat halaman ini → folder pertama. */
+/** Folder used by the menu: the user's choice → the folder containing this page → the first folder. */
 export function resolveMenuSite(s: Pick<MenuState, "siteId">, ctx?: SiteContext): SiteInfo | null {
   const sites = ctx?.sites ?? [];
   return (
@@ -97,7 +97,7 @@ export function resolveMenuSite(s: Pick<MenuState, "siteId">, ctx?: SiteContext)
 export function menuItems(s: Pick<MenuState, "siteId" | "pageIds">, ctx?: SiteContext): { items: SitePageInfo[]; sample: boolean } {
   const site = resolveMenuSite(s, ctx);
   if (!site) return { items: SAMPLE, sample: true };
-  // v20: "Semua halaman" = halaman yang tidak disembunyikan dari menu (Studio → Halaman).
+  // v20: "All pages" = pages not hidden from the menu (Studio → Pages).
   const items = s.pageIds.length ? site.pages.filter((p) => s.pageIds.includes(p.designId)) : site.pages.filter((p) => p.inMenu !== false);
   return { items, sample: false };
 }
@@ -147,7 +147,7 @@ ${
 }${vertical ? "" : mobileCss(s, cls, text, active)}`;
 }
 
-/** CSS versi HP: hamburger (dropdown CSS murni, tanpa JS) atau bertumpuk. */
+/** Phone CSS: hamburger (pure CSS dropdown, no JS) or stacked. */
 function mobileCss(s: MenuState, cls: string, text: string, active: string): string {
   const mode = s.mobileMenu ?? (s.stackOnMobile ? "stack" : "wrap");
   if (mode === "wrap") return "";
@@ -177,7 +177,7 @@ function mobileCss(s: MenuState, cls: string, text: string, active: string): str
 }
 @media (max-width: ${MOBILE_MAX}px) {
   .${cls} {
-    /* Hamburger di ujung kanan baris header (setelah tombol CTA). */
+    /* Hamburger at the right end of the header row (after the CTA button). */
     order: 2;
     display: flex;
     justify-content: ${JUSTIFY[s.align] ?? "flex-start"};
@@ -289,7 +289,7 @@ function menuSpec(s: MenuState, cls: string, ctx?: { site?: SiteContext }): Elem
   const css = menuCss(s, cls);
   const burger = s.orientation !== "vertical" && (s.mobileMenu ?? "burger") === "burger";
   if (site?.routing !== "site") {
-    // Satu halaman: tautan biasa ke berkas halaman (sama untuk semua framework).
+    // Single page: a plain link to the page file (the same for every framework).
     return { css, markup: tree(cls, items, current, "html", burger) };
   }
   return {

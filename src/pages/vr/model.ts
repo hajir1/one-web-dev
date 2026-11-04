@@ -3,12 +3,12 @@ import { isDemoMode } from "../../demo/demoMode";
 /* ================================================================== */
 /* Tur 360° (menu VR) — model data                                      */
 /*                                                                    */
-/* Tur = beberapa scene panorama equirectangular (2:1). Tiap scene      */
-/* punya hotspot di koordinat yaw/pitch (derajat):                       */
-/*   yaw   0 = depan (-Z), positif = ke kiri; rentang -180..180          */
-/*   pitch 0 = horizon, positif = ke atas; rentang -85..85              */
-/* Berkas gambar/audio disimpan terpisah (IndexedDB, lihat storage.ts),  */
-/* model hanya menyimpan id media-nya.                                  */
+/* A tour = several equirectangular (2:1) panorama scenes. Each scene   */
+/* has hotspots at yaw/pitch coordinates (degrees):                      */
+/*   yaw   0 = front (-Z), positive = to the left; range -180..180       */
+/*   pitch 0 = horizon, positive = up; range -85..85                     */
+/* Image/audio files are stored separately (IndexedDB, see storage.ts), */
+/* the model only stores its media id.                                  */
 /* ================================================================== */
 
 export type HotspotKind = "scene" | "info" | "image" | "audio";
@@ -18,11 +18,11 @@ export interface Hotspot {
   kind: HotspotKind;
   yaw: number;
   pitch: number;
-  /** Teks tooltip / judul panel. */
+  /** Tooltip text / panel title. */
   label: string;
   /** kind "scene": scene tujuan. */
   targetSceneId?: string;
-  /** kind "info": isi teks. */
+  /** kind "info": the text content. */
   text?: string;
   /** kind "image" | "audio": id media. */
   mediaId?: string;
@@ -31,7 +31,7 @@ export interface Hotspot {
 export interface TourScene {
   id: string;
   name: string;
-  /** id media panorama (null = belum diunggah). */
+  /** Panorama media id (null = not uploaded yet). */
   panoramaId: string | null;
   hotspots: Hotspot[];
 }
@@ -41,9 +41,9 @@ export interface Tour {
   name: string;
   startSceneId: string;
   scenes: TourScene[];
-  /** Putar perlahan sampai pengunjung menyentuh layar. */
+  /** Rotate slowly until the visitor touches the screen. */
   autoRotate: boolean;
-  /** Warna titik hotspot. */
+  /** Hotspot dot color. */
   accent: string;
   createdAt: number;
   updatedAt: number;
@@ -56,10 +56,10 @@ export interface MediaMeta {
   size: number;
 }
 
-/** Mode demo (v15): jumlah tur, scene, dan hotspot tanpa batas. */
+/** Demo mode (v15): unlimited tours, scenes, and hotspots. */
 export const vrCap = (n: number): number => (isDemoMode() ? Infinity : n);
 
-/** Batas paket: Gratis vs Tur 360° Pro (sekali buka per akun). */
+/** Plan limits: Free vs 360° Tour Pro (one-time unlock per account). */
 export const VR_LIMITS = {
   freeScenes: 3,
   proScenes: 30,
@@ -71,7 +71,7 @@ export const VR_LIMITS = {
 } as const;
 
 export const HOTSPOT_KINDS: HotspotKind[] = ["scene", "info", "image", "audio"];
-/** Jenis hotspot yang butuh Tur 360° Pro. */
+/** Hotspot types that need 360° Tour Pro. */
 export const PRO_HOTSPOT_KINDS: HotspotKind[] = ["image", "audio"];
 
 let seq = 0;
@@ -79,7 +79,7 @@ export const uid = (p: string) => `${p}-${Date.now().toString(36)}${(seq++).toSt
 
 const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, Number.isFinite(n) ? n : 0));
 const round1 = (n: number) => Math.round(n * 10) / 10;
-/** Normalisasi yaw ke -180..180. */
+/** Normalize yaw to -180..180. */
 export const normYaw = (y: number) => round1(((((Number.isFinite(y) ? y : 0) + 180) % 360) + 360) % 360 - 180);
 export const clampPitch = (p: number) => round1(clamp(p, -85, 85));
 const text = (v: unknown, max: number, d = "") => (typeof v === "string" ? v.slice(0, max) : d);
@@ -98,7 +98,7 @@ export function createHotspot(kind: HotspotKind, yaw: number, pitch: number, lab
   return { id: uid("hs"), kind, yaw: normYaw(yaw), pitch: clampPitch(pitch), label: label.slice(0, 80) };
 }
 
-/** Bersihkan data tersimpan / impor (nilai asing → aman, referensi rusak dibuang). */
+/** Sanitizes stored / imported data (unknown values → safe, broken references are dropped). */
 export function sanitizeTour(v: unknown): Tour | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Record<string, unknown>;
@@ -138,7 +138,7 @@ export function sanitizeTour(v: unknown): Tour | null {
   };
 }
 
-/** Fitur Pro yang dipakai tur ini (kosong = cukup paket Gratis). */
+/** Pro features used by this tour (empty = the Free plan is enough). */
 export function proFeaturesUsed(tour: Tour): ("scenes" | "image" | "audio")[] {
   const out: ("scenes" | "image" | "audio")[] = [];
   if (tour.scenes.length > VR_LIMITS.freeScenes) out.push("scenes");
@@ -148,7 +148,7 @@ export function proFeaturesUsed(tour: Tour): ("scenes" | "image" | "audio")[] {
   return out;
 }
 
-/** Masalah yang membuat tur belum bisa diekspor (kunci i18n vr.issues.*). */
+/** Issues that keep the tour from being exported yet (i18n keys vr.issues.*). */
 export function tourIssues(tour: Tour): { key: string; scene?: string; label?: string }[] {
   const out: { key: string; scene?: string; label?: string }[] = [];
   for (const s of tour.scenes) {
@@ -161,7 +161,7 @@ export function tourIssues(tour: Tour): { key: string; scene?: string; label?: s
   return out;
 }
 
-/** Hapus scene + hotspot yang menuju ke sana. */
+/** Deletes a scene + the hotspots leading to it. */
 export function removeScene(tour: Tour, sceneId: string): Tour {
   if (tour.scenes.length <= 1) return tour;
   const scenes = tour.scenes
@@ -170,14 +170,14 @@ export function removeScene(tour: Tour, sceneId: string): Tour {
   return { ...tour, scenes, startSceneId: tour.startSceneId === sceneId ? scenes[0].id : tour.startSceneId };
 }
 
-/** Semua id media yang dipakai tur (panorama + gambar/audio hotspot). */
+/** Every media id the tour uses (panoramas + hotspot images/audio). */
 export function mediaIdsOf(tour: Tour): string[] {
   const ids = tour.scenes.flatMap((s) => [s.panoramaId, ...s.hotspots.map((h) => h.mediaId)]);
   return [...new Set(ids.filter((x): x is string => !!x))];
 }
 
 /* ------------------------------------------------------------------ */
-/* Geometri: yaw/pitch ↔ posisi 3D (sama dengan runtime A-Frame)         */
+/* Geometry: yaw/pitch ↔ 3D position (same as the A-Frame runtime)     */
 /* ------------------------------------------------------------------ */
 
 const RAD = Math.PI / 180;
@@ -195,7 +195,7 @@ export function fromDirection(x: number, y: number, z: number): { yaw: number; p
 }
 
 /* ------------------------------------------------------------------ */
-/* Deteksi jenis berkas dari isi (bukan nama/ekstensi)                   */
+/* File kind detection from content (not the name/extension)            */
 /* ------------------------------------------------------------------ */
 
 export type VrMediaKind = "jpeg" | "png" | "webp" | "mp3" | "wav" | "ogg" | "unknown";

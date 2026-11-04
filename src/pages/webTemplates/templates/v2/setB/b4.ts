@@ -42,8 +42,8 @@ import {
 } from "./kitB";
 
 /* ================================================================== */
-/* Set B · bagian 4: Lanskap, Majalah Berita, Fintech, Toko Furnitur,   */
-/* Kursus Bahasa.                                                       */
+/* Set B · part 4: Landscaping, News Magazine, Fintech, Furniture Store, */
+/* Language Course.                                                     */
 /* ================================================================== */
 
 /* ---------------- 16. architecture-landscape (PREMIUM, 5) ---------- */

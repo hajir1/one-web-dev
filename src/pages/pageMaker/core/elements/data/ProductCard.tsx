@@ -18,11 +18,11 @@ import i18n from "../../../../../i18n";
 import { boxImage } from "../placeholders";
 
 /* ================================================================== */
-/* Product Card (GRATIS) — kartu produk untuk katalog toko online       */
+/* Product Card (FREE) — product card for an online store catalog       */
 /*                                                                    */
-/* Gambar, label, nama, harga (+ harga coret), rating, deskripsi       */
-/* singkat, dan tombol CTA. Harga hanyalah TEKS tampilan: elemen ini    */
-/* tidak memproses pembayaran apa pun.                                 */
+/* Image, label, name, price (+ struck-through price), rating, description */
+/* summary, and a CTA button. The price is only display TEXT: this element */
+/* does not process any payment.                                       */
 /* ================================================================== */
 
 type BaseCard = Omit<
@@ -44,9 +44,9 @@ export interface ProductCardState extends BaseCard {
   nameTag: "h2" | "h3" | "h4";
   description: string;
   showDescription: boolean;
-  /** Teks harga apa adanya, mis. "Rp249.000" atau "$19". */
+  /** Price text as is, e.g. "Rp249.000" or "$19". */
   priceText: string;
-  /** Harga coret (opsional). */
+  /** Struck-through price (optional). */
   comparePriceText: string;
   priceFontSize: number;
   priceColor: string;
@@ -55,7 +55,7 @@ export interface ProductCardState extends BaseCard {
   ratingColor: string;
   ratingCount: string;
   ctaText: string;
-  /** Kosong = <button>; terisi = <a href>. */
+  /** Empty = <button>; filled = <a href>. */
   ctaHref: string;
   ctaFullWidth: boolean;
   ctaBgColor: string;
@@ -155,8 +155,8 @@ const DEFAULT_CLASS_NAME = "custom-product-card";
 
 const clampRating = (r: number) => Math.max(0, Math.min(5, Number.isFinite(r) ? r : 0));
 
-/** "★★★★☆" — bintang penuh dibulatkan ke 0,5 terdekat (setengah = ★ terakhir dianggap penuh ≥ .5). */
-/** Harga coret: abu-abu yang tetap lolos kontras AA di latar kartu terang maupun gelap. */
+/** "★★★★☆": full stars rounded to the nearest 0.5 (a half = the last ★ counts as full at ≥ .5). */
+/** Strikethrough price: a gray that still passes AA contrast on light and dark card backgrounds. */
 function wasColor(bg: unknown): string {
   const m = typeof bg === "string" ? /^#([0-9a-f]{6})$/i.exec(bg.trim()) : null;
   if (!m) return "#64748b";
@@ -301,7 +301,7 @@ function buildMarkup(s: ProductCardState, cls: string) {
   return h(
     "article",
     { class: cls },
-    // width/height = rasio ukuran asli sebelum gambar termuat (cegah layout bergeser); ukuran tampil tetap dari CSS.
+    // width/height = original size ratio before the image loads (prevents layout shift); the displayed size still comes from CSS.
     h("img", { class: `${cls}__image`, src: safeUrl(s.imageSrc, PLACEHOLDER_IMG), alt: s.imageAlt, width: imgW(s.width), height: Math.max(1, Math.round(s.imageHeight)), loading: "lazy", decoding: "async" }),
     s.badgeEnabled && s.badgeText.trim() ? h("span", { class: `${cls}__badge` }, s.badgeText) : null,
     h(

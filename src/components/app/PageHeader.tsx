@@ -5,8 +5,8 @@ import HelpButton from "./HelpButton";
 import type { DocTopicId } from "../../config/docs";
 
 /* ================================================================== */
-/* Header halaman standar: breadcrumb, ikon, judul, deskripsi, chip,     */
-/* aksi, dan tombol Bantuan (dokumentasi menu ini).                      */
+/* Standard page header: breadcrumb, icon, title, description, chips,    */
+/* actions, and a Help button (documentation for this menu).             */
 /* ================================================================== */
 
 export interface Crumb {
@@ -31,7 +31,7 @@ export default function PageHeader({
   crumbs?: Crumb[];
   chips?: ReactNode;
   actions?: ReactNode;
-  /** Topik dokumentasi untuk tombol Bantuan. */
+  /** Documentation topic for the Help button. */
   help?: DocTopicId;
   tileClassName?: string;
   testId?: string;

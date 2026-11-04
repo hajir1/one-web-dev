@@ -6,7 +6,7 @@ import { INPUT, btn } from "../../../../components/app/ui";
 import type { PagePatternId } from "../../helpers/studio";
 import type { ResolvedSitePage } from "../../helpers/site";
 
-/* Dialog "Tambah halaman" (v20): pilih pola atau salin halaman yang ada. */
+/* "Add page" dialog (v20): pick a pattern or copy an existing page.    */
 
 export type NewPageChoice = { name: string; pattern: PagePatternId } | { name: string; copyFrom: string };
 

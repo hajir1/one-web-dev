@@ -79,7 +79,7 @@ test("SPA: index.html berisi meta beranda, seo.js dipanggil router", () => {
     assert.ok(f["public/robots.txt"], fw);
   }
   assert.match(files("react")["src/seo.js"], /"\/tentang": \{\n\s+"title": "Tentang Toko Kue <Ibu>"/);
-  // Svelte memakai hash → sitemap hanya beranda.
+  // Svelte uses hashes → the sitemap only has the home page.
   assert.ok(!files("svelte")["public/sitemap.xml"].includes("#"));
 });
 

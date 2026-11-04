@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Download, FilePlus2, FileText, Globe, LayoutTemplate, PencilRuler, Rocket, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
+import { ArrowRight, Download, ExternalLink, FilePlus2, Github, FileText, Globe, LayoutTemplate, PencilRuler, Rocket, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
 import AppMeta from "../../components/app/AppMeta";
 import PageHeader from "../../components/app/PageHeader";
 import { Link, useLocaleNavigate } from "../../components/app/LocaleLink";
@@ -16,21 +16,22 @@ import DesignLimitDialog from "../pageMaker/ui/DesignLimitDialog";
 import SiteLimitDialog from "../pageMaker/ui/SiteLimitDialog";
 import CreditDialog from "../../credits/CreditDialog";
 import { homeDesignOf } from "../webTemplates/createFromTemplate";
+import { deployKey, removeDeploy, useDeploys } from "../pageMaker/helpers/deployHistory";
 import { CODE_SITE_TYPE, normalizeCodeSite } from "../webTemplates/codeTemplates/codeSite";
 
-// Dialog unduh (jszip + generator code) dan data preset Studio dimuat saat dipakai, bukan saat halaman dibuka.
+// The download dialog (jszip + code generator) and the Studio preset data load when used, not when the page opens.
 const SiteDownloadDialog = lazy(() => import("../pageMaker/ui/collections/SiteDownloadDialog"));
 import { countEdits } from "../webTemplates/codeTemplates/editModel";
 
 /* ================================================================== */
-/* "Website Saya" (v17): pintu masuk Pembuat Website.                    */
+/* "My Websites" (v17): entry point of the Website Builder.              */
 /*                                                                    */
-/* Satu alur yang sama untuk semua jenis proyek:                         */
-/*   1. Pilih awal  : template, atau mulai dari kosong                   */
-/*   2. Modifikasi  : Studio (v20: semua halaman di satu editor) atau     */
-/*                    Studio template kode (klik untuk edit)             */
-/*   3. Deploy      : tombol Deploy di Studio                            */
-/* Daftar proyek menggabungkan folder website dan proyek Template Kode.  */
+/* One flow for every project kind:                                     */
+/*   1. Starting point: a template, or start from scratch               */
+/*   2. Modify      : Studio (v20: every page in one editor) or         */
+/*                    Code template Studio (click to edit)               */
+/*   3. Deploy      : the Deploy button in Studio                       */
+/* The project list combines website folders and Code Template projects. */
 /* ================================================================== */
 
 const EMPTY: SavedDesign[] = [];
@@ -55,7 +56,7 @@ export default function WebsiteHub() {
   const deleteDesign = useDesignStore((s) => s.deleteDesign);
   const [name, setName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  /** Website yang sedang diunduh (dialog Unduh). */
+  /** Website being downloaded (Download dialog). */
   const [downloadId, setDownloadId] = useState<string | null>(null);
   const downloadSite = downloadId ? (sites.find((s) => s.id === downloadId) ?? null) : null;
 
@@ -89,7 +90,7 @@ export default function WebsiteHub() {
     return list.sort((a, b) => b.item.updatedAt - a.item.updatedAt);
   }, [sites, codeSites, t]);
 
-  /** v20: desain halaman lama yang belum masuk website mana pun. */
+  /** v20: old page designs not yet in any website. */
   const loosePages = useMemo(() => {
     const used = new Set(sites.flatMap((s) => normalizeSiteDoc(s.state).pages.map((p) => p.designId)));
     return pages.filter((d) => !used.has(d.id)).sort((a, b) => b.updatedAt - a.updatedAt);
@@ -104,13 +105,15 @@ export default function WebsiteHub() {
     if (!ensureSiteRoom({ reason: "create", label: page.name, onRoom: () => makeSiteNow(page) })) return;
     makeSiteNow(page);
   };
+  const deploys = useDeploys();
   const removeProject = (p: Project) => {
-    // Website: hanya foldernya yang dihapus; desain halamannya muncul lagi di "Desain halaman lepas".
+    // Website: only its folder is deleted; its page designs appear again under "Loose page designs".
     deleteDesign(p.kind === "site" ? SITE_TYPE : CODE_SITE_TYPE, p.item.id);
+    removeDeploy(deployKey(p.kind, p.item.id));
     setConfirmDelete(null);
   };
 
-  /** Mulai dari kosong: folder website + satu halaman "Beranda" kosong → langsung ke editor. */
+  /** Start from scratch: a website folder + one empty "Beranda" page → straight to the editor. */
   const startBlankNow = async () => {
     const { createDefaultPageDoc } = await import("../pageMaker/helpers/pageDoc");
     const st = useDesignStore.getState();
@@ -157,7 +160,7 @@ export default function WebsiteHub() {
           ))}
         </ol>
 
-        {/* -------- mulai -------- */}
+        {/* -------- start -------- */}
         <Panel title={t("hub.startTitle")} description={t("hub.startHint")}>
           <div className="grid gap-3 md:grid-cols-2">
             <Link to={TEMPLATES_PATH} className="group flex flex-col gap-2 rounded-2xl border-2 border-brand-200 bg-brand-50/50 p-4 hover:border-brand-500 dark:border-brand-500/30 dark:bg-brand-500/5" data-testid="hub-start-template">
@@ -203,6 +206,20 @@ export default function WebsiteHub() {
                     <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                       {p.kind === "site" ? t("hub.kindSite") : t("hub.kindCode")} · {p.detail} · {formatDate(p.item.updatedAt)}
                     </p>
+                    {deploys[deployKey(p.kind, p.item.id)] && (() => {
+                      const d = deploys[deployKey(p.kind, p.item.id)];
+                      return (
+                        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs" data-testid="hub-deployed">
+                          <Chip tone="green">{t("hub.deployed", { date: formatDate(Date.parse(d.at)) })}</Chip>
+                          <a href={d.pagesUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-w-0 items-center gap-1 truncate font-medium text-brand-700 hover:underline dark:text-brand-300">
+                            <ExternalLink className="h-3 w-3 shrink-0" /> <span className="truncate">{d.pagesUrl.replace(/^https:\/\//, "")}</span>
+                          </a>
+                          <a href={d.repoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-gray-500 hover:underline dark:text-gray-400">
+                            <Github className="h-3 w-3" /> {d.owner}/{d.repo}
+                          </a>
+                        </p>
+                      );
+                    })()}
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5">
                     <Link to={p.edit} className={ACTION}>
@@ -214,7 +231,7 @@ export default function WebsiteHub() {
                       </button>
                     )}
                     <Link to={p.deploy} className={`${ACTION} !border-brand-600 !text-brand-700 dark:!text-brand-300`}>
-                      <Rocket className="h-3.5 w-3.5" /> {t("hub.deploy")}
+                      <Rocket className="h-3.5 w-3.5" /> {t(deploys[deployKey(p.kind, p.item.id)] ? "hub.redeploy" : "hub.deploy")}
                     </Link>
                     {confirmDelete === p.item.id ? (
                         <span className="flex items-center gap-1 text-xs">

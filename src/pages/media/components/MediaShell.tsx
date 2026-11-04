@@ -12,9 +12,9 @@ import ServerGateDialog from "./ServerGate";
 import { isDemoMode } from "../../../demo/demoMode";
 
 /**
- * Kerangka halaman Media: header standar (breadcrumb, ikon beraksen khas
- * tiap alat, chip mode pemrosesan, tombol Bantuan), lalu isi. Dialog kredit
- * & server dipasang sekali di sini.
+ * Media page shell: standard header (breadcrumb, an accent icon specific to
+ * each tool, processing mode chip, Help button), then the content. The credit
+ * & server dialogs are mounted once here.
  */
 export default function MediaShell({
   tool,
@@ -27,16 +27,16 @@ export default function MediaShell({
   tool: MediaToolId;
   icon: LucideIcon;
   accent: Accent;
-  /** Chip tambahan di bawah judul. */
+  /** Extra chips under the title. */
   chips?: ReactNode;
-  /** Aksi di kanan header (mis. tombol reset). */
+  /** Actions on the right of the header (e.g. a reset button). */
   actions?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useTranslation();
   const spec = TOOL_BY_ID[tool];
   const a = ACCENT[accent];
-  // Mode demo (v12): tanpa mode server berbayar.
+  // Demo mode (v12): no paid server mode.
   const browserOnly = !spec.modes.server || isDemoMode();
   const pricing = useBilling((st) => (spec.serverFeature ? st.pricing[spec.serverFeature] : null));
   const serverChip = pricing ? t("media.shell.serverCost", { cost: serverCostLabel(pricing) }) : t("media.shell.server");

@@ -14,7 +14,7 @@ import { refreshBilling, useBilling } from "../media/processing/billing";
 import { formatCredits } from "../media/processing/pricing";
 import { TEAM_MAX_MEMBERS, type TeamView } from "./team";
 
-/** v7 (P6): /:lang/team — tim & kredit bersama; /:lang/team/join?token=… menerima undangan. */
+/** v7 (P6): /:lang/team — team & shared credits; /:lang/team/join?token=… accepts an invitation. */
 export default function TeamPage() {
   const { t } = useTranslation();
   const status = useSession((s) => s.status);

@@ -1,2 +1,2 @@
-// Kontrol UI Media kini memakai kit bersama aplikasi (components/app/ui.tsx).
+// Media UI controls now use the app's shared kit (components/app/ui.tsx).
 export * from "../../../components/app/ui";

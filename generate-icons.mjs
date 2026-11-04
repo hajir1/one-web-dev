@@ -1,13 +1,13 @@
-// v9: ikon OneWeb DevTools = angka "1" bergaya kode (garis monospace + kursor terminal "_") di ubin biru.
-// Satu sumber geometri (di bawah) → semua SVG & PNG. Jalankan ulang setelah logo berubah: npm run icons
+// v9: the OneWeb DevTools icon = a code-styled "1" (monospace stroke + terminal cursor "_") on a blue tile.
+// One geometry source (below) → every SVG & PNG. Run again after the logo changes: npm run icons
 //
-//   public/favicon.svg                    favicon vektor (ubin membulat, terbaca di latar terang & gelap)
-//   public/favicon.ico                    16/32/48 (PNG di dalam ICO)
-//   public/pwa-64x64.png, -192, -512      purpose "any" (sudut transparan)
-//   public/maskable-icon-192/512.png      purpose "maskable" (latar penuh, isi di zona aman 80%)
-//   public/apple-touch-icon-180x180.png   iOS (latar penuh, iOS membulatkan sendiri)
-//   public/og-image.png                   1200×630 untuk Open Graph / media sosial
-//   public/brand/*.svg + *.png            sumber: ubin, transparan (latar terang/gelap), logo lengkap terang/gelap
+//   public/favicon.svg                    vector favicon (rounded tile, readable on light & dark backgrounds)
+//   public/favicon.ico                    16/32/48 (PNG inside ICO)
+//   public/pwa-64x64.png, -192, -512      purpose "any" (transparent corners)
+//   public/maskable-icon-192/512.png      purpose "maskable" (full background, content in the 80% safe zone)
+//   public/apple-touch-icon-180x180.png   iOS (full background, iOS rounds it itself)
+//   public/og-image.png                   1200×630 for Open Graph / social media
+//   public/brand/*.svg + *.png            sources: tile, transparent (light/dark background), full logo light/dark
 
 import sharp from "sharp";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -18,10 +18,10 @@ const pub = join(dirname(fileURLToPath(import.meta.url)), "public");
 const brandDir = join(pub, "brand");
 mkdirSync(brandDir, { recursive: true });
 
-/** Warna brand (sama dengan --color-brand-* di index.css). */
+/** Brand colors (same as --color-brand-* in index.css). */
 const C = { from: "#3b68f0", to: "#1f3a8f", ink: "#2950d8", light: "#c0d2fd", navy: "#0f1b46" };
 
-/** Angka "1" + kursor, dalam kotak 40×40. `s` = tebal garis. */
+/** The "1" + cursor, in a 40×40 box. `s` = stroke width. */
 const glyph = (main, cursor, s = 3.6) =>
   `<path d="M9.7 15.2 15.8 10.2V29.6" fill="none" stroke="${main}" stroke-width="${s}" stroke-linecap="round" stroke-linejoin="round"/>` +
   `<path d="M10.2 29.6H21.2" fill="none" stroke="${main}" stroke-width="${s}" stroke-linecap="round"/>` +
@@ -32,13 +32,13 @@ const svg40 = (body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40
 
 /** Ubin membulat (favicon, PWA "any"). */
 const tile = svg40(`${grad}<rect width="40" height="40" rx="11" fill="url(#g)"/>${glyph("#fff", C.light)}`);
-/** Latar penuh; isi diperkecil ke 80% agar aman untuk mask lingkaran (maskable, apple-touch). */
+/** Full background; content scaled to 80% so it is safe for circular masks (maskable, apple-touch). */
 const fullBleed = svg40(`${grad}<rect width="40" height="40" fill="url(#g)"/><g transform="translate(20 20) scale(0.8) translate(-20 -20)">${glyph("#fff", C.light)}</g>`);
-/** Transparan: untuk latar terang (biru) dan latar gelap (putih/biru muda). */
+/** Transparent: for light backgrounds (blue) and dark backgrounds (white/light blue). */
 const onLight = svg40(glyph(C.ink, C.from, 4));
 const onDark = svg40(glyph("#fff", C.light, 4));
 
-/** Logo lengkap (ubin + wordmark). Teks memakai font sistem; aplikasi sendiri merender wordmark dengan HTML. */
+/** The full logo (tile + wordmark). Text uses the system font; the app itself renders the wordmark in HTML. */
 const lockup = (dark) => {
   const text = dark ? "#ffffff" : "#101828";
   const accent = dark ? "#8fb0fb" : C.from;
@@ -60,7 +60,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width
 
 const png = (svg, size, viewBox = 40) => sharp(Buffer.from(svg), { density: Math.ceil((72 * size * 2) / viewBox) }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
 
-/** ICO berisi PNG (didukung semua browser modern & Windows Vista+). */
+/** An ICO containing PNGs (supported by every modern browser & Windows Vista+). */
 function ico(images) {
   const head = Buffer.alloc(6 + images.length * 16);
   head.writeUInt16LE(0, 0);
@@ -109,12 +109,12 @@ for (const [svg, size, name] of [
 ])
   write(join(pub, name), await png(svg, size));
 
-// Semua ukuran umum (16–1024) untuk toko aplikasi, media sosial, dan dokumen
+// Every common size (16–1024) for app stores, social media, and documents
 mkdirSync(join(brandDir, "sizes"), { recursive: true });
 for (const size of [16, 24, 32, 48, 64, 96, 128, 144, 152, 167, 180, 192, 256, 384, 512, 1024])
   write(join(brandDir, "sizes", `logo-mark-${size}.png`), await png(tile, size));
 
-// Versi transparan & berlatar (PNG 512) untuk dipakai di luar aplikasi
+// Transparent & background versions (PNG 512) for use outside the app
 write(join(brandDir, "logo-mark-512.png"), await png(tile, 512));
 write(join(brandDir, "logo-mark-transparent-512.png"), await png(onLight, 512));
 write(join(brandDir, "logo-mark-transparent-dark-512.png"), await png(onDark, 512));

@@ -16,19 +16,19 @@ import {
 } from "../helpers/SmallUIHelpers";
 
 /* ------------------------------------------------------------------ */
-/* Bound fields: kontrol form yang langsung terikat ke satu key state. */
+/* Bound fields: form controls bound directly to one state key.       */
 /*                                                                    */
-/*   <NumberField s={s} update={update} k="boxSize" label="Ukuran" /> */
+/*   <NumberField s={s} update={update} k="boxSize" label="Size" /> */
 /*                                                                    */
-/* `k` diketik ketat: NumberField hanya menerima key bertipe number,  */
-/* ColorField/TextField hanya key string, dst — jadi salah ketik nama */
-/* field langsung ketahuan saat compile.                              */
+/* `k` is strictly typed: NumberField only accepts keys of type number, */
+/* ColorField/TextField only accept string keys, etc., so a mistyped  */
+/* field name is caught at compile time.                              */
 /* ------------------------------------------------------------------ */
 
-/** Signature `update` yang dipakai semua elemen. */
+/** The `update` signature used by every element. */
 export type Updater<S> = <K extends keyof S>(key: K, value: S[K]) => void;
 
-/** Ambil nama key di S yang tipenya T. */
+/** Picks the key names in S whose type is T. */
 export type KeysOfType<S, T> = {
   [K in keyof S]-?: S[K] extends T ? K : never;
 }[keyof S] &
@@ -232,7 +232,7 @@ export function LinesField<S>({
   );
 }
 
-/** v21: kolom gambar (Aset saya / Unggah / URL) — nilai `aset:<id>` atau URL. */
+/** v21: image field (My assets / Upload / URL); value `aset:<id>` or a URL. */
 export function ImageField<S>({ s, update, k, label, hint }: BoundBase<S> & { k: KeysOfType<S, string> }) {
   return (
     <Field label={label} hint={hint}>
@@ -241,7 +241,7 @@ export function ImageField<S>({ s, update, k, label, hint }: BoundBase<S> & { k:
   );
 }
 
-/** Contoh bawaan (Unsplash/Picsum) → label "Ilustrasi contoh" di editor galeri. */
+/** Built-in samples (Unsplash/Picsum) → "Sample illustration" label in the gallery editor. */
 export const isSampleImage = (src: string) => /^https:\/\/(images\.unsplash\.com|picsum\.photos)\//.test(src);
 
 const toGallery = (lines: string[]): GalleryItem[] =>
@@ -254,7 +254,7 @@ const toGallery = (lines: string[]): GalleryItem[] =>
     });
 const fromGallery = (items: GalleryItem[]) => items.filter((it) => it.src.trim()).map((it) => (it.caption.trim() ? `${it.src.trim()} | ${it.caption.trim()}` : it.src.trim()));
 
-/** v21: galeri visual (baris "url | keterangan") + "Edit sebagai teks". */
+/** v21: visual gallery ("url | caption" lines) + "Edit as text". */
 export function GalleryField<S>({ s, update, k, label, hint, rows, max }: BoundBase<S> & { k: KeysOfType<S, string[]>; rows?: number; max?: number }) {
   const set = (v: string[]) => update(k, v as S[typeof k]);
   return (
@@ -274,13 +274,13 @@ export function GalleryField<S>({ s, update, k, label, hint, rows, max }: BoundB
   );
 }
 
-/** Tampilkan children hanya kalau `when` true — biar JSX panel tetap rata. */
+/** Shows children only when `when` is true, so the panel JSX stays flat. */
 export function Show({ when, children }: { when: boolean; children: ReactNode }) {
   return when ? <>{children}</> : null;
 }
 
 /* ------------------------------------------------------------------ */
-/* Opsi select yang dipakai berulang                                   */
+/* Reused select options                                               */
 /* ------------------------------------------------------------------ */
 
 export const FONT_WEIGHT_OPTIONS: SelectOption<number>[] = [
@@ -295,7 +295,7 @@ export const EASING_OPTIONS: SelectOption<string>[] = [
   "linear",
 ].map((e) => ({ value: e, label: e }));
 
-/** Opsi dengan label i18n lewat getter — selalu mengikuti bahasa aktif saat dibaca. */
+/** Options with i18n labels via a getter; always in the active language when read. */
 export function tOption<V extends string | number>(value: V, key: string): SelectOption<V> {
   return {
     value,

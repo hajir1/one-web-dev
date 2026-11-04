@@ -112,7 +112,7 @@ test("vr model: jenis berkas dicek dari isi", () => {
   assert.equal(sniffVrMedia(b(0x3c, 0x73, 0x76, 0x67)), "unknown", "SVG/HTML ditolak");
 });
 
-/* ------------------------------ ekspor ------------------------------ */
+/* ------------------------------ export ------------------------------ */
 
 test("vr ekspor: A-Frame dari CDN (versi dikunci, MIT) dipasang sekali di <head>", () => {
   assert.equal(AFRAME.license, "MIT");
@@ -160,7 +160,7 @@ test("vr pratinjau 1 berkas: semua media ditanam sebagai data URL, tanpa assets/
     { id: "m-unused", kind: "png" as const, blob: new Blob(["x"]) },
   ];
   assert.equal(await blobToDataUrl(media[0].blob, "image/jpeg"), "data:image/jpeg;base64,/9j/AA==");
-  // Berkas besar (lebih dari satu potongan base64) tetap utuh.
+  // Large files (more than one base64 chunk) stay intact.
   const big = new Uint8Array(100_000).map((_, i) => i % 251);
   assert.equal(await blobToDataUrl(new Blob([big]), "image/png"), "data:image/png;base64," + Buffer.from(big).toString("base64"));
   const html = await buildTourSingleHtml(t, media, "id");
@@ -170,7 +170,7 @@ test("vr pratinjau 1 berkas: semua media ditanam sebagai data URL, tanpa assets/
   assert.match(boot.media["m-a"], /^data:image\/jpeg;base64,/);
   assert.match(boot.media["m-b"], /^data:image\/webp;base64,/);
   assert.ok(!html.includes("assets/"));
-  // Catatan "perlu server web" hanya untuk ekspor ZIP (aset terpisah).
+  // The "needs a web server" note only applies to ZIP exports (separate assets).
   assert.match(RUNTIME_JS, /location\.protocol === "file:" && !\(window\.__VR_BOOT && window\.__VR_BOOT\.inline\)/);
   const zipHtml = buildTourHtml({ title: "T", lang: "id", boot: { tour: runtimeTour(t), media: {}, mode: "view" } });
   assert.ok(!zipHtml.includes('"inline"'));
@@ -191,7 +191,7 @@ test("vr pratinjau layar penuh: rute di luar layout, dibuka dari editor & daftar
   }
 });
 
-/* ------------------------- kredit, menu, docs ------------------------- */
+/* ------------------------- credits, menu, docs ------------------------- */
 
 test("vr kredit: Tur 360° Pro = item fitur 50 kredit (Rp50.000, rentang template Premium)", () => {
   const key = itemIdOf.feature(VR_PRO.id);

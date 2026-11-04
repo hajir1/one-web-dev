@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-/** useState yang diingat di localStorage (preferensi tampilan). Aman bila storage diblokir. */
+/** A useState remembered in localStorage (display preferences). Safe when storage is blocked. */
 export function usePersistentState<T>(key: string, initial: T, valid?: (v: unknown) => v is T) {
   const [value, setValue] = useState<T>(() => {
     try {

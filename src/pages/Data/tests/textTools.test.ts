@@ -46,7 +46,7 @@ test("regex", () => {
   const r = runRegex("(\\w+)@(?<dom>\\w+)", "", "x a@b y c@d");
   assert.equal(r.matches.length, 1);
   assert.deepEqual(runRegex("(\\w+)@(?<dom>\\w+)", "g", "x a@b y c@d").matches.map((m) => m.named.dom), ["b", "d"]);
-  assert.equal(runRegex("", "g", "ab").matches.length, 3); // kecocokan kosong tidak membuat loop tak hingga
+  assert.equal(runRegex("", "g", "ab").matches.length, 3); // empty matches do not cause an infinite loop
   assert.throws(() => runRegex("(", "g", "x"), { code: "regexInvalid" });
   assert.equal(regexReplace("(\\w+)@(\\w+)", "g", "a@b", "$2 at $1"), "b at a");
 });

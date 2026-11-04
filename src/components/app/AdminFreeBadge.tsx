@@ -1,18 +1,18 @@
 // ─── components/app/AdminFreeBadge.tsx ───────────────────────────────────────
-// v6: penanda "Admin: tanpa kredit". Status berasal dari profil sesi backend
-// (`adminFree`), bukan dari pilihan pengguna; badge hanya informasi.
+// v6: "Admin: no credits" indicator. The status comes from the backend session profile
+// (`adminFree`), not from a user choice; the badge is informational only.
 
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, ShieldAlert } from "lucide-react";
 import { useSession } from "../../auth/session";
 import { Link } from "./LocaleLink";
 
-/** true = sesi admin tervalidasi; semua fitur tanpa kredit. */
+/** true = validated admin session; every feature without credits. */
 export const useAdminFree = () => useSession((s) => s.user?.adminFree === true);
-/** true = admin yang sesinya belum lolos 2FA. */
+/** true = admin whose session has not passed 2FA yet. */
 const useAdminFreePending = () => useSession((s) => s.user?.adminFreePendingMfa === true);
 
-/** Badge kecil (header, kartu akses). Tidak dirender untuk pengguna biasa. */
+/** Small badge (header, access card). Not rendered for regular users. */
 export function AdminFreeBadge({ compact = false, className = "" }: { compact?: boolean; className?: string }) {
   const { t } = useTranslation();
   const free = useAdminFree();
@@ -35,7 +35,7 @@ export function AdminFreeBadge({ compact = false, className = "" }: { compact?: 
   return free ? body : <Link to="/admin">{body}</Link>;
 }
 
-/** Kotak penjelasan (halaman Credits, dialog beli). */
+/** Explanation box (Credits page, buy dialog). */
 export function AdminFreeNotice({ className = "" }: { className?: string }) {
   const { t } = useTranslation();
   const free = useAdminFree();

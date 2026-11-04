@@ -2,8 +2,8 @@ import type { Chapter, MotionSpec, Pose, ScreenMode } from "./motion3d";
 import type { ObjectKind } from "./motionObjects";
 
 /* ================================================================== */
-/* Isi 8 template 3D Motion (v18). Semua nama, angka, dan kontak fiktif. */
-/* Alur bab sama: hero → biodata kode → kalimat → kartu → angka → kontak.*/
+/* Content of the 8 3D Motion templates (v18). All names, numbers, and contacts are fictional. */
+/* Same chapter flow: hero → bio code → statement → cards → numbers → contact.*/
 /* ================================================================== */
 
 type V3 = [number, number, number];
@@ -14,7 +14,7 @@ function p(pos: V3, rot: V3, s: number, screen?: ScreenMode, st?: Record<string,
   return { cam, look, pos, rot, s, screen, st };
 }
 
-/** Pose per bab untuk tiap objek (urutan: hero, kode, kalimat, kartu, angka, kontak). */
+/** Pose per chapter for each object (order: hero, code, sentence, cards, numbers, contact). */
 const POSES: Record<ObjectKind, Pose[]> = {
   monitor: [
     p([2.4, -0.1, 0], [0.12, -0.5, 0], 0.8, "logo", { glow: 0, keys: 0 }),
@@ -91,7 +91,7 @@ interface Story {
   contact: { nav: string; kicker: string; title: string; body: string };
 }
 
-/** Susun 6 bab standar dari cerita + pose objek. */
+/** Build the 6 standard chapters from the story + object poses. */
 function chapters(obj: ObjectKind, s: Story): Chapter[] {
   const P = POSES[obj];
   return [

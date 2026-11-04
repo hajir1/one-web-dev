@@ -28,17 +28,17 @@ import {
 } from "./projectExport";
 
 /* ================================================================== */
-/* Pratinjau & ekspor WEBSITE (satu folder = satu proyek)               */
+/* WEBSITE preview & export (one folder = one project)                  */
 /*                                                                    */
 /*   HTML    index.html (homepage) + <slug>.html, assets/<nama>.css/js  */
 /*   Blade   resources/views/pages/<slug>.blade.php + routes/web.php     */
 /*   React   src/pages/<slug>/…, src/App.jsx (react-router-dom)          */
 /*   Vue     src/pages/<slug>/…, src/router.js (vue-router), App.vue     */
-/*   Svelte  src/pages/<slug>/…, src/App.svelte (router hash bawaan)     */
+/*   Svelte  src/pages/<slug>/…, src/App.svelte (built-in hash router)   */
 /*   Angular src/app/pages/<slug>/…, app.routes.ts (@angular/router)     */
-/* Tiap halaman di-compose terpisah (class `page-<slug>`), jadi gaya,    */
-/* ID, Custom CSS/JS, dan komponen anak tiap halaman tidak bertabrakan.  */
-/* v7: setiap format = proyek lengkap siap jalan (package.json, README). */
+/* Each page is composed separately (class `page-<slug>`), so styles,   */
+/* IDs, Custom CSS/JS, and child components of each page do not collide. */
+/* v7: every format = a complete ready-to-run project (package.json, README). */
 /* ================================================================== */
 
 export interface SiteBuildOptions {
@@ -48,13 +48,13 @@ export interface SiteBuildOptions {
   allowPremiumEvents?: PremiumAllow;
   allowPremiumElements?: PremiumAllow;
   /**
-   * Izin elemen premium PER HALAMAN (mis. item bawaan template hanya berlaku
-   * di desain dari template itu). Bila ada, menggantikan `allowPremiumElements`.
+   * Premium element permission PER PAGE (e.g. a template's built-in items only apply
+   * in designs from that template). When present, it replaces `allowPremiumElements`.
    */
   allowPremiumElementsFor?: (doc: PageDoc) => PremiumAllow;
-  /** Sama seperti `allowPremiumElementsFor`, untuk event Premium. */
+  /** Same as `allowPremiumElementsFor`, for Premium events. */
   allowPremiumEventsFor?: (doc: PageDoc) => PremiumAllow;
-  /** v7: variabel global (lihat cssVars.ts). */
+  /** v7: global variables (see cssVars.ts). */
   vars?: CssVar[];
 }
 
@@ -63,15 +63,15 @@ export interface BuiltPage {
   slug: string;
   title: string;
   isHome: boolean;
-  /** Nama berkas HTML tanpa ekstensi ("index" untuk homepage). */
+  /** HTML file name without extension ("index" for the home page). */
   file: string;
   rootClass: string;
   composed: Composed;
-  /** v10: SEO halaman dari folder website. */
+  /** v10: page SEO from the website folder. */
   seo?: PageSeo;
   /**
-   * Uji coba halaman item: satu salinan halaman per item koleksi
-   * (ekspor HTML: <dir>/<slug>.html). Kosong untuk halaman biasa.
+   * Item page preview: one copy of the page per collection item
+   * (HTML export: <dir>/<slug>.html). Empty for regular pages.
    */
   items?: { dir: string; slug: string; title: string; composed: Composed }[];
 }
@@ -108,7 +108,7 @@ export function buildSite(site: SavedDesign, designs: SavedDesign[], opts: SiteB
   };
 
   const docs = new Map(available.map((p) => [p.designId, normalizePageDoc(p.design!.state)]));
-  /** Koleksi data di semua halaman (untuk halaman item). */
+  /** Data collections across every page (for item pages). */
   const cols = [...docs.values()].flatMap((d) => collectionsIn(d.root).map((r) => r.col));
   const pages: BuiltPage[] = available.map((p) => {
     const isHome = p.designId === homeId;
@@ -125,7 +125,7 @@ export function buildSite(site: SavedDesign, designs: SavedDesign[], opts: SiteB
         allowPremiumElements: opts.allowPremiumElementsFor ? opts.allowPremiumElementsFor(pageDoc) : opts.allowPremiumElements,
         site: { sites: [info], currentDesignId: p.designId, routing: "site" },
       });
-    // Halaman item: data koleksi terbaru dari halaman lain ikut dipakai.
+    // Item pages: the latest collection data from other pages is used too.
     const root = itemCollectionsUsed(pageDoc.root).length ? syncItemPage(pageDoc.root, cols) : pageDoc.root;
     const composed = composeRoot(root);
     for (const w of composed.warnings) warnings.push(`${p.title}: ${w.message}`);
@@ -137,34 +137,34 @@ export function buildSite(site: SavedDesign, designs: SavedDesign[], opts: SiteB
     return { designId: p.designId, slug: p.slug, title: p.title, isHome, file: isHome ? "index" : p.slug, rootClass, composed, ...(p.seo ? { seo: p.seo } : {}), ...(items?.length ? { items } : {}) };
   });
   const home = pages.find((p) => p.isHome) ?? null;
-  // Homepage didahulukan di routing.
+  // The homepage comes first in routing.
   const ordered = home ? [home, ...pages.filter((p) => p !== home)] : pages;
 
   return { info, pages, home, warnings, files: (fw: Framework) => projectFiles(fw, site.name, ordered, { seo: doc.seo ?? {} }) };
 }
 
-/** Nama dasar zip website, mis. "website-kopi-senja". */
+/** Website zip base name, e.g. "website-kopi-senja". */
 export const siteZipName = (name: string) => `website-${name}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "website";
 
-/** Bungkus hasil compose satu desain menjadi "situs" satu halaman (ekspor proyek Desain Halaman). */
+/** Wraps one design's compose output into a single-page "site" (Page Design project export). */
 export function singlePage(composed: Composed, title: string): BuiltPage {
   return { designId: "", slug: "home", title, isHome: true, file: "index", rootClass: composed.rootClass, composed };
 }
 
-/** CSS global proyek: pemuat font (@import harus paling atas) + variabel :root + reset dasar. */
+/** Project global CSS: font loaders (@import must come first) + :root variables + base reset. */
 function projectGlobalCss(pages: readonly BuiltPage[]): string {
   const uniq = (xs: string[]) => [...new Set(xs.map((x) => x.trim()).filter(Boolean))];
   return [...uniq(pages.map((p) => p.composed.fontLoaders)), ...uniq(pages.map((p) => p.composed.varsCss)), BASE_RESET].join("\n\n") + "\n";
 }
 
 /**
- * Berkas proyek siap jalan (v7) untuk satu format. `ordered` = halaman dengan
- * beranda di depan. Tiap halaman di-compose terpisah; kerangka proyek
- * (package.json, router, README, CSS global) dari projectExport.ts.
+ * Ready-to-run project files (v7) for one format. `ordered` = pages with the
+ * home page first. Each page is composed separately; the project skeleton
+ * (package.json, router, README, global CSS) comes from projectExport.ts.
  */
 export function projectFiles(fw: Framework, siteName: string, ordered: readonly BuiltPage[], site?: { seo: SiteSeo }): GeneratedFile[] {
-  // v10: SEO hanya untuk ekspor folder website (Desain Halaman tetap seperti sebelumnya).
-  // Halaman tanpa deskripsi SEO → deskripsi otomatis dari paragraf pertamanya.
+  // v10: SEO only for website folder exports (Page Design stays as before).
+  // Pages without an SEO description → an automatic description from their first paragraph.
   const seo: ResolvedSeo[] | null = site
     ? ordered.map((p) => {
         const r = resolveSeo(siteName, site.seo, p, fw);
@@ -182,10 +182,10 @@ export function projectFiles(fw: Framework, siteName: string, ordered: readonly 
       ? { headTitle: homeSeo.title, headExtra: [seoMetaTags(homeSeo, siteName, lang), websiteJsonLd(siteName, site!.seo)].filter(Boolean).join("\n") }
       : {}),
   };
-  /** robots.txt + sitemap.xml di folder publik format ini. */
+  /** robots.txt + sitemap.xml in this format's public folder. */
   const seoFiles = (dir: string): GeneratedFile[] => {
     if (!seo || !site) return [];
-    // Tanpa <lastmod>: hasil ekspor tetap identik untuk desain yang sama (sidik jari ekspor).
+    // No <lastmod>: the export stays identical for the same design (export fingerprint).
     const map = sitemapXml(seo);
     return [
       { name: `${dir}robots.txt`, lang: "text", content: robotsTxt(site.seo) },
@@ -196,13 +196,13 @@ export function projectFiles(fw: Framework, siteName: string, ordered: readonly 
 
   if (fw === "html") {
     const out: GeneratedFile[] = [];
-    // Font Google: dari @import CSS (berantai, memblokir render) → <link> di <head> + preconnect.
+    // Google fonts: from CSS @import (chained, render-blocking) → <link> in <head> + preconnect.
     const globalFonts = splitFontImports(ctx.globalCss);
     for (const p of ordered) {
       const h = { ...p.composed.html };
       const pageFonts = splitFontImports(h.css);
       h.css = pageFonts.css;
-      // Aksesibilitas: tautan "Lewati ke konten" ke <main> (pengguna keyboard/pembaca layar).
+      // Accessibility: a "Skip to content" link to <main> (keyboard/screen reader users).
       h.body = withSkipLink(h.body, lang);
       const fontHead = fontHeadTags([...globalFonts.urls, ...pageFonts.urls]);
       out.push({
@@ -229,11 +229,11 @@ ${indent(h.body, 2)}${libraryScripts(p.composed.libraries) ? `\n${indent(library
       });
       out.push({ name: `assets/${p.file}.css`, lang: "css", content: h.css });
       if (h.script) out.push({ name: `assets/${p.file}.js`, lang: "js", content: h.script.trim() + "\n" });
-      // Uji coba halaman item: satu berkas statis per item (<koleksi>/<slug>.html).
+      // Item page preview: one static file per item (<collection>/<slug>.html).
       const page = out[out.length - (h.script ? 3 : 2)].content;
       for (const it of p.items ?? []) {
         const v = { ...it.composed.html, css: splitFontImports(it.composed.html.css).css, body: withSkipLink(it.composed.html.body, lang) };
-        // Hanya komentar nama elemen yang berbeda → pakai CSS halaman.
+        // Only the element name comments differ → use the page CSS.
         const bare = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");
         const ownCss = bare(v.css) !== bare(h.css);
         let html = page
@@ -274,14 +274,14 @@ ${indent(h.body, 2)}${libraryScripts(p.composed.libraries) ? `\n${indent(library
   const pageFiles = ordered.flatMap((p) =>
     p.composed.files(fw).map((f) => {
       let content = f.lang === "css" ? f.content : rewritePageLinks(f.content, ctx.pages, linkMode);
-      // Komponen halaman Angular dipakai langsung oleh router → harus standalone.
+      // Angular page components are used directly by the router → they must be standalone.
       if (fw === "angular" && f.name === `${toKebab(toPascal(p.rootClass))}.component.ts` && !content.includes("standalone: true"))
         content = content.replace(/(selector: '[^']+',)/, "$1\n  standalone: true,");
       return { ...f, name: `${prefix}/${p.slug}/${f.name}`, content };
     }),
   );
   const name = (p: BuiltPage) => toPascal(p.rootClass);
-  // Urutan berkas: halaman dulu (ditampilkan pertama di panel kode), lalu router/entry, kerangka, README.
+  // File order: pages first (shown first in the code panel), then router/entry, skeleton, README.
   const scaffold = (files: GeneratedFile[]) => {
     const readme = files.filter((f) => f.name === "README.md");
     return { head: files.filter((f) => f.name !== "README.md"), readme };
@@ -294,7 +294,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { initLibraries } from "./initLibraries";${seo ? `\nimport { applySeo } from "./seo";` : ""}
 ${ordered.map((p) => `import ${name(p)} from "./pages/${p.slug}/${name(p)}";`).join("\n")}
 
-/** Gulir ke atas & jalankan ulang library CDN setiap pindah halaman. */
+/** Scroll to top & re-run CDN libraries on every page change. */
 function RouteEffects() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -347,7 +347,7 @@ ${ordered.map((p) => `    { path: "${p.isHome ? "/" : `/${p.slug}`}", component:
   ],
 });
 
-// Jalankan ulang library CDN setelah halaman baru dirender.
+// Re-run CDN libraries after the new page has rendered.
 router.afterEach((${seo ? "to" : ""}) => {${seo ? "\n  applySeo(to.path);" : ""}
   nextTick(() => initLibraries());
 });
@@ -377,7 +377,7 @@ export default router;
   import { initLibraries } from "./initLibraries.js";${seo ? `\n  import { applySeo } from "./seo.js";` : ""}
 ${ordered.map((p) => `  import ${name(p)} from "./pages/${p.slug}/${name(p)}.svelte";`).join("\n")}
 
-  // Router hash sederhana (Svelte tidak punya router bawaan): #/ , #/slug
+  // Simple hash router (Svelte has no built-in router): #/ , #/slug
   const routes = {
 ${ordered.map((p) => `    "${p.isHome ? "/" : `/${p.slug}`}": ${name(p)},`).join("\n")}
   };
@@ -441,10 +441,10 @@ import { initLibraries } from './init-libraries';${seo ? "\nimport { applySeo } 
 })
 export class AppComponent {
   constructor(router: Router) {
-    // Jalankan ulang library CDN setiap pindah halaman.
+    // Re-run CDN libraries on every page change.
     router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(${
       seo
-        ? `(e) => {\n      // Judul & meta SEO per halaman (setelah TitleStrategy Angular).\n      setTimeout(() => applySeo((e as NavigationEnd).urlAfterRedirects.split(/[?#]/)[0] || '/'));\n      setTimeout(() => initLibraries());\n    }`
+        ? `(e) => {\n      // Per-page SEO title & meta (after Angular's TitleStrategy).\n      setTimeout(() => applySeo((e as NavigationEnd).urlAfterRedirects.split(/[?#]/)[0] || '/'));\n      setTimeout(() => initLibraries());\n    }`
         : "() => setTimeout(() => initLibraries())"
     });
   }
@@ -467,7 +467,7 @@ export class AppComponent {
 
 const FONT_IMPORT = /^@import url\("(https:\/\/fonts\.googleapis\.com\/[^"]+)"\);?[ \t]*\n?/gm;
 
-/** Pisahkan @import Google Fonts dari CSS (untuk dijadikan <link> di <head>). */
+/** Separates Google Fonts @import lines from the CSS (to turn them into <link>s in <head>). */
 export function splitFontImports(css: string): { css: string; urls: string[] } {
   const urls: string[] = [];
   const rest = css.replace(FONT_IMPORT, (_m, url: string) => {
@@ -479,7 +479,7 @@ export function splitFontImports(css: string): { css: string; urls: string[] } {
 
 const attrEsc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
-/** preconnect + stylesheet Google Fonts (unik); "" bila tidak ada font pustaka. */
+/** Google Fonts preconnect + stylesheet (unique); "" when there are no library fonts. */
 export function fontHeadTags(urls: readonly string[]): string {
   const uniq = [...new Set(urls)];
   if (!uniq.length) return "";
@@ -490,7 +490,7 @@ export function fontHeadTags(urls: readonly string[]): string {
   ].join("\n");
 }
 
-/** Favicon SVG sederhana: huruf pertama nama situs (cegah 404 /favicon.ico). */
+/** Simple SVG favicon: the first letter of the site name (prevents a 404 on /favicon.ico). */
 export function faviconSvg(siteName: string): string {
   const ch = (siteName.trim().match(/[\p{L}\p{N}]/u)?.[0] ?? "W").toUpperCase();
   const x = ch.replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -499,7 +499,7 @@ export function faviconSvg(siteName: string): string {
 
 /* ------------------------------ skip link ------------------------------- */
 
-export const SKIP_LINK_CSS = `/* Tautan "Lewati ke konten": tersembunyi sampai difokus dengan keyboard */
+export const SKIP_LINK_CSS = `/* "Skip to content" link: hidden until focused with the keyboard */
 .owd-skip {
   position: absolute;
   left: 12px;
@@ -518,7 +518,7 @@ export const SKIP_LINK_CSS = `/* Tautan "Lewati ke konten": tersembunyi sampai d
   outline-offset: 2px;
 }`;
 
-/** Tambah tautan skip di awal body dan id pada <main> pertama (bila ada <main>). */
+/** Adds a skip link at the start of the body and an id on the first <main> (when there is a <main>). */
 export function withSkipLink(body: string, lang: "id" | "en"): string {
   const m = /<main\b([^>]*)>/i.exec(body);
   if (!m || body.includes('class="owd-skip"')) return body;

@@ -11,16 +11,16 @@ import { V9I_CATALOG } from "../pages/webTemplates/templates/v9/catalogI";
 import { V10J_CATALOG } from "../pages/webTemplates/templates/v10/catalogJ";
 
 /* ================================================================== */
-/* Katalog Web Templates (metadata) — konten tiap template ada di        */
-/* pages/webTemplates/templates/. Nama & deskripsi tampil di locales:    */
+/* Web Templates catalog (metadata); each template's content lives in    */
+/* pages/webTemplates/templates/. Names & descriptions shown via locales: */
 /* templates.items.<id>.{name,description}.                             */
 /*                                                                    */
-/* - tier "free"    : langsung bisa dipakai (tanpa pembelian).          */
-/* - tier "premium" : pratinjau bebas; unduh & edit setelah template     */
-/*   dibeli (simulasi lokal di tahap ini, lihat src/marketplace/).       */
+/* - tier "free"    : usable right away (no purchase).                  */
+/* - tier "premium" : free preview; download & edit after the template   */
+/*   purchased (local simulation at this stage, see src/marketplace/).  */
 /*                                                                    */
-/* Harga: Free = 0 kredit, Premium = 3 kredit per halaman + bonus      */
-/* kualitas 0–2 (lihat marketplace/templatePricing.ts).                 */
+/* Price: Free = 0 credits, Premium = 3 credits per page + a           */
+/* quality bonus of 0–2 (see marketplace/templatePricing.ts).           */
 /* ================================================================== */
 
 export type TemplateCategory =
@@ -102,7 +102,7 @@ export type TemplateCategory =
   | "driving"
   | "repair"
   | "garden"
-  // v16: Template Kode (bagian J)
+  // v16: Code Templates (part J)
   | "invitation"
   | "animation";
 
@@ -110,17 +110,17 @@ export type TemplateTier = "free" | "premium";
 
 export interface TemplateMeta {
   id: string;
-  /** Naik bila isi template berubah (disimpan di website hasil edit). */
+  /** Bumped when template content changes (stored in edited websites). */
   version: number;
   category: TemplateCategory;
   tier: TemplateTier;
-  /** Harga dalam kredit (Free = TEMPLATE_PRICE.free). */
+  /** Price in credits (Free = TEMPLATE_PRICE.free). */
   price: number;
-  /** Warna aksen kartu katalog. */
+  /** Catalog card accent color. */
   accent: string;
-  /** Kata kunci pencarian tambahan (bahasa netral). */
+  /** Extra search keywords (language neutral). */
   tags: string[];
-  /** Label "Terbaru": hanya template di LATEST_TEMPLATE_IDS (unggahan terakhir), diatur otomatis di bawah. */
+  /** "Latest" label: only templates in LATEST_TEMPLATE_IDS (the last upload), set automatically below. */
   isNew?: boolean;
 }
 
@@ -149,57 +149,99 @@ const RAW_TEMPLATE_CATALOG: TemplateMeta[] = [
   { id: "professional-lexa", version: 2, category: "professional", tier: "premium", price: 35, accent: "#b8860b", tags: ["hukum", "law", "konsultan"] },
   { id: "creative-studio", version: 2, category: "creative", tier: "premium", price: 55, accent: "#ec4899", tags: ["studio", "branding", "motion"] },
   { id: "community-kita", version: 2, category: "community", tier: "premium", price: 20, accent: "#7c3aed", tags: ["komunitas", "meetup", "member"] },
-  // Rilis katalog v2: 50 template (2 Free + 48 Premium), 4–10 halaman.
+  // Catalog release v2: 50 templates (2 Free + 48 Premium), 4–10 pages.
   ...V2A_CATALOG,
   ...V2B_CATALOG,
   ...V3C_CATALOG,
   ...V3D_CATALOG,
-  // Rilis katalog v4: 20 template (1 Free + 19 Premium), sebagian memakai elemen Chart.
+  // Catalog release v4: 20 templates (1 Free + 19 Premium), some using the Chart element.
   ...V4E_CATALOG,
-  // Rilis katalog v5: 10 template (1 Free + 9 Premium) dengan section Lebar Penuh & Spesialisasi.
+  // Catalog release v5: 10 templates (1 Free + 9 Premium) with Full Width & Specialty sections.
   ...V5F_CATALOG,
-  // Rilis katalog v6: 100 template (bagian G) dari spesifikasi data, 3–8 halaman.
+  // Catalog release v6: 100 templates (part G) from the data spec, 3–8 pages.
   ...V6G_CATALOG,
-  // Rilis katalog v7: 100 template dashboard (bagian H) + kategori Dashboard.
+  // Catalog release v7: 100 dashboard templates (part H) + Dashboard category.
   ...V7H_CATALOG,
-  // Rilis katalog v9: template Premium 3D & animasi (bagian I), 60–300 kredit.
+  // Catalog release v9: Premium 3D & animation templates (part I), 60–300 credits.
   ...V9I_CATALOG,
-  // Rilis katalog v10: template 3D + efek scroll (bagian J), dibuat per batch.
+  // Catalog release v10: 3D + scroll effect templates (part J), made in batches.
   ...V10J_CATALOG,
 ];
 
 /* ------------------------------------------------------------------ */
-/* Label "Terbaru" + urutan teratas                                     */
+/* "Newest" label + top ordering                                        */
 /*                                                                    */
-/* Hanya unggahan TERAKHIR yang berlabel "Terbaru", dan template itu    */
-/* tampil paling atas di urutan "Unggulan" (katalog, demo, seed backend */
-/* lewat sortOrder). Saat batch baru diunggah, ganti isi daftar ini;    */
-/* label lama otomatis hilang. Berlaku juga untuk Template Kode.        */
+/* Only the LAST upload is labeled "Latest", and those templates         */
+/* appear at the top of the "Featured" order (catalog, demo, backend seed */
+/* via sortOrder). When a new batch is uploaded, replace this list;      */
+/* old labels disappear automatically. Also applies to Code Templates.  */
 /* ------------------------------------------------------------------ */
-export const LATEST_TEMPLATE_IDS: readonly string[] = V10J_CATALOG.map((t) => t.id);
+/* v29 upload: 15 3D scroll stories, 15 invitations, 10 pure CSS animations (Code Templates). */
+export const LATEST_TEMPLATE_IDS: readonly string[] = [
+  "story-benang-rajut",
+  "story-sawah-terasering",
+  "story-seribu-bangau",
+  "story-senar-gitar",
+  "story-lilin-aroma",
+  "story-ombak-selancar",
+  "story-pizza-tungku",
+  "story-satelit-jaringan",
+  "story-sepeda-lembah",
+  "story-kotak-musik",
+  "story-teh-kebun",
+  "story-jahit-busana",
+  "story-kompas-properti",
+  "story-daur-kertas",
+  "story-cat-sanggar",
+  "undangan-nikah-segel-lilin",
+  "undangan-nikah-lensa-kamera",
+  "undangan-ultah-60-lampion",
+  "undangan-reuni-kalender-sobek",
+  "undangan-tujuh-bulan-anyaman",
+  "undangan-nikah-candi-bentar",
+  "undangan-wisuda-ubin-balik",
+  "undangan-rumah-jendela-kayu",
+  "undangan-ultah-anak-kue-lapis",
+  "undangan-khitanan-balon-letus",
+  "undangan-nikah-kartu-pos",
+  "undangan-ultah-30-kaca-pecah",
+  "undangan-aqiqah-tetes-madu",
+  "undangan-lamaran-surat-lipat",
+  "undangan-nikah-tirai-manik",
+  "anim-css-matahari-terbit",
+  "anim-css-kincir-angin",
+  "anim-css-kapal-kertas",
+  "anim-css-roket-luncur",
+  "anim-css-kebun-bunga",
+  "anim-css-api-unggun",
+  "anim-css-lampu-kota",
+  "anim-css-pesawat-spanduk",
+  "anim-css-mesin-ketik",
+  "anim-css-orbit-planet",
+];
 const LATEST = new Set(LATEST_TEMPLATE_IDS);
 export const isLatestTemplate = (id: string): boolean => LATEST.has(id);
 
-/** Taruh template terbaru paling atas (urutan di LATEST_TEMPLATE_IDS), sisanya tetap urutan semula. */
+/** Puts the latest templates on top (in LATEST_TEMPLATE_IDS order); the rest keep their original order. */
 export function latestFirst<T extends { id: string }>(list: readonly T[]): T[] {
   const rank = (id: string) => (LATEST.has(id) ? LATEST_TEMPLATE_IDS.indexOf(id) : LATEST_TEMPLATE_IDS.length);
   return list.map((t, i) => ({ t, i })).sort((a, b) => rank(a.t.id) - rank(b.t.id) || a.i - b.i).map((x) => x.t);
 }
 
-/** Urutan sortOrder seed backend: terbaru jauh di depan, lalu urutan asli `index`. */
+/** Backend seed sortOrder: latest far ahead, then the original `index` order. */
 export const latestSortOrder = (id: string, index: number): number => (LATEST.has(id) ? LATEST_TEMPLATE_IDS.indexOf(id) - 1_000_000 : index);
 
-/** Urutan sumber tetap (tes & ID lama bergantung padanya); urutan tampil diatur latestFirst/latestSortOrder. */
+/** Source order stays fixed (tests & old IDs depend on it); display order is set by latestFirst/latestSortOrder. */
 export const TEMPLATE_CATALOG: TemplateMeta[] = RAW_TEMPLATE_CATALOG.map((t) => ({ ...t, isNew: LATEST.has(t.id) }));
 
-/** @deprecated Harga kini per template (`TemplateMeta.price`). Dipertahankan untuk kompatibilitas. */
+/** @deprecated Prices are now per template (`TemplateMeta.price`). Kept for compatibility. */
 export const PREMIUM_TEMPLATE_COST = 12;
 
-/** Urutan kategori di filter katalog. */
+/** Category order in the catalog filter. */
 export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
-  // v7: kategori Dashboard di urutan pertama.
+  // v7: Dashboard category first.
   "dashboard",
-  // v16: Template Kode (undangan digital & animasi desain).
+  // v16: Code Templates (digital invitations & design animations).
   "invitation",
   "animation",
   "company",

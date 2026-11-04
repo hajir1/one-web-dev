@@ -1,14 +1,14 @@
 /* ================================================================== */
-/* Runtime elemen 3D (v9) — satu sumber untuk pratinjau & semua ekspor  */
+/* 3D element runtime (v9): one source for the preview & every export   */
 /*                                                                    */
-/* Three.js 0.186.1 (MIT, versi dikunci) dimuat lewat import() dinamis  */
-/* dari jsDelivr HANYA saat elemen 3D mendekati layar. Render dijeda    */
-/* saat elemen tidak terlihat / tab disembunyikan, pixel ratio dibatasi, */
-/* jumlah titik dikurangi di HP, dan gambar statis tetap tampil bila     */
-/* WebGL tidak tersedia. Kartu 3D memakai CSS saja (tanpa Three.js).    */
+/* Three.js 0.186.1 (MIT, pinned version) is loaded via dynamic import() */
+/* from jsDelivr ONLY when a 3D element approaches the screen. Rendering pauses */
+/* while the element is not visible / the tab is hidden, the pixel ratio is capped, */
+/* the point count is reduced on phones, and the static image still shows when */
+/* WebGL is not available. The 3D card uses CSS only (no Three.js).     */
 /*                                                                    */
-/* Ditulis sebagai JavaScript biasa (tanpa backtick) supaya bisa        */
-/* disisipkan apa adanya ke script.js (HTML) dan berkas owd3d.js /      */
+/* Written as plain JavaScript (no backticks) so it can be               */
+/* inserted as is into script.js (HTML) and the owd3d.js /               */
 /* owd-3d.ts (React, Vue, Svelte, Angular).                             */
 /* ================================================================== */
 
@@ -20,7 +20,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
   var VERSION = "0.186.1";
   var BASE = "https://cdn.jsdelivr.net/npm/three@" + VERSION;
   var URLS = { core: BASE + "/+esm", gltf: BASE + "/examples/jsm/loaders/GLTFLoader.js/+esm" };
-  // Peta daratan 128×64 (1 bit per sel) dari Natural Earth 110m (domain publik) lewat world-atlas (ISC).
+  // 128×64 land map (1 bit per cell) from Natural Earth 110m (public domain) via world-atlas (ISC).
   var LAND = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+AH/AAAAAAAAAAAAAAAAwH///wHAAwAABgAAAAAAYAAO//8BIAAAADAAAAAAAAAAA/D/AQAAEIB/AAAAAADYdz/w/wAAAAz//z8cAOD/P8nlwH8AwB9A+////+/v////weMHBvCv////////yP///8DBAQB4/////////+D3/z9wAAEAPP//////fxwAA/9/4AMAQDD+/////wMDAAD8//cHAOCI//////+AAwAA+P/3DwDA////////BwAAAPj//xgAgP///////wcAAADw//8HAID/3/n///8FAAAA8P9/AACg18P9////DAAAAPD/PwAA4KD/+///PwAAAADw/x8AAOAQ//n//zMCAAAA4P8fAADAD+D///+jAwAAAMD/BwAA4J/w////RwAAAAAAvwQAAPD///3//wcAAAAAAB4YAAD4/+/7//8HAAAAAAAcAAAA/P/fD///AwAAAAAAGBEAAPz/3x9+PgAAAAAAALhRAQD8/78PPDwAAAAAAACAAwAA/P+/Awx4AAAAAAAAAAIAAPz//wAIeAAAAAAAAACkAwD4//8DCCAAAAAAAAAA8AcA8P//AxAIEAAAAAAAAPA/AAD4/wEAFAIAAAAAAADwPwAA+P8AAIgzAAAAAAAA+P8AAPh/AACQjQAAAAAAAPj/BwDwPwAAMAgPAAAAAADw/w8A4D8AAMAADgAAAAAA8P8HAOA/AAAABBAAAAAAAOD/AwDgPwIAAMAFAAAAAADg/wMA8D8CAADwDAAAAAAAgP8DAPAfAwAA+A8AAAAAAID/AQDgDwEAAP4fAAAAAACA/wAA4B8BAAD/PwAAAAAAgH8AAOAPAAAA/z8AAAAAAIA/AADABwAAAP5/AAAAAACAHwAAwAMAAAAePwAAAAAAwA8AAAAAAAAAAD4AAAAAAMAPAAAAAAAAAAAUQAAAAADAAwAAAAAAAAAACEAAAAAAwAEAAAAAAAAAAAAQAAAAAOAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAQAAAAAAAAAA4AQAAAAAAAAAAAAAAAAAAIABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAIABABAAAAAAAAAAEAAACQ//H//38AAAAAAOADAPD////+////HwCA//H/AwD8/////////wcA////HwDg//////////8DAPD//x/kwP//////////AQD8////9////////////wf//////////////////////////////////////////w==";
   var dynImport = function (u) { return import(/* @vite-ignore */ u); };
   var noop = function () {};
@@ -47,14 +47,14 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       return "";
     }
   }
-  /** Warna: hex/rgb biasa atau var(--x) dari variabel global. */
+  /** Color: plain hex/rgb or var(--x) from a global variable. */
   function color(host, v, d) {
     if (!v) return d;
     var m = /^var\((--[\w-]+)\)$/.exec(String(v).trim());
     if (m) return cssVar(host, m[1]) || d;
     return v;
   }
-  /** Pengaturan efektif: nilai elemen, atau Pengaturan Global (--owd-3d-*). */
+  /** Effective settings: the element's value, or Global Settings (--owd-3d-*). */
   function settings(host, cfg) {
     var g = function (n) { return cssVar(host, "--owd-3d-" + n); };
     var q = cfg.quality && cfg.quality !== "global" ? cfg.quality : g("quality") || "auto";
@@ -101,7 +101,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     if (ctx.renderer.forceContextLoss) ctx.renderer.forceContextLoss();
     if (ctx.canvas.parentNode) ctx.canvas.parentNode.removeChild(ctx.canvas);
   }
-  /** Tekstur titik bulat lembut (tanpa berkas gambar). */
+  /** Soft round dot texture (no image file). */
   function dotTexture(T) {
     var c = document.createElement("canvas");
     c.width = c.height = 64;
@@ -141,7 +141,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     scene.add(rim);
   }
 
-  /** Seret untuk memutar (horizontal), gulir vertikal tetap jalan di HP. */
+  /** Drag to rotate (horizontal); vertical scrolling still works on phones. */
   function dragControl(ctx, onDrag) {
     var el = ctx.canvas, down = false, lx = 0, ly = 0;
     var start = function (e) { down = true; lx = e.clientX; ly = e.clientY; ctx.dragging = true; };
@@ -164,7 +164,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       window.removeEventListener("pointercancel", end);
     };
   }
-  /** Posisi kursor relatif host (-1..1), untuk efek "mengikuti kursor". */
+  /** Cursor position relative to the host (-1..1), for the "follow the cursor" effect. */
   function hoverControl(ctx, target) {
     var host = ctx.host;
     var move = function (e) {
@@ -190,7 +190,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     obj.position.sub(center.multiplyScalar(k));
   }
 
-  /* ---------------- 1. Produk berputar ---------------- */
+  /* ---------------- 1. Spinning product ---------------- */
 
   var PROFILES = {
     bottle: [[0, 0], [0.4, 0], [0.46, 0.06], [0.46, 1.05], [0.42, 1.22], [0.2, 1.42], [0.17, 1.6], [0, 1.6]],
@@ -200,11 +200,11 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     vase: [[0, 0], [0.3, 0], [0.34, 0.04], [0.52, 0.38], [0.6, 0.68], [0.52, 0.98], [0.3, 1.24], [0.21, 1.42], [0.24, 1.56], [0.31, 1.62], [0.29, 1.66], [0.18, 1.6], [0.16, 1.4], [0, 1.4]],
     lens: [[0, 0], [0.5, 0], [0.5, 0.14], [0.56, 0.14], [0.56, 0.5], [0.5, 0.5], [0.5, 0.58], [0.6, 0.58], [0.6, 1.04], [0.66, 1.04], [0.66, 1.22], [0.58, 1.22], [0, 1.22]]
   };
-  /* v26: model non-putar (bukan LatheGeometry). */
+  /* v26: non-lathe models (not LatheGeometry). */
   function extraModel(T, model, mat, body, accent, seg) {
     var g = new T.Group(), m;
     if (model === "massing") {
-      // Maket arsitektur: massa bangunan putih di atas pelat tapak.
+      // Architectural model: white building masses on a site plate.
       var plate = new T.Mesh(new T.BoxGeometry(2.4, 0.08, 1.7), mat(accent, 0.8));
       g.add(plate);
       [[-0.7, 0.9, -0.3, 0.7, 0.6], [0.05, 0.5, -0.35, 0.8, 0.5], [0.15, 1.5, 0.35, 0.5, 0.5], [0.75, 0.7, 0.2, 0.5, 0.9], [-0.55, 0.35, 0.45, 0.8, 0.45]].forEach(function (b) {
@@ -218,7 +218,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       return g;
     }
     if (model === "kite") {
-      // Layangan wajik: kertas, dua bilah bambu, dan ekor pita.
+      // Diamond kite: paper, two bamboo sticks, and a ribbon tail.
       var sh = new T.Shape();
       sh.moveTo(0, 1.1); sh.lineTo(0.75, 0.25); sh.lineTo(0, -0.85); sh.lineTo(-0.75, 0.25); sh.closePath();
       var paper = new T.Mesh(new T.ShapeGeometry(sh), new T.MeshStandardMaterial({ color: new T.Color(body), roughness: 0.75, side: T.DoubleSide }));
@@ -270,7 +270,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
         g.add(lid);
       }
       if (model === "lens") {
-        // Kaca depan lensa + cincin fokus; lensa direbahkan agar kacanya terlihat saat berputar.
+        // Front lens glass + focus ring; the lens is tilted so the glass shows while it spins.
         var glass = new T.Mesh(new T.SphereGeometry(1.1, seg, 16, 0, Math.PI * 2, 0, 0.5), new T.MeshPhysicalMaterial({ color: new T.Color(accent), roughness: 0.05, metalness: 0.2, clearcoat: 1 }));
         glass.position.y = 1.22 - 1.1 * Math.cos(0.5);
         g.add(glass);
@@ -312,7 +312,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
             obj = m;
             pivot.add(m);
             ctx.wake();
-          }, undefined, function () { /* model gagal dimuat: tetap pakai bentuk bawaan */ });
+          }, undefined, function () { /* model failed to load: keep the built-in shape */ });
         })
         .catch(noop);
     }
@@ -424,11 +424,11 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     var land = new T.Points(dots, new T.PointsMaterial({ color: dotC, size: s.q === "low" ? 0.065 : 0.055, map: dotTex, transparent: true, alphaTest: 0.05, depthWrite: false, sizeAttenuation: true }));
     land.renderOrder = 1;
     globe.add(land);
-    // Atmosfer: cahaya tepi (fresnel) di belakang bola.
+    // Atmosphere: rim light (fresnel) behind the globe.
     var atmo = new T.ShaderMaterial({
       uniforms: { c: { value: glowC } },
       vertexShader: "varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
-      // 0 di tepi luar → 1 di tepi bola; warna premultiplied supaya rapi di latar terang maupun gelap.
+      // 0 at the outer edge → 1 at the globe's edge; premultiplied color so it looks clean on light and dark backgrounds.
       fragmentShader: "uniform vec3 c; varying vec3 vN; void main(){ float d = clamp(-dot(vN, vec3(0.0, 0.0, 1.0)) / 0.53, 0.0, 1.0); float i = pow(d, 1.6); gl_FragColor = vec4(c * i, i); }",
       side: T.BackSide,
       premultipliedAlpha: true,
@@ -437,7 +437,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     });
     var atm = new T.Mesh(new T.SphereGeometry(R * 1.18, 48, 32), atmo);
     ctx.scene.add(atm);
-    // Penanda lokasi + garis lengkung antar penanda.
+    // Location markers + arcs between markers.
     var markC = new T.Color(color(host, cfg.marker, "#f59e0b"));
     var markers = (cfg.markers || []).slice(0, 24);
     var rings = [];
@@ -486,7 +486,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     };
   }
 
-  /* ---------------- 4. Latar partikel 3D ---------------- */
+  /* ---------------- 4. 3D particle background ---------------- */
 
   function particleScene(ctx, cfg) {
     var T = ctx.T, s = ctx.s, host = ctx.host;
@@ -567,7 +567,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
     };
   }
 
-  /* ---------------- 5. Kartu 3D (CSS, tanpa WebGL) ---------------- */
+  /* ---------------- 5. 3D card (CSS, no WebGL) ---------------- */
 
   function mountTilt(host, cfg) {
     var card = host.querySelector(".owd3d-card") || host;
@@ -606,13 +606,13 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
   var SCENES = { product: productScene, shape: shapeScene, globe: globeScene, particles: particleScene };
 
   /**
-   * Pasang satu elemen 3D. Three.js dimuat saat elemen mendekati layar,
-   * render berhenti saat elemen tidak terlihat / tab disembunyikan, dan
-   * gambar statis tetap tampil bila WebGL tidak tersedia atau gagal.
-   * Mengembalikan fungsi pembersih (dipanggil saat komponen dilepas).
+   * Mount one 3D element. Three.js loads when the element nears the viewport,
+   * rendering stops while the element is hidden / the tab is in the background, and
+   * a static image still shows when WebGL is unavailable or fails.
+   * Returns a cleanup function (called when the component unmounts).
    */
-  // Elemen yang dilepas dari DOM (mis. pratinjau dirender ulang) dibersihkan
-  // pada pemasangan berikutnya supaya konteks WebGL tidak menumpuk.
+  // Elements removed from the DOM (e.g. a re-rendered preview) are cleaned up
+  // on the next mount so WebGL contexts do not pile up.
   var live = [];
   function sweep() {
     live = live.filter(function (m) {
@@ -638,9 +638,9 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       host.classList.add("is-3d-fallback");
       if (err && window.console) console.warn("[3D] memakai gambar statis:", err);
     }
-    /* Penjaga FPS: HP lemah yang menggambar < minFps (bawaan 30) selama ~2,5 dtk
-       pertama turun ke resolusi 1x lalu diukur ulang; bila tetap lambat, animasi
-       dihentikan dan gambar statis ditampilkan. minFps: 0 mematikan penjaga. */
+    /* FPS guard: weak phones that draw < minFps (default 30) during the first ~2.5 s
+       drop to 1x resolution and are measured again; if still slow, the animation
+       stops and the static image is shown. minFps: 0 disables the guard. */
     var minFps = typeof cfg.minFps === "number" ? cfg.minFps : 30;
     var probe = { t: 0, n: 0, strikes: 0, done: !(minFps > 0) };
     function probeFrame(dt) {
@@ -664,10 +664,10 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       return true;
     }
     function fallbackNow(why) {
-      if (state.dead) return; // forceContextLoss() saat destroy juga memicu "context lost"
+      if (state.dead) return; // forceContextLoss() on destroy also triggers "context lost"
       if (window.console) console.warn("[3D] memakai gambar statis:", why);
       destroy();
-      host.__owd3d = true; // jangan dipasang ulang otomatis
+      host.__owd3d = true; // do not remount automatically
       host.classList.add("is-3d-fallback");
     }
     function resize() {
@@ -687,7 +687,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
       var raw = state.last ? (now - state.last) / 1000 : 0;
       var dt = Math.min(0.05, raw || 0.016);
       state.last = now;
-      // Ukur hanya frame beruntun (bukan jeda setelah tab/scroll tidur).
+      // Only measure consecutive frames (not the gap after the tab/scroll was idle).
       if (raw > 0 && raw < 0.5 && state.scene.animate && probeFrame(raw)) return;
       var moving = state.scene.update(dt);
       c.renderer.render(c.scene, c.camera);
@@ -764,7 +764,7 @@ export const OWD3D_RUNTIME = String.raw`var OWD3D = (typeof window !== "undefine
   return api;
 })();`;
 
-/** Modul untuk proyek framework: runtime + `mount3d()` (mengembalikan fungsi pembersih). */
+/** Module for framework projects: runtime + `mount3d()` (returns a cleanup function). */
 export const OWD3D_MODULE = `${OWD3D_RUNTIME}
 
 export function mount3d(host, kind, cfg) {

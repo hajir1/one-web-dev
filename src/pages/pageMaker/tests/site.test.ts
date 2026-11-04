@@ -120,25 +120,25 @@ test("menu: mengambil halaman dari folder yang tepat; ganti nama & hapus desain 
   const sites = [site(d2, "s2", "Lain"), site(d1, "s1", "Utama")];
 
   let infos = allSiteInfos(sites, [a, b, c, z]);
-  // otomatis: folder yang memuat halaman yang sedang dirender
+  // automatic: the folder containing the page being rendered
   assert.equal(resolveMenuSite({ siteId: "" }, { sites: infos, currentDesignId: "b", routing: "none" }).id, "s1");
-  // tanpa konteks halaman → folder pertama
+  // no page context → the first folder
   assert.equal(resolveMenuSite({ siteId: "" }, { sites: infos, routing: "none" }).id, "s2");
-  // pilihan eksplisit menang
+  // an explicit choice wins
   assert.equal(resolveMenuSite({ siteId: "s2" }, { sites: infos, currentDesignId: "b", routing: "none" }).id, "s2");
 
   const ctx = { sites: infos, currentDesignId: "a", routing: "none" };
   assert.deepEqual(menuItems({ siteId: "", pageIds: [] }, ctx).items.map((p) => p.label), ["Beranda", "Tentang", "Kontak"]);
   assert.deepEqual(menuItems({ siteId: "", pageIds: ["c", "a"] }, ctx).items.map((p) => p.label), ["Beranda", "Kontak"], "urutan ikut folder");
 
-  // ganti nama desain → label menu ikut (folder hanya menyimpan ID)
+  // renaming a design → the menu label follows (the folder only stores IDs)
   const b2 = { ...b, name: "Tentang Kami" };
   infos = allSiteInfos(sites, [a, b2, c, z]);
   assert.deepEqual(menuItems({ siteId: "s1", pageIds: [] }, { sites: infos, routing: "none" }).items.map((p) => p.label), ["Beranda", "Tentang Kami", "Kontak"]);
-  // desain dihapus → hilang dari menu
+  // design deleted → gone from the menu
   infos = allSiteInfos(sites, [a, c, z]);
   assert.deepEqual(menuItems({ siteId: "s1", pageIds: [] }, { sites: infos, routing: "none" }).items.map((p) => p.slug), ["beranda", "kontak"]);
-  // tanpa folder → contoh
+  // no folder → sample
   assert.equal(menuItems({ siteId: "", pageIds: [] }, { sites: [], routing: "none" }).sample, true);
 });
 
@@ -164,7 +164,7 @@ test("menu: tautan per target (halaman tunggal & ekspor website per framework)",
   assert.match(all("html"), /href="tentang-kami\.html"/);
 });
 
-/* ---------------------------- ekspor website ------------------------ */
+/* ---------------------------- website export ------------------------ */
 
 test("ekspor website: struktur & routing per framework, homepage dihormati", () => {
   const a = page("a", "Beranda"), b = page("b", "Tentang Kami", [createElementNode("tabs", structuredClone(D.tabs.defaults), "Tabs")]), c = page("c", "Kontak");
@@ -177,7 +177,7 @@ test("ekspor website: struktur & routing per framework, homepage dihormati", () 
   const names = (fw) => built.files(fw).map((f) => f.name);
   const file = (fw, n) => built.files(fw).find((f) => f.name === n)?.content ?? "";
 
-  // HTML: homepage = index.html, halaman lain = <slug>.html
+  // HTML: homepage = index.html, other pages = <slug>.html
   assert.ok(names("html").includes("index.html"));
   assert.ok(names("html").includes("beranda.html") && names("html").includes("kontak.html"));
   assert.ok(!names("html").includes("tentang-kami.html"), "homepage tidak diduplikasi");

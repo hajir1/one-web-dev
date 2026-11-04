@@ -15,7 +15,7 @@ import { LIBRARY_BY_ID } from "../engine/helpers/libraries";
 import { ELEMENT_3D_PRICE, isValidPrice } from "../../../config/marketplace";
 import { elementPrice } from "../../../marketplace/data/prices";
 
-/* v9: 5 elemen 3D Premium (Three.js dimuat dinamis, gambar statis cadangan). */
+/* v9: 5 Premium 3D elements (Three.js loaded dynamically, static fallback image). */
 
 const icons = makeIconLookup([]);
 const FRAMEWORKS = ["html", "react", "vue", "svelte", "angular"];
@@ -36,7 +36,7 @@ test("3D: 5 elemen terdaftar di grup 3D, semuanya Premium dengan harga 10–25 k
     assert.equal(elementPrice(t, "premium"), ELEMENT_3D_PRICE[t], t);
     assert.ok(isValidPrice("element3d", "premium", ELEMENT_3D_PRICE[t]), t);
   }
-  // Kartu tilt tidak butuh Three.js.
+  // The tilt card does not need Three.js.
   assert.deepEqual(D["card-3d"].libraries, undefined);
   for (const t of THREE_D_TYPES.slice(0, 4)) assert.deepEqual(D[t].libraries, ["three"], t);
 });
@@ -74,7 +74,7 @@ test("3D: HTML memuat runtime sekali, gambar statis di markup, variabel --owd-3d
   assert.equal((ok.html.body.match(/__fallback/g) || []).length, 4);
   assert.match(ok.html.css, /--owd-3d-quality/);
   assert.doesNotThrow(() => new Function(ok.html.script.replace(/import\(/g, "Promise.resolve(")));
-  // Halaman tanpa elemen 3D tidak membawa variabel 3D.
+  // Pages without 3D elements do not carry 3D variables.
   const plain = compose(page(["text"]), { rootClass: "pg", icons, vars: VARS });
   assert.doesNotMatch(plain.html.css, /--owd-3d-/);
   assert.doesNotMatch(plain.html.script ?? "", /OWD3D/);
@@ -98,7 +98,7 @@ test("3D: proyek framework mendapat satu berkas runtime + LIBRARIES.md", () => {
   const react = ok.files("react").filter((f) => f.name.endsWith(".jsx") && f.content.includes("mount3d("));
   assert.equal(react.length, 5);
   assert.ok(react.every((f) => f.content.includes('import { mount3d } from "./owd3d";')));
-  // HTML tidak butuh berkas tambahan.
+  // HTML needs no extra files.
   assert.ok(!ok.files("html").some((f) => f.name.startsWith("owd3d")));
 });
 

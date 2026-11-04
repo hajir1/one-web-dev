@@ -8,13 +8,13 @@ import i18n from "../../../../../i18n";
 import { clamp, color, safeVideoFile, seconds, vimeoId, youtubeId } from "./shared";
 
 /* ================================================================== */
-/* Elemen GRATIS tambahan: Banner, Spinner, Rating, Tooltip, Video,     */
+/* Extra FREE elements: Banner, Spinner, Rating, Tooltip, Video,        */
 /* Date Picker, Clipboard.                                              */
 /*                                                                    */
-/* Semua markup memakai h() sehingga sama di 5 framework. Interaksi     */
-/* kecil (tutup banner, salin teks) memakai `customCode` → runtime       */
-/* Custom JS yang sama dengan pengaturan Lanjutan (jalan di Pratinjau &  */
-/* hasil ekspor, tidak di canvas Desain).                               */
+/* All markup uses h() so it is identical across the 5 frameworks. Small */
+/* interactions (closing a banner, copying text) use `customCode` → the same */
+/* Custom JS runtime as the Advanced settings (runs in Preview &        */
+/* exported output, not on the Design canvas).                          */
 /* ================================================================== */
 
 const tr = (k: string) => i18n.t(`el.x.${k}`);
@@ -519,7 +519,7 @@ export interface VideoState {
   poster: string;
 }
 
-/** URL embed yang aman (null = URL tidak dikenali). */
+/** A safe embed URL (null = URL not recognized). */
 function videoEmbedUrl(s: Pick<VideoState, "source" | "url" | "autoplay" | "controls">): string | null {
   if (s.source === "youtube") {
     const id = youtubeId(s.url);

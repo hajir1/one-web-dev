@@ -4,17 +4,17 @@ import { createBox, createElementNode } from "../engine/helpers/tree";
 import { createRow } from "./rowModel";
 
 /* ================================================================== */
-/* Blok penyusun pohon (dipakai preset section & template website)       */
+/* Tree building blocks (used by section presets & website templates)    */
 /*                                                                    */
-/* Template disusun dari struktur & elemen Page Maker yang SAMA dengan    */
-/* yang dipakai pengguna (Section → Row → Elemen), jadi setiap halaman    */
-/* hasil template bisa diedit penuh di Page Maker.                       */
+/* Templates are built from the SAME Page Maker structure & elements    */
+/* that users use (Section → Row → Element), so every page              */
+/* from a template is fully editable in Page Maker.                     */
 /* ================================================================== */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Patch = Record<string, any>;
 
-/** Elemen dengan state default + patch. Melempar bila tipe/field tidak dikenal (ditangkap tes). */
+/** An element with default state + a patch. Throws when the type/field is unknown (caught by tests). */
 export function el(type: string, patch: Patch = {}, name?: string): ElementNode {
   const def = ELEMENT_DEFINITION_BY_TYPE[type];
   if (!def) throw new Error(`Unknown element type: ${type}`);
@@ -34,13 +34,13 @@ export interface Palette {
   line: string;
 }
 
-/* ------------------------------ teks ------------------------------- */
+/* ------------------------------ text ------------------------------- */
 
 type TextOpts = { size?: number; weight?: number; color?: string; align?: "left" | "center" | "right"; full?: boolean; spacing?: number; transform?: "none" | "uppercase" };
 
 export function heading(text: string, tag: "h1" | "h2" | "h3" | "h4", o: TextOpts = {}): ElementNode {
   const size = o.size ?? { h1: 44, h2: 32, h3: 22, h4: 18 }[tag];
-  // Jarak baris rapat + ukuran lebih kecil di ponsel (Custom CSS gratis, bisa diedit di Page Maker).
+  // Tight line height + smaller size on phones (free Custom CSS, editable in Page Maker).
   const big = size >= 28;
   const node = el(
     "text",
@@ -92,7 +92,7 @@ export const eyebrow = (text: string, color: string, align: TextOpts["align"] = 
 
 type BtnKind = "primary" | "outline" | "light" | "dark";
 
-/** Tautan bergaya tombol (Anchor) — CTA yang benar-benar menuju sebuah alamat. */
+/** A button-styled link (Anchor): a CTA that really goes to an address. */
 export function linkButton(text: string, href: string, kind: BtnKind, p: Palette, o: { full?: boolean } = {}): ElementNode {
   const styles: Record<BtnKind, Patch> = {
     primary: { bgColor: p.primary, textColor: "#ffffff", borderWidth: 0, borderStyle: "none", hoverBgColor: p.primaryDark, hoverTextColor: "#ffffff", hoverBorderColor: p.primaryDark },
@@ -123,7 +123,7 @@ export function linkButton(text: string, href: string, kind: BtnKind, p: Palette
   );
 }
 
-/** Tombol <button> (aksi di halaman, tanpa tujuan). */
+/** A <button> (an in-page action, no destination). */
 export function button(text: string, p: Palette, o: { full?: boolean; type?: "button" | "submit" } = {}): ElementNode {
   return el(
     "button",
@@ -179,7 +179,7 @@ export function section(name: string, rows: BoxNode[], o: { bg?: string; padY?: 
     : o.bg
       ? { bgEnabled: true, bgColor: o.bg }
       : {};
-  // Jarak antar-Row di dalam section (section bertata letak blok tidak memakai `gap`).
+  // Spacing between Rows inside a section (block-layout sections do not use `gap`).
   rows.forEach((r, i) => {
     if (i < rows.length - 1 && !r.advanced) r.advanced = { customCss: "margin-bottom: 32px;" };
   });
@@ -198,12 +198,12 @@ export function section(name: string, rows: BoxNode[], o: { bg?: string; padY?: 
   });
 }
 
-/** Row satu kolom (isi ditumpuk). */
+/** Single-column row (content stacked). */
 export function stack(children: (BoxNode | ElementNode)[], o: { gap?: number; align?: "start" | "center" | "end" | "stretch" } = {}): BoxNode {
   return createRow({ name: "Row", padding: 0, gap: o.gap ?? 16, align: o.align ?? "start", children });
 }
 
-/** Row grid N kolom (jadi satu kolom di layar kecil). */
+/** An N-column grid Row (becomes one column on small screens). */
 export function grid(cells: BoxNode[], columns: number | string, o: { gap?: number; align?: "start" | "center" | "end" | "stretch" } = {}): BoxNode {
   return createRow({
     name: `Row ${typeof columns === "number" ? columns : ""} Kolom`.replace("  ", " "),
@@ -218,7 +218,7 @@ export function grid(cells: BoxNode[], columns: number | string, o: { gap?: numb
   });
 }
 
-/** Kelompok horizontal di dalam kolom (bukan Row): elemen berjajar, turun baris bila sempit. */
+/** A horizontal group inside a column (not a Row): elements side by side, wrapping when narrow. */
 export function inline(children: (BoxNode | ElementNode)[], o: { gap?: number; justify?: "start" | "center" | "end" | "between" } = {}): BoxNode {
   return createBox("row", {
     name: "Grup sejajar",
@@ -233,7 +233,7 @@ export function inline(children: (BoxNode | ElementNode)[], o: { gap?: number; j
   });
 }
 
-/** Kolom/sel di dalam Row. */
+/** Column/cell inside a Row. */
 export function col(children: (BoxNode | ElementNode)[], o: { gap?: number; align?: "start" | "center" | "end" | "stretch"; card?: { bg: string; border?: string; radius?: number; padding?: number }; name?: string; layout?: "stack" | "row"; width?: number; stackOnMobile?: boolean; wrap?: boolean } = {}): BoxNode {
   const card: Partial<BoxNode> = o.card
     ? { bgEnabled: true, bgColor: o.card.bg, borderWidth: o.card.border ? 1 : 0, borderColor: o.card.border ?? "#e5e7eb", borderRadius: o.card.radius ?? 16, padding: o.card.padding ?? 24 }

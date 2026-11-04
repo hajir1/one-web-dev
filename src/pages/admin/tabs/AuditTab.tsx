@@ -15,7 +15,7 @@ interface AuditRow {
   createdAt: string;
 }
 
-/** Jejak audit semua perubahan oleh admin (dicatat server, tidak bisa diubah dari panel). */
+/** Audit trail of every admin change (recorded by the server, cannot be changed from the panel). */
 export function AuditTab() {
   const { t } = useTranslation();
   const [cursor, setCursor] = useState<string | null>(null);

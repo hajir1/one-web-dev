@@ -5,11 +5,11 @@ import { isBackendConfigured } from "../pages/media/processing/apiConfig";
 import type { ItemId, Tier } from "./types";
 
 /* ================================================================== */
-/* Harga & tier section/elemen/event/fitur dari SERVER (GET /catalog)    */
+/* Section/element/event/feature prices & tiers from the SERVER (GET /catalog) */
 /*                                                                    */
-/* Admin bisa mengubah tier & harga di panel admin; nilai di sini         */
-/* menimpa angka bawaan frontend untuk TAMPILAN. Harga yang dipotong      */
-/* tetap dihitung server.                                                */
+/* Admins can change tiers & prices in the admin panel; values here      */
+/* override the frontend defaults for DISPLAY. The charged price          */
+/* is still computed by the server.                                      */
 /* ================================================================== */
 
 export interface ServerPiece {
@@ -25,7 +25,7 @@ interface ServerCatalogState {
 
 const useServerCatalog = create<ServerCatalogState>(() => ({ status: "idle", items: new Map() }));
 
-/** Nilai server untuk satu item, bila sudah dimuat. */
+/** Server value for one item, once loaded. */
 export const serverPiece = (id: ItemId): ServerPiece | undefined => useServerCatalog.getState().items.get(id);
 
 function sanitizeServerCatalog(raw: unknown): Map<ItemId, ServerPiece> {

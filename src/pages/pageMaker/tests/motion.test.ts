@@ -64,7 +64,7 @@ test("motion: compose (ekspor) menulis class, keyframes, variabel :root, dan pem
     assert.match(all, /@keyframes (-global-)?owd-fade-up/, fw);
     assert.match(all, /data-owd-once|IntersectionObserver/, fw);
   }
-  // Angular: CSS animasi global (encapsulation None) agar menjangkau komponen anak.
+  // Angular: global animation CSS (encapsulation None) so it reaches child components.
   assert.match(c.files("angular").map((f) => f.content).join("\n"), /ViewEncapsulation\.None/);
 });
 

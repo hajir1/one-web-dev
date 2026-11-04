@@ -730,7 +730,7 @@ export const logisticsKirim: TemplateContent = {
 /* ------------------- 15. Arena Nexus Esports (6 hlm) ----------------- */
 
 const AN: Palette = { ink: "#0f172a", muted: "#64748b", primary: "#06b6d4", primaryDark: "#0891b2", soft: "#cffafe", line: "#67e8f9" };
-// Hero, banner, & pita gelap; section konten terang agar mudah dibaca.
+// Hero, banners, & dark bands; content sections light so they are easy to read.
 const an = look(AN, { bg: "#f8fafc", alt: "#ecfeff", dark: "#05010d", radius: 4, headFont: FONTS.mono, font: FONTS.grotesk, page: "#05010d" });
 
 export const gamingArena: TemplateContent = {

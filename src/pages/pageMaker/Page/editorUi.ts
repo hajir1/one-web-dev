@@ -1,11 +1,11 @@
 import { Code2, Eye, Monitor, PencilRuler, Smartphone, Tablet } from "lucide-react";
 
-/* Konstanta & util kecil editor halaman (dipisah dari PageMaker.tsx, no. 15). */
+/* Page editor constants & small utilities (split out of PageMaker.tsx, no. 15). */
 
 export type Mode = "design" | "preview" | "code";
 export type Viewport = "desktop" | "tablet" | "mobile";
 
-/** `label` = kunci i18n (diterjemahkan saat render). */
+/** `label` = i18n key (translated at render time). */
 export const VIEWPORTS: { id: Viewport; label: string; width: number | null; icon: typeof Monitor }[] = [
   { id: "desktop", label: "pm.editor.viewport.desktop", width: null, icon: Monitor },
   { id: "tablet", label: "pm.editor.viewport.tablet", width: 768, icon: Tablet },

@@ -10,7 +10,7 @@ import { V9I_SPECS } from "../../pages/webTemplates/templates/v9/setI/specs";
 import { showcasePrice, threeTypesOf } from "../../pages/webTemplates/templates/v9/setI/kitI";
 import { V10J_CATALOG } from "../../pages/webTemplates/templates/v10/catalogJ";
 
-/* Harga template Premium: 3 kredit/halaman + bonus kualitas 0–2 (lihat templatePricing.ts). */
+/* Premium template price: 3 credits/page + quality bonus 0–2 (see templatePricing.ts). */
 
 const premiumCount = (c: ReturnType<typeof templateContents>) =>
   c.sectionIds.filter((id) => isPremiumPreset(id.replace("preset:", ""))).length + c.elementIds.filter((id) => D[id.replace("element:", "")]?.premium).length;
@@ -27,7 +27,7 @@ test("rumus harga: bonus kualitas < harga satu halaman, batas 20–300 kredit (R
   for (let p = 1; p < 10; p++) assert.ok(templatePrice(p + 1, 0, 0) > templatePrice(p, 99, 3), `${p + 1} vs ${p} halaman`);
 });
 
-/* Set I (Premium 3D & animasi) memakai rumus showcasePrice sendiri, 60–300 kredit. */
+/* Set I (Premium 3D & animation) uses its own showcasePrice formula, 60–300 credits. */
 const SHOWCASE = new Set([...V9I_SPECS.map((s) => s.id), ...V10J_CATALOG.map((m) => m.id)]);
 
 const premium = WEB_TEMPLATES.filter((t) => t.tier === "premium" && !SHOWCASE.has(t.id)).map((t) => {

@@ -21,7 +21,7 @@ import { boxImage } from "../placeholders";
 /* ------------------------------------------------------------------ */
 
 export interface CardState {
-  /* Ukuran & padding */
+  /* Size & padding */
   widthMode: "auto" | "fixed" | "full";
   width: number;
   paddingLinked: boolean;
@@ -69,7 +69,7 @@ export interface CardState {
   transitionDuration: number;
   transitionEasing: string;
 
-  /* Gambar */
+  /* Image */
   imageEnabled: boolean;
   imageSrc: string;
   imageAlt: string;
@@ -77,7 +77,7 @@ export interface CardState {
   imageObjectFit: "cover" | "contain" | "fill";
   imageBorderRadius: number;
 
-  /* Teks */
+  /* Text */
   titleText: string;
   titleTag: "h2" | "h3" | "h4";
   titleFontSize: number;
@@ -99,7 +99,7 @@ export interface CardState {
   /* Footer */
   footerEnabled: boolean;
   footerBtnText: string;
-  /** Kosong = <button>; terisi = <a href>. */
+  /** Empty = <button>; filled = <a href>. */
   footerBtnHref: string;
   footerBtnBgColor: string;
   footerBtnTextColor: string;
@@ -261,7 +261,7 @@ ${shadowLine(s, "hoverShadow")}}`);
 }`);
 
   if (s.footerEnabled) {
-    // Sebelumnya padding kiri footer hilang (hanya 3 nilai: atas kanan bawah).
+    // Previously the footer's left padding was missing (only 3 values: top right bottom).
     rules.push(`.${cls}__footer {
   padding: 0 ${pad.right}px ${pad.bottom}px ${pad.left}px;
 }`);
@@ -446,7 +446,7 @@ function cardSections(s: CardState, update: Updater<CardState>): PanelSection[] 
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const cardElement = defineElement<CardState>({

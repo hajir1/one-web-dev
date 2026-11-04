@@ -1,4 +1,4 @@
-// Deklarasi minimal untuk gifenc (MIT, https://github.com/mattdesl/gifenc).
+// Minimal declarations for gifenc (MIT, https://github.com/mattdesl/gifenc).
 declare module "gifenc" {
   export type Palette = number[][];
   export interface GifEncoderInstance {

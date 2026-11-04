@@ -1,6 +1,6 @@
-/* Adegan animasi cerita 9-16 (canvas 2D). Lihat anim2ScenesA.ts untuk aturannya. */
+/* Story animation scenes 9-16 (2D canvas). See anim2ScenesA.ts for the rules. */
 
-/** 9. Jembatan kosong di bawah bulan → kereta malam lewat → kereta berhenti, tiap jendela menyalakan satu huruf → kereta pergi meninggalkan bintang. */
+/** 9. An empty bridge under the moon → a night train passes → the train stops, each window lights one letter → the train leaves stars behind. */
 export const SCENE_KERETA = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -11,7 +11,7 @@ function scene(api) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       for (const s of stars) { g.fillStyle = rgba("#ffffff", 0.2 + 0.5 * Math.abs(Math.sin(t * 0.6 + s[2]))); g.fillRect(s[0] * W, s[1] * H, 1.5, 1.5); }
       glowDot(W * 0.78, H * 0.2, u * 22, COL["c-3"], 0.25); g.fillStyle = api.mix(COL["c-3"], "#ffffff", 0.6); g.beginPath(); g.arc(W * 0.78, H * 0.2, u * 6, 0, 7); g.fill();
-      /* Bukit dan jembatan berlengkung. */
+      /* Hills and an arched bridge. */
       g.fillStyle = api.mix(COL["bg-1"], COL["bg-2"], 0.5); g.beginPath(); g.moveTo(0, H); g.lineTo(0, H * 0.72); g.quadraticCurveTo(W * 0.3, H * 0.6, W * 0.6, H * 0.74); g.quadraticCurveTo(W * 0.85, H * 0.82, W, H * 0.7); g.lineTo(W, H); g.fill();
       const ty = H * 0.66;
       g.fillStyle = COL["bg-1"]; g.fillRect(0, ty, W, u * 1.6);
@@ -39,19 +39,19 @@ function scene(api) {
         if (ch && light > 0) { const k = seg(light, i / cars * 0.6, i / cars * 0.6 + 0.4) * (1 - leave * 3); if (k > 0) { glowDot(wx + ww / 2, wy + wh / 2, carW * 0.9, COL["c-3"], 0.3 * k); g.globalAlpha = Math.max(0, k); g.fillStyle = COL["bg-1"]; g.font = "700 " + Math.round(wh * 0.82) + "px " + getComputedStyle(document.documentElement).getPropertyValue("--font-display"); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(ch, wx + ww / 2, wy + wh * 0.55); g.globalAlpha = 1; } }
         g.fillStyle = COL["bg-1"]; g.beginPath(); g.arc(x + carW * 0.22, ty - u * 0.6, carH * 0.13, 0, 7); g.arc(x + carW * 0.78, ty - u * 0.6, carH * 0.13, 0, 7); g.fill();
       }
-      /* Lokomotif di depan. */
+      /* Locomotive in front. */
       const lx = x0 + cars * (carW + gap), ly = ty - carH * 1.05 - u * 0.8;
       g.fillStyle = COL["c-1"]; g.fillRect(lx, ly + carH * 0.25, carW * 1.1, carH * 0.8); g.fillRect(lx, ly - carH * 0.05, carW * 0.45, carH * 0.4);
       g.fillRect(lx + carW * 0.75, ly - carH * 0.12, carW * 0.14, carH * 0.4);
       glowDot(lx + carW * 1.12, ly + carH * 0.6, u * 8, "#fff3c4", 0.6);
       for (let i = 0; i < 5; i++) { const k = (t * 0.6 + i / 5) % 1; if (!moving) continue; glowDot(lx + carW * 0.82 - k * u * 18, ly - carH * 0.2 - k * u * 10, u * (1.5 + k * 4), "#cfd3e6", 0.25 * (1 - k)); }
-      /* Setelah kereta pergi: bintang naik dari rel. */
+      /* After the train leaves: stars rise from the rails. */
       if (leave > 0) for (const s of sparks) { const k = (s[1] + t * 0.08 * s[3]) % 1; const x = s[0] * W + Math.sin(t + s[2]) * u, y = lerp(ty, H * 0.1, k); glowDot(x, y, u * 1.6, COL["c-3"], 0.6 * (1 - k) * leave); }
     },
   };
 }`;
 
-/** 10. Ulat merayap di daun → membungkus diri jadi kepompong → kepompong retak, kupu-kupu membuka sayap → kupu-kupu lain berdatangan. */
+/** 10. A caterpillar crawls on a leaf → wraps itself into a cocoon → the cocoon cracks, a butterfly opens its wings → other butterflies arrive. */
 export const SCENE_KUPU = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -73,14 +73,14 @@ function scene(api) {
     draw(t, B) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const crawl = seg(B, 0, 0.9), wrap = seg(B, 0.9, 1.5), crack = seg(B, 1.6, 2.1), fly = seg(B, 2.1, 2.95);
-      /* Dahan dan daun. */
+      /* Branch and leaves. */
       const by = H * 0.3, bx = W * 0.5;
       g.strokeStyle = COL["c-2"]; g.lineWidth = u * 2.2; g.lineCap = "round"; g.beginPath(); g.moveTo(-10, by - u * 6); g.quadraticCurveTo(W * 0.4, by + u * 4, W + 10, by - u * 2); g.stroke();
       const lx = W * 0.32, ly = by + u * 1.5, ls = u * 22;
       g.fillStyle = COL["c-2"] === "" ? "#4a7a3a" : api.mix(COL["c-2"], "#4c8a3c", 0.75);
       g.beginPath(); g.moveTo(lx, ly); g.quadraticCurveTo(lx + ls * 0.2, ly + ls * 0.9, lx - ls * 0.15, ly + ls * 1.5); g.quadraticCurveTo(lx - ls * 0.6, ly + ls * 0.7, lx, ly); g.fill();
       g.strokeStyle = rgba("#ffffff", 0.25); g.lineWidth = 1.5; g.beginPath(); g.moveTo(lx, ly); g.quadraticCurveTo(lx - ls * 0.1, ly + ls * 0.8, lx - ls * 0.15, ly + ls * 1.45); g.stroke();
-      /* Ulat: ruas yang bergelombang, merayap dari daun ke dahan. */
+      /* Caterpillar: wavy segments crawling from the leaf to the branch. */
       const hang = [bx, by + u * 2];
       if (wrap < 1) {
         const segs = 9, path = (k) => { if (k < 0.6) { const q = k / 0.6; return [lerp(lx - ls * 0.12, lx, q), lerp(ly + ls * 1.2, ly, q)]; } const q = (k - 0.6) / 0.4; return [lerp(lx, hang[0], q), lerp(ly, hang[1], q) - Math.sin(q * Math.PI) * u * 2]; };
@@ -103,7 +103,7 @@ function scene(api) {
         if (crack > 0) { g.strokeStyle = "#fff8e0"; g.lineWidth = 2; g.beginPath(); g.moveTo(0, -chh * 0.9); g.lineTo(-cw * 0.3, -chh * 0.4); g.lineTo(cw * 0.2, -chh * 0.1); g.lineTo(-cw * 0.1, chh * 0.4 * crack); g.stroke(); glowDot(0, 0, u * 12 * crack, COL["c-3"], 0.4 * crack); }
         g.restore(); g.globalAlpha = 1;
       }
-      /* Kupu-kupu utama dan teman-temannya. */
+      /* The main butterfly and its friends. */
       if (crack > 0.6) {
         const open = seg(crack, 0.6, 1);
         const x = lerp(hang[0], W * 0.5 + Math.sin(t * 0.6) * W * 0.18, ease(fly)), y = lerp(hang[1] + u * 6, H * 0.36 + Math.sin(t * 1.1) * u * 4, ease(fly));
@@ -115,7 +115,7 @@ function scene(api) {
   };
 }`;
 
-/** 11. Kolam dari atas: satu koi berenang sendiri → koi kedua datang → keduanya berputar membentuk lingkaran → teratai mekar di tengah. */
+/** 11. A pond from above: one koi swims alone → a second koi arrives → both circle into a ring → a lotus blooms in the middle. */
 export const SCENE_KOI = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -140,7 +140,7 @@ function scene(api) {
       for (const p of pads) { const x = p[0] * W, y = p[1] * H, r = u * 5 * p[2]; g.fillStyle = COL["c-3"]; g.beginPath(); g.moveTo(x, y); g.arc(x, y, r, p[3] + t * 0.02, p[3] + t * 0.02 + Math.PI * 1.85); g.closePath(); g.fill(); }
       const two = seg(B, 0.9, 1.6), circle = seg(B, 1.6, 2.4), lotus = seg(B, 2.1, 2.9);
       const cx = W / 2, cy = H * 0.36, R = Math.min(W, H) * 0.2;
-      /* Posisi kepala pada waktu tt: lingkaran bebas → lingkaran tetap di sekitar pusat. Tubuh = posisi kepala sesaat sebelumnya. */
+      /* Head position at time tt: free circle → fixed circle around the center. Body = the head's position a moment earlier. */
       const k = ease(circle);
       const headAt = (i, tt) => {
         const fr = i === 0 ? [cx + Math.cos(tt * 0.5) * W * 0.32, cy + Math.sin(tt * 0.8) * H * 0.22] : [lerp(W * 1.2, cx + Math.cos(tt * 0.6 + 2) * W * 0.3, ease(two)), cy + Math.sin(tt * 0.7 + 1) * H * 0.2];
@@ -156,7 +156,7 @@ function scene(api) {
       g.globalAlpha = 0.25; g.save(); g.translate(u * 1.2, u * 1.8); koi(pick(hist[0]), "#000000", false, sz); if (two > 0.01) koi(pick(hist[1]), "#000000", false, sz); g.restore(); g.globalAlpha = 1;
       koi(pick(hist[0]), COL["c-1"], true, sz);
       if (two > 0.01) koi(pick(hist[1]), "#fbf6ee", true, sz);
-      /* Teratai di tengah. */
+      /* Lotus in the middle. */
       if (lotus > 0) {
         glowDot(cx, cy, R * 1.1, COL["c-2"], 0.25 * lotus);
         for (let layer = 0; layer < 3; layer++) { const n = 8 - layer * 2, len = u * (9 - layer * 2.5) * ease(seg(lotus, layer * 0.15, 0.6 + layer * 0.15)); for (let i = 0; i < n; i++) { const an = (i / n) * Math.PI * 2 + layer * 0.4; g.save(); g.translate(cx, cy); g.rotate(an); g.fillStyle = layer === 2 ? api.mix(COL["c-2"], "#ffffff", 0.5) : layer === 1 ? api.mix(COL["c-2"], "#ffffff", 0.25) : COL["c-2"]; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(len * 0.45, -len * 0.5, 0, -len); g.quadraticCurveTo(-len * 0.45, -len * 0.5, 0, 0); g.fill(); g.restore(); } }
@@ -166,7 +166,7 @@ function scene(api) {
   };
 }`;
 
-/** 12. Satu pohon melewati empat musim: semi berbunga → panas rimbun → gugur berjatuhan → salju, lalu lampu kecil menyala. */
+/** 12. One tree through four seasons: spring blossoms → lush summer → falling autumn leaves → snow, then small lights turn on. */
 export const SCENE_MUSIM = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot, mix } = api;
@@ -180,18 +180,18 @@ function scene(api) {
     resize: build,
     draw(t, B, dt) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
-      /* Warna langit per musim lewat lapisan tipis. */
+      /* Sky color per season through a thin layer. */
       const sum = seg(B, 0.6, 1.2), aut = seg(B, 1.6, 2.2), win = seg(B, 2.6, 3.2) + seg(B, 2.4, 2.9) * 0;
       const tint = mix(mix(mix("#ffd9e6", "#bfe6ff", sum), "#ffc98a", aut), "#1f2a4a", seg(B, 2.4, 3));
       g.globalAlpha = 0.3; g.fillStyle = tint; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
       if (sum > 0 && aut < 1) glowDot(W * 0.82, H * 0.18, u * 26, "#fff2b8", 0.6 * sum * (1 - aut));
       const winter = seg(B, 2.4, 3);
       g.fillStyle = mix(mix(COL["c-3"], "#c58b3a", aut), "#f2f5fb", winter); g.beginPath(); g.moveTo(0, H); g.lineTo(0, H * 0.86); g.quadraticCurveTo(W / 2, H * 0.82, W, H * 0.86); g.lineTo(W, H); g.fill();
-      /* Batang dan dahan. */
+      /* Trunk and branches. */
       g.strokeStyle = COL["c-2"]; g.lineCap = "round";
       for (const b of branches) { g.lineWidth = Math.max(1, b[4]); g.beginPath(); g.moveTo(b[0], b[1]); g.lineTo(b[2] + Math.sin(t * 0.8 + b[3] * 0.01) * (b[4] < 2 ? 1.5 : 0), b[3]); g.stroke(); }
       if (winter > 0) { g.strokeStyle = rgba("#ffffff", 0.85 * winter); for (const b of branches) if (b[4] > 1.5) { g.lineWidth = b[4] * 0.35; g.beginPath(); g.moveTo(b[0], b[1] - b[4] * 0.4); g.lineTo(b[2], b[3] - b[4] * 0.4); g.stroke(); } }
-      /* Daun / bunga di ujung dahan. */
+      /* Leaves / flowers at the branch tips. */
       const bloom = 0.45 + 0.55 * seg(B, 0, 0.6), leafy = sum, drop = seg(B, 1.9, 2.6), bare = seg(B, 2.4, 2.8);
       for (const tp of tips) {
         const keep = tp[2] > drop;
@@ -203,7 +203,7 @@ function scene(api) {
       }
       /* Daun gugur. */
       if (aut > 0 && winter < 1) for (const f of fall) { const k = (f[1] + t * 0.05 * f[3]) % 1; const x = f[0] * W + Math.sin(t * f[3] + f[2]) * u * 3, y = lerp(H * 0.25, H * 0.88, k); g.save(); g.translate(x, y); g.rotate(t * f[3] + f[2]); g.globalAlpha = aut * (1 - winter); g.fillStyle = f[2] > 3 ? "#e2752e" : "#c9452a"; g.beginPath(); g.ellipse(0, 0, u * 1.1, u * 0.55, 0, 0, 7); g.fill(); g.restore(); g.globalAlpha = 1; }
-      /* Salju dan lampu kecil di musim dingin. */
+      /* Snow and small lights in winter. */
       if (winter > 0) {
         for (const s of snow) { s[1] += dt * 0.04 * s[2]; if (s[1] > 1) s[1] = 0; g.fillStyle = rgba("#ffffff", 0.8 * winter * s[2]); g.beginPath(); g.arc(s[0] * W + Math.sin(t + s[2] * 7) * u, s[1] * H, s[2] * 2, 0, 7); g.fill(); }
         const lights = seg(B, 2.7, 3);
@@ -213,7 +213,7 @@ function scene(api) {
   };
 }`;
 
-/** 13. Kue dengan lilin menyala → lilin ditiup, asap mengepul → lampu kamar menyala, konfeti meledak → hujan konfeti. */
+/** 13. Cake with lit candles → candles blown out, smoke rises → room lights on, confetti bursts → confetti rain. */
 export const SCENE_LILIN = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -230,7 +230,7 @@ function scene(api) {
       const cx = W / 2, top = H * 0.6, cw = Math.min(W * 0.36, u * 46), ch = u * 12;
       /* Meja. */
       g.fillStyle = rgba(COL.ink, 0.08); g.fillRect(0, top + ch * 2.2, W, H);
-      /* Kue dua tingkat. */
+      /* Two-tier cake. */
       g.fillStyle = rgba("#000000", 0.18); g.beginPath(); g.ellipse(cx, top + ch * 2.2, cw * 0.62, u * 2.2, 0, 0, 7); g.fill();
       const tier = (y, w, h, c) => { g.fillStyle = c; g.fillRect(cx - w / 2, y, w, h); g.beginPath(); g.ellipse(cx, y + h, w / 2, h * 0.2, 0, 0, Math.PI); g.fill(); g.fillStyle = api.mix(c, "#ffffff", 0.25); g.beginPath(); g.ellipse(cx, y, w / 2, h * 0.2, 0, 0, 7); g.fill(); g.fillStyle = "#fffaf3"; for (let i = 0; i < 9; i++) { const x = cx - w / 2 + (i + 0.5) * (w / 9); g.beginPath(); g.ellipse(x, y + h * 0.12, w / 20, h * 0.28, 0, 0, Math.PI); g.fill(); } };
       tier(top + ch, cw, ch, COL["c-2"]);
@@ -266,7 +266,7 @@ function scene(api) {
   };
 }`;
 
-/** 14. Tongkat sabun berkilau → gelembung ditiup → satu gelembung raksasa memantulkan pelangi → gelembung pecah jadi kilau. */
+/** 14. Sparkling soap wand → bubbles blown → one giant bubble reflects a rainbow → the bubble pops into sparkles. */
 export const SCENE_GELEMBUNG = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -285,12 +285,12 @@ function scene(api) {
     draw(t, B, dt) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const blow = seg(B, 0.1, 1.9), big = seg(B, 1.95, 2.5), pop = seg(B, 2.55, 2.85);
-      /* Tongkat sabun di kiri bawah. */
+      /* Soap wand at the bottom left. */
       const wx = W * (api.small ? 0.22 : 0.18), wy = H * 0.68, wr = u * 6;
       g.strokeStyle = COL["c-3"]; g.lineWidth = u * 1.1; g.beginPath(); g.arc(wx, wy, wr, 0, 7); g.stroke();
       g.beginPath(); g.moveTo(wx - wr * 0.3, wy + wr); g.lineTo(wx - wr * 1.1, H + 10); g.stroke();
       if (blow < 0.98) { g.fillStyle = rgba(COL["c-2"], 0.18 + 0.08 * Math.sin(t * 3)); g.beginPath(); g.arc(wx, wy, wr - 2, 0, 7); g.fill(); g.strokeStyle = rgba(COL["c-1"], 0.4); g.lineWidth = 2; g.beginPath(); g.arc(wx, wy, wr * 0.7, t, t + 2); g.stroke(); }
-      /* Gelembung kecil. */
+      /* Small bubbles. */
       for (const b of bubbles) {
         const age = (blow - b.d) / 0.6; if (age <= 0) continue;
         const life = Math.min(age, 3);
@@ -307,7 +307,7 @@ function scene(api) {
   };
 }`;
 
-/** 15. Awan malam, ekor paus mengintip → paus berenang di langit → paus melompat menyemburkan bintang → paus melintasi bulan. */
+/** 15. Night clouds, a whale's tail peeks out → the whale swims in the sky → the whale leaps spouting stars → the whale crosses the moon. */
 export const SCENE_PAUS = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -341,7 +341,7 @@ function scene(api) {
       whale(x, y, s, rot, t * 2.2);
       /* Semburan bintang. */
       if (jump > 0.3) { const k = seg(jump, 0.3, 1) + pass * 0.5; for (const p of spray) { const sx = W * 0.34 + p[0] * u * 34 * k, sy = H * 0.38 - p[1] * u * 30 * Math.sin(Math.min(1, k) * Math.PI * 0.9) + k * k * u * 10; glowDot(sx, sy, u * 1.6, COL["c-2"], (0.8 - pass * 0.6) * (0.6 + 0.4 * Math.sin(t * 6 + p[2]))); } }
-      /* Awan di depan. */
+      /* Clouds in front. */
       g.fillStyle = rgba(COL["c-3"], 0.11);
       for (const c of clouds) { const cx = ((c[0] + t * c[3]) % 1.4 - 0.2) * W; cloud(cx, c[1] * H, u * 6 * c[2]); }
       if (swim < 0.15) { g.fillStyle = COL["c-1"]; g.save(); g.translate(W * 0.12, H * 0.8); g.rotate(Math.sin(t * 2) * 0.2); g.beginPath(); g.moveTo(0, 0); g.bezierCurveTo(-u * 2, -u * 2, -u * 4, -u * 4, -u * 5, -u * 3); g.bezierCurveTo(-u * 3, -u * 1, -u * 3, u * 1, -u * 5, u * 3); g.closePath(); g.fill(); g.restore(); }
@@ -349,7 +349,7 @@ function scene(api) {
   };
 }`;
 
-/** 16. Jendela berembun di malam bersalju → jari menggambar hati di kaca → kristal es tumbuh di sudut, cokelat panas mengepul → lampu hias menyala. */
+/** 16. A fogged window on a snowy night → a finger draws a heart on the glass → ice crystals grow in the corner, hot chocolate steams → string lights turn on. */
 export const SCENE_JENDELA = String.raw`
 function scene(api) {
   const { g, COL, seg, lerp, ease, rnd, rgba, glowDot } = api;
@@ -361,13 +361,13 @@ function scene(api) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const fw = Math.min(W * 0.8, H * 0.95), fh = Math.min(H * 0.7, fw * 0.9), fx = (W - fw) / 2, fy = H * 0.12;
       const draw = seg(B, 0.9, 1.8), frost = seg(B, 1.8, 2.5), lights = seg(B, 2.3, 2.9);
-      /* Luar: langit, salju, rumah-rumah jauh dengan jendela. */
+      /* Outside: sky, snow, distant houses with windows. */
       g.save(); g.beginPath(); g.rect(fx, fy, fw, fh); g.clip();
       g.fillStyle = COL["bg-3"]; g.fillRect(fx, fy, fw, fh);
       g.fillStyle = api.mix(COL["bg-3"], "#ffffff", 0.7); g.beginPath(); g.moveTo(fx, fy + fh); g.lineTo(fx, fy + fh * 0.78); g.quadraticCurveTo(fx + fw * 0.5, fy + fh * 0.7, fx + fw, fy + fh * 0.8); g.lineTo(fx + fw, fy + fh); g.fill();
       for (let i = 0; i < 4; i++) { const hx = fx + fw * (0.12 + i * 0.22), hy = fy + fh * 0.76, hw = fw * 0.1; g.fillStyle = api.mix(COL["bg-1"], COL["bg-3"], 0.4); g.fillRect(hx, hy - hw * 0.6, hw, hw * 0.6); g.beginPath(); g.moveTo(hx - 4, hy - hw * 0.6); g.lineTo(hx + hw / 2, hy - hw); g.lineTo(hx + hw + 4, hy - hw * 0.6); g.fill(); g.fillStyle = rgba(COL["c-2"], 0.85); g.fillRect(hx + hw * 0.35, hy - hw * 0.4, hw * 0.3, hw * 0.22); }
       for (const s of snow) { s[1] += dt * 0.05 * s[2]; if (s[1] > 1) s[1] = 0; g.fillStyle = rgba("#ffffff", 0.85 * s[2]); g.beginPath(); g.arc(fx + s[0] * fw + Math.sin(t + s[2] * 9) * u, fy + s[1] * fh, s[2] * 2.2, 0, 7); g.fill(); }
-      /* Embun: lapisan putih buram dengan lubang berbentuk hati (yang digambar jari). */
+      /* Fog: a frosted white layer with a heart-shaped hole (drawn by a finger). */
       const cx = fx + fw / 2, cy = fy + fh * 0.42, R = Math.min(fw, fh) * 0.24;
       g.fillStyle = rgba("#e8eef6", 0.42);
       g.beginPath(); g.rect(fx, fy, fw, fh);
@@ -376,24 +376,24 @@ function scene(api) {
       g.fill("evenodd");
       if (draw > 0 && draw < 1) { const p = HEART[Math.max(0, n - 1)]; g.fillStyle = rgba("#f2c8a8", 0.9); g.beginPath(); g.ellipse(cx + p[0] * R + u * 1.2, cy + p[1] * R + u * 3, u * 2.2, u * 4, 0.3, 0, 7); g.fill(); }
       if (draw > 0) { g.strokeStyle = rgba("#ffffff", 0.35); g.lineWidth = u * 1.4; g.beginPath(); for (let i = 0; i < n; i++) { const p = HEART[i]; i ? g.lineTo(cx + p[0] * R, cy + p[1] * R) : g.moveTo(cx + p[0] * R, cy + p[1] * R); } g.stroke(); }
-      /* Kristal es di sudut. */
+      /* Ice crystals in the corner. */
       if (frost > 0) {
         const corners = [[fx, fy, 1, 1], [fx + fw, fy, -1, 1], [fx, fy + fh, 1, -1], [fx + fw, fy + fh, -1, -1]];
         g.strokeStyle = rgba("#ffffff", 0.75); g.lineWidth = 1.4;
         for (const c of crystals) { const k = corners[c[0]], L = u * 14 * c[2] * ease(frost), a = c[1] * 0.6 + 0.1; const ex = k[0] + k[2] * Math.cos(a) * L, ey = k[1] + k[3] * Math.sin(a) * L; g.beginPath(); g.moveTo(k[0], k[1]); g.lineTo(ex, ey); for (let j = 1; j < 4; j++) { const q = j / 4, bx = lerp(k[0], ex, q), by = lerp(k[1], ey, q), bl = L * 0.2 * (1 - q); g.moveTo(bx, by); g.lineTo(bx + k[2] * Math.cos(a + 0.8) * bl, by + k[3] * Math.sin(a + 0.8) * bl); g.moveTo(bx, by); g.lineTo(bx + k[2] * Math.cos(a - 0.8) * bl, by + k[3] * Math.sin(a - 0.8) * bl); } g.stroke(); }
       }
       g.restore();
-      /* Kusen jendela dan ambang. */
+      /* Window frame and sill. */
       g.strokeStyle = COL["c-3"]; g.lineWidth = u * 2.2; g.strokeRect(fx, fy, fw, fh); g.lineWidth = u * 1.2; g.beginPath(); g.moveTo(cx, fy); g.lineTo(cx, fy + fh); g.moveTo(fx, fy + fh * 0.55); g.lineTo(fx + fw, fy + fh * 0.55); g.stroke();
       g.fillStyle = COL["c-3"]; g.fillRect(fx - u * 3, fy + fh, fw + u * 6, u * 3);
-      /* Cangkir cokelat panas di ambang. */
+      /* A cup of hot chocolate on the sill. */
       const mx = fx + fw * 0.8, my = fy + fh, mw = u * 6, mh = u * 6, mug = seg(B, 1.9, 2.4);
       if (mug > 0) {
         g.globalAlpha = mug; g.fillStyle = COL["c-1"]; g.fillRect(mx - mw / 2, my - mh, mw, mh); g.strokeStyle = COL["c-1"]; g.lineWidth = u * 1; g.beginPath(); g.arc(mx + mw / 2, my - mh / 2, mh * 0.28, -1.4, 1.4); g.stroke();
         for (let k = 0; k < 3; k++) { const q = (t * 0.3 + k / 3) % 1; g.strokeStyle = rgba("#ffffff", 0.45 * (1 - q) * mug); g.lineWidth = u * 0.5; g.beginPath(); const sx = mx - mw * 0.25 + k * mw * 0.25; g.moveTo(sx, my - mh - u); g.bezierCurveTo(sx - u * 1.5, my - mh - u * 4 - q * u * 4, sx + u * 1.5, my - mh - u * 6 - q * u * 6, sx, my - mh - u * 9 - q * u * 6); g.stroke(); }
         g.globalAlpha = 1;
       }
-      /* Lampu hias di sepanjang kusen atas. */
+      /* String lights along the top of the window frame. */
       if (lights > 0) {
         g.strokeStyle = rgba(COL.ink, 0.5); g.lineWidth = 1; g.beginPath();
         const N = 14; for (let i = 0; i <= N; i++) { const x = fx + (i / N) * fw, y = fy + Math.sin((i / N) * Math.PI * 4) * u * 1.5 + u * 1.2; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();

@@ -3,11 +3,11 @@ import { isBox } from "../../pageMaker/engine/helpers/componentTypes";
 import { isSection, type PageDoc } from "../../pageMaker/helpers/pageDoc";
 
 /* ================================================================== */
-/* Gambar hero (LCP) diprioritaskan                                      */
+/* Hero image (LCP) is prioritized                                       */
 /*                                                                    */
-/* Gambar pertama di bagian atas halaman (3 section teratas: navbar,    */
-/* hero, ...) biasanya elemen LCP. Gambar itu TIDAK boleh lazy dan       */
-/* diberi fetchpriority="high"; gambar lain tetap lazy.                 */
+/* The first image at the top of the page (the top 3 sections: navbar,  */
+/* hero, ...) is usually the LCP element. That image must NOT be lazy and */
+/* gets fetchpriority="high"; other images stay lazy.                   */
 /* ================================================================== */
 
 const TOP_SECTIONS = 3;
@@ -40,13 +40,13 @@ export function prioritizeHeroImage(doc: PageDoc): PageDoc {
 }
 
 /* ------------------------------------------------------------------ */
-/* Hero tanpa animasi masuk                                             */
+/* Hero without an entrance animation                                   */
 /*                                                                    */
-/* Animasi masuk (AOS / Animate.css) di hero membuat judul & gambar      */
-/* (AOS dilepas, Animate.css diganti "pulse" yang tidak menyembunyikan)  */
-/* utama tersembunyi sampai animasi berjalan, sehingga LCP tertunda      */
-/* (realty-rumah-kita: ±3,8 detik). Section konten pertama (hero)        */
-/* ditampilkan langsung; section berikutnya tetap beranimasi.            */
+/* Entrance animations (AOS / Animate.css) in the hero make the heading & image */
+/* (AOS removed, Animate.css replaced with "pulse", which does not hide) */
+/* main content stayed hidden until the animation ran, delaying LCP      */
+/* (realty-rumah-kita: ±3.8 seconds). The first content section (hero)   */
+/* shown right away; the following sections still animate.             */
 /* ------------------------------------------------------------------ */
 
 function stripEntrance(n: ComponentNode, keepAos: boolean): ComponentNode {
@@ -55,7 +55,7 @@ function stripEntrance(n: ComponentNode, keepAos: boolean): ComponentNode {
     const { aos: _a, ...base } = n.libs;
     void _a;
     const rest = keepAos && n.libs.aos ? { ...base, aos: n.libs.aos } : base;
-    // Animate.css diganti "pulse" (hanya skala, tanpa opacity 0): tetap hidup, LCP tidak tertunda.
+    // Animate.css replaced with "pulse" (scale only, no opacity 0): still lively, LCP not delayed.
     const libs = rest.animate ? { ...rest, animate: { ...rest.animate, effect: "pulse" as const, delay: 0 } } : rest;
     out = { ...n, libs } as ComponentNode;
     if (!Object.keys(libs).length) delete (out as { libs?: unknown }).libs;
@@ -69,11 +69,11 @@ const isContent = (s: ComponentNode) => isSection(s) && isBox(s) && s.tag !== "h
 
 export function calmHero(doc: PageDoc): PageDoc {
   const idx = doc.root.children.findIndex(isContent);
-  // Halaman yang isinya hanya hero tetap beranimasi (tidak ada section lain).
+  // Pages whose content is only a hero still animate (there are no other sections).
   if (idx < 0 || doc.root.children.filter(isContent).length < 2) return doc;
   const hero = doc.root.children[idx];
   const usesAos = (n: ComponentNode): boolean => !!n.libs?.aos || (isBox(n) && n.children.some(usesAos));
-  // AOS terpasang hanya di hero → biarkan (pustaka terpasang harus tetap dipakai).
+  // AOS installed only in the hero → leave it (an installed library must still be used).
   const keepAos = !doc.root.children.some((s, i) => i !== idx && usesAos(s));
   const calm = stripEntrance(hero, keepAos);
   if (calm === hero) return doc;

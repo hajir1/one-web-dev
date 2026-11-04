@@ -1,8 +1,8 @@
 import type { Domain } from "./spec";
 
 /* ================================================================== */
-/* Isi domain dashboard (bagian 5): properti & sewa, gym, pertanian,    */
-/* donasi/yayasan, penyelenggara acara. Semua data adalah contoh.       */
+/* Dashboard domain content (part 5): property & rentals, gym, agriculture, */
+/* donations/foundation, event organizer. All data is sample data.      */
 /* ================================================================== */
 
 const M6 = ["Jan|Jan", "Feb|Feb", "Mar|Mar", "Apr|Apr", "Mei|May", "Jun|Jun"];

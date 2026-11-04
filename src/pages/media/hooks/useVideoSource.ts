@@ -10,12 +10,12 @@ export interface VideoSource {
 }
 
 /**
- * Satu video sumber: muat metadata (durasi, ukuran) dengan penanganan codec
- * tidak didukung, durasi Infinity, dan timeout. URL dicabut saat diganti
- * atau halaman ditinggalkan.
+ * One source video: loads metadata (duration, size) while handling unsupported
+ * codecs, Infinity durations, and timeouts. The URL is revoked when replaced
+ * or when leaving the page.
  *
- * `requireVideoTrack: false` → file audio-saja / video tanpa gambar tetap
- * diterima (untuk Ekstrak Audio).
+ * `requireVideoTrack: false` → audio-only files / videos without picture are still
+ * accepted (for Extract Audio).
  */
 export function useVideoSource({ requireVideoTrack = true }: { requireVideoTrack?: boolean } = {}) {
   const [video, setVideo] = useState<VideoSource | null>(null);
@@ -55,7 +55,7 @@ export function useVideoSource({ requireVideoTrack = true }: { requireVideoTrack
         try {
           meta = await loadVideoMeta(el, url);
         } catch (e) {
-          // Tanpa trek video (mis. audio saja): metadata durasi masih bisa dibaca.
+          // No video track (e.g. audio only): duration metadata can still be read.
           if (!requireVideoTrack && Number.isFinite(el.duration) && el.duration > 0) meta = { duration: el.duration, width: 0, height: 0, durationFixed: false };
           else throw e;
         }

@@ -5474,7 +5474,10 @@
         "files": "Berkas website gagal disiapkan. Coba lagi.",
         "blocked": "Kuota ekspor gratis habis. Setelah pembayaran kredit disetujui, deploy berjalan otomatis.",
         "unknown": "Deploy gagal."
-      }
+      },
+      "lastTitle": "Sudah dideploy ke {{repo}} · {{date}}",
+      "lastHint": "Deploy lagi memperbarui repo yang sama, jadi alamat situsnya tetap.",
+      "restart": "Deploy ulang"
     }
   },
   "designLimit": {
@@ -7544,6 +7547,66 @@
         "name": "Cerita 3D Pintu Rimba",
         "description": "Resor hutan: pintu berdiri sendirian di gurun, terbuka dan bercahaya, kamera melangkah masuk dan dunia berganti menjadi hutan malam."
       },
+      "story-benang-rajut": {
+        "name": "Cerita 3D Benang Rajut",
+        "description": "Toko benang dan kelas rajut: gulungan benang terurai, menggambar pola sweter, lalu rajutannya terisi dan melambai."
+      },
+      "story-sawah-terasering": {
+        "name": "Cerita 3D Sawah Terasering",
+        "description": "Beras dari petani: setetes hujan beriak, sawah terasering naik, padi tumbuh lalu menguning, dan karung beras muncul."
+      },
+      "story-seribu-bangau": {
+        "name": "Cerita 3D Seribu Bangau",
+        "description": "Wedding organizer: kertas dilipat jadi bangau, terbang bersama kawanannya, lalu membentuk hati."
+      },
+      "story-senar-gitar": {
+        "name": "Cerita 3D Senar Gitar",
+        "description": "Sekolah musik: senar dipetik, gelombang suara menjalar, jadi batang equalizer, lalu lampu panggung menyapu."
+      },
+      "story-lilin-aroma": {
+        "name": "Cerita 3D Lilin Aroma",
+        "description": "Lilin aromaterapi: sumbu menyala, ruangan meredup, lilin meleleh, asap wangi naik, lalu rak penuh lilin menyala."
+      },
+      "story-ombak-selancar": {
+        "name": "Cerita 3D Ombak Selancar",
+        "description": "Sekolah selancar: laut menggulung jadi terowongan ombak, papan meluncur di dalamnya, lalu pantai kelapa muncul."
+      },
+      "story-pizza-tungku": {
+        "name": "Cerita 3D Pizza Tungku",
+        "description": "Pizza kayu bakar: adonan berputar pipih, saus dan topping jatuh, tungku menyala, lalu satu potong terangkat."
+      },
+      "story-satelit-jaringan": {
+        "name": "Cerita 3D Satelit Jaringan",
+        "description": "Internet desa: antena menengadah, cincin sinyal naik, satelit mengorbit bumi, lalu kota-kota tersambung."
+      },
+      "story-sepeda-lembah": {
+        "name": "Cerita 3D Sepeda Lembah",
+        "description": "Tur sepeda: roda menggelinding, rangka sepeda menyatu, rute tergambar di bukit, lalu sepeda melaju di rute itu."
+      },
+      "story-kotak-musik": {
+        "name": "Cerita 3D Kotak Musik",
+        "description": "Kelas musik anak: kotak musik terbuka, penari kecil berputar, not balok melayang, lalu langit berbintang muncul."
+      },
+      "story-teh-kebun": {
+        "name": "Cerita 3D Teh Kebun",
+        "description": "Rumah teh: daun teh jatuh ke cangkir, air berubah warna, uap mengepul, lalu kebun teh berundak muncul."
+      },
+      "story-jahit-busana": {
+        "name": "Cerita 3D Jahit Busana",
+        "description": "Penjahit dan butik: jarum menarik benang, jahitan berjalan di kampuh, lalu kain menutup jadi gaun di manekin."
+      },
+      "story-kompas-properti": {
+        "name": "Cerita 3D Kompas Properti",
+        "description": "Agen properti: jarum kompas berhenti, peta terbuka, blok kota tumbuh, lalu pin lokasi jatuh di rumah incaran."
+      },
+      "story-daur-kertas": {
+        "name": "Cerita 3D Daur Kertas",
+        "description": "Bank sampah: tutup tempat sampah terbuka, sobekan kertas jadi bubur, lalu memipih menjadi buku baru."
+      },
+      "story-cat-sanggar": {
+        "name": "Cerita 3D Cat Sanggar",
+        "description": "Sanggar melukis: tetes cat memercik, warna menyebar di kanvas, lalu kanvas-kanvas tergantung di dinding galeri."
+      },
       "anim-surat-merpati": {
         "name": "Surat Merpati",
         "description": "Animasi cerita: amplop terbuka, surat terlipat jadi burung kertas yang terbang menggambar hati. Tanpa library."
@@ -8256,6 +8319,66 @@
         "name": "Sweet 17 Resleting",
         "description": "Undangan ulang tahun ke-17 bergaya denim neon: resleting tertarik turun dan kedua sisi sampul terbuka."
       },
+      "undangan-nikah-segel-lilin": {
+        "name": "Segel Lilin Surat Antik",
+        "description": "Undangan pernikahan merah marun: segel lilin retak dan empat lipatan amplop terlempar ke tepi layar."
+      },
+      "undangan-nikah-lensa-kamera": {
+        "name": "Lensa Kamera Monokrom",
+        "description": "Undangan pernikahan monokrom: enam bilah diafragma lensa berputar terbuka seperti kamera."
+      },
+      "undangan-ultah-60-lampion": {
+        "name": "Lampion Syukuran 60 Tahun",
+        "description": "Syukuran ulang tahun ke-60: tujuh lajur sampul membawa lampion yang terbang ke langit malam."
+      },
+      "undangan-reuni-kalender-sobek": {
+        "name": "Kalender Sobek Reuni Perak",
+        "description": "Undangan reuni 25 tahun: tiga lembar kalender tersobek ke atas satu per satu."
+      },
+      "undangan-tujuh-bulan-anyaman": {
+        "name": "Anyaman Pandan Tujuh Bulanan",
+        "description": "Undangan tujuh bulanan: lajur anyaman pandan ditarik keluar ke arah berlawanan."
+      },
+      "undangan-nikah-candi-bentar": {
+        "name": "Candi Bentar Pawiwahan Bali",
+        "description": "Pawiwahan Bali: dua sisi gerbang candi bentar turun lalu bergeser terbuka dengan cahaya senja."
+      },
+      "undangan-wisuda-ubin-balik": {
+        "name": "Ubin Balik Wisuda",
+        "description": "Syukuran wisuda: 48 ubin sampul berbalik dalam gelombang diagonal."
+      },
+      "undangan-rumah-jendela-kayu": {
+        "name": "Jendela Kayu Rumah Baru",
+        "description": "Syukuran rumah baru: daun jendela berkisi terayun terbuka dan cahaya pagi masuk."
+      },
+      "undangan-ultah-anak-kue-lapis": {
+        "name": "Kue Lapis Ulang Tahun Anak",
+        "description": "Ulang tahun anak: lapisan kue warna-warni bergeser keluar bergantian ke kiri dan kanan."
+      },
+      "undangan-khitanan-balon-letus": {
+        "name": "Balon Letus Khitanan",
+        "description": "Tasyakuran khitanan: kumpulan balon warna-warni mengembang lalu meletus satu per satu."
+      },
+      "undangan-nikah-kartu-pos": {
+        "name": "Kartu Pos Pernikahan Pantai",
+        "description": "Pernikahan di pantai: kartu pos berbalik memperlihatkan perangko lalu meluncur ke kotak pos."
+      },
+      "undangan-ultah-30-kaca-pecah": {
+        "name": "Kaca Pecah Pesta 30 Tahun",
+        "description": "Pesta ulang tahun ke-30: sampul kaca retak menjadi delapan pecahan yang jatuh berputar."
+      },
+      "undangan-aqiqah-tetes-madu": {
+        "name": "Tetes Madu Aqiqah",
+        "description": "Undangan aqiqah: sampul keemasan meleleh turun seperti tetesan madu."
+      },
+      "undangan-lamaran-surat-lipat": {
+        "name": "Surat Lipat Lamaran",
+        "description": "Undangan lamaran: surat bergaris terlipat dua lalu meluncur keluar ke kanan."
+      },
+      "undangan-nikah-tirai-manik": {
+        "name": "Tirai Manik Baralek Minang",
+        "description": "Baralek Minang: untaian tirai manik tersibak dari tengah ke kedua sisi sambil berayun."
+      },
       "anim-layangan-bukit": {
         "name": "Layangan Bukit",
         "description": "Animasi semangat: angin menerbangkan layangan dari bukit, lalu layangan lain ikut naik dan mengitarinya. Tanpa library."
@@ -8275,6 +8398,46 @@
       "anim-piringan-lagu": {
         "name": "Piringan Lagu",
         "description": "Animasi lagu kita: piringan hitam berputar, not-not lagu beterbangan lalu membentuk hati. Tanpa library."
+      },
+      "anim-css-matahari-terbit": {
+        "name": "Animasi CSS Matahari Terbit",
+        "description": "Animasi CSS murni: matahari naik perlahan di balik tiga lapis bukit, langit menghangat, awan bergeser, dan burung melintas."
+      },
+      "anim-css-kincir-angin": {
+        "name": "Animasi CSS Kincir Angin",
+        "description": "Animasi CSS murni: baling-baling kincir angin berputar, tiga lajur kebun tulip bergulir dengan kecepatan berbeda, dan awan melintas pelan."
+      },
+      "anim-css-kapal-kertas": {
+        "name": "Animasi CSS Kapal Kertas",
+        "description": "Animasi CSS murni: kapal kertas terombang-ambing di atas tiga lapis ombak, matahari terbenam berganti bulan, dan bintang mulai berkelip."
+      },
+      "anim-css-roket-luncur": {
+        "name": "Animasi CSS Roket Meluncur",
+        "description": "Animasi CSS murni: hitung mundur tiga, dua, satu, asap mengepul di landasan, roket meluncur ke atas dan bintang melesat lewat."
+      },
+      "anim-css-kebun-bunga": {
+        "name": "Animasi CSS Kebun Bunga",
+        "description": "Animasi CSS murni: batang tumbuh, kelopak mekar bergantian, daun membuka, dan dua lebah terbang mengikuti jalur angka delapan."
+      },
+      "anim-css-api-unggun": {
+        "name": "Animasi CSS Api Unggun",
+        "description": "Animasi CSS murni: tiga lapis api unggun berkedip, percikan naik ke langit, cahaya hangat bernapas, dan tenda berdiri di bawah bintang."
+      },
+      "anim-css-lampu-kota": {
+        "name": "Animasi CSS Lampu Kota",
+        "description": "Animasi CSS murni: senja turun di atas deretan gedung, jendela menyala bergelombang, bulan naik, dan bintang jatuh melintas."
+      },
+      "anim-css-pesawat-spanduk": {
+        "name": "Animasi CSS Pesawat Spanduk",
+        "description": "Animasi CSS murni: pesawat kecil terbang menembus tiga lapis awan sambil menarik spanduk dan meninggalkan jejak titik-titik."
+      },
+      "anim-css-mesin-ketik": {
+        "name": "Animasi CSS Mesin Ketik",
+        "description": "Animasi CSS murni: tuts mesin ketik menghentak, tiga baris kalimat terketik satu per satu di kertas, dan rol kertas bergeser naik."
+      },
+      "anim-css-orbit-planet": {
+        "name": "Animasi CSS Orbit Planet",
+        "description": "Animasi CSS murni: empat planet mengelilingi matahari pada orbit miring 3D, planet bercincin ikut berputar, dan komet melesat lewat."
       },
       "j3d-tanah-liat-kasongan": {
         "name": "Tanah Liat Kasongan",
@@ -10307,7 +10470,9 @@
       "button": "Unduh",
       "title": "Unduh {{name}}",
       "text": "Kode seluruh website ({{count}} halaman) dalam satu ZIP. Centang Include CRUD bila butuh dashboard dan backend untuk koleksi data."
-    }
+    },
+    "deployed": "Dideploy {{date}}",
+    "redeploy": "Deploy ulang"
   },
   "codeEditor": {
     "title": "Editor tanpa kode",

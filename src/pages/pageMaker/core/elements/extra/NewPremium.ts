@@ -1,17 +1,17 @@
 /* ================================================================== */
-/* Elemen PREMIUM v3 (tingkat lanjut — butuh JS interaksi):             */
+/* PREMIUM elements v3 (advanced — need interaction JS):                */
 /* Popover, Notifikasi Toast, Panel Samping (Offcanvas), Input OTP,     */
-/* Tombol Dropdown, Persetujuan Cookie, Gambar Hotspot, Formulir        */
+/* Dropdown Button, Cookie Consent, Hotspot Image, Form                 */
 /* Bertahap.                                                            */
 /*                                                                    */
-/* Pola yang sama dengan elemen premium v2: markup statis tetap masuk   */
-/* akal tanpa JS (canvas Desain tidak menjalankan JS), interaksi lewat  */
-/* `customCode` (runtime Custom JS: `element`, `on`, `onCleanup`) di    */
-/* Pratinjau dan hasil ekspor kelima framework. Atribut `data-ready`    */
-/* dipasang runtime; elemen mengambang (toast, cookie) baru "melayang"  */
-/* setelah atribut itu ada, jadi di canvas tetap bisa dipilih & diatur. */
+/* The same pattern as the v2 premium elements: static markup still makes */
+/* sense without JS (the Design canvas does not run JS), interaction via */
+/* `customCode` (Custom JS runtime: `element`, `on`, `onCleanup`) in    */
+/* the preview and the export output of all five frameworks. The `data-ready` attribute */
+/* set by the runtime; floating elements (toast, cookie) only "float"  */
+/* once that attribute exists, so they stay selectable & editable on the canvas. */
 /* ================================================================== */
-/* Dipecah per elemen di folder newPremium/ (no. 15); berkas ini hanya mengekspor ulang. */
+/* Split per element in the newPremium/ folder (no. 15); this file only re-exports. */
 
 export * from "./newPremium/Popover";
 export * from "./newPremium/Toast";

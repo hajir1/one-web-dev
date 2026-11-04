@@ -1,6 +1,6 @@
 import { addCss, box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, list, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 01 · Tanah Liat Kasongan: UMKM gerabah. Ide besar: meja putar perajin + proses yang "dibakar" bertahap (pin). */
+/* 01 · Tanah Liat Kasongan: a pottery small business. Big idea: the potter's wheel + a process "fired" in stages (pin). */
 
 const C = { tera: "#B5532A", tanah: "#3B2A20", kapur: "#F3EBDD", abu: "#8C7B6B", lumut: "#5E7D5B" };
 export const L01 = lookJ({ ink: C.tanah, muted: "#5c4a3e", primary: C.tera, primaryDark: "#8f3f1e", soft: "#ead9c4", line: "#d8c6ae", bg: C.kapur, head: "Young Serif", body: "Hanken Grotesk", r: 0 });
@@ -22,7 +22,7 @@ const STEPS: [string, B, B, B][] = [
   ["04", ["Bakar", "Fire"], ["Dibakar dengan kayu dan sekam sampai 1.050°C, lalu didinginkan pelan semalaman.", "Fired with wood and rice husk to 1,050°C, then cooled slowly overnight."], ["Hari 4", "Day 4"]],
 ];
 
-/** Tag katalog: lubang tali, nomor cap, gambar, nama, ukuran, harga. */
+/** Catalog tag: string hole, stamp number, image, name, size, price. */
 function tag(j: J, [no, name, size, price, art]: (typeof ITEMS)[number]): BoxNode {
   const { t } = j;
   const c = box(

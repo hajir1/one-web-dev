@@ -1,8 +1,8 @@
 import type { AssetBackend, AssetMeta, PreparedImage } from "./types";
 
-/* Mode demo & sebelum masuk: aset disimpan di IndexedDB browser ini      */
-/* (kapasitas ratusan MB, tidak seperti localStorage yang hanya ±5 MB).  */
-/* Desain hanya menyimpan `aset:<id>`.                                   */
+/* Demo mode & before signing in: assets are stored in this browser's IndexedDB */
+/* (capacity of hundreds of MB, unlike localStorage at about 5 MB).     */
+/* Designs only store `aset:<id>`.                                       */
 
 const DB = "owd-assets";
 const META = "meta";

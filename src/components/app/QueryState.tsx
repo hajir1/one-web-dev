@@ -4,16 +4,16 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import { ApiError } from "../../api/client";
 
 /* ================================================================== */
-/* Tampilan loading & error yang seragam untuk data dari API             */
-/* (dipakai bersama hook TanStack Query di api/queries.ts).              */
+/* Consistent loading & error display for API data                      */
+/* (used together with the TanStack Query hooks in api/queries.ts).     */
 /* ================================================================== */
 
-/** Blok abu-abu berdenyut sebagai pengganti konten yang sedang dimuat. */
+/** Pulsing gray block shown in place of content that is loading. */
 export function Skeleton({ className = "" }: { className?: string }) {
   return <span aria-hidden="true" className={`block animate-pulse rounded-lg bg-gray-200/80 dark:bg-white/10 ${className}`} />;
 }
 
-/** Baris-baris skeleton (daftar transaksi, tabel). */
+/** Skeleton rows (transaction list, tables). */
 export function SkeletonRows({ rows = 4, testId }: { rows?: number; testId?: string }) {
   const { t } = useTranslation();
   return (
@@ -32,7 +32,7 @@ export function SkeletonRows({ rows = 4, testId }: { rows?: number; testId?: str
   );
 }
 
-/** Kartu skeleton (katalog template). */
+/** Skeleton card (template catalog). */
 export function SkeletonCards({ count = 6, testId }: { count?: number; testId?: string }) {
   const { t } = useTranslation();
   return (
@@ -59,7 +59,7 @@ export function SkeletonCards({ count = 6, testId }: { count?: number; testId?: 
   );
 }
 
-/** Pesan ramah per jenis error (jaringan, terlalu banyak permintaan, server). */
+/** Friendly message per error type (network, too many requests, server). */
 function errorMessage(error: unknown, t: (k: string) => string): string {
   if (error instanceof ApiError) {
     if (error.status === 0) return error.code === "API_UNAVAILABLE" ? error.message : t("query.network");
@@ -71,7 +71,7 @@ function errorMessage(error: unknown, t: (k: string) => string): string {
   return error instanceof Error && error.message ? error.message : t("errors.unknown");
 }
 
-/** Kotak error dengan tombol "Coba lagi". */
+/** Error box with a "Try again" button. */
 export function QueryError({ error, onRetry, title, retrying, testId, compact }: { error: unknown; onRetry?: () => void; title?: ReactNode; retrying?: boolean; testId?: string; compact?: boolean }) {
   const { t } = useTranslation();
   return (

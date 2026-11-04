@@ -1,5 +1,5 @@
 // @ts-nocheck
-// v11: paket langganan Media & Data di sisi frontend.
+// v11: Media & Data subscription plans on the frontend side.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_CATALOG, DEFAULT_PLANS, perMonthWhenYearly, planQuota, sanitizeCatalog, sanitizePlanView, sanitizeSummary, unitsFor, videoSecondsFor } from "../planCore";

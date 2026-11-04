@@ -4,8 +4,8 @@ import type { BoxNode, ComponentDoc } from "./componentTypes";
 /* ================================================================== */
 /* State dokumen + riwayat (undo / redo)                                */
 /*                                                                    */
-/* Perubahan beruntun pada properti yang sama (mengetik, menggeser      */
-/* slider) digabung jadi satu langkah undo lewat `key`.                 */
+/* Consecutive changes to the same property (typing, dragging a         */
+/* slider) are merged into one undo step through `key`.                 */
 /* ================================================================== */
 
 const LIMIT = 80;
@@ -77,7 +77,7 @@ export function useComponentDoc(initial: () => ComponentDoc) {
     lastAt: 0,
   }));
 
-  /** Ubah pohon. `key` menggabungkan perubahan beruntun jadi satu langkah undo. */
+  /** Changes the tree. `key` merges consecutive changes into one undo step. */
   const editRoot = useCallback(
     (fn: (root: BoxNode) => BoxNode, key?: string) =>
       dispatch({
@@ -92,7 +92,7 @@ export function useComponentDoc(initial: () => ComponentDoc) {
     [],
   );
 
-  /** Setter bergaya useState — untuk useDesignSaver (memuat / desain baru, bisa di-undo). */
+  /** A useState-style setter, for useDesignSaver (loading / new design, undoable). */
   const setDoc = useCallback(
     (action: SetStateAction<ComponentDoc>) =>
       dispatch({

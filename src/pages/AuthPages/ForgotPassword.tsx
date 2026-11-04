@@ -8,7 +8,7 @@ import { ApiError } from "../../api/client";
 import { forgotPassword } from "../../auth/session";
 import AuthLayout from "./AuthPageLayout";
 
-/** /:lang/forgot-password — minta tautan atur ulang sandi (respons selalu generik). */
+/** /:lang/forgot-password — request a password reset link (the response is always generic). */
 export default function ForgotPassword() {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");

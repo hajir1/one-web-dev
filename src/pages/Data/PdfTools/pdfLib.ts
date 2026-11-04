@@ -2,21 +2,21 @@ import { PDFDocument, degrees } from "pdf-lib";
 import { DataError } from "../shared/errors";
 
 /* ================================================================== */
-/* Alat PDF (v10) — logika murni pdf-lib (MIT), berjalan di browser.     */
-/* Tidak ada berkas yang dikirim ke server. Render halaman ke gambar     */
-/* (PDF → gambar, kompres kuat) ada di pdfRender.ts (pdf.js).            */
+/* PDF tools (v10) — pure pdf-lib (MIT) logic, runs in the browser.      */
+/* No files are sent to a server. Rendering pages to images             */
+/* (PDF → images, strong compression) lives in pdfRender.ts (pdf.js).    */
 /* ================================================================== */
 
 import { MAX_IMAGES } from "./pdfLimits";
 
 const isPdf = (b: Uint8Array) => b.length > 4 && b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46; // %PDF
 
-/** Buka PDF; error ramah bila bukan PDF, rusak, atau terkunci sandi. */
+/** Opens a PDF; friendly errors when it is not a PDF, is corrupt, or is password-locked. */
 export async function loadPdf(bytes: Uint8Array): Promise<PDFDocument> {
   if (!isPdf(bytes)) throw new DataError("notPdf");
   try {
     const doc = await PDFDocument.load(bytes, { updateMetadata: false });
-    // pdf-lib kadang tidak melempar error untuk file rusak; cek pohon halamannya.
+    // pdf-lib sometimes does not throw for corrupt files; check its page tree.
     if (doc.getPageCount() < 1) throw new Error("no pages");
     return doc;
   } catch (e) {
@@ -26,8 +26,8 @@ export async function loadPdf(bytes: Uint8Array): Promise<PDFDocument> {
 }
 
 /**
- * "1-3, 5, 8-" → indeks halaman 0-based (urutan dipertahankan, tanpa duplikat).
- * Kosong = semua halaman. Error bila di luar 1..total.
+ * "1-3, 5, 8-" → 0-based page indexes (order kept, no duplicates).
+ * Empty = every page. Error when outside 1..total.
  */
 export function parseRanges(input: string, total: number): number[] {
   const s = input.replace(/\s+/g, "");
@@ -63,7 +63,7 @@ async function copyInto(target: PDFDocument, src: PDFDocument, indices: number[]
 
 const save = (doc: PDFDocument) => doc.save({ useObjectStreams: true });
 
-/** Gabungkan beberapa PDF sesuai urutan. */
+/** Merge several PDFs in order. */
 export async function mergePdfs(files: Uint8Array[]): Promise<Uint8Array> {
   if (files.length < 2) throw new DataError("pdfNeedTwo");
   const out = await PDFDocument.create();
@@ -74,7 +74,7 @@ export async function mergePdfs(files: Uint8Array[]): Promise<Uint8Array> {
   return save(out);
 }
 
-/** Ambil halaman tertentu menjadi satu PDF baru. */
+/** Extracts specific pages into a new PDF. */
 export async function extractPages(bytes: Uint8Array, ranges: string): Promise<Uint8Array> {
   const src = await loadPdf(bytes);
   const out = await PDFDocument.create();
@@ -82,7 +82,7 @@ export async function extractPages(bytes: Uint8Array, ranges: string): Promise<U
   return save(out);
 }
 
-/** Pisahkan: satu PDF per halaman (atau per kelompok N halaman). */
+/** Split: one PDF per page (or per group of N pages). */
 export async function splitPdf(bytes: Uint8Array, every = 1): Promise<Uint8Array[]> {
   const src = await loadPdf(bytes);
   const n = src.getPageCount();
@@ -96,7 +96,7 @@ export async function splitPdf(bytes: Uint8Array, every = 1): Promise<Uint8Array
   return parts;
 }
 
-/** Hapus halaman tertentu. */
+/** Delete specific pages. */
 export async function deletePages(bytes: Uint8Array, ranges: string): Promise<Uint8Array> {
   const src = await loadPdf(bytes);
   const drop = new Set(parseRanges(ranges, src.getPageCount()));
@@ -107,7 +107,7 @@ export async function deletePages(bytes: Uint8Array, ranges: string): Promise<Ui
   return save(out);
 }
 
-/** Putar halaman (semua atau rentang) 90/180/270 derajat searah jarum jam. */
+/** Rotates pages (all or a range) 90/180/270 degrees clockwise. */
 export async function rotatePages(bytes: Uint8Array, angle: 90 | 180 | 270, ranges = ""): Promise<Uint8Array> {
   const doc = await loadPdf(bytes);
   for (const i of parseRanges(ranges, doc.getPageCount())) {
@@ -117,14 +117,14 @@ export async function rotatePages(bytes: Uint8Array, angle: 90 | 180 | 270, rang
   return save(doc);
 }
 
-/** Susun ulang halaman dengan urutan baru, mis. "3,1,2". Halaman yang tidak disebut dibuang. */
+/** Reorders pages in a new order, e.g. "3,1,2". Pages not listed are dropped. */
 export async function reorderPages(bytes: Uint8Array, order: string): Promise<Uint8Array> {
   return extractPages(bytes, order);
 }
 
 /**
- * Kompres ringan: tulis ulang struktur PDF (object stream, buang objek
- * yatim, hapus metadata). Isi & teks tetap sama, penghematan bervariasi.
+ * Light compression: rewrites the PDF structure (object streams, drops orphan
+ * objects, removes metadata). Content & text stay the same; savings vary.
  */
 export async function compressLossless(bytes: Uint8Array, stripMetadata = true): Promise<Uint8Array> {
   const src = await loadPdf(bytes);
@@ -149,7 +149,7 @@ export interface ImageInput {
   height: number;
 }
 
-/** Gambar (JPG/PNG) → satu PDF, satu gambar per halaman. */
+/** Images (JPG/PNG) → one PDF, one image per page. */
 export async function imagesToPdf(images: ImageInput[], size: PageSize = "fit", margin = 0): Promise<Uint8Array> {
   if (!images.length) throw new DataError("noFile");
   if (images.length > MAX_IMAGES) throw new DataError("tooManyFiles", { max: MAX_IMAGES });
@@ -162,7 +162,7 @@ export async function imagesToPdf(images: ImageInput[], size: PageSize = "fit", 
     let ph: number = ih + margin * 2;
     if (size !== "fit") {
       const [w, h] = SIZES[size];
-      // Orientasi halaman mengikuti gambar.
+      // Page orientation follows the image.
       [pw, ph] = iw > ih ? [h, w] : [w, h];
     }
     const scale = Math.min((pw - margin * 2) / iw, (ph - margin * 2) / ih, size === "fit" ? 1 : Infinity);
@@ -173,7 +173,7 @@ export async function imagesToPdf(images: ImageInput[], size: PageSize = "fit", 
   return save(doc);
 }
 
-/** Info singkat PDF untuk ditampilkan. */
+/** Short PDF info for display. */
 export async function pdfInfo(bytes: Uint8Array): Promise<{ pages: number; title?: string }> {
   const d = await loadPdf(bytes);
   return { pages: d.getPageCount(), title: d.getTitle() || undefined };

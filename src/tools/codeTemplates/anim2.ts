@@ -1,18 +1,18 @@
 import { dataBlock, doc, esc, ot, type ThemeVar } from "./shared";
 
 /* ================================================================== */
-/* ANIMASI CERITA (v22): kartu ucapan yang bercerita dalam beberapa      */
-/* babak. Tanpa library: satu canvas 2D + teks HTML.                     */
+/* STORY ANIMATIONS (v22): greeting cards that tell a story in several   */
+/* acts. No library: one 2D canvas + HTML text.                         */
 /*                                                                    */
-/* - Tiap template punya adegan sendiri (fungsi scene di storyAnim*.ts):*/
-/*   amplop yang berubah jadi burung, lilin yang ditiup, ulat yang jadi */
-/*   kupu-kupu, dan seterusnya. Alurnya tidak seragam.                  */
-/* - Waktu cerita B: 0 → jumlah babak. Babak maju sendiri tiap          */
-/*   CONFIG.detikPerBabak detik; ketuk/klik/spasi untuk lanjut lebih    */
-/*   cepat. Babak terakhir menampilkan kartu ucapan.                    */
-/* - Warna dibaca dari variabel CSS (bisa diubah di editor tanpa kode).  */
-/* - Hemat: DPR maks 2, partikel dibatasi, berhenti saat tab tersembunyi,*/
-/*   "kurangi gerakan" langsung menampilkan babak terakhir tanpa gerak.  */
+/* - Each template has its own scene (scene functions in storyAnim*.ts): */
+/*   an envelope that turns into a bird, a candle being blown out, a caterpillar becoming */
+/*   a butterfly, and so on. The flows are not uniform.                 */
+/* - Story time B: 0 → number of acts. Acts advance on their own every  */
+/*   CONFIG.detikPerBabak seconds; tap/click/space to advance           */
+/*   faster. The last act shows the greeting card.                      */
+/* - Colors are read from CSS variables (changeable in the no-code editor). */
+/* - Lightweight: DPR max 2, capped particles, stops while the tab is hidden,*/
+/*   "reduce motion" shows the last act right away without motion.     */
 /* ================================================================== */
 
 export type CapFx = "rise" | "blur" | "letters" | "scale" | "slide";
@@ -22,23 +22,23 @@ export interface Anim2Spec {
   title: string;
   description: string;
   font: { display: string; href: string; italic?: boolean };
-  /** Warna: 3 latar (bawah/tengah/atas), 3 warna adegan, teks. */
+  /** Colors: 3 backgrounds (bottom/middle/top), 3 scene colors, text. */
   colors: { bg1: string; bg2: string; bg3: string; c1: string; c2: string; c3: string; ink: string; panel: string };
-  /** Nama warna adegan untuk form editor. */
+  /** Scene color names for the editor form. */
   labels: [string, string, string];
-  /** Teks per babak (sebelum kartu ucapan). */
+  /** Text per act (before the greeting card). */
   beats: string[];
   to: string;
   heading: string;
   text: string;
   from: string;
-  /** Posisi teks babak & kartu akhir. */
+  /** Position of the act text & final card. */
   capPos?: "top" | "bottom";
   notePos?: "top" | "bottom" | "center" | "left" | "right";
   capFx: CapFx;
-  /** Petunjuk interaksi di babak pertama. */
+  /** Interaction hint in the first act. */
   hint: string;
-  /** Data adegan yang bisa diedit (mis. kata yang dibentuk partikel). */
+  /** Editable scene data (e.g. the word formed by particles). */
   config?: Record<string, unknown>;
   configLabel?: string;
   beatSec?: number;
@@ -138,16 +138,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -166,7 +166,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -189,7 +189,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {
@@ -256,7 +256,7 @@ ${capHtml}
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = ${dataBlock("CONFIG", s.configLabel ?? "Pengaturan animasi", config)};
 ${s.scene.trim()}
 ${ENGINE.trim()}

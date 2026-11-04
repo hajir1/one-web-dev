@@ -5,17 +5,17 @@ import { IMG_FALLBACK_TAG } from "./imagePlaceholder";
 import i18n from "../../../i18n";
 
 /* ================================================================== */
-/* Kerangka proyek siap jalan untuk hasil ekspor (v7)                   */
+/* Ready-to-run project scaffold for the export output (v7)             */
 /*                                                                    */
-/* Setiap format diunduh sebagai ZIP yang bisa langsung dijalankan:     */
-/*   HTML     buka index.html (tanpa build)                             */
+/* Every format downloads as a ZIP that can run right away:            */
+/*   HTML     open index.html (no build)                                */
 /*   Blade    routes/web.php + resources/views + public/assets (Laravel) */
 /*   React    Vite + react-router-dom                                   */
 /*   Vue      Vite + vue-router                                         */
-/*   Svelte   Vite + Svelte 4 (router hash bawaan)                      */
+/*   Svelte   Vite + Svelte 4 (built-in hash router)                    */
 /*   Angular  Angular CLI 18 (application builder, standalone)           */
-/* Versi dependensi dikunci (tanpa ^) supaya hasil build bisa diulang;  */
-/* kombinasi ini diuji build di tools/verifyExports.ts.                  */
+/* Dependency versions are pinned (no ^) so builds are reproducible;    */
+/* this combination is build-tested in tools/verifyExports.ts.          */
 /* ================================================================== */
 
 const PROJECT_VERSIONS = {
@@ -40,27 +40,27 @@ export interface ProjectPage {
   title: string;
   slug: string;
   isHome: boolean;
-  /** Nama berkas tanpa ekstensi (index untuk beranda). */
+  /** File name without extension (index for the home page). */
   file: string;
 }
 
 export interface ProjectContext {
-  /** Nama situs (judul README, <title>). */
+  /** Site name (README title, <title>). */
   name: string;
   pages: ProjectPage[];
-  /** Library CDN gabungan semua halaman. */
+  /** The combined CDN libraries of every page. */
   libs: LibraryId[];
   /** CSS global: variabel :root + reset dasar. */
   globalCss: string;
-  /** v10: <title> bawaan index.html SPA (judul SEO beranda). */
+  /** v10: default <title> of the SPA index.html (home page SEO title). */
   headTitle?: string;
-  /** v10: tag meta SEO beranda untuk <head> index.html SPA. */
+  /** v10: home page SEO meta tags for the SPA index.html <head>. */
   headExtra?: string;
 }
 
 const tr = (id: string, en: string) => (i18n.language?.startsWith("en") ? en : id);
 
-/** Nama paket npm yang valid dari nama situs. */
+/** A valid npm package name from the site name. */
 function packageName(name: string): string {
   const s = name
     .toLowerCase()
@@ -71,8 +71,8 @@ function packageName(name: string): string {
   return s || "situs-onewebdev";
 }
 
-/** Gaya dasar yang sama dengan kanvas/pratinjau Page Maker (pageShell.ts), supaya hasil ekspor tampil identik. */
-export const BASE_RESET = `/* Dasar (sama dengan pratinjau Page Maker) */
+/** The same base styles as the Page Maker canvas/preview (pageShell.ts), so the export looks identical. */
+export const BASE_RESET = `/* Base (same as the Page Maker preview) */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -94,7 +94,7 @@ img {
 }
 `;
 
-/** Baris inisialisasi library (OWDMotion.init untuk AOS/Animate/Tilt) untuk dijalankan ulang tiap pindah halaman SPA. */
+/** Library init lines (OWDMotion.init for AOS/Animate/Tilt) to rerun on every SPA page change. */
 function libraryInitJs(libs: readonly LibraryId[]): string {
   return [...new Set(libs.map((id) => LIBRARY_BY_ID[id].init).filter(Boolean))].join("\n  ");
 }
@@ -107,9 +107,9 @@ const indent = (s: string, n: number) =>
     .join("\n");
 
 /**
- * Ubah tautan antarhalaman bentuk berkas (`slug.html`, `index.html`) menjadi
- * rute: `/slug` (router & Blade) atau `#/slug` (Svelte). Hanya slug halaman
- * situs ini yang diubah; tautan luar tidak disentuh.
+ * Turns file-style links between pages (`slug.html`, `index.html`) into
+ * routes: `/slug` (router & Blade) or `#/slug` (Svelte). Only this site's
+ * page slugs are changed; external links are untouched.
  */
 export function rewritePageLinks(content: string, pages: readonly ProjectPage[], mode: "router" | "hash"): string {
   const files = new Map(pages.map((p) => [p.file, p] as const));
@@ -171,7 +171,7 @@ const headTags = (libs: readonly LibraryId[], pad = 4) => {
   return `${" ".repeat(pad)}${IMG_FALLBACK_TAG}${head ? `\n${indent(head, pad)}` : ""}`;
 };
 
-/** Skrip library di akhir <body> TANPA baris init (init dijalankan aplikasi setelah render). */
+/** Library scripts at the end of <body> WITHOUT the init line (the app runs init after rendering). */
 const libraryTailScripts = (libs: readonly LibraryId[]): string => libraryTailTags(libs);
 
 const viteIndex = (ctx: ProjectContext, mount: string, entry: string) => `<!DOCTYPE html>
@@ -192,7 +192,7 @@ ${headTags(ctx.libs)}
 const initLibsFile = (ctx: ProjectContext, ext: "js" | "ts") => {
   const body = libraryInitJs(ctx.libs);
   const win = ext === "ts" ? "(window as any)" : "window";
-  return `${ext === "ts" ? "// @ts-nocheck — memanggil library CDN global.\n" : ""}/** Jalankan ulang inisialisasi library CDN setelah halaman dirender (SPA). */
+  return `${ext === "ts" ? "// @ts-nocheck — memanggil library CDN global.\n" : ""}/** Re-run CDN library initialization after the page renders (SPA). */
 export function initLibraries()${ext === "ts" ? ": void" : ""} {
   ${body ? body.replace(/\bwindow\./g, `${win}.`) : "// (tidak ada library yang perlu diinisialisasi)"}
 }
@@ -434,9 +434,9 @@ ${headTags(ctx.libs)}
 const phpStr = (s: string) => `'${s.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 
 export interface BladePage extends ProjectPage {
-  /** v10: judul lengkap (SEO); kosong = "<judul> — <nama situs>". */
+  /** v10: full title (SEO); empty = "<title> — <site name>". */
   fullTitle?: string;
-  /** v10: tag meta SEO untuk <head>. */
+  /** v10: SEO meta tags for <head>. */
   meta?: string;
   body: string;
   css: string;
@@ -445,9 +445,9 @@ export interface BladePage extends ProjectPage {
 }
 
 /**
- * Laravel Blade: satu layout + satu view per halaman. Isi halaman dibungkus
- * `@verbatim` agar teks seperti `{{ }}` atau `@handle` tidak dianggap sintaks
- * Blade. CSS/JS per halaman di `public/assets` dimuat lewat `asset()`.
+ * Laravel Blade: one layout + one view per page. Page content is wrapped in
+ * `@verbatim` so text such as `{{ }}` or `@handle` is not treated as Blade
+ * syntax. Per-page CSS/JS in `public/assets` is loaded through `asset()`.
  */
 export function bladeProject(ctx: ProjectContext, pages: BladePage[]): GeneratedFile[] {
   const files: GeneratedFile[] = [];
@@ -500,8 +500,8 @@ ${tail || p.script ? `\n@push('scripts')${tail ? `\n${indent(tail.replace(/@/g, 
 use Illuminate\\Support\\Facades\\Route;
 
 /*
-| Rute halaman hasil ekspor OneWebDev.
-| Tambahkan baris di bawah ke routes/web.php proyek Laravel Anda.
+| Page routes exported by OneWebDev.
+| Add the lines below to your Laravel project's routes/web.php.
 */
 
 ${pages.map((p) => `Route::view(${phpStr(p.isHome ? "/" : `/${p.slug}`)}, ${phpStr(`pages.${p.file}`)})->name(${phpStr(`page.${p.isHome ? "home" : p.slug}`)});`).join("\n")}
@@ -522,5 +522,5 @@ ${pages.map((p) => `Route::view(${phpStr(p.isHome ? "/" : `/${p.slug}`)}, ${phpS
   return files;
 }
 
-/** Label format ekspor (ditampilkan di tombol pilihan). */
+/** Export format labels (shown on the option buttons). */
 export const EXPORT_FORMATS: Framework[] = ["html", "blade", "react", "vue", "svelte", "angular"];

@@ -5,8 +5,8 @@ import type { DocTopicId } from "../../config/docs";
 import { isDemoMode } from "../../demo/demoMode";
 
 /* ================================================================== */
-/* Render isi dokumentasi dari locales (docs.topics.<id>).               */
-/* Format teks sederhana: **tebal** dan `kode`. Tidak ada HTML mentah.   */
+/* Renders documentation content from the locales (docs.topics.<id>).    */
+/* Simple text format: **bold** and `code`. No raw HTML.                */
 /* ================================================================== */
 
 interface DocSection {
@@ -15,7 +15,7 @@ interface DocSection {
   heading: string;
   body?: string;
   items?: string[];
-  /** Pasangan masalah → solusi (untuk kind "errors"). */
+  /** Problem → solution pairs (for kind "errors"). */
   pairs?: { q: string; a: string }[];
 }
 
@@ -35,7 +35,7 @@ const KIND_ICON: Record<string, typeof Target> = {
   backend: ServerCog,
 };
 
-/** `**tebal**` dan `kode` → elemen React (teks lain di-escape oleh React). */
+/** `**bold**` and `code` → React elements (other text is escaped by React). */
 function richText(text: string): ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return parts.map((p, i) => {
@@ -52,7 +52,7 @@ function richText(text: string): ReactNode {
 
 export function useDocTopic(id: DocTopicId): DocTopicContent | null {
   const { t, i18n } = useTranslation();
-  // Mode demo (v12): topik yang punya versi demo (tanpa kredit/akun) memakai versi itu.
+  // Demo mode (v12): topics that have a demo version (no credits/account) use that version.
   const demoKey = `demo.docs.topics.${id}`;
   const raw = t(isDemoMode() && i18n.exists(demoKey) ? demoKey : `docs.topics.${id}`, { returnObjects: true }) as unknown;
   if (!raw || typeof raw !== "object" || !Array.isArray((raw as DocTopicContent).sections)) return null;

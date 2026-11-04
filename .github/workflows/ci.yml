@@ -1,4 +1,4 @@
-# CI frontend OneWebDev (v10): typecheck, lint, uji unit, dan build PWA.
+# OneWebDev frontend CI (v10): typecheck, lint, unit tests, and the PWA build.
 name: frontend-ci
 
 on:
@@ -21,5 +21,5 @@ jobs:
       - run: npm test
       - run: npm run build
         env:
-          # Build CI tidak butuh backend sungguhan.
+          # The CI build does not need a real backend.
           VITE_API_BASE_URL: https://api.example.com

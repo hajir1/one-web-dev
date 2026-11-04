@@ -29,14 +29,14 @@ import {
 /* ================================================================== */
 /* Dashboard Data (uji coba CRUD)                                        */
 /*                                                                    */
-/* Satu layar untuk semua koleksi di website: tabel + cari + pagination, */
-/* tambah / ubah / hapus / urutkan. Setiap perubahan langsung menyusun   */
-/* ulang kartu di halaman (lewat `onChange`); situs online berubah       */
-/* setelah Deploy ulang.                                                 */
+/* One screen for every collection in the website: table + search + pagination, */
+/* add / edit / delete / reorder. Every change immediately rebuilds      */
+/* the cards on the page (through `onChange`); the online site changes   */
+/* after redeploying.                                                    */
 /* ================================================================== */
 
 export interface DashboardEntry {
-  /** Unik di dashboard: `<pageId>:<boxId>`. */
+  /** Unique in the dashboard: `<pageId>:<boxId>`. */
   key: string;
   pageTitle: string;
   boxId: string;
@@ -88,7 +88,7 @@ export default function CollectionDashboard({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-white/90" role="dialog" aria-modal="true" aria-label={t("crud.title")} data-testid="crud-dashboard">
-      {/* ---------- bilah atas ---------- */}
+      {/* ---------- top bar ---------- */}
       <header className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
         <Database className="h-5 w-5 shrink-0 text-brand-600" />
         <h1 className="min-w-0 flex-1 truncate text-sm font-semibold">{t("crud.title")}</h1>
@@ -111,7 +111,7 @@ export default function CollectionDashboard({
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          {/* ---------- daftar koleksi ---------- */}
+          {/* ---------- collection list ---------- */}
           <aside className="shrink-0 border-b border-gray-200 bg-white p-3 md:w-60 md:border-r md:border-b-0 dark:border-gray-800 dark:bg-gray-900">
             <p className="mb-2 hidden px-2 text-[11px] font-semibold tracking-wide text-gray-400 uppercase md:block">{t("crud.collections")}</p>
             <select className={`${INPUT} md:hidden`} value={entry.key} onChange={(e) => setActiveKey(e.target.value)} aria-label={t("crud.collections")}>
@@ -140,7 +140,7 @@ export default function CollectionDashboard({
             </nav>
           </aside>
 
-          {/* ---------- isi koleksi ---------- */}
+          {/* ---------- collection content ---------- */}
           <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-3 sm:p-5">
             <div className="mx-auto max-w-6xl">
               <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -332,7 +332,7 @@ function ItemForm({ col, item, onCancel, onSave }: { col: CollectionDef; item: C
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const set = (k: string, v: string) => setRaw((r) => ({ ...r, [k]: v }));
-  /** Slug URL item: kosong = dibuat dari nama (item baru) / tetap (item lama). */
+  /** Item URL slug: empty = made from the name (new item) / unchanged (existing item). */
   const [slug, setSlug] = useState(item?.slug ?? "");
 
   const submit = () => {

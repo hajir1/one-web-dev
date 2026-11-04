@@ -1,9 +1,9 @@
 import { api, apiFetch } from "../api/client";
 
 /* ================================================================== */
-/* Kiriman (v20 · backend v12): formulir, RSVP, dan ucapan dari situs   */
-/* pengguna yang sudah online. Satu proyek (website / template kode) =  */
-/* satu alamat penerima (`POST {API}/f/:id`).                          */
+/* Submissions (v20 · backend v12): forms, RSVPs, and wishes from the   */
+/* user's sites that are already online. One project (website / code template) = */
+/* one receiving address (`POST {API}/f/:id`).                         */
 /* ================================================================== */
 
 export type ProjectType = "site" | "code-site";
@@ -57,7 +57,7 @@ export const deleteSubmission = (id: string, sid: string) =>
 
 export const setShowWishes = (id: string, showWishes: boolean) => api<FormEndpoint>(`/forms/${encodeURIComponent(id)}`, { method: "PATCH", body: { showWishes } });
 
-/** CSV dari server (cookie sesi ikut), dikembalikan sebagai Blob. */
+/** CSV from the server (session cookie included), returned as a Blob. */
 export async function downloadCsv(id: string, kind?: SubmissionKind): Promise<{ blob: Blob; fileName: string }> {
   const res = await apiFetch(`/forms/${encodeURIComponent(id)}/submissions.csv${kind ? `?kind=${kind}` : ""}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -67,15 +67,15 @@ export async function downloadCsv(id: string, kind?: SubmissionKind): Promise<{ 
 }
 
 /**
- * Skrip penghubung yang disisipkan ke HTML hasil unduh/deploy template kode.
- * Mesin undangan membaca `window.OWD_FORM` (lihat tools/codeTemplates/invite.ts).
+ * Connector script inserted into the HTML of downloaded/deployed code templates.
+ * The invitation engine reads `window.OWD_FORM` (see tools/codeTemplates/invite.ts).
  */
 export function formBridgeScript(ep: Pick<FormEndpoint, "submitUrl" | "wishesUrl">): string {
   const json = JSON.stringify({ submit: ep.submitUrl, wishes: ep.wishesUrl }).replace(/</g, "\\u003c");
   return `<script>window.OWD_FORM = ${json};</script>`;
 }
 
-/** Sisipkan skrip penghubung tepat sebelum </head> (sekali). */
+/** Insert the connector script right before </head> (once). */
 export function withFormBridge(html: string, ep: Pick<FormEndpoint, "submitUrl" | "wishesUrl"> | null): string {
   if (!ep || html.includes("window.OWD_FORM =")) return html;
   const tag = formBridgeScript(ep);

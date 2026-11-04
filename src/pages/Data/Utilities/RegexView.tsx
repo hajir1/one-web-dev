@@ -6,7 +6,7 @@ import { dataErrorMessage } from "../shared/errors";
 import { MAX_REGEX_MATCHES, regexReplace, runRegex, type RegexMatch } from "./lib/textTools";
 
 const FLAGS = ["g", "i", "m", "s", "u"] as const;
-/** Teks sangat panjang tidak disorot (render ribuan <mark> memperlambat tab). */
+/** Very long text is not highlighted (rendering thousands of <mark> slows the tab). */
 const HIGHLIGHT_LIMIT = 200_000;
 
 export default function RegexView() {

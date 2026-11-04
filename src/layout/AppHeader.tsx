@@ -13,7 +13,7 @@ import UserMenu from "./UserMenu";
 import { AdminFreeBadge } from "../components/app/AdminFreeBadge";
 import { isDemoMode } from "../demo/demoMode";
 
-/** Mode demo (v12): penanda "Demo" menggantikan saldo kredit & menu akun. */
+/** Demo mode (v12): a "Demo" badge replaces the credit balance & account menu. */
 function DemoBadge() {
   const { t } = useTranslation();
   return (
@@ -27,7 +27,7 @@ function DemoBadge() {
   );
 }
 
-/** Saldo kredit dari server (atau "—" bila backend belum tersedia). */
+/** Credit balance from the server (or "—" when the backend is not available). */
 function CreditPill() {
   const { t } = useTranslation();
   const account = useBilling((s) => s.account);

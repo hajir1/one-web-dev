@@ -16,7 +16,7 @@ import { V7H_CATALOG } from "../templates/v7/catalogH";
 import { V9I_CATALOG } from "../templates/v9/catalogI";
 import { V10J_CATALOG } from "../templates/v10/catalogJ";
 
-/* Template Premium lama (katalog awal + v2) kini memakai library dari menu Element → Library. */
+/* Old Premium templates (initial catalog + v2) now use libraries from the Element → Library menu. */
 
 const V3 = new Set([...V3C_CATALOG, ...V3D_CATALOG, ...V4E_CATALOG, ...V5F_CATALOG, ...V6G_CATALOG, ...V7H_CATALOG, ...V9I_CATALOG, ...V10J_CATALOG].map((m) => m.id));
 const OLD = WEB_TEMPLATES.filter((t) => !V3.has(t.id));

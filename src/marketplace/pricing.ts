@@ -2,30 +2,30 @@ import { DESIGN_PACKAGES, MAX_DESIGNS_PER_PURCHASE, MAX_SITES_PER_PURCHASE, SITE
 import type { DesignQuote, SiteQuote } from "./types";
 
 /* ================================================================== */
-/* Hitung harga paket desain (murni, mudah diuji)                       */
+/* Design pack price calculation (pure, easy to test)                   */
 /*                                                                    */
-/* Jumlah desain dibeli kelipatan paket terkecil (5). Kombinasi paket    */
-/* dipilih yang PALING MURAH, mis. 50 desain = 1× paket 50 (6 kredit),   */
-/* bukan 10× paket 5 (10 kredit). Bila menambah sedikit desain justru    */
-/* lebih murah (45 desain = 9 kredit vs 50 desain = 6 kredit), UI        */
-/* menampilkan saran lewat `betterDeal`.                                 */
+/* Designs are bought in multiples of the smallest pack (5). The pack combination */
+/* chosen is the CHEAPEST, e.g. 50 designs = 1× pack of 50 (6 credits),  */
+/* not 10× pack of 5 (10 credits). When adding a few designs is actually */
+/* cheaper (45 designs = 9 credits vs 50 designs = 6 credits), the UI    */
+/* shows a suggestion via `betterDeal`.                                  */
 /* ================================================================== */
 
 export const smallestPack = (packs: DesignPackage[] = DESIGN_PACKAGES) => packs.reduce((a, b) => (b.designs < a.designs ? b : a));
 
-/** Bulatkan ke atas ke kelipatan paket terkecil, dibatasi 1 paket … MAX_DESIGNS_PER_PURCHASE. */
+/** Rounds up to a multiple of the smallest pack, limited to 1 pack … MAX_DESIGNS_PER_PURCHASE. */
 export function normalizeDesignCount(n: number, packs: DesignPackage[] = DESIGN_PACKAGES): number {
   const step = smallestPack(packs).designs;
   const v = Number.isFinite(n) ? Math.ceil(Math.max(step, n) / step) * step : step;
   return Math.min(Math.floor(MAX_DESIGNS_PER_PURCHASE / step) * step, v);
 }
 
-/** Kombinasi paket termurah untuk tepat `designs` desain (kelipatan paket terkecil). */
+/** Cheapest pack combination for exactly `designs` designs (multiples of the smallest pack). */
 export function quoteDesigns(designs: number, packs: DesignPackage[] = DESIGN_PACKAGES): DesignQuote {
   const total = normalizeDesignCount(designs, packs);
   const step = smallestPack(packs).designs;
   const units = total / step;
-  // Knapsack kecil (jumlah unit ≤ 40): biaya minimum untuk tepat u unit.
+  // Small knapsack (units ≤ 40): minimum cost for exactly u units.
   const best: { cost: number; pick: number[] }[] = [{ cost: 0, pick: packs.map(() => 0) }];
   for (let u = 1; u <= units; u++) {
     let cur: { cost: number; pick: number[] } | null = null;
@@ -52,7 +52,7 @@ export function quoteDesigns(designs: number, packs: DesignPackage[] = DESIGN_PA
   };
 }
 
-/** Saran: jumlah lebih besar yang biayanya sama atau lebih murah (null bila tidak ada). */
+/** Suggestion: a larger amount that costs the same or less (null when none). */
 export function betterDeal(designs: number, packs: DesignPackage[] = DESIGN_PACKAGES): DesignQuote | null {
   const now = quoteDesigns(designs, packs);
   let best: DesignQuote | null = null;
@@ -66,22 +66,22 @@ export function betterDeal(designs: number, packs: DesignPackage[] = DESIGN_PACK
 }
 
 /* ------------------------------------------------------------------ */
-/* Paket folder website (diskon bertingkat)                             */
+/* Website folder packs (tiered discounts)                              */
 /* ------------------------------------------------------------------ */
 
-/** Paket website dalam bentuk paket desain supaya memakai knapsack yang sama. */
+/** Website packs in design pack form so they use the same knapsack. */
 const asPacks = (packs: SitePackage[]): DesignPackage[] => packs.map((p) => ({ id: p.id, designs: p.sites, credits: p.credits }));
 
 /** Bulatkan jumlah website: 1 … MAX_SITES_PER_PURCHASE. */
 export const normalizeSiteCount = (n: number): number => Math.min(MAX_SITES_PER_PURCHASE, Number.isFinite(n) ? Math.max(1, Math.ceil(n)) : 1);
 
-/** Kombinasi paket website termurah untuk tepat `sites` website. */
+/** Cheapest website pack combination for exactly `sites` websites. */
 export function quoteSites(sites: number, packs: SitePackage[] = SITE_PACKAGES): SiteQuote {
   const q = quoteDesigns(normalizeSiteCount(sites), asPacks(packs));
   return { sites: q.designs, credits: q.credits, lines: q.lines.map((l) => ({ packageId: l.packageId, sites: l.designs, credits: l.credits, count: l.count })), listCredits: q.listCredits };
 }
 
-/** Saran jumlah website lebih banyak dengan biaya sama atau lebih murah (null bila tidak ada). */
+/** Suggests more websites for the same or lower cost (null when none). */
 export function betterSiteDeal(sites: number, packs: SitePackage[] = SITE_PACKAGES): SiteQuote | null {
   const now = quoteSites(sites, packs);
   let best: SiteQuote | null = null;

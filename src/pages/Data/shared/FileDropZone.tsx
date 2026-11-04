@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Upload } from "lucide-react";
 
 /**
- * Area unggah yang aksesibel: bisa diklik, di-drag & drop, dan dipakai
- * dengan keyboard (Enter/Spasi). Validasi file dilakukan oleh pemanggil.
+ * Accessible upload area: clickable, drag & drop, and usable
+ * with the keyboard (Enter/Space). File validation is done by the caller.
  */
 export default function FileDropZone({
   accept,

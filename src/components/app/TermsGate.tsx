@@ -10,9 +10,9 @@ import { splitLangPath } from "../../i18n";
 import { TermsConsentText } from "../../pages/AuthPages/AuthForm";
 
 /**
- * User yang masuk tetapi belum menyetujui S&K versi berlaku (akun lama,
- * login Google dari halaman Masuk, atau dokumen diperbarui) diminta setuju
- * dulu. Backend juga menolak checkout (403 TERMS_NOT_ACCEPTED) tanpa ini.
+ * Signed-in users who have not accepted the current terms version (old accounts,
+ * Google login from the Sign-in page, or updated documents) are asked to accept
+ * first. The backend also rejects checkout (403 TERMS_NOT_ACCEPTED) without it.
  */
 export default function TermsGate() {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ export default function TermsGate() {
   const [error, setError] = useState<string | null>(null);
 
   if (!user || user.termsAccepted !== false) return null;
-  // Dokumen legal harus tetap bisa dibaca.
+  // Legal documents must stay readable.
   if (splitLangPath(pathname).rest.startsWith("/legal/")) return null;
 
   const accept = async () => {

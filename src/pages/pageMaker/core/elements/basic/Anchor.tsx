@@ -100,7 +100,7 @@ function buildMarkup(s: AnchorState, cls: string, iconMarkup: string | null) {
     {
       href: safeUrl(s.href),
       target: s.target || undefined,
-      // Wajib untuk target="_blank": cegah tab baru mengakses window.opener.
+      // Required for target="_blank": prevents the new tab from accessing window.opener.
       rel: s.target === "_blank" ? "noopener noreferrer" : undefined,
       class: cls,
     },
@@ -152,7 +152,7 @@ function anchorSections(s: AnchorState, update: Updater<AnchorState>): PanelSect
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const anchorElement = defineElement<AnchorState>({

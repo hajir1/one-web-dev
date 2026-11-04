@@ -1,14 +1,14 @@
 /* ================================================================== */
-/* Logo media sosial untuk elemen Tautan Sosial (SVG 24×24, satu path).   */
+/* Social media logos for the Social Links element (SVG 24×24, one path). */
 /*                                                                    */
 /* Sumber: Simple Icons v16.35.0 (https://simpleicons.org), lisensi CC0. */
-/* LinkedIn, Email, dan Website digambar sendiri (Simple Icons tidak     */
-/* lagi menyediakan logo LinkedIn). Merek tetap milik pemiliknya.        */
+/* LinkedIn, Email, and Website are drawn in-house (Simple Icons does not */
+/* provides a LinkedIn logo anymore). Brands remain their owners' property. */
 /* ================================================================== */
 
 export interface BrandIcon {
   title: string;
-  /** Warna merek (hex tanpa #). */
+  /** Brand color (hex without #). */
   hex: string;
   path: string;
 }
@@ -45,10 +45,10 @@ export const BRAND_ICONS: Record<string, BrandIcon> = {
   youtube: { title: "YouTube", hex: "FF0000", path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" },
 };
 
-/** Alias nama jaringan → kunci ikon ("Twitter" → x, "Mail" → email). */
+/** Network name aliases → icon key ("Twitter" → x, "Mail" → email). */
 const ALIAS: Record<string, string> = { twitter: "x", mail: "email", surel: "email", web: "website", situs: "website", blog: "website", yt: "youtube", ig: "instagram", fb: "facebook", wa: "whatsapp" };
 
-/** Kunci ikon untuk nama jaringan; null bila tidak dikenal. */
+/** Icon key for a network name; null when unknown. */
 export function brandIconKey(name: string): string | null {
   const k = name.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
   if (BRAND_ICONS[k]) return k;
@@ -56,7 +56,7 @@ export function brandIconKey(name: string): string | null {
   return null;
 }
 
-/** Tebak jaringan dari URL (https://instagram.com/... → instagram). */
+/** Guess the network from the URL (https://instagram.com/... → instagram). */
 export function brandIconKeyFromUrl(url: string): string | null {
   if (/^mailto:/i.test(url)) return "email";
   const m = url.match(/^https?:\/\/(?:www\.|m\.)?([^/?#]+)/i);
@@ -68,7 +68,7 @@ export function brandIconKeyFromUrl(url: string): string | null {
   return BRAND_ICONS[base] ? base : null;
 }
 
-/** Markup <svg> ikon (atribut aman, warna lewat currentColor). */
+/** Icon <svg> markup (safe attributes, color via currentColor). */
 export function brandSvg(key: string, size = 20): string {
   const icon = BRAND_ICONS[key];
   if (!icon) return "";

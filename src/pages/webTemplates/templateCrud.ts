@@ -6,15 +6,15 @@ import { canBind, markRelated, syncItemPage, type BindField } from "../pageMaker
 import type { TplLang } from "./types";
 
 /* ================================================================== */
-/* Uji coba CRUD untuk SEMUA template yang punya katalog Product Card.  */
+/* CRUD preview for EVERY template that has a Product Card catalog.    */
 /*                                                                    */
-/* Dijalankan setelah halaman template dibangun (buildPages.ts):        */
-/*   1. Grid kartu terbesar = koleksi data (nama dari halamannya).      */
-/*   2. Bila kartu menuju halaman detail (key "product" / "car"):       */
-/*      halaman itu jadi halaman item (judul, harga, gambar, … terikat) */
-/*      dan grid kartu di halaman detail jadi "Mungkin Anda suka".      */
-/* Template yang sudah menandai koleksinya sendiri (mis. Kopi Senja)    */
-/* tidak diubah. Grid kartu lain tetap statis.                          */
+/* Runs after the template pages are built (buildPages.ts):             */
+/*   1. The largest card grid = the data collection (named after its page). */
+/*   2. When the cards lead to a detail page (key "product" / "car"):   */
+/*      that page becomes the item page (title, price, image, … bound)  */
+/*      and the card grid on the detail page becomes "You may also like". */
+/* Templates that already mark their own collection (e.g. Kopi Senja)   */
+/* are not changed. Other card grids stay static.                       */
 /* ================================================================== */
 
 interface PageLike {
@@ -25,9 +25,9 @@ interface PageLike {
   doc: { root: BoxNode };
 }
 
-/** Halaman yang isinya detail SATU item (kartu katalog menuju ke sini). */
+/** A page whose content is the detail of ONE item (catalog cards lead here). */
 const DETAIL_KEYS = new Set(["product", "car"]);
-/** Nama halaman yang terlalu umum untuk jadi nama koleksi. */
+/** Page names too generic to become a collection name. */
 const GENERIC = /^(beranda|home|katalog|catalog|koleksi|collection|toko|shop|store|produk|products?|karya|works?|merch)$/i;
 
 interface Grid {
@@ -35,7 +35,7 @@ interface Grid {
   box: BoxNode;
 }
 
-/** Grid kartu teratas (bukan grid di dalam grid kartu lain), urutan dokumen. */
+/** Top-level card grids (not grids inside other card grids), in document order. */
 function cardGrids(root: BoxNode, page: number, out: Grid[] = []): Grid[] {
   const walk = (n: ComponentNode) => {
     if (!isBox(n)) return;
@@ -58,14 +58,14 @@ const cardHref = (box: BoxNode): string[] => [
 const textOf = (e: ElementNode) => String(e.state?.text ?? "").trim();
 const PRICE = /^(rp|idr|\$|usd)\s?[\d.,]+/i;
 const isText = (e: ElementNode) => e.elementType === "text";
-/** Judul item: h1 pertama; tanpa h1 → h2 pertama yang bukan harga. */
+/** Item title: the first h1; without an h1 → the first h2 that is not a price. */
 const titleOf = (els: ElementNode[]) =>
   els.find((e) => isText(e) && e.state?.tag === "h1") ?? els.find((e) => isText(e) && e.state?.tag === "h2" && !PRICE.test(textOf(e)));
 
 /**
- * Ikatan halaman detail berdasarkan posisi: judul h1 → nama, teks harga
- * pertama/kedua → harga/harga coret, bintang → rating, badge → label,
- * gambar pertama → gambar, paragraf panjang pertama setelah judul → deskripsi.
+ * Detail page bindings by position: h1 title → name, the first/second price
+ * text → price/strikethrough price, stars → rating, badge → label,
+ * the first image → image, the first long paragraph after the title → description.
  */
 function bindDetail(box: BoxNode): BoxNode | null {
   const els = collectElements(box).filter((e) => canBind(e) && e.elementType !== "product-card");
@@ -93,7 +93,7 @@ function bindDetail(box: BoxNode): BoxNode | null {
   return patch(box) as BoxNode;
 }
 
-/** Box terkecil yang memuat judul h1/h2 dan harga (= "detail item"). */
+/** The smallest box containing the h1/h2 title and the price (= "item detail"). */
 function detailBox(root: BoxNode): BoxNode | null {
   let best: BoxNode | null = null;
   const walk = (n: ComponentNode) => {
@@ -101,7 +101,7 @@ function detailBox(root: BoxNode): BoxNode | null {
     if (canBecomeCollection(n)) return;
     const els = collectElements(n);
     const title = titleOf(els);
-    // Judul, harga (selain judul), dan gambar dalam satu box; tanpa kartu produk.
+    // Title, price (other than the title), and image in one box; no product card.
     const ok =
       !!title &&
       els.some((e) => e !== title && isText(e) && PRICE.test(textOf(e))) &&
@@ -114,7 +114,7 @@ function detailBox(root: BoxNode): BoxNode | null {
   return best;
 }
 
-/** Nama koleksi bawaan per kategori template (bila halaman katalog bernama umum / beranda). */
+/** Default collection name per template category (when the catalog page has a generic name / is the home page). */
 const BY_CATEGORY: Record<string, [string, string]> = {
   restaurant: ["Menu", "Menu"],
   bakery: ["Menu", "Menu"],
@@ -153,11 +153,11 @@ export function applyTemplateCrud<P extends PageLike>(pages: P[], lang: TplLang,
   if (pages.some((p) => collectionsIn(p.doc.root).length)) return pages;
   const grids = pages.flatMap((p, i) => cardGrids(p.doc.root, i));
   if (!grids.length) return pages;
-  // Grid terbesar; seri → halaman selain beranda (katalog), lalu yang lebih dulu.
+  // The largest grid; ties → pages other than home (catalog), then the earlier one.
   const main = grids.reduce((a, b) => (b.box.children.length > a.box.children.length || (b.box.children.length === a.box.children.length && pages[a.page].home && !pages[b.page].home) ? b : a));
   const hrefs = cardHref(main.box);
   const found = hrefs.length === 1 ? pages.findIndex((p) => DETAIL_KEYS.has(p.key) && hrefs[0] === `${p.slug}.html`) : -1;
-  // Grid utama di halaman detail itu sendiri → tanpa halaman item.
+  // The main grid on the detail page itself → no item page.
   const detailIdx = found >= 0 && found !== main.page ? found : -1;
   const detail = detailIdx >= 0 ? pages[detailIdx] : null;
   const name = collectionName(pages[main.page], detail, lang, category);
@@ -169,11 +169,11 @@ export function applyTemplateCrud<P extends PageLike>(pages: P[], lang: TplLang,
   return pages.map((p, i) => {
     let root = p.doc.root;
     if (i === main.page) root = updateNode(root, main.box.id, (n) => (isBox(n) ? materialize({ ...n, name: n.name || name }, col) : n)) as BoxNode;
-    // Kartu lain (mis. "Terlaris" di beranda) yang produknya ada di koleksi → menuju halaman itemnya.
+    // Other cards (e.g. "Best sellers" on the home page) whose products are in the collection → lead to their item page.
     if (bound) root = linkCards(root, col, main.box.id);
     if (bound && i === detailIdx && dBox) {
       root = updateNode(root, dBox.id, () => ({ ...bound, itemOf: { collection: col.slug } })) as BoxNode;
-      // Grid kartu di halaman detail → "Mungkin Anda suka" (label sama dulu).
+      // The card grid on the detail page → "You may also like" (same label first).
       for (const g of cardGrids(root, i)) if (findNode(root, g.box.id)) root = markRelated(root, g.box.id, col, g.box.children.length);
       root = syncItemPage(root, [col]);
     }

@@ -1,9 +1,9 @@
 import type { InviteSpec } from "./invite";
 
 /* ================================================================== */
-/* 7 undangan baru (v18). Mesin, fitur, dan penanda edit sama dengan    */
-/* undangan lain (AOS, Swiper, konfeti, ?to=, .ics, RSVP WhatsApp).     */
-/* Semua nama, alamat, nomor, dan rekening fiktif.                     */
+/* 7 new invitations (v18). Engine, features, and edit markers are the same as */
+/* other invitations (AOS, Swiper, confetti, ?to=, .ics, WhatsApp RSVP). */
+/* All names, addresses, numbers, and bank accounts are fictional.     */
 /* ================================================================== */
 
 const C4 = (c1: string, c2: string, c3: string, c4: string) => ({ c1, c2, c3, c4 });
@@ -24,7 +24,7 @@ const BLOOM = `<svg viewBox="0 0 240 200" aria-hidden="true" focusable="false"><
 
 const CASSETTE = `<svg viewBox="0 0 240 160" aria-hidden="true" focusable="false"><rect x="10" y="10" width="220" height="140" rx="14" fill="currentColor" fill-opacity=".12" stroke="currentColor" stroke-width="4"/><rect x="34" y="30" width="172" height="62" rx="8" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="80" cy="61" r="16" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="160" cy="61" r="16" fill="none" stroke="currentColor" stroke-width="4"/><path d="M96 61h48" stroke="currentColor" stroke-width="3"/><path d="M60 150l12-30h96l12 30" fill="none" stroke="currentColor" stroke-width="3"/><g fill="currentColor"><circle cx="90" cy="134" r="5"/><circle cx="150" cy="134" r="5"/></g></svg>`;
 
-/* --------------------------- bagian bersama ------------------------ */
+/* --------------------------- shared parts ------------------------ */
 
 const RSVP_PILIHAN = ["Hadir", "Belum dapat memastikan", "Mohon maaf, tidak dapat hadir"];
 

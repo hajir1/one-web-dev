@@ -1,10 +1,10 @@
 // ─── lib/audio.ts ────────────────────────────────────────────────────────────
-// Ekstraksi audio di browser lewat Web Audio API → WAV.
+// Audio extraction in the browser via the Web Audio API → WAV.
 
 import i18n from "../../../i18n";
 import { encodeWav, mixToMono, sliceChannels } from "./wav";
 
-/** Batas aman: seluruh audio di-decode ke memori sebagai float32. */
+/** Safety limit: the whole audio is decoded into memory as float32. */
 export const BROWSER_AUDIO_MAX_SECONDS = 20 * 60;
 
 export interface AudioExtractOptions {
@@ -27,7 +27,7 @@ export async function extractWav(file: Blob, o: AudioExtractOptions, signal?: Ab
   let buffer: AudioBuffer;
   try {
     buffer = await new Promise<AudioBuffer>((resolve, reject) => {
-      // Bentuk callback untuk Safari lama; bentuk promise untuk browser modern.
+      // Callback form for old Safari; promise form for modern browsers.
       const p = ctx.decodeAudioData(data, resolve, () => reject(new Error("x")));
       if (p && typeof (p as Promise<AudioBuffer>).then === "function") (p as Promise<AudioBuffer>).then(resolve, reject);
     });
@@ -45,7 +45,7 @@ export async function extractWav(file: Blob, o: AudioExtractOptions, signal?: Ab
 
   let rate = buffer.sampleRate;
   if (o.sampleRate && o.sampleRate !== rate) {
-    // Resample dengan OfflineAudioContext (interpolasi bawaan browser).
+    // Resample with OfflineAudioContext (the browser's built-in interpolation).
     const frames = Math.ceil((channels[0].length * o.sampleRate) / rate);
     const off = new OfflineAudioContext(channels.length, frames, o.sampleRate);
     const src = off.createBuffer(channels.length, channels[0].length, rate);

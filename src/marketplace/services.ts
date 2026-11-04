@@ -4,11 +4,11 @@ import { quoteDesigns, quoteSites } from "./pricing";
 import type { DesignQuote, PieceCatalogItem, SiteQuote, TemplateCatalogItem } from "./types";
 
 /* ================================================================== */
-/* Layanan transaksi (terpisah dari tampilan)                           */
+/* Transaction services (separate from the UI)                          */
 /*                                                                    */
-/* Semua pembelian lewat backend Nest: harga ditentukan SERVER, kredit    */
-/* dipotong sekali per kunci idempoten, dan akun hanya diperbarui dari    */
-/* respons server. Komponen tidak menghitung saldo sendiri.              */
+/* Every purchase goes through the Nest backend: prices are set by the SERVER, credits */
+/* are charged once per idempotency key, and the account is only updated from */
+/* server responses. Components never compute balances themselves.      */
 /* ================================================================== */
 
 type PurchaseError = "insufficient" | "already-owned" | "not-for-sale" | "invalid" | "signin" | "network";
@@ -19,13 +19,13 @@ export interface CommerceService {
   readonly mode: "server";
   purchaseTemplate(tpl: TemplateCatalogItem): Promise<CommerceResult>;
   purchaseItem(item: PieceCatalogItem): Promise<CommerceResult>;
-  /** Beli kuota desain halaman; jumlah dibulatkan ke paket (lihat pricing.ts). */
+  /** Buys page design quota; the amount is rounded to a pack (see pricing.ts). */
   purchaseDesigns(designs: number): Promise<CommerceResult & { quote?: DesignQuote }>;
-  /** Beli slot folder website tambahan; harga bertingkat (lihat pricing.ts). */
+  /** Buy extra website folder slots; tiered prices (see pricing.ts). */
   purchaseSites(sites: number): Promise<CommerceResult & { quote?: SiteQuote }>;
 }
 
-/** Ubah error HTTP backend menjadi alasan yang dipahami UI. */
+/** Turns backend HTTP errors into reasons the UI understands. */
 function purchaseError(e: unknown): { ok: false; error: PurchaseError; message?: string } {
   if (!(e instanceof ApiError)) return { ok: false, error: "network" };
   const message = e.message;
@@ -39,7 +39,7 @@ function purchaseError(e: unknown): { ok: false; error: PurchaseError; message?:
 
 type PurchaseBody = { account?: unknown; billing?: unknown };
 
-/** Klik ganda pada aksi yang sama digabung menjadi satu permintaan (satu kunci idempoten). */
+/** Double clicks on the same action are merged into one request (one idempotency key). */
 const inflight = new Map<string, Promise<CommerceResult>>();
 function once(key: string, fn: () => Promise<CommerceResult>) {
   const cur = inflight.get(key);
@@ -56,7 +56,7 @@ async function post(path: string, body: unknown, prefix: string): Promise<Commer
     return { ok: true };
   } catch (e) {
     const res = purchaseError(e);
-    // Sudah dimiliki = tidak ada biaya baru; tetap muat ulang akun agar UI sinkron.
+    // Already owned = no new cost; still reload the account so the UI stays in sync.
     if (res.error === "already-owned") void refreshMarketAccount();
     return res;
   }

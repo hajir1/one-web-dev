@@ -31,6 +31,7 @@ import { INPUT, Notice, Slider, btn } from "../../../../components/app/ui";
 import { notify } from "../../../../components/app/Toaster";
 import { TEMPLATES_PATH, WEBSITE_HUB_PATH } from "../../../../config/menu";
 import { useDesignStore } from "../../../pageMaker/core/store/designStore";
+import { deployKey } from "../../../pageMaker/helpers/deployHistory";
 import DeployDialog from "../../../pageMaker/ui/DeployDialog";
 import FloatingPanel from "../../../pageMaker/ui/FloatingPanel";
 import { useSaveTarget } from "../../../pageMaker/ui/studio/saveTarget";
@@ -49,15 +50,15 @@ import DataForm, { ImageInput } from "./DataForm";
 import { BRIDGE_MSG, fieldsForPick, getIn, hiddenExcept, isEmptyPick, setIn, withBridge, type Pick as StudioPick } from "./codeStudio";
 
 /* ================================================================== */
-/* Studio TEMPLATE KODE (v20): undangan, animasi, 3D, portofolio.        */
+/* CODE TEMPLATE Studio (v20): invitations, animations, 3D, portfolios.  */
 /*                                                                    */
-/* Tata letak sama dengan Studio website: kanvas penuh, klik bagian     */
-/* mana pun → popup isian bagian itu. Mode "Coba" menjalankan template  */
-/* apa adanya (tombol, animasi, 3D). Struktur template DIKUNCI (tidak   */
-/* ada tambah/pindah section) supaya animasi & 3D tidak rusak; yang      */
-/* diubah hanya teks, tautan, warna, dan data.                          */
-/* Undangan yang di-deploy/diunduh saat masuk (bukan demo) otomatis     */
-/* dipasangi alamat Kiriman: RSVP & ucapan tamu masuk ke akun.          */
+/* The same layout as the website Studio: a full canvas, click a section */
+/* anywhere → a popup with that part's fields. "Try" mode runs the template */
+/* as is (buttons, animation, 3D). The template structure is LOCKED (no  */
+/* adding/moving sections) so animation & 3D do not break; only          */
+/* text, links, colors, and data are changed.                           */
+/* Invitations deployed/downloaded while signed in (not demo) are automatically */
+/* gets a Submissions address: guest RSVPs & wishes go to the account.  */
 /* ================================================================== */
 
 type Tab = "text" | "style" | "data";
@@ -74,7 +75,7 @@ function useDebounced<T>(value: T, ms: number): T {
   return v;
 }
 
-/** Nilai yang ditampilkan form: perubahan pengguna, atau bawaan template. */
+/** The value shown in the form: the user's change, or the template default. */
 const pick = <T,>(edited: Record<string, T> | undefined, key: string, base: T): T => (edited && key in edited ? edited[key] : base);
 const without = <T,>(map: Record<string, T> | undefined, key: string) => {
   const next = { ...(map ?? {}) };
@@ -187,7 +188,7 @@ function StyleTab({ model, edits, onChange }: { model: CodeModel; edits: CodeEdi
 }
 
 
-/** Isian semua data (dipakai popup "Semua isian" dan popup bagian). */
+/** All data fields (used by the "All fields" popup and the section popup). */
 function DataBlocks({ model, edits, onChange, only, invitation }: { model: CodeModel; edits: CodeEdits; onChange: (e: CodeEdits) => void; only?: { name: string; keys: string[] | null }[]; invitation: boolean }) {
   const { t } = useTranslation();
   const blocks = only ? only.map((o) => ({ o, d: model.data.find((d) => d.name === o.name) })).filter((x) => !!x.d) : model.data.map((d) => ({ o: { name: d.name, keys: null }, d }));
@@ -210,7 +211,7 @@ function DataBlocks({ model, edits, onChange, only, invitation }: { model: CodeM
   );
 }
 
-/** Satu foto yang diklik di pratinjau (v21): unggah dari perangkat atau URL, langsung di popup. */
+/** One photo clicked in the preview (v21): upload from the device or a URL, right in the popup. */
 function PhotoField({ model, edits, onChange, path }: { model: CodeModel; edits: CodeEdits; onChange: (e: CodeEdits) => void; path: string[] }) {
   const { t } = useTranslation();
   const d = model.data.find((x) => x.name === "CONFIG");
@@ -275,14 +276,14 @@ export default function CodeTemplateEditor() {
   const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState(true);
   const frame = useRef<HTMLIFrameElement>(null);
-  /** Posisi gulir & status sampul, dibawa ke pratinjau berikutnya (tidak memicu render). */
+  /** Scroll position & cover state, carried to the next preview (does not trigger a render). */
   const view = useRef({ scrollY: 0, opened: false });
   const editRef = useRef(editMode);
   editRef.current = editMode;
 
-  // Pratinjau = HTML + jembatan. Hanya dibangun ulang saat isi berubah (mode dikirim lewat pesan).
+  // Preview = HTML + bridge. Only rebuilt when the content changes (the mode is sent through messages).
   const rawPreview = useMemo(() => (debounced ? withBridge(debounced, { edit: editRef.current, ...view.current }) : ""), [debounced]);
-  // v21: gambar Pustaka Aset (`aset:<id>`) → data URL untuk iframe sandbox.
+  // v21: Asset Library images (`aset:<id>`) → data URLs for the sandboxed iframe.
   const [preview] = useResolvedAssets([rawPreview] as const);
 
   useEffect(() => {
@@ -305,7 +306,7 @@ export default function CodeTemplateEditor() {
     return () => window.removeEventListener("message", onMsg);
   }, []);
 
-  // ?step=deploy dari "Website Saya": buka dialog sekali, lalu bersihkan URL.
+  // ?step=deploy from "My Websites": open the dialog once, then clean the URL.
   useEffect(() => {
     if (params.get("step") === "deploy") {
       const next = new URLSearchParams(params);
@@ -314,7 +315,7 @@ export default function CodeTemplateEditor() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** HTML final untuk unduh/deploy: undangan + akun (bukan demo) → alamat Kiriman dipasang. */
+  /** Final HTML for download/deploy: invitation + account (not demo) → the Submissions address is set. */
   const finalHtml = useCallback(async (): Promise<string> => {
     if (!invitation || isDemoMode() || session !== "authenticated" || !project) return html;
     try {
@@ -373,7 +374,7 @@ export default function CodeTemplateEditor() {
   };
 
   const openTab = async () => {
-    // Tab dibuka langsung saat diklik (agar tidak diblokir), isinya menyusul setelah gambar aset siap.
+    // The tab is opened right on click (so it is not blocked); its content follows once asset images are ready.
     const tab = html.includes("aset:") ? window.open("about:blank", "_blank") : null;
     const url = URL.createObjectURL(new Blob([await resolveForPreview(html)], { type: "text/html" }));
     if (tab) {
@@ -401,7 +402,7 @@ export default function CodeTemplateEditor() {
     <>
       <AppMeta title={`${project.name} · ${t("codeEditor.title")}`} description={t("codeEditor.description")} />
       <div className="flex h-dvh flex-col bg-gray-100 dark:bg-gray-950" data-testid="code-editor">
-        {/* -------- bar atas -------- */}
+        {/* -------- top bar -------- */}
         <header className="flex flex-wrap items-center gap-1 border-b border-gray-200 bg-white px-2 py-1.5 dark:border-gray-800 dark:bg-gray-900" data-testid="code-studio-bar">
           <Link to={WEBSITE_HUB_PATH} className={BAR_BTN} aria-label={t("studio.exitAria")} title={t("studio.exitAria")}>
             <ArrowLeft className="h-4 w-4" /> <span className="hidden lg:inline">{t("studio.exit")}</span>
@@ -596,6 +597,7 @@ export default function CodeTemplateEditor() {
           open
           onClose={() => setDeployOpen(false)}
           defaultRepo={folder}
+          projectKey={deployKey("code", project.id)}
           withFiles={async (push) => {
             const content = deployHtml ?? (await finalHtml());
             return push([{ name: "index.html", content }]).then(

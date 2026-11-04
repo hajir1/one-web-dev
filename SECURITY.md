@@ -1,7 +1,7 @@
-# Keamanan
+# Security
 
-Menemukan celah keamanan? **Jangan buka issue publik.** Laporkan secara privat lewat tab **Security → Report a vulnerability** di repositori GitHub ini (GitHub Private Vulnerability Reporting).
+Found a security vulnerability? **Please do not open a public issue.** Report it privately through the **Security → Report a vulnerability** tab of this GitHub repository (GitHub Private Vulnerability Reporting).
 
-Sertakan langkah untuk mereproduksi, versi atau commit yang terdampak, dan dampaknya menurut Anda. Kami akan membalas dalam 7 hari dan memberi kabar sampai masalahnya selesai. Pelapor akan disebut di catatan rilis bila bersedia.
+Include steps to reproduce, the affected version or commit, and the impact as you see it. We will reply within 7 days and keep you updated until the issue is resolved. Reporters are credited in the release notes if they wish.
 
-Versi frontend-only berjalan sepenuhnya di browser dan tidak menyimpan data pengguna di server, tetapi celah seperti XSS di hasil ekspor, injeksi lewat template, atau kebocoran data di penyimpanan browser tetap kami anggap serius.
+The frontend-only version runs entirely in the browser and stores no user data on a server, but we still take issues such as XSS in exported output, injection through templates, or data leaks from browser storage seriously.

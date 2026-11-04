@@ -1,10 +1,10 @@
 // ─── converters/sizings.ts ───────────────────────────────────────────────────
-// Hitung ukuran hasil. Dipakai raster→raster, vektor→raster, vektor→vektor.
+// Computes the output size. Used for raster→raster, vector→raster, vector→vector.
 //
-// Tambahan: mode "fit-box" (muat di dalam kotak L×T, rasio terjaga) dan
-// `noUpscale` — cocok untuk resize batch foto berbagai ukuran tanpa
-// memperbesar gambar kecil. Nilai tidak valid (0, NaN, negatif) jatuh ke
-// ukuran asli, dan hasil dijepit ke batas Canvas.
+// Extras: a "fit-box" mode (fit inside a W×H box, ratio kept) and
+// `noUpscale`, suited to batch resizing photos of various sizes without
+// enlarging small images. Invalid values (0, NaN, negative) fall back to
+// the original size, and the result is clamped to the Canvas limit.
 
 import { MAX_CANVAS_SIDE } from "./image";
 
@@ -15,7 +15,7 @@ export interface ResizeOptions {
   mode: ResizeMode;
   width: number;
   height: number;
-  /** Jangan perbesar gambar yang lebih kecil dari target (kecuali mode exact). */
+  /** Do not enlarge images smaller than the target (except in exact mode). */
   noUpscale?: boolean;
 }
 
@@ -56,7 +56,7 @@ export function computeOutputSize(naturalWidth: number, naturalHeight: number, r
     w = nw;
     h = nh;
   }
-  // Jepit ke batas Canvas dengan rasio tetap.
+  // Clamp to the Canvas limit with a fixed ratio.
   const over = Math.max(w / MAX_CANVAS_SIDE, h / MAX_CANVAS_SIDE, 1);
   return { width: clampSide(w / over), height: clampSide(h / over) };
 }

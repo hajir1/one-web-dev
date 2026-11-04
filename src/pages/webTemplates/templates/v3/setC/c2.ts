@@ -153,7 +153,7 @@ export const bakeryPatisserie: TemplateContent = {
   },
 };
 
-/* ------------ 7. Podcast Ruang Dengar (PREMIUM, 5 hlm) — neon -------- */
+/* ------------ 7. Podcast Ruang Dengar (PREMIUM, 5 pages) — neon -------- */
 
 const RD: Palette = { ink: "#f5f3ff", muted: "#c4b5fd", primary: "#8b5cf6", primaryDark: "#6d28d9", soft: "#ede9fe", line: "#c4b5fd" };
 const rd = lookC(RD, { head: "Syne", body: "Inter", skin: "neon", radius: 18, bg: "#0e0a1f", alt: "#171030", dark: "#08061a", fx: { animate: "fadeInUp", tilt: { max: 12, glare: true } }, btnR: 999, onDark: "#c4b5fd", accent2: "#ec4899" });

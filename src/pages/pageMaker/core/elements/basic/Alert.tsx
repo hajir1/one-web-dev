@@ -12,7 +12,7 @@ import i18n from "../../../../../i18n";
 export interface AlertState extends StyleState {
   /** "alert" = penting & diumumkan segera; "status" = informasi sopan. */
   role: "alert" | "status";
-  /** Tampilkan tombol tutup (×). */
+  /** Show the close button (×). */
   dismissible: boolean;
 }
 
@@ -95,7 +95,7 @@ const DEFAULT_CLASS_NAME = "custom-alert";
 const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
 function alertCss(s: AlertState, cls: string, hasIcon: boolean) {
-  // Alert selalu block-level; jadi flex kalau ada ikon/tombol tutup supaya sejajar rapi.
+  // Alerts are always block-level; they become flex when there is an icon/close button so everything lines up.
   const flex = hasIcon || s.dismissible;
   let css = generateCss(s, cls, hasIcon, flex).replace(
     flex ? "display: inline-flex;" : "display: inline-block;",
@@ -208,7 +208,7 @@ function alertSpec(s: AlertState, cls: string, icons: IconLookup): ElementSpec {
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const alertElement = defineElement<AlertState>({

@@ -16,7 +16,7 @@ import type { TplLang } from "../types";
 
 type SectionBox = { tag?: string; name: string };
 
-/* Katalog v2 bagian A: 25 template (1 Free + 24 Premium), 4–10 halaman. */
+/* v2 catalog part A: 25 templates (1 Free + 24 Premium), 4–10 pages. */
 
 const LANGS: TplLang[] = ["id", "en"];
 const IDS = [
@@ -49,7 +49,7 @@ const IDS = [
 
 const templates = (): WebTemplate[] => V2A_CATALOG.map((m) => getTemplate(m.id) as WebTemplate);
 
-/** Item Premium (preset section & elemen) yang dipakai template. */
+/** Premium items (section presets & elements) used by the template. */
 function premiumItems(tpl: WebTemplate): string[] {
   const { sectionIds, elementIds } = templateContents(tpl);
   return [
@@ -68,7 +68,7 @@ test("katalog A: 25 template berurutan, terdaftar, 1 Free + 24 Premium, harga va
   for (const m of V2A_CATALOG) {
     assert.ok(isValidPrice("template", m.tier, m.price), `${m.id}: harga ${m.price}`);
     assert.ok(TEMPLATE_CATEGORIES.includes(m.category), `${m.id}: kategori ${m.category}`);
-    // Premium naik ke v2 karena kini memakai library (templates/libraryPlan.ts).
+    // Premium moved up to v2 because it now uses libraries (templates/libraryPlan.ts).
     assert.equal(m.version, m.tier === "premium" ? 2 : 1);
     assert.equal(m.isNew, true);
     assert.equal(m.tags.length, 3);
@@ -76,7 +76,7 @@ test("katalog A: 25 template berurutan, terdaftar, 1 Free + 24 Premium, harga va
     assert.ok(TEMPLATE_CATALOG.some((c) => c.id === m.id), `${m.id}: masuk TEMPLATE_CATALOG`);
     assert.ok(WEB_TEMPLATES.some((t) => t.id === m.id), `${m.id}: punya konten`);
   }
-  // Premium: harga naik seiring jumlah halaman (template 10 halaman lebih mahal dari 5 halaman).
+  // Premium: the price rises with the page count (a 10-page template costs more than a 5-page one).
   const price = (id: string) => V2A_CATALOG.find((m) => m.id === id)?.price ?? 0;
   assert.ok(price("saas-crm-relasi") > price("automotive-bengkel"));
   assert.ok(price("company-manufaktur") > price("agri-tani"));
@@ -117,10 +117,10 @@ test("setiap halaman dibangun di ID & EN: section saja di root, header + isi + f
         assert.equal(kids[kids.length - 1].tag, "footer", `${tpl.id}/${p.key}: footer di bawah`);
       }
     }
-    // Halaman dalam satu template tidak identik satu sama lain (desain halaman berbeda).
+    // Pages within one template are not identical to each other (different page designs).
     const shapes = byLang.id.map((p) => (p.doc.root.children as unknown as SectionBox[]).map((s) => s.name).join("|"));
     assert.equal(new Set(shapes).size, shapes.length, `${tpl.id}: susunan section tiap halaman berbeda`);
-    // Konten benar-benar dwibahasa.
+    // Content is truly bilingual.
     assert.notEqual(JSON.stringify(byLang.id.map((p) => p.name)), JSON.stringify(byLang.en.map((p) => p.name)), `${tpl.id}: nama halaman dwibahasa`);
   }
 });
@@ -167,7 +167,7 @@ test("aset v2a: nama berawalan, SVG ASCII kecil tanpa URL eksternal", () => {
 
 test("locale: kunci ID & EN identik, semua template & 16 kategori v2", () => {
   type Frag = { templates: { items: Record<string, { name: string; description: string }>; categories: Record<string, string> } };
-  // Locale hasil gabungan (src/locales) — folder fragmen tidak ikut dikirim.
+  // Merged locales (src/locales) — the fragment folder is not shipped.
   const read = (lang: TplLang): Frag => JSON.parse(readFileSync(fileURLToPath(new URL(`../../../locales/${lang}.json`, import.meta.url)), "utf8"));
   const idj = read("id");
   const enj = read("en");

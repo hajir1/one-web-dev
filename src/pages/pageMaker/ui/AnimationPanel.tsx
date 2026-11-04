@@ -5,8 +5,8 @@ import type { ComponentNode } from "../engine/helpers/componentTypes";
 import { useMotionStore } from "../core/store/motionStore";
 
 /* ================================================================== */
-/* Grup "Animasi" di panel Styling (v9) — animasi CSS tanpa library.    */
-/* Kosong = ikut Pengaturan Global → Animasi & 3D.                      */
+/* The "Animation" group in the Styling panel (v9): CSS animations without a library. */
+/* Empty = follow Global Settings → Animation & 3D.                     */
 /* ================================================================== */
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 const SELECT = "w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100";
 const KINDS: AnimKind[] = ["entrance", "loop", "hover"];
 
-/** Angka opsional: kosong = ikut global. */
+/** Optional number: empty = follow global. */
 function OptNum({ value, onChange, placeholder, min, max, step, suffix }: { value?: number; onChange: (v: number | undefined) => void; placeholder: string; min: number; max: number; step: number; suffix: string }) {
   return (
     <div className="flex items-center gap-1.5">
@@ -52,7 +52,7 @@ export default function AnimationPanel({ node, onChange }: Props) {
     if (!preset) return onChange(undefined, key("preset"));
     const p = preset as AnimPreset;
     const k = ANIM_PRESETS[p].kind;
-    // Pemicu bawaan global disimpan saat animasi dipilih, sehingga hasil ekspor tetap sama di perangkat lain.
+    // The global default trigger is stored when an animation is picked, so the export stays the same on other devices.
     onChange({ preset: p, ...(k === "entrance" ? { trigger: a?.trigger ?? defaults.trigger } : {}), ...(a?.duration !== undefined ? { duration: a.duration } : {}), ...(a?.easing ? { easing: a.easing } : {}) }, key("preset"));
   };
 

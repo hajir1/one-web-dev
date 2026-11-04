@@ -10,9 +10,9 @@ export interface ItemFieldDef<T> {
 }
 
 /**
- * Editor daftar item berstruktur (judul+isi, label+href, dst): tambah,
- * hapus, ubah urutan. Dipakai Accordion, Tabs, Breadcrumbs — dan elemen
- * baru mana pun yang butuh data berulang.
+ * Editor for structured item lists (title+body, label+href, etc.): add,
+ * remove, reorder. Used by Accordion, Tabs, Breadcrumbs, and any
+ * new element that needs repeated data.
  */
 export default function ItemListEditor<T extends Record<string, string>>({
   items,

@@ -121,7 +121,7 @@ import { DEFAULT_CRUD_STACK, frameworkForStack, isOfferedStack, stackForFramewor
 
 import { VIEWPORTS, isBool, isMode, isViewport, summarize, type Mode, type Viewport } from "./editorUi";
 
-/** Titik masuk: tidak bergantung pada AppLayout — halaman memenuhi viewport sendiri. */
+/** Entry point: does not depend on AppLayout; the page fills the viewport itself. */
 const NO_DESIGNS: SavedDesign[] = [];
 
 export default function PageMaker() {
@@ -130,9 +130,9 @@ export default function PageMaker() {
   const { doc, editRoot } = history;
   const root = doc.root;
   /**
-   * Akses item Premium: dibuka server (billing), dibeli individual (simulasi),
-   * atau DISERTAKAN template milik pengguna — yang terakhir hanya bila desain
-   * ini dibuat dari template tersebut (`doc.source.templateId`).
+   * Premium item access: unlocked by the server (billing), bought individually (simulation),
+   * or INCLUDED with a template the user owns; the last one only when this design
+   * was created from that template (`doc.source.templateId`).
    */
   const templateId = docTemplateId(doc);
   const access = useAccess({ templateId });
@@ -143,15 +143,15 @@ export default function PageMaker() {
 
   const defaultDoc = useMemo(createDefaultPageDoc, []);
   const design = useDesignSaver(PAGE_TYPE, doc, history.setDoc, defaultDoc, normalizePageDoc, {
-    // Mode demo (v15): desain tanpa batas → tanpa kotak kuota.
+    // Demo mode (v15): unlimited designs → no quota box.
     maxFree: isDemoMode() ? undefined : maxDesigns,
-    // Penuh → dialog batas desain (pengguna menghapus sendiri; tidak ada hapus otomatis).
+    // Full → design limit dialog (users delete designs themselves; nothing is deleted automatically).
     onLimit: () => useDesignLimit.getState().open({ adding: 1, reason: "save" }),
   });
-  /* ---------------- Studio (v20): /studio/:siteId = satu website, banyak halaman ---------------- */
+  /* ---------------- Studio (v20): /studio/:siteId = one website, many pages ---------------- */
   const { siteId } = useParams();
   const siteMode = !!siteId;
-  // Studio menyimpan otomatis, jadi tidak perlu dialog "simpan sebelum keluar".
+  // Studio saves automatically, so there is no "save before leaving" dialog.
   const guard = useLeaveGuard(siteMode ? false : design.isDirty);
 
   /* ---------------- website (Menu Element) ---------------- */
@@ -162,13 +162,13 @@ export default function PageMaker() {
     [siteDocs, pageDesigns, design.activeDesignId],
   );
 
-  // v17: "Lanjut: Susun & Deploy" membuka folder website yang memuat desain ini.
+  // v17: "Next: Compose & Deploy" opens the website folder that contains this design.
   const nextStepPath = useMemo(() => {
     const site = siteDocs.find((s) => normalizeSiteDoc(s.state).pages.some((p) => p.designId === design.activeDesignId));
     return site ? `/website?site=${encodeURIComponent(site.id)}` : "/website";
   }, [siteDocs, design.activeDesignId]);
 
-  // /page-maker?design=<id> → buka desain itu (dari halaman Website).
+  // /page-maker?design=<id> → open that design (from the Website page).
   const [searchParams, setSearchParams] = useSearchParams();
   const openId = searchParams.get("design");
   useEffect(() => {
@@ -183,7 +183,7 @@ export default function PageMaker() {
   }, [openId]);
   const { className, setClassName, safeClassName: cls } = useSafeClassName(DEFAULT_PAGE_CLASS_NAME);
 
-  /* ---------------- Studio: halaman website (useStudioSite.ts) ---------------- */
+  /* ---------------- Studio: website pages (useStudioSite.ts) ---------------- */
   const { toasts, push, dismiss } = useToasts();
   const [selectedId, setSelectedId] = useState<NodeId>(ROOT_ID);
   const { localeNavigate, updateDesignInStore, site, siteDoc, sitePages, saveTarget, boardOpen, setBoardOpen, addPageOpen, setAddPageOpen, sitePanelOpen, setSitePanelOpen, kirimanOpen, setKirimanOpen, deployOpen, setDeployOpen, deletePageId, setDeletePageId, saveSite, flush, openPage, currentPage, pageDocOf, homeDoc, createPage, renamePage, confirmDeletePage, syncChrome } = useStudioSite({ t, push, design, history, siteId, siteDocs, pageDesigns, searchParams, setSearchParams, onPageLoaded: () => setSelectedId(ROOT_ID) });
@@ -205,8 +205,8 @@ export default function PageMaker() {
   const [layersOpen, setLayersOpen] = useState(false);
   const [designsOpen, setDesignsOpen] = useState(false);
   /**
-   * Tujuan tombol (+); null = ikut seleksi.
-   * `after: true` = tepat di bawah node itu (saudara berikutnya); false = di dalamnya.
+   * Target of the (+) button; null = follow the selection.
+   * `after: true` = right below that node (next sibling); false = inside it.
    */
   const [addTarget, setAddTarget] = useState<{ id: NodeId; after: boolean } | null>(null);
   const [addTab, setAddTab] = useState<AddTab>("element");
@@ -230,13 +230,13 @@ export default function PageMaker() {
     () => compose(root, { rootClass: cls, icons, fonts, baseFont, vars: globalVars, site: siteCtx, allowPremiumElements: allowElement }),
     [root, cls, icons, fonts, baseFont, globalVars, siteCtx, allowElement],
   );
-  // v7: unduhan = proyek satu halaman siap jalan (package.json, README, CSS global).
+  // v7: download = a ready-to-run single-page project (package.json, README, global CSS).
   const projectTitle = design.designNameInput.trim() || t("pm.editor.untitled");
   const premiumFor = usePremiumElementsFor();
   /**
-   * Studio (website): panel Kode mengekspor SELURUH website (semua halaman +
-   * menu), sama seperti Deploy. Halaman aktif memakai isi editor terbaru.
-   * Hanya dihitung di mode Kode (compose semua halaman cukup berat).
+   * Studio (website): the Code panel exports the WHOLE website (every page +
+   * menu), same as Deploy. The active page uses the latest editor content.
+   * Only computed in Code mode (composing every page is fairly heavy).
    */
   const builtSite = useMemo(() => {
     if (!siteMode || !site || mode !== "code") return null;
@@ -253,14 +253,14 @@ export default function PageMaker() {
   const [crudStack, setCrudStack] = usePersistentState<CrudStack>("pm-crud-stack", DEFAULT_CRUD_STACK, isOfferedStack);
   const [crudOpen, setCrudOpen] = useState<{ key: string | null } | null>(null);
   const [reveal, setReveal] = useState<{ id: NodeId; n: number } | null>(null);
-  /** Semua koleksi di website (halaman aktif = isi editor). */
+  /** Every collection in the website (active page = editor content). */
   const crudEntries: DashboardEntry[] = useMemo(() => {
     const pages = siteMode && sitePages.length ? sitePages.map((p) => ({ id: p.designId, title: p.title })) : [{ id: design.activeDesignId ?? "", title: projectTitle }];
     return pages.flatMap((p) => {
       const r = !siteMode || p.id === design.activeDesignId ? root : normalizePageDoc(p.id ? useDesignStore.getState().designs[PAGE_TYPE]?.find((x) => x.id === p.id)?.state : null).root;
       return collectionsIn(r).map((c) => ({ key: `${p.id}:${c.boxId}`, pageTitle: p.title, boxId: c.boxId, col: c.col }));
     });
-    // pageDesigns: halaman lain berubah → daftar ikut berubah.
+    // pageDesigns: another page changes → the list changes too.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteMode, sitePages, design.activeDesignId, root, projectTitle, pageDesigns]);
   const crudCols = useMemo(() => crudEntries.map((e) => e.col), [crudEntries]);
@@ -270,16 +270,16 @@ export default function PageMaker() {
     [crudActive, crudStack, baseFiles, crudCols, site?.name, projectTitle],
   );
   /**
-   * Uji coba halaman item: setelah koleksi berubah, halaman detail dan kartu
-   * "item terkait" di semua halaman ikut disusun ulang (slug koleksi yang
-   * diganti ikut diperbarui).
+   * Item page preview: after a collection changes, the detail pages and
+   * "related items" cards on every page are recomposed (a renamed collection
+   * slug is updated too).
    */
   const syncItemPages = useCallback(
     (cols: CollectionDef[], rename?: { from: string; to: string }) => {
       const fix = (r: BoxNode) => {
         const renamed = rename ? renameCollectionRefs(r, rename.from, rename.to) : r;
         const items = itemCollectionsUsed(renamed).length ? syncItemPage(renamed, cols) : renamed;
-        // Chip filter kategori mengikuti kategori di data.
+        // Category filter chips follow the categories in the data.
         return filterBarsIn(items).length ? syncFilterBars(items, cols, rename) : items;
       };
       const ids = siteMode && sitePages.length ? sitePages.map((p) => p.designId) : [design.activeDesignId ?? ""];
@@ -308,7 +308,7 @@ export default function PageMaker() {
     },
     [siteMode, design.activeDesignId, editRoot, pageDocOf, updateDesignInStore, crudEntries, syncItemPages],
   );
-  /** Koleksi `slug` punya halaman item (tombol kartu menuju halaman item)? */
+  /** Does collection `slug` have an item page (card buttons lead to the item page)? */
   const setItemPageFlag = useCallback(
     (slug: string, on: boolean) => {
       const entry = crudEntries.find((e) => e.col.slug === slug);
@@ -331,11 +331,11 @@ export default function PageMaker() {
 
   /* ---------------- tujuan penambahan ---------------- */
   /**
-   * Titik sisip KONTEN (elemen / component / grup):
-   *   - (+) pada elemen / grup  → tepat di bawahnya (selalu menumpuk ke
-   *                                bawah; lihat `belowSpot`)
-   *   - (+) di dalam Row / grup → akhir isinya
-   *   - section                 → Row terakhirnya (atau Row baru bila belum ada)
+   * CONTENT insertion point (element / component / group):
+   *   - (+) on an element / group → right below it (always stacks
+   *                                downward; see `belowSpot`)
+   *   - (+) inside a Row / group → the end of its content
+   *   - section                 → its last Row (or a new Row when there is none)
    */
   const spot: { parentId: NodeId; index: number; label: string; wrapId?: NodeId } | null = useMemo(() => {
     const explicit = addTarget ? findNode(root, addTarget.id) : null;
@@ -356,7 +356,7 @@ export default function PageMaker() {
       }
       if (isBox(base) && base.id !== ROOT_ID) {
         if (isSection(base)) return intoSection(base);
-        // Row/Row dalam berkolom: modul masuk ke kolom (kolom kosong pertama, atau kolom terakhir), bukan jadi kolom baru.
+        // Row/inner Row with columns: the module goes into a column (the first empty column, or the last column), not a new column.
         const cols = (isRow(base) || isInnerRow(base)) && (base.layout === "grid" || base.layout === "row") && base.children.length > 0 && base.children.every(isBox) ? (base.children as BoxNode[]) : null;
         if (cols) {
           const c = cols.find((x) => x.children.length === 0) ?? cols[cols.length - 1];
@@ -372,10 +372,10 @@ export default function PageMaker() {
     return lastSec && isBox(lastSec) ? intoSection(lastSec) : null;
   }, [root, selected, addTarget, t]);
   const targetLabel = spot ? spot.label : t("pm.editor.target.page");
-  /** Susunan wadah tujuan (grup baru yang dibungkus selalu Stack). */
+  /** Layout of the target container (a new wrapping group is always a Stack). */
   const spotLayout: BoxLayout | undefined = spot?.wrapId ? "stack" : spot ? (findNode(root, spot.parentId) as BoxNode | null)?.layout : undefined;
 
-  /** Keterangan posisi untuk Row baru. */
+  /** Position note for the new Row. */
   const rowBaseId: NodeId | null = useMemo(() => {
     const explicit = addTarget ? findNode(root, addTarget.id) : null;
     const base = explicit ?? (selected.id !== ROOT_ID ? selected : null);
@@ -416,7 +416,7 @@ export default function PageMaker() {
     [root, editRoot, push, t],
   );
 
-  /** Pasang section baru di halaman. `openAdd`: langsung buka panel elemen ke Row pertamanya. */
+  /** Adds a new section to the page. `openAdd`: immediately opens the element panel for its first Row. */
   const placeSection = useCallback(
     (node: BoxNode, index: number, openAdd = false) => {
       if (!insert(node, ROOT_ID, index)) return;
@@ -439,11 +439,11 @@ export default function PageMaker() {
       const p = typeof preset === "string" ? getSectionPreset(preset) : preset;
       if (!unlocked && p && isPremiumPreset(p) && !owns(itemKey.preset(p.id))) {
         const key = itemKey.preset(p.id);
-        // `unlocked` = baru saja dibuka di dialog (state akses belum ter-render ulang).
+        // `unlocked` = just unlocked in the dialog (the access state has not re-rendered yet).
         requireCredit("premium-preset", { item: p.name, itemKey: key, simCost: pieceInfo(key)?.price, onUnlocked: () => addSectionRef.current(p, index, true, withContent) });
         return;
       }
-      // Bawaan: kerangka kosong (Section → Row → kolom); contoh isi hanya bila diminta.
+      // Default: an empty skeleton (Section → Row → column); sample content only when requested.
       const node = createSectionForEditor(preset, withContent);
       if (node) placeSection(node, index);
     },
@@ -457,7 +457,7 @@ export default function PageMaker() {
     return def ? createElementNode(pick.elementType, structuredClone(def.defaults), def.label) : null;
   }, []);
 
-  /** Tambah node baru ke `parentId` pada `index` (default: akhir). */
+  /** Adds a new node to `parentId` at `index` (default: the end). */
   const addContent = useCallback(
     (node: ComponentNode | null, parentId?: NodeId, index?: number) => {
       if (!node) {
@@ -471,7 +471,7 @@ export default function PageMaker() {
       }
       const parent = findNode(root, pid);
       if (parentId === undefined && spot?.wrapId) {
-        // Elemen/kartu di grid atau baris sejajar: bungkus dulu supaya isi baru di bawahnya, bukan di samping.
+        // Elements/cards in a grid or a side-by-side row: wrap first so new content goes below, not beside.
         const placed = placeBelowWrapped(root, spot.wrapId, node);
         if (!placed.id) {
           push(t("pm.editor.toast.cannotPlaceHere"));
@@ -492,7 +492,7 @@ export default function PageMaker() {
   const addContentRef = useRef(addContent);
   addContentRef.current = addContent;
 
-  /** Tambah elemen dari pustaka. Elemen premium → dialog kredit (tidak ditambahkan). */
+  /** Adds an element from the library. Premium element → credit dialog (not added). */
   const addElement = useCallback(
     (pick: { elementType: string }, parentId?: NodeId, index?: number) => {
       const def = ELEMENT_DEFINITION_BY_TYPE[pick.elementType];
@@ -510,7 +510,7 @@ export default function PageMaker() {
     [addContent, makeElement, owns],
   );
 
-  /** Satu pintu untuk semua drop (canvas & pohon). */
+  /** One entry point for every drop (canvas & tree). */
   const applyDrop = useCallback(
     (parentId: NodeId, index: number, payload: DragPayload) => {
       switch (payload.kind) {
@@ -594,11 +594,11 @@ export default function PageMaker() {
     setAddOpen(true);
   }, []);
 
-  /** Row baru. `baseId`: section (→ akhir section) atau node di dalam Row (→ tepat di bawah Row itu). */
+  /** New Row. `baseId`: a section (→ end of the section) or a node inside a Row (→ right below that Row). */
   const addRow = useCallback(
     (variantId: string, baseId?: NodeId | null) => {
       const id = baseId ?? rowBaseId;
-      // Di kolom spesial (Spesialisasi): Row dalam baru tepat di bawah Row dalam itu (ala Divi).
+      // In a specialty column (Specialty): a new inner Row goes right below that inner Row (Divi style).
       if (id && innerRowSpot(root, id)) {
         const inner = placeInnerRow(root, id, variantId);
         if (inner.id) {
@@ -659,7 +659,7 @@ export default function PageMaker() {
     [select, handleRename, editRoot, handleDuplicate, handleDelete, root],
   );
 
-  /** Section "JavaScript (Event)" untuk elemen interaktif. */
+  /** "JavaScript (Event)" section for interactive elements. */
   const advancedSection = useCallback(
     (n: ComponentNode): PanelSection => ({
       id: "advanced",
@@ -678,7 +678,7 @@ export default function PageMaker() {
     [inspector, root, t],
   );
 
-  /** v9: animasi CSS (tanpa library), nilai kosong ikut Pengaturan Global. */
+  /** v9: CSS animations (no library); empty values follow Global Settings. */
   const animationSection = useCallback(
     (n: ComponentNode): PanelSection => ({
       id: "animation",
@@ -689,7 +689,7 @@ export default function PageMaker() {
     [inspector, t],
   );
 
-  /** Pasang/lepas library CDN (disimpan di root.libraries; ikut ke kode ekspor). */
+  /** Adds/removes a CDN library (stored in root.libraries; included in the exported code). */
   const installed = useMemo(() => root.libraries ?? [], [root.libraries]);
   const toggleLibrary = useCallback(
     (id: LibraryId) =>
@@ -719,10 +719,10 @@ export default function PageMaker() {
     [inspector, installed, toggleLibrary, t],
   );
 
-  // Event JavaScript per elemen sudah dihapus dari mode edit: JavaScript tambahan
-  // ditulis utuh di Custom JavaScript (Lanjutan). Event lama dipindahkan ke sana
-  // saat desain dibuka (lihat migrate.ts).
-  /** Uji coba CRUD: Pengaturan › Koleksi data (Row/grup kartu) dan catatan di kartu koleksi. */
+  // Per-element JavaScript events were removed from edit mode: extra JavaScript
+  // is written in full in Custom JavaScript (Advanced). Old events are moved there
+  // when the design is opened (see migrate.ts).
+  /** CRUD preview: Settings › Data collection (Row/card group) and notes on collection cards. */
   const openCollection = useCallback(
     (boxId: NodeId) => {
       flush();
@@ -756,7 +756,7 @@ export default function PageMaker() {
         : null,
     [editRoot, push, t, openCollection, history.undo],
   );
-  /** Uji coba halaman item: panel box detail, kartu terkait, dan ikatan elemen. */
+  /** Item page preview: detail box panel, related cards, and element bindings. */
   const itemSections = useCallback(
     (b: BoxNode): PanelSection[] => {
       if (b.id === ROOT_ID || b.collection || !crudCols.length) return [];
@@ -902,7 +902,7 @@ export default function PageMaker() {
 
   /* ---------------- pintasan keyboard ---------------- */
   const { undo, redo } = history;
-  /** Dipakai untuk keyboard di induk maupun yang diteruskan dari iframe. */
+  /** Used for keyboard input in the parent as well as input forwarded from the iframe. */
   const shortcut = useCallback(
     (key: string, mod: boolean, shift: boolean): boolean => {
       const k = key.toLowerCase();
@@ -979,7 +979,7 @@ export default function PageMaker() {
   return (
     <PieceAccessProvider value={pieceAccess}>
       <div className="fixed inset-0 z-40 flex flex-col bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-white/90" data-testid={siteMode ? "studio" : "page-maker"}>
-        {/* ---------- Studio: bilah website (halaman, Situs, Kiriman, Deploy) ---------- */}
+        {/* ---------- Studio: website bar (pages, Site, Submissions, Deploy) ---------- */}
         {siteMode && site && (
           <StudioBar
             siteName={site.name}
@@ -1039,7 +1039,7 @@ export default function PageMaker() {
           </div>
         )}
 
-        {/* ---------- area utama: 100% lebar ---------- */}
+        {/* ---------- main area: 100% width ---------- */}
         <main className="relative min-h-0 flex-1">
           {mode === "design" && (
             <BuilderCanvas
@@ -1055,7 +1055,7 @@ export default function PageMaker() {
               onAddTo={(id) => openAdd(id, false, "element")}
               onAddAfter={(id) => openAdd(id, true, "element")}
               onAddRowAfter={(id) => {
-                // Seperti Divi: (+) Row membuka pilihan struktur kolom, hasilnya tepat di bawah.
+                // Like Divi: (+) Row opens the column structure options, and the result goes right below.
                 setSelectedId(id);
                 openAdd(id, false, "row");
               }}
@@ -1244,7 +1244,7 @@ export default function PageMaker() {
             positionLabel={addPositionLabel}
             onClose={() => setSectionAt(null)}
             onPick={(p, withContent) => addSection(p, sectionAt, false, withContent)}
-            // Lebar Penuh: langsung pilih elemen (seperti Divi meminta modul lebar penuh).
+            // Full Width: pick an element right away (as Divi asks for a full-width module).
             onCreate={(node, kind) => placeSection(node, sectionAt, kind === "fullwidth")}
           />
         )}
@@ -1299,7 +1299,7 @@ export default function PageMaker() {
               setCrudOpen(null);
               if (siteMode && pageId && pageId !== design.activeDesignId) openPage(pageId);
               setMode("design");
-              // Setelah halaman termuat: pilih Row koleksi dan buka Pengaturan.
+              // After the page loads: select the collection Row and open Settings.
               setTimeout(() => {
                 openSettings(e.boxId);
                 setReveal((r) => ({ id: e.boxId, n: (r?.n ?? 0) + 1 }));

@@ -6,8 +6,8 @@ import { inferCollection, materialize, type CollectionDef } from "../../pageMake
 import { syncItemPage, type BindField } from "../../pageMaker/helpers/itemPage";
 import type { BoxNode, ElementNode } from "../../pageMaker/engine/helpers/componentTypes";
 
-/* Toko Online — GRATIS: kedai kopi, 3 halaman (Beranda+katalog, Detail Produk, Cara Pesan).
-   Harga & tombol hanya tampilan: TIDAK ada transaksi sungguhan. */
+/* Online Store, FREE: a coffee shop, 3 pages (Home+catalog, Product Detail, How to Order).
+   Prices & buttons are display only: there are NO real transactions. */
 
 const P: Palette = { ink: "#1c1917", muted: "#57534e", primary: "#b45309", primaryDark: "#78350f", soft: "#fef3c7", line: "#e7e5e4" };
 const BRAND = "Kopi Senja";
@@ -21,7 +21,7 @@ export interface DemoProduct {
   reviews: number;
   desc: [string, string];
   badge?: [string, string];
-  /** Uji coba CRUD: kategori (cocok dengan chip "Biji kopi / Alat seduh / Camilan"). */
+  /** CRUD trial: categories (matching the "Biji kopi / Alat seduh / Camilan" chips). */
   cat?: [string, string];
 }
 
@@ -130,10 +130,10 @@ function home(tr: Tr, href: (k: string) => string) {
   ]);
 }
 
-/** Row horizontal langsung di section (untuk deretan badge kategori). */
+/** A horizontal Row directly in a section (for a row of category badges). */
 function inlineRow(children: ReturnType<typeof badge>[], filter?: CollectionDef) {
   const row = inline(children, { gap: 10 });
-  // Uji coba CRUD: chip = filter kategori koleksi Produk (klik → kartu katalog disaring).
+  // CRUD trial: chips = category filter of the Produk collection (click → catalog cards filtered).
   const r = stack([filter ? syncFilterBar({ ...row, name: "Filter kategori", filterOf: filter.slug }, filter) : row], { gap: 0 });
   return r;
 }
@@ -146,23 +146,23 @@ const productGrid = (tr: Tr, items: DemoProduct[], href: (k: string) => string) 
   );
 
 /**
- * Uji coba CRUD: koleksi "Produk" dari kartu katalog. Halaman Detail Produk
- * adalah halaman item koleksi ini, jadi tombol kartu menuju produk/<slug>.html.
+ * CRUD preview: a "Produk" collection from the catalog cards. The Product Detail page
+ * is this collection's item page, so card buttons lead to produk/<slug>.html.
  */
 const productCollection = (tr: Tr, href: (k: string) => string): CollectionDef => withCategories(tr, { ...inferCollection(productGrid(tr, COFFEE, href), tr("Produk", "Products")), itemPage: true });
 
-/** Kategori data awal (urutan item = urutan COFFEE). */
+/** Seed data categories (item order = COFFEE order). */
 const withCategories = (tr: Tr, col: CollectionDef): CollectionDef => ({
   ...col,
   items: col.items.map((it, i) => (COFFEE[i]?.cat ? { ...it, values: { ...it.values, category: tr(...COFFEE[i].cat!) } } : it)),
 });
 
-/** Ikat elemen ke kolom item (halaman detail). */
+/** Binds an element to an item field (detail page). */
 const bound = <T extends ElementNode>(n: T, field: BindField): T => ({ ...n, bind: field });
 
 function katalog(tr: Tr, href: (k: string) => string) {
   const raw = productGrid(tr, COFFEE, href);
-  // Uji coba CRUD: kartu katalog = koleksi data "Produk" (dikelola di dashboard Data).
+  // CRUD trial: catalog cards = the "Produk" data collection (managed in the Data dashboard).
   raw.name = tr("Daftar produk", "Product list");
   const cards = materialize(raw, withCategories(tr, { ...inferCollection(raw, tr("Produk", "Products")), itemPage: true }));
   const s = section(
@@ -244,7 +244,7 @@ function product(tr: Tr, href: (k: string) => string) {
     ),
     footer(tr),
   ]);
-  // Uji coba halaman item: grid foto + info = satu produk dari koleksi "Produk".
+  // Item page preview: photo grid + info = one product from the "Produk" collection.
   const mark = (n: BoxNode): BoxNode =>
     n.children.some((c) => c.name === "Foto produk")
       ? { ...n, name: tr("Detail item produk", "Product item detail"), itemOf: { collection: productCollection(tr, href).slug } }

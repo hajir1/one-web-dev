@@ -10,7 +10,7 @@ import {
 } from "./componentTypes";
 
 /* ================================================================== */
-/* Operasi pohon — murni & immutable (mengembalikan root baru)          */
+/* Tree operations — pure & immutable (return a new root)               */
 /* ================================================================== */
 
 export const LAYOUT_LABEL: Record<BoxLayout, string> = {
@@ -22,7 +22,7 @@ export const LAYOUT_LABEL: Record<BoxLayout, string> = {
 
 export const newNodeId = (): NodeId => `n-${makeId()}`;
 
-/** Box baru. `parentLayout` menentukan lebar bawaan yang masuk akal di induknya. */
+/** A new box. `parentLayout` sets a sensible default width within its parent. */
 export function createBox(
   layout: BoxLayout = "stack",
   patch: Partial<BoxNode> = {},
@@ -56,7 +56,7 @@ export function createBox(
   };
 }
 
-/** Root bawaan: kartu putih bersudut membulat (sama seperti Component Maker lama). */
+/** Default root: a white card with rounded corners (same as the old Component Maker). */
 export function createRoot(layout: BoxLayout = "stack", patch: Partial<BoxNode> = {}): BoxNode {
   return createBox(layout, {
     id: ROOT_ID,
@@ -119,7 +119,7 @@ export function findParent(
   return null;
 }
 
-/** Jalur dari root ke node (inklusif) — untuk membuka cabang pohon. */
+/** Path from the root to the node (inclusive), to expand tree branches. */
 export function pathTo(root: ComponentNode, id: NodeId): ComponentNode[] {
   if (root.id === id) return [root];
   if (isBox(root)) {
@@ -141,7 +141,7 @@ export function walk(
   if (isBox(node)) node.children.forEach((c) => walk(c, fn, node, depth + 1));
 }
 
-/** `id` adalah turunan (bukan diri sendiri) dari `ancestor`? */
+/** Is `id` a descendant (not itself) of `ancestor`? */
 export function isDescendant(ancestor: ComponentNode, id: NodeId): boolean {
   if (!isBox(ancestor)) return false;
   return ancestor.children.some((c) => c.id === id || isDescendant(c, id));
@@ -159,7 +159,7 @@ export const countElements = (root: ComponentNode) => collectElements(root).leng
 
 /* ------------------------------ update ----------------------------- */
 
-/** Ganti satu node (sepanjang jalurnya saja yang disalin). */
+/** Replace one node (only its path is copied). */
 export function updateNode(
   root: BoxNode,
   id: NodeId,
@@ -183,7 +183,7 @@ function mapBox(root: BoxNode, id: NodeId, fn: (b: BoxNode) => BoxNode): BoxNode
   return updateNode(root, id, (n) => (isBox(n) ? fn(n) : n));
 }
 
-/** Sisipkan `node` ke `parentId` pada `index` (di-clamp). Induk harus box. */
+/** Inserts `node` into `parentId` at `index` (clamped). The parent must be a box. */
 export function insertNode(
   root: BoxNode,
   parentId: NodeId,
@@ -198,7 +198,7 @@ export function insertNode(
   });
 }
 
-/** Hapus node (root tidak bisa dihapus). */
+/** Removes a node (the root cannot be removed). */
 export function removeNode(root: BoxNode, id: NodeId): BoxNode {
   if (id === root.id) return root;
   const loc = findParent(root, id);
@@ -209,7 +209,7 @@ export function removeNode(root: BoxNode, id: NodeId): BoxNode {
   }));
 }
 
-/** Bolehkah `dragId` dijatuhkan ke dalam `parentId`? (bukan root, bukan ke dirinya/turunannya) */
+/** May `dragId` be dropped into `parentId`? (not the root, not into itself/its descendants) */
 export function canMoveInto(root: BoxNode, dragId: NodeId, parentId: NodeId): boolean {
   if (dragId === root.id) return false;
   const target = findNode(root, parentId);
@@ -221,9 +221,9 @@ export function canMoveInto(root: BoxNode, dragId: NodeId, parentId: NodeId): bo
 }
 
 /**
- * Pindahkan node. `index` = posisi di daftar anak induk tujuan SEBELUM node
- * dicabut (cocok dengan posisi garis penanda drop); penyesuaian saat satu
- * induk dilakukan di sini.
+ * Moves a node. `index` = the position in the target parent's child list BEFORE the node
+ * is removed (matches the drop marker line position); the same-parent
+ * adjustment is done here.
  */
 export function moveNode(
   root: BoxNode,
@@ -237,11 +237,11 @@ export function moveNode(
   if (!loc || !node) return root;
   let target = index;
   if (loc.parent.id === parentId && loc.index < index) target -= 1;
-  if (loc.parent.id === parentId && target === loc.index) return root; // tidak berubah
+  if (loc.parent.id === parentId && target === loc.index) return root; // unchanged
   return insertNode(removeNode(root, id), parentId, target, node);
 }
 
-/** Geser satu langkah dalam induk yang sama (delta -1 = naik, +1 = turun). */
+/** Shifts one step within the same parent (delta -1 = up, +1 = down). */
 export function moveBy(root: BoxNode, id: NodeId, delta: -1 | 1): BoxNode {
   const loc = findParent(root, id);
   if (!loc) return root;
@@ -256,7 +256,7 @@ export function moveBy(root: BoxNode, id: NodeId, delta: -1 | 1): BoxNode {
 
 /* ----------------------------- duplicate --------------------------- */
 
-/** Salinan dalam dengan id baru. */
+/** A deep copy with new ids. */
 export function cloneNode<T extends ComponentNode>(node: T): T {
   const copy = (n: ComponentNode): ComponentNode => {
     if (isBox(n)) {
@@ -285,7 +285,7 @@ export function duplicateNode(root: BoxNode, id: NodeId): { root: BoxNode; newId
 
 /* ------------------------- grouping (wrap/unwrap) ------------------- */
 
-/** Bungkus node dengan box baru di posisi yang sama. */
+/** Wraps a node in a new box at the same position. */
 export function wrapInBox(
   root: BoxNode,
   id: NodeId,
@@ -296,7 +296,7 @@ export function wrapInBox(
   const node = findNode(root, id);
   if (!loc || !node) return { root, boxId: null };
   const box = createBox(layout, { name: "Grup" }, loc.parent.layout);
-  // Posisi di induk (grow/span) berpindah ke pembungkus; isi bungkusan bersih.
+  // The position in the parent (grow/span) moves to the wrapper; the wrapped content is clean.
   box.place = { ...node.place };
   box.children = [{ ...node, place: {} }];
   const replaced = updateNode(root, loc.parent.id, (p) =>
@@ -305,7 +305,7 @@ export function wrapInBox(
   return { root: replaced, boxId: box.id };
 }
 
-/** Lepas box: anak-anaknya naik ke induk pada posisi box. */
+/** Unwraps a box: its children move up into the parent at the box's position. */
 export function unwrapBox(root: BoxNode, id: NodeId): BoxNode {
   if (id === root.id) return root;
   const loc = findParent(root, id);
@@ -320,7 +320,7 @@ export function unwrapBox(root: BoxNode, id: NodeId): BoxNode {
 
 /* ----------------------------- utilities --------------------------- */
 
-/** Pastikan tidak ada id ganda (mis. dari data korup); ganti yang ganda. */
+/** Ensures there are no duplicate ids (e.g. from corrupt data); replaces the duplicates. */
 export function dedupeIds(root: BoxNode): BoxNode {
   const seen = new Set<string>();
   const fix = (n: ComponentNode, isRoot: boolean): ComponentNode => {

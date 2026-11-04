@@ -13,7 +13,7 @@ const STATUS = {
   error: { tone: "rose" as const, Icon: AlertCircle },
 };
 
-/** Satu baris file di antrean: pratinjau, ukuran, status, progres, dan aksi. */
+/** One file row in the queue: preview, size, status, progress, and actions. */
 export default function FileRow({
   item,
   stale,
@@ -27,10 +27,10 @@ export default function FileRow({
 }: {
   item: QueueItem;
   stale?: boolean;
-  /** Antrean lain sedang berjalan. */
+  /** Another queue is running. */
   disabled?: boolean;
   actionLabel?: string;
-  /** Tampilkan hasil (dengan latar kotak-kotak) sebagai thumbnail. */
+  /** Shows the result (with a checkerboard background) as a thumbnail. */
   showResultThumb?: boolean;
   extra?: ReactNode;
   onProcess: () => void;

@@ -1,10 +1,10 @@
 /* ================================================================== */
-/* Dokumen iframe untuk canvas & pratinjau Page Maker                   */
+/* iframe document for the Page Maker canvas & preview                  */
 /*                                                                    */
-/* Halaman dirender di iframe sungguhan (sandbox) supaya @media bereaksi */
-/* pada lebar viewport (Desktop/Tablet/Mobile) dan CSS halaman tidak     */
-/* bocor ke aplikasi. Mode edit melaporkan kotak (rect) tiap node ke     */
-/* induk; overlay (toolbar, tombol +, penanda drop) digambar di induk.   */
+/* The page is rendered in a real (sandboxed) iframe so @media reacts   */
+/* to the viewport width (Desktop/Tablet/Mobile) and the page CSS does not */
+/* leak into the app. Edit mode reports each node's box (rect) to the   */
+/* parent; overlays (toolbar, + buttons, drop markers) are drawn in the parent. */
 /* ================================================================== */
 
 import { IMG_FALLBACK_TAG } from "./imagePlaceholder";
@@ -14,9 +14,9 @@ export interface PageRenderMessage {
   css: string;
   body: string;
   script: string;
-  /** true = mode edit (klik memilih node, kontainer kosong diberi tinggi minimum). */
+  /** true = edit mode (clicks select nodes, empty containers get a minimum height). */
   edit: boolean;
-  /** Library CDN (hanya dimuat di luar mode edit). */
+  /** CDN libraries (only loaded outside edit mode). */
   libs?: { css: string[]; js: string[]; init: string; editJs?: string[] };
 }
 
@@ -74,11 +74,11 @@ const RUNTIME = `
     } catch (err) { console.error(err); }
   }
 
-  // Library CDN: <link>/<script> dimuat sekali; di mode edit stylesheet dimatikan
-  // (AOS menyembunyikan elemen sebelum di-scroll).
+  // CDN libraries: <link>/<script> loaded once; in edit mode stylesheets are disabled
+  // (AOS hides elements until they are scrolled into view).
   var libLinks = {}, libScripts = {};
   function loadLibs(l, done) {
-    // Di mode edit hanya skrip yang aman (mis. Chart.js) yang dimuat.
+    // In edit mode only safe scripts (e.g. Chart.js) are loaded.
     var css = edit ? [] : (l && l.css) || [], js = (l && (edit ? l.editJs : l.js)) || [];
     Object.keys(libLinks).forEach(function (u) { libLinks[u].disabled = edit || css.indexOf(u) < 0; });
     if (!css.length && !js.length) return done();
@@ -103,7 +103,7 @@ const RUNTIME = `
     var m = e.data;
     if (!m || m.type !== "pm:render") return;
     edit = !!m.edit;
-    // Bersihkan Custom JS render sebelumnya (listener, timer) sebelum DOM diganti.
+    // Clean up the previous render's Custom JS (listeners, timers) before the DOM is replaced.
     if (document.__pmCustomDestroy) { try { document.__pmCustomDestroy(); } catch (err) { console.error(err); } }
     cssEl.textContent = String(m.css || "");
     root.innerHTML = String(m.body || "");
@@ -121,7 +121,7 @@ const RUNTIME = `
     var t = e.target;
     var a = t && t.closest ? t.closest("a[href]") : null;
     if (a && !(a.getAttribute("href") || "").startsWith("#")) e.preventDefault();
-    // Tautan antarhalaman (Menu Element) → minta induk menampilkan halaman itu (hanya pratinjau).
+    // Links between pages (Menu Element) → ask the parent to show that page (preview only).
     if (!edit && a && a.getAttribute("data-pm-page")) post({ type: "pm:navigate", page: a.getAttribute("data-pm-page") });
     if (!edit) return;
     var n = nodeOf(t);
@@ -144,7 +144,7 @@ const RUNTIME = `
     if (edit && lastHover !== null) { lastHover = null; post({ type: "pm:hover", id: null }); }
   });
 
-  // Keyboard di dalam iframe tidak sampai ke induk → teruskan pintasan builder.
+  // Keyboard events inside the iframe don't reach the parent → forward builder shortcuts.
   document.addEventListener("keydown", function (e) {
     if (!edit) return;
     var t = e.target, tag = t && t.tagName;

@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Kopi Senja Roastery · Kopi Sangrai Nusantara</title>
 <meta name="description" content="Website 3D scroll-driven untuk roastery kopi: cangkir dengan biji mengorbit dan uap, kebun bertingkat, drum sangrai, seduh manual, dan pulau asal kopi. Three.js prosedural + Lenis.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -24,7 +24,7 @@ document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
 </script>
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --accent: #e08c3c; /* Warna aksen (tombol, objek 3D) */
   --accent-2: #f3d9a4; /* Warna aksen kedua (objek 3D) */
@@ -48,7 +48,7 @@ a { color: inherit; }
 html.webgl #gl { opacity: 1; }
 html.no-webgl #gl { display: none; }
 
-/* Loading: penanda kecil di bawah, konten tetap terbaca selama adegan 3D dimuat. */
+/* Loading: a small indicator at the bottom; content stays readable while the 3D scene loads. */
 .loader { position: fixed; left: 50%; bottom: 20px; z-index: 30; display: none; transform: translateX(-50%); padding: 10px 16px 12px; border-radius: 999px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--ink); pointer-events: none; }
 html.loading .loader { display: block; }
 .loader p { margin: 8px 0 0; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); text-align: center; }
@@ -89,7 +89,7 @@ h2 { font-size: clamp(30px, 4.4vw, 52px); }
 .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent); }
 .btn:focus-visible, .brand:focus-visible, .nav a:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
 
-/* Kontak (penutup, menutupi canvas: render berhenti di sini) */
+/* Contact (closing, covers the canvas: rendering stops here) */
 .contact { position: relative; z-index: 1; padding: clamp(80px, 12vw, 140px) clamp(16px, 6vw, 96px) 48px; background: var(--bg); border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
 .contact h2 { max-width: 16ch; }
 .contact p { max-width: 52ch; color: var(--ink-soft); }
@@ -170,7 +170,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -182,7 +182,7 @@ const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw 
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
 const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
 
-/* ==== KONFIGURASI: warna 3D, anggaran, dan jalur kamera per section ==== */
+/* ==== CONFIGURATION: 3D colors, budget, and camera path per section ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan 3D" hide="maksPixelRatio,maksSegitiga,jarakAktif,benih,adegan"*/{
   "maksPixelRatio": 2,
   "maksSegitiga": 50000,
@@ -310,9 +310,9 @@ const CONFIG = /*owd:data name="CONFIG" label="Pengaturan 3D" hide="maksPixelRat
 }/*owd:end*/;
 /* ==================================================================== */
 
-/* Adegan per section (urutan = urutan section). Semua bentuk prosedural. */
+/* Scenes per section (order = section order). All shapes are procedural. */
 const GLOBAL = (ctx) => {
-  /* Debu hangat di sepanjang jalur (Points). */
+  /* Warm dust along the path (Points). */
   const { THREE, rand } = ctx;
   const n = 900, pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { pos[i * 3] = (rand() - 0.5) * 140; pos[i * 3 + 1] = (rand() - 0.5) * 50; pos[i * 3 + 2] = 20 - rand() * 210; }
@@ -322,7 +322,7 @@ const GLOBAL = (ctx) => {
 const BEAN = 0x5a3320, CREAM = 0xf4ece2;
 const beanGeo = (THREE) => { const g = new THREE.SphereGeometry(1, 14, 10); g.scale(0.62, 0.42, 0.9); return g; };
 const SCENES = [
-  /* 0. Cangkir, biji kopi mengorbit, dan uap */
+  /* 0. Cup, orbiting coffee beans, and steam */
   (ctx, g) => {
     const { THREE, rand, warna } = ctx;
     const prof = [[0, 0], [1.9, 0], [2.1, 0.25], [2.3, 2.6], [2.45, 3.2], [2.25, 3.25], [2.05, 0.5], [0, 0.45]].map((p) => new THREE.Vector2(p[0], p[1]));
@@ -352,7 +352,7 @@ const SCENES = [
     place(0, 0);
     return { update: place };
   },
-  /* 1. Kebun kopi bertingkat di dataran tinggi */
+  /* 1. Terraced coffee farm in the highlands */
   (ctx, g) => {
     const { THREE, rand } = ctx;
     const greens = [0x2f5d3a, 0x3c7046, 0x4c8452, 0x5d975e, 0x6fa86a];
@@ -414,7 +414,7 @@ const SCENES = [
     place(0);
     return { update: place };
   },
-  /* 4. Pulau asal biji kopi dengan penanda */
+  /* 4. The coffee beans' home island with a marker */
   (ctx, g) => {
     const { THREE, warna } = ctx;
     const geo = new THREE.IcosahedronGeometry(7, 3); geo.scale(1.3, 0.22, 0.8);
@@ -446,7 +446,7 @@ function hasWebGL() {
   try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; }
 }
 
-/* RNG deterministik supaya adegan sama di setiap kunjungan. */
+/* Deterministic RNG so the scene is the same on every visit. */
 function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 function triangles(obj) {
@@ -460,7 +460,7 @@ function triangles(obj) {
   return Math.round(n);
 }
 
-/* Warna latar & aksen diambil dari variabel CSS (satu tempat untuk diubah). */
+/* Background & accent colors come from CSS variables (one place to change them). */
 const cssv = getComputedStyle(root);
 const cv = (name, fallback) => cssv.getPropertyValue(name).trim() || fallback;
 const WARNA = Object.assign({}, CONFIG.warna, { latar: cv("--bg", "#000000"), aksen: cv("--accent", "#ffffff"), aksen2: cv("--accent-2", "#ffffff") });
@@ -499,13 +499,13 @@ function start() {
   window.__OWD_STATS = { triangles: tris, budget: CONFIG.maksSegitiga, contexts: 1 };
   if (tris > CONFIG.maksSegitiga) console.warn("[owd] Melebihi anggaran segitiga:", tris);
 
-  /* Jalur kamera: satu titik per section, dihaluskan dengan CatmullRom. */
+  /* Camera path: one point per section, smoothed with CatmullRom. */
   const v = (a) => new THREE.Vector3(a[0], a[1], a[2]);
   const camPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.kamera)), false, "centripetal");
   const lookPath = new THREE.CatmullRomCurve3(CONFIG.adegan.map((a) => v(a.lihat)), false, "centripetal");
   const N = CONFIG.adegan.length;
 
-  /* Progres scroll: kamera "berhenti" sejenak di tiap adegan (dwell), lalu pindah. */
+  /* Scroll progress: the camera "pauses" briefly at each scene (dwell), then moves on. */
   let stops = [];
   function measure() {
     const y0 = window.scrollY;
@@ -525,13 +525,13 @@ function start() {
     return 1;
   }
 
-  /* Pointer: kamera bergeser sedikit (desktop). */
+  /* Pointer: the camera shifts slightly (desktop). */
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   const finePointer = matchMedia("(pointer: fine)").matches;
   if (finePointer && !reduce) addEventListener("pointermove", (e) => { pointer.tx = (e.clientX / innerWidth - 0.5) * 2; pointer.ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
 
-  /* Komposisi: objek digeser ke sisi yang berlawanan dengan teks (setViewOffset).
-     Di layar tegak teks ada di bawah, jadi objek digeser ke atas. */
+  /* Composition: the object shifts to the side opposite the text (setViewOffset).
+     On portrait screens the text is at the bottom, so the object shifts up. */
   function frameView(uu) {
     const w = innerWidth, h = innerHeight;
     const k = uu * (N - 1), i = Math.min(N - 2, Math.floor(k)), f = k - i;
@@ -552,7 +552,7 @@ function start() {
   addEventListener("resize", resize);
   resize();
 
-  /* Lenis: gulir halus (dimatikan bila pengguna memilih kurangi gerak). */
+  /* Lenis: smooth scrolling (off when the user prefers reduced motion). */
   let lenis = null;
   if (!reduce) lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
   document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
@@ -563,7 +563,7 @@ function start() {
     t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true });
   }));
 
-  /* Render hanya saat ada section 3D yang terlihat dan tab aktif. */
+  /* Render only while a 3D section is visible and the tab is active. */
   let visible = true;
   const seen = new Set();
   const io = new IntersectionObserver((entries) => {
@@ -599,7 +599,7 @@ function start() {
     }
     renderer.render(scene, camera);
     if (first) { first = false; root.classList.add("webgl"); root.classList.remove("loading"); }
-    /* Turunkan pixel ratio bila rata-rata frame > 22 ms (target 60 fps). */
+    /* Lower the pixel ratio when the average frame is > 22 ms (target 60 fps). */
     frames++;
     if (dt > 0.022) slow++;
     if (frames === 90) {
@@ -618,7 +618,7 @@ function start() {
   }
   raf = requestAnimationFrame(frame);
 
-  /* Bersihkan semuanya saat halaman ditinggalkan. */
+  /* Clean everything up when the page is left. */
   function dispose() {
     cancelAnimationFrame(raf);
     io.disconnect();

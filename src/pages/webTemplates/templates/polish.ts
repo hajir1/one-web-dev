@@ -4,21 +4,21 @@ import { gridTrackCount } from "../../pageMaker/engine/helpers/compose";
 import type { PageDoc } from "../../pageMaker/helpers/pageDoc";
 
 /* ================================================================== */
-/* Polesan responsif untuk SEMUA template (v5)                          */
+/* Responsive polish for EVERY template (v5)                            */
 /*                                                                    */
-/* Dijalankan saat halaman template dibangun, jadi berlaku sama untuk   */
-/* pratinjau, Desain Halaman (bisa diubah lagi di panel), dan unduhan:  */
-/*  - Judul memakai ukuran cair (clamp) menggantikan @media ukuran HP.   */
-/*  - Kartu di grid terangkat halus saat hover; sudut minimal 14px      */
+/* Runs when a template page is built, so it applies equally to         */
+/* the preview, Page Design (can be changed again in the panel), and downloads: */
+/*  - Headings use fluid sizes (clamp) instead of phone-size @media.    */
+/*  - Cards in a grid lift slightly on hover; corners at least 14px     */
 /*    (kecuali gaya tegas bersudut 0).                                   */
-/*  - Grid di HP: angka/statistik 2 kolom, kartu bergambar jadi baris    */
-/*    geser (scroll-snap), sisanya satu kolom seperti biasa.             */
-/*  - Grid kartu teks diselang-seling di desktop (tidak sejajar kaku),   */
-/*    berselang satu grid agar tidak berlebihan.                         */
-/* Semua lewat properti node biasa: tanpa library tambahan.             */
+/*  - Grids on phones: numbers/stats in 2 columns, image cards become rows */
+/*    swipe (scroll-snap), the rest one column as usual.                 */
+/*  - Text card grids are staggered on desktop (not rigidly aligned),   */
+/*    every other grid so it is not overdone.                           */
+/* All through regular node properties: no extra libraries.             */
 /* ================================================================== */
 
-/** @media ukuran judul HP lama (dari helper heading); kini diganti ukuran cair. */
+/** The old phone heading size @media (from the heading helper); now replaced by fluid sizes. */
 const MOBILE_FONT_RE = /\n?@media \(max-width: 640px\) \{\s*& \{ font-size: \d+px; \}\s*\}/g;
 
 const isEl = (n: ComponentNode, ...types: string[]): n is ElementNode => !isBox(n) && types.includes((n as ElementNode).elementType);
@@ -35,23 +35,23 @@ function descendants(n: ComponentNode, out: ComponentNode[] = []): ComponentNode
 const hasBg = (b: BoxNode) => b.bgEnabled || (!!b.bgType && b.bgType !== "none");
 const cssHas = (b: BoxNode, re: RegExp) => re.test(b.advanced?.customCss ?? "");
 
-/** Kotak yang tampil sebagai kartu (latar + sudut/garis/bayangan). */
+/** A box shown as a card (background + corners/border/shadow). */
 function isCard(b: BoxNode): boolean {
   if (b.section || b.row) return false;
   return (hasBg(b) || cssHas(b, /background/)) && (b.borderRadius > 0 || b.borderWidth > 0 || b.shadow !== "none" || cssHas(b, /border|box-shadow/));
 }
 
-/** Isi pendek tanpa gambar/tombol: angka statistik, label, ikon kecil. */
+/** Short content without images/buttons: stat numbers, labels, small icons. */
 function isSmallStat(n: ComponentNode): boolean {
   if (isEl(n, "stats-counter")) return true;
   if (!isBox(n)) return false;
   const d = descendants(n).filter((x) => !isBox(x));
-  // Teks pendek saja (angka + label); kartu berparagraf tetap satu kolom agar lega.
+  // Short text only (number + label); cards with paragraphs stay single-column so they breathe.
   const short = (x: ComponentNode) => !isEl(x, "text") || String((x as ElementNode).state.text ?? "").length <= 28;
   return d.length > 0 && d.length <= 3 && d.every((x) => isEl(x, "text", "badge", "icon") && short(x));
 }
 
-/** Kartu bergambar / produk / testimoni: enak digeser di HP. */
+/** Image / product / testimonial cards: nice to swipe on phones. */
 function isMediaCard(n: ComponentNode): boolean {
   const MEDIA = ["image", "product-card", "testimonial", "card"];
   if (isEl(n, ...MEDIA)) return true;
@@ -74,7 +74,7 @@ function polishGrid(b: BoxNode, stagger: { n: number }): void {
     if (kids.every(isSmallStat)) b.mobileGrid = "two";
     else if (kids.every(isMediaCard)) b.mobileGrid = "scroll";
   }
-  // Kartu teks sejajar 3/4 kolom → selang-seling di desktop (setiap grid kedua).
+  // Text cards aligned in 3/4 columns → staggered on desktop (every second grid).
   const cols = gridTrackCount(b.columns || "");
   const textCards = kids.every((k) => isBox(k) && isCard(k) && !isMediaCard(k));
   const spans = kids.some((k) => k.place.colSpan || k.place.colStart);
@@ -85,8 +85,8 @@ function polishGrid(b: BoxNode, stagger: { n: number }): void {
 }
 
 /**
- * Tombol header di HP: lebih ringkas, dan tidak dipatah per kata bila layar
- * cukup lebar (di bawah 420px boleh dua baris agar ikon menu tetap muat).
+ * Header buttons on phones: more compact, and not broken per word when the screen
+ * is wide enough (below 420px two lines are allowed so the menu icon still fits).
  */
 const HEADER_BTN_CSS = "@media (min-width: 420px) {\n  & { white-space: nowrap; }\n}\n@media (max-width: 480px) {\n  & { padding: 8px 12px; font-size: 13px; }\n}";
 
@@ -106,14 +106,14 @@ function walk(n: ComponentNode, parent: BoxNode | null, stagger: { n: number }, 
   if (n.section && n.tag === "header") header = true;
   if (parent && (parent.layout === "grid" || parent.layout === "row") && isCard(n)) {
     n.hoverLift = true;
-    // Sudut lembut; gaya tegas (sudut 0) dibiarkan sesuai karakternya.
+    // Soft corners; bold styles (0 radius) are left true to their character.
     if (n.borderRadius > 0 && n.borderRadius < 14) n.borderRadius = 14;
   }
   if (n.layout === "grid") polishGrid(n, stagger);
   n.children.forEach((c) => walk(c, n, stagger, header));
 }
 
-/** Terapkan polesan ke satu halaman template (mengubah pohon yang baru dibangun). */
+/** Applies the polish to one template page (changes the freshly built tree). */
 export function polishTemplatePage(doc: PageDoc): PageDoc {
   walk(doc.root, null, { n: 0 });
   return doc;

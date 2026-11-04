@@ -3,7 +3,7 @@ import { cateringDapurRasa, hotelTerasSenja, rentalLintas, yogaHening } from "./
 import { barberCukurJenggala, eventRiangPesta, taxTaksa } from "./f2";
 import { agroPetikKebun, appDompetku, museumLiniMasa } from "./f3";
 
-/** Konten template katalog v5 (bagian F), dikunci dengan ID di ../catalogF.ts. */
+/** Catalog v5 template content (part F), keyed by the IDs in ../catalogF.ts. */
 export const V5F_TEMPLATES: Record<string, TemplateContent> = {
   "catering-dapur-rasa": cateringDapurRasa,
   "hotel-teras-senja": hotelTerasSenja,

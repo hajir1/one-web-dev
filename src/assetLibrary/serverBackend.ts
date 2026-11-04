@@ -4,12 +4,12 @@ import { AssetError } from "./prepareImage";
 import type { AssetBackend, AssetMeta, PreparedImage } from "./types";
 
 /* ================================================================== */
-/* Mode fullstack (backend v13): aset milik akun di object storage.     */
+/* Fullstack mode (backend v13): account-owned assets in object storage. */
 /*                                                                    */
-/*   GET    /assets                     → { assets: [...] } (+ url unduh)  */
+/*   GET    /assets                     → { assets: [...] } (+ download url) */
 /*   POST   /assets/uploads             { name, contentType, bytes, width, height } */
 /*            → 201 { asset, upload:{ url, method:"PUT", headers } }    */
-/*   PUT    upload.url                  (langsung ke storage)            */
+/*   PUT    upload.url                  (directly to storage)            */
 /*   POST   /assets/:id/complete        → asset siap (+ url)            */
 /*   PATCH  /assets/:id                 { name }                         */
 /*   DELETE /assets/:id                                                 */
@@ -39,7 +39,7 @@ const toMeta = (a: ServerAsset): AssetMeta => ({
 
 const isApi = (u: string) => u.startsWith(apiUrl("/"));
 
-/** URL unduh terakhir per id (dipakai blob()). */
+/** Latest download URL per id (used by blob()). */
 const urls = new Map<string, string>();
 const remember = (m: AssetMeta) => {
   if (m.url) urls.set(m.id, m.url);

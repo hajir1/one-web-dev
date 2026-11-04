@@ -1,7 +1,7 @@
 import i18n from "../../../i18n";
 import type { WorkerRequest, WorkerResponse } from "./imageWorker";
 
-/** Jalankan satu tugas di worker baru; abort → worker dihentikan seketika. */
+/** Runs one task in a new worker; abort → the worker is stopped immediately. */
 export function runImageWorker(req: WorkerRequest, signal?: AbortSignal): Promise<WorkerResponse & { ok: true }> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {

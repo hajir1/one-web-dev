@@ -6,12 +6,12 @@ import { normalizePageSeo, normalizeSiteSeo, type PageSeo, type SiteSeo } from "
 /* ================================================================== */
 /* Folder Website                                                       */
 /*                                                                    */
-/*   Design/Page = satu desain Page Maker = satu halaman (tipe "page"). */
-/*   Folder/Website = daftar REFERENSI ke desain (tipe "site"):         */
+/*   Design/Page = one Page Maker design = one page (type "page"). */
+/*   Folder/Website = a list of REFERENCES to designs (type "site"):    */
 /*     { pages: [{ designId, slug, label? }], homepageId }              */
-/*   Folder tidak menyalin desain → tidak ada duplikasi; nama desain    */
-/*   yang diubah otomatis terbawa ke menu. Menghapus halaman dari        */
-/*   folder TIDAK menghapus desainnya.                                  */
+/*   Folders do not copy designs → no duplication; renamed design names */
+/*   carry over to the menu automatically. Removing a page from          */
+/*   the folder does NOT delete its designs.                            */
 /* ================================================================== */
 
 export const SITE_TYPE = "site";
@@ -19,15 +19,15 @@ export const PAGE_DESIGN_TYPE = "page";
 const MAX_SITE_PAGES = 50;
 
 interface SitePage {
-  /** ID stabil desain sumber. */
+  /** Stable ID of the source design. */
   designId: string;
-  /** Bagian URL: /slug, slug.html. Unik di satu website. */
+  /** URL part: /slug, slug.html. Unique within one website. */
   slug: string;
-  /** Teks menu khusus; kosong = nama desain terkini. */
+  /** Custom menu text; empty = the current design name. */
   label?: string;
-  /** v10: SEO halaman (judul, deskripsi, gambar OG, noindex). */
+  /** v10: page SEO (title, description, OG image, noindex). */
   seo?: PageSeo;
-  /** v20: true = tidak tampil di menu otomatis (halaman tetap ada & bisa dibuka lewat tautan). */
+  /** v20: true = not shown in the automatic menu (the page still exists & opens through links). */
   hidden?: boolean;
 }
 
@@ -35,9 +35,9 @@ export interface SiteDoc {
   version: 1;
   pages: SitePage[];
   homepageId: string | null;
-  /** Asal folder bila dibuat dari Web Templates (untuk mencegah duplikasi tak sengaja). */
+  /** The folder's origin when created from Web Templates (to prevent accidental duplicates). */
   source?: { templateId: string; version: number };
-  /** v10: SEO situs (URL publik, deskripsi & gambar bawaan). */
+  /** v10: site SEO (public URL, default description & image). */
   seo?: SiteSeo;
 }
 
@@ -49,7 +49,7 @@ const RESERVED = new Set(["index", "assets", "src", "app", "pages", "node-module
 
 export const isValidSlug = (s: string) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s) && s.length <= 60 && !RESERVED.has(s);
 
-/** "Tentang Kami!" → "tentang-kami" (huruf latin tanpa aksen, angka, tanda hubung). */
+/** "Tentang Kami!" → "tentang-kami" (unaccented Latin letters, digits, hyphens). */
 export function slugify(name: string): string {
   const s = name
     .normalize("NFKD")
@@ -71,7 +71,7 @@ export function uniqueSlug(base: string, taken: Set<string>): string {
 
 /* --------------------------- normalisasi ---------------------------- */
 
-/** Data tersimpan apa pun → SiteDoc valid (slug unik & valid, homepage ada di daftar). */
+/** Any saved data → a valid SiteDoc (unique & valid slugs, homepage in the list). */
 export function normalizeSiteDoc(raw: unknown): SiteDoc {
   const out = createSiteDoc();
   if (!raw || typeof raw !== "object") return out;
@@ -110,7 +110,7 @@ export function addPage(doc: SiteDoc, d: SavedDesign): SiteDoc {
   return { ...doc, pages, homepageId: doc.homepageId ?? d.id };
 }
 
-/** Keluarkan halaman dari folder (desain sumber tetap ada). */
+/** Removes a page from the folder (the source design stays). */
 export function removePage(doc: SiteDoc, designId: string): SiteDoc {
   const pages = doc.pages.filter((p) => p.designId !== designId);
   return { ...doc, pages, homepageId: doc.homepageId === designId ? (pages[0]?.designId ?? null) : doc.homepageId };
@@ -127,7 +127,7 @@ export function movePage(doc: SiteDoc, designId: string, to: number): SiteDoc {
   return { ...doc, pages };
 }
 
-/** Ganti desain sebuah halaman (posisi, slug & homepage dipertahankan). */
+/** Replace a page's design (position, slug & homepage kept). */
 export function replacePage(doc: SiteDoc, designId: string, d: SavedDesign): SiteDoc {
   if (designId === d.id || doc.pages.some((p) => p.designId === d.id)) return doc;
   return {
@@ -140,7 +140,7 @@ export function replacePage(doc: SiteDoc, designId: string, d: SavedDesign): Sit
 export const setHomepage = (doc: SiteDoc, designId: string): SiteDoc =>
   doc.pages.some((p) => p.designId === designId) ? { ...doc, homepageId: designId } : doc;
 
-/** Ubah slug. Error (bahasa aktif) bila tidak valid / sudah dipakai. */
+/** Changes the slug. Error (active language) when invalid / already used. */
 export function setSlug(doc: SiteDoc, designId: string, slug: string): { doc: SiteDoc; error?: string; code?: "slugInvalid" | "slugTaken" } {
   const s = slug.trim().toLowerCase();
   if (!isValidSlug(s))
@@ -156,7 +156,7 @@ export const setLabel = (doc: SiteDoc, designId: string, label: string): SiteDoc
   ),
 });
 
-/** v20: tampil/sembunyikan halaman dari menu otomatis. */
+/** v20: shows/hides a page in the automatic menu. */
 export function setHidden(doc: SiteDoc, designId: string, hidden: boolean): SiteDoc {
   return {
     ...doc,
@@ -169,7 +169,7 @@ export function setHidden(doc: SiteDoc, designId: string, hidden: boolean): Site
   };
 }
 
-/** v20: sisipkan halaman baru tepat setelah `afterId` (null = di akhir). */
+/** v20: inserts a new page right after `afterId` (null = at the end). */
 export function insertPageAfter(doc: SiteDoc, d: SavedDesign, afterId: string | null): SiteDoc {
   const added = addPage(doc, d);
   if (added === doc || !afterId) return added;
@@ -177,7 +177,7 @@ export function insertPageAfter(doc: SiteDoc, d: SavedDesign, afterId: string | 
   return at < 0 ? added : movePage(added, d.id, at + 1);
 }
 
-/** v10: ubah SEO situs (nilai dinormalkan; kosong = dihapus). */
+/** v10: changes the site SEO (values normalized; empty = removed). */
 export function setSiteSeo(doc: SiteDoc, patch: Partial<SiteSeo>): SiteDoc {
   const seo = normalizeSiteSeo({ ...doc.seo, ...patch });
   const { seo: _old, ...rest } = doc;
@@ -185,7 +185,7 @@ export function setSiteSeo(doc: SiteDoc, patch: Partial<SiteSeo>): SiteDoc {
   return seo ? { ...rest, seo } : rest;
 }
 
-/** v10: ubah SEO satu halaman. */
+/** v10: changes the SEO of one page. */
 export function setPageSeo(doc: SiteDoc, designId: string, patch: Partial<PageSeo>): SiteDoc {
   return {
     ...doc,
@@ -199,16 +199,16 @@ export function setPageSeo(doc: SiteDoc, designId: string, patch: Partial<PageSe
   };
 }
 
-/* ------------------------- konteks untuk menu ----------------------- */
+/* ------------------------- context for the menu ----------------------- */
 
 export interface ResolvedSitePage extends SitePage {
   design: SavedDesign | null;
-  /** Label efektif (label khusus atau nama desain terkini). */
+  /** Effective label (custom label or the current design name). */
   title: string;
   isHome: boolean;
 }
 
-/** Halaman folder + desainnya (desain yang sudah dihapus ditandai `design: null`). */
+/** Folder pages + their designs (deleted designs are marked `design: null`). */
 export function resolvePages(doc: SiteDoc, designs: SavedDesign[]): ResolvedSitePage[] {
   return doc.pages.map((p) => {
     const design = designs.find((d) => d.id === p.designId) ?? null;
@@ -221,7 +221,7 @@ export function resolvePages(doc: SiteDoc, designs: SavedDesign[]): ResolvedSite
   });
 }
 
-/** Info website untuk Menu Element (hanya halaman yang desainnya masih ada). */
+/** Website info for the Menu Element (only pages whose designs still exist). */
 function siteInfo(site: SavedDesign, designs: SavedDesign[]): SiteInfo {
   const doc = normalizeSiteDoc(site.state);
   return {

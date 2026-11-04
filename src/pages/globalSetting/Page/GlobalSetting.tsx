@@ -14,17 +14,17 @@ import MotionManager from "../ui/MotionManager";
 import { useMotionStore } from "../../pageMaker/core/store/motionStore";
 
 /* ================================================================== */
-/* Global Setting — konfigurasi yang dipakai SEMUA maker                */
+/* Global Setting: configuration used by EVERY maker                    */
 /*                                                                    */
-/* Menambah kelompok pengaturan baru (warna merek, spacing, dst.) =     */
-/* menambah satu entri di SETTING_TABS + satu komponen panel.           */
+/* Adding a new settings group (brand colors, spacing, etc.) =          */
+/* adding one entry to SETTING_TABS + one panel component.              */
 /* ================================================================== */
 
 interface SettingTab {
   id: "icon" | "font" | "vars" | "motion";
   icon: LucideIcon;
   Panel: ComponentType;
-  /** Jumlah isi pustaka (ditampilkan di tab). */
+  /** Number of library items (shown in the tab). */
   useCount: () => number;
 }
 
@@ -48,7 +48,7 @@ const SETTING_TABS: SettingTab[] = [
     useCount: () => useVarStore((s) => s.vars.length),
   },
   {
-    // v9: nilai bawaan animasi CSS & elemen 3D (jumlah = pengaturan yang diubah dari bawaan).
+    // v9: default values for CSS animations & 3D elements (count = settings changed from the defaults).
     id: "motion",
     icon: Sparkles,
     Panel: MotionManager,

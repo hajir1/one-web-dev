@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Mercusuar Pulang</title>
 <meta name="description" content="Animasi terima kasih: perahu kecil tersesat di laut malam, mercusuar menyala dan sorotnya berputar, perahu mengikuti cahaya sampai dermaga, lalu fajar menyingsing.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #0b1a2e; /* Latar bawah */
   --bg-2: #173a5e; /* Latar tengah */
@@ -97,7 +97,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true
@@ -110,11 +110,11 @@ function scene(api) {
     draw(t, B) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const on = seg(B, 0.2, 0.8), sail = seg(B, 1.1, 2.3), dawn = seg(B, 2.1, 3);
-      /* Fajar: cahaya hangat dari cakrawala. */
+      /* Dawn: warm light from the horizon. */
       if (dawn > 0) { const gr = g.createLinearGradient(0, H * 0.25, 0, H * 0.66); gr.addColorStop(0, rgba(COL["c-3"], 0)); gr.addColorStop(1, rgba(mix(COL["c-3"], "#ff9a6b", 0.5), 0.55 * dawn)); g.fillStyle = gr; g.fillRect(0, H * 0.25, W, H * 0.41); }
       for (const s of stars) { g.fillStyle = rgba("#ffffff", (0.25 + 0.5 * Math.abs(Math.sin(t * 0.5 + s[2]))) * (1 - dawn * 0.7)); g.fillRect(s[0] * W, s[1] * H, 1.5, 1.5); }
       const sea = H * 0.66;
-      /* Mercusuar di atas batu karang. */
+      /* Lighthouse on a rock. */
       const lx = W * (api.small ? 0.8 : 0.78), base = sea + u * 2, tw = u * 7, th = u * 34, top = base - th;
       g.fillStyle = mix(COL["bg-1"], "#000000", 0.3); g.beginPath(); g.moveTo(lx - u * 16, sea + u * 6); g.quadraticCurveTo(lx - u * 10, sea - u * 4, lx, sea - u * 2); g.quadraticCurveTo(lx + u * 12, sea - u * 4, lx + u * 18, sea + u * 6); g.fill();
       for (let i = 0; i < 4; i++) { const y0 = base - (i / 4) * th, y1 = base - ((i + 1) / 4) * th, w0 = lerp(tw, tw * 0.7, i / 4), w1 = lerp(tw, tw * 0.7, (i + 1) / 4); g.fillStyle = i % 2 ? "#f4efe6" : COL["c-1"]; g.beginPath(); g.moveTo(lx - w0, y0); g.lineTo(lx + w0, y0); g.lineTo(lx + w1, y1); g.lineTo(lx - w1, y1); g.fill(); }
@@ -122,7 +122,7 @@ function scene(api) {
       g.fillStyle = rgba(COL["c-3"], 0.25 + 0.75 * on); g.fillRect(lx - tw * 0.55, top - u * 6, tw * 1.1, u * 4.8);
       g.fillStyle = mix(COL["c-1"], "#000000", 0.35); g.beginPath(); g.moveTo(lx - tw * 0.8, top - u * 6); g.lineTo(lx, top - u * 10); g.lineTo(lx + tw * 0.8, top - u * 6); g.fill();
       const lampY = top - u * 3.6;
-      /* Sorot cahaya berputar (lebih pelan saat perahu mendekat). */
+      /* Rotating light beam (slower as the boat approaches). */
       if (on > 0) {
         glowDot(lx, lampY, u * 14, COL["c-3"], 0.6 * on);
         const ang = Math.PI + Math.sin(t * 0.8) * 0.5 * (1 - sail * 0.6) - sail * 0.25;
@@ -130,13 +130,13 @@ function scene(api) {
         const gr = g.createRadialGradient(lx, lampY, 0, lx, lampY, len); gr.addColorStop(0, rgba(COL["c-3"], 0.55 * on)); gr.addColorStop(1, rgba(COL["c-3"], 0));
         g.fillStyle = gr; g.beginPath(); g.moveTo(lx, lampY); g.lineTo(lx + Math.cos(ang - spread) * len, lampY + Math.sin(ang - spread) * len); g.lineTo(lx + Math.cos(ang + spread) * len, lampY + Math.sin(ang + spread) * len); g.closePath(); g.fill();
       }
-      /* Laut dan ombak. */
+      /* Sea and waves. */
       const sg = g.createLinearGradient(0, sea, 0, H); sg.addColorStop(0, mix(COL["bg-2"], COL["c-2"], 0.25)); sg.addColorStop(1, COL["bg-1"]); g.fillStyle = sg; g.fillRect(0, sea, W, H - sea);
       if (dawn > 0) { g.fillStyle = rgba(COL["c-3"], 0.18 * dawn); g.fillRect(0, sea, W, u * 3); }
       for (const w of waves) { const y = w[0] * H; g.strokeStyle = rgba("#ffffff", 0.12 + 0.1 * on); g.lineWidth = 1.2; g.beginPath(); for (let x = 0; x <= W; x += 12) { const yy = y + Math.sin(x * 0.02 * w[2] + t * 1.2 + w[1]) * u * 0.8; x ? g.lineTo(x, yy) : g.moveTo(x, yy); } g.stroke(); }
-      /* Pantulan sorot di air. */
+      /* Beam reflection on the water. */
       if (on > 0) for (let i = 0; i < 10; i++) { const y = sea + u * (2 + i * 2.4); g.fillStyle = rgba(COL["c-3"], 0.25 * on * (1 - i / 10)); g.fillRect(lx - u * (3 + Math.sin(t * 3 + i) * 2), y, u * (6 + Math.sin(t * 2 + i) * 3), 2); }
-      /* Perahu: terombang-ambing di kiri, lalu berlayar ke dermaga di kaki mercusuar. */
+      /* Boat: bobbing on the left, then sails to the pier at the foot of the lighthouse. */
       const bx = lerp(W * 0.16, lx - u * 22, ease(sail)), by = sea + u * 6 + Math.sin(t * 1.6) * u * 0.8, bs = u * (api.small ? 6 : 5);
       const tilt = Math.sin(t * 1.3) * 0.08 * (1 - sail * 0.5);
       g.save(); g.translate(bx, by); g.rotate(tilt);
@@ -160,16 +160,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -188,7 +188,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -211,7 +211,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

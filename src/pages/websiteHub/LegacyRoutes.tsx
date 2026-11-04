@@ -10,14 +10,14 @@ const PageMaker = lazy(() => import("../pageMaker/Page/PageMaker"));
 const WebsiteManager = lazy(() => import("../pageMaker/Page/WebsiteManager"));
 
 /* ================================================================== */
-/* v20: alamat lama tetap bekerja setelah alur disederhanakan menjadi    */
+/* v20: old addresses keep working after the flow was simplified into   */
 /* Website Saya → Studio.                                               */
-/*   /page-maker?design=X  → Studio website yang memuat halaman X        */
-/*                           (desain lepas: editor satu halaman lama)    */
+/*   /page-maker?design=X  → the website Studio containing page X       */
+/*                           (a loose design: the old single-page editor) */
 /*   /page-maker           → Website Saya                                */
 /*   /website?site=X       → Studio website X (&step=deploy ikut)        */
-/*   /website              → Website Saya (kecuali masih ada data        */
-/*                           Page Composer lama yang perlu dikonversi)   */
+/*   /website              → My Websites (unless there is still data     */
+/*                           an old Page Composer that needs converting) */
 /* ================================================================== */
 
 const EMPTY: SavedDesign[] = [];

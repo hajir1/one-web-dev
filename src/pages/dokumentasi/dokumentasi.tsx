@@ -29,9 +29,9 @@ import { TEMPLATE_SPLIT } from "../../config/marketplace";
 /* ================================================================== */
 /* Dokumentasi Web Maker                                                */
 /* Panduan membangun web: Global Setting → Page Maker → export.         */
-/* Teks ada di locales (guide.*). Format teks sederhana: **tebal**,      */
-/* `kode`, dan [[tombol]] (kbd). Angka kuota & harga dibaca dari config  */
-/* (quota.ts, pricing.ts) supaya panduan selalu sesuai aplikasi.         */
+/* Text lives in the locales (guide.*). Simple text format: **bold**,    */
+/* `code`, and [[button]] (kbd). Quota & price numbers are read from config */
+/* (quota.ts, pricing.ts) so the guide always matches the app.           */
 /* ================================================================== */
 
 /* ------------------------------ kerangka ---------------------------- */
@@ -54,10 +54,10 @@ const ALL_SECTIONS = [
   "tips",
 ] as const;
 
-/** Mode demo (v12): bagian Kredit tidak ditampilkan (tidak ada kredit di demo). */
+/** Demo mode (v12): the Credits section is not shown (no credits in demo). */
 const SECTIONS = isDemoMode() ? ALL_SECTIONS.filter((id) => id !== "kredit") : ALL_SECTIONS;
 
-/** Angka yang disisipkan ke teks panduan ({{maxDesigns}}, {{freeSites}}, …). */
+/** Numbers inserted into the guide text ({{maxDesigns}}, {{freeSites}}, …). */
 const NUMS = {
   maxDesigns: MAX_DESIGNS,
   nextDesign: MAX_DESIGNS + 1,
@@ -73,7 +73,7 @@ const NUMS = {
   exportCost: CREDIT_COST.export ?? 1,
 };
 
-/** `**tebal**`, `kode`, dan [[tombol]] → elemen React (teks lain di-escape oleh React). */
+/** `**bold**`, `code`, and [[button]] → React elements (other text is escaped by React). */
 function rich(text: string): ReactNode {
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[\[[^\]]+\]\])/g).map((p, i) => {
     if (p.startsWith("**") && p.endsWith("**")) return <B key={i}>{p.slice(2, -2)}</B>;
@@ -83,7 +83,7 @@ function rich(text: string): ReactNode {
   });
 }
 
-/** Teks panduan: string (dengan format sederhana) dan daftar string dari locales. */
+/** Guide text: strings (with simple formatting) and string lists from the locales. */
 function useGuide() {
   const { t } = useTranslation();
   const tx = (key: string): string => t(`guide.${key}`, NUMS) as string;
@@ -234,9 +234,9 @@ function GoLink({ to, children }: { to: string; children: ReactNode }) {
   );
 }
 
-/* --------------------------- daftar isi (TOC) ----------------------- */
+/* --------------------------- table of contents (TOC) ----------------------- */
 
-/** Bagian aktif = heading terakhir yang sudah melewati batas atas layar. */
+/** Active section = the last heading that has passed the top of the screen. */
 function useActiveSection(): string {
   const [active, setActive] = useState<string>(SECTIONS[0]);
   useEffect(() => {
@@ -321,20 +321,20 @@ function Flow() {
   );
 }
 
-/** Daftar butir dari locales (`guide.<key>` berupa array string). */
+/** Bullet list from locales (`guide.<key>` is a string array). */
 function Items({ k, ordered = false }: { k: string; ordered?: boolean }) {
   const { list } = useGuide();
   const items = list(k).map((it, i) => <li key={i}>{rich(it)}</li>);
   return ordered ? <Steps>{items}</Steps> : <UL>{items}</UL>;
 }
 
-/** Tabel dari locales: `guide.<key>.head` (array) + `guide.<key>.rows` (array baris). */
+/** Table from locales: `guide.<key>.head` (array) + `guide.<key>.rows` (array of rows). */
 function GTable({ k }: { k: string }) {
   const { list, rows } = useGuide();
   return <Table head={list(`${k}.head`)} rows={rows(`${k}.rows`)} />;
 }
 
-/* ------------------------------ halaman ----------------------------- */
+/* ------------------------------ page ----------------------------- */
 
 export default function Dokumentasi() {
   const active = useActiveSection();
@@ -493,12 +493,12 @@ onCleanup(() => clearInterval(t));`}</Code>
               <GTable k="lib.table" />
               <H3>{tx("lib.useTitle")}</H3>
               <Items k="lib.steps" ordered />
-              <Code label={tx("lib.codeLabel")}>{`<!-- di dalam <head> -->
+              <Code label={tx("lib.codeLabel")}>{`<!-- inside <head> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
 
 <section data-aos="fade-up" data-aos-duration="700">...</section>
 
-<!-- sebelum </body> -->
+<!-- before </body> -->
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
   if (window.AOS) AOS.init({ duration: 700, once: true });
@@ -552,7 +552,7 @@ onCleanup(() => clearInterval(t));`}</Code>
               <GoLink to={TEMPLATES_PATH}>{tx("tpl.open")}</GoLink>
             </section>
 
-            {/* ------------------------------- KREDIT ------------------------------ */}
+            {/* ------------------------------- CREDITS ------------------------------ */}
             {!isDemoMode() && (
               <section className="mb-14">
                 <H2 id="kredit" icon={<Coins size={18} />}>
@@ -565,7 +565,7 @@ onCleanup(() => clearInterval(t));`}</Code>
               </section>
             )}
 
-            {/* ------------------------------ CONTOH ----------------------------- */}
+            {/* ------------------------------ EXAMPLES ----------------------------- */}
             <section className="mb-14">
               <H2 id="contoh">{tx("example.title")}</H2>
               <P>{r("example.intro")}</P>

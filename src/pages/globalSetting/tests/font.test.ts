@@ -183,7 +183,7 @@ test("compose: semua framework memuat font di berkas CSS/style yang tepat", () =
     const withFace = files.filter((f) => f.content.includes("@font-face"));
     assert.ok(withFace.length >= 1, `${fw}: tidak ada @font-face`);
     for (const f of withFace) {
-      // @font-face/@import harus mendahului aturan pertama di berkasnya
+      // @font-face/@import must come before the first rule in its file
       const i = f.content.indexOf("@font-face");
       const firstRule = f.content.search(/\.demo[\s{_]/);
       assert.ok(firstRule === -1 || i < firstRule, `${fw}/${f.name}: urutan`);
@@ -196,7 +196,7 @@ test("compose: semua framework memuat font di berkas CSS/style yang tepat", () =
 test("menu: 4 kelompok, Web Maker disederhanakan (v20), path unik", () => {
   assert.deepEqual(MENU_SECTIONS.map((s) => s.id), ["data", "media", "web-maker", "vr"]);
   const web = MENU_SECTIONS.find((s) => s.id === "web-maker");
-  // v20: editor, susun & deploy, dan gaya global pindah ke dalam Studio.
+  // v20: the editor, compose & deploy, and global styles moved into Studio.
   assert.deepEqual(web.items.map((i) => i.key), ["websiteHub", "webTemplates", "webMarket"]);
   const paths = MENU_SECTIONS.flatMap((s) => s.items.map((i) => i.path));
   assert.equal(new Set(paths).size, paths.length);

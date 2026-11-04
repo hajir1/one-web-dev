@@ -11,25 +11,25 @@ import { installLibs, tilt } from "../../v3/libs";
 import { addCss } from "../../v3/setD/kitD";
 
 /* ================================================================== */
-/* Perangkat template v10 bagian J: 3D + efek scroll (OWD Scroll).       */
+/* Template kit v10 part J: 3D + scroll effects (OWD Scroll).            */
 /*                                                                    */
-/* Berbeda dari set G–I (blok data yang dipakai ulang), setiap template  */
-/* set J menyusun beranda SENDIRI dari elemen dasar Page Maker, supaya   */
-/* tata letak, tipografi, dan alur scroll tidak berulang antartemplate.  */
-/* Kit ini hanya menyediakan bahan: teks berfont tema, tombol, section,  */
-/* elemen 3D, formulir, header/footer polos, dan pemasang efek scroll.   */
-/* Semua hasil tetap Section → Row → Elemen biasa (bisa diedit penuh).   */
+/* Unlike sets G–I (reused data blocks), every set J template           */
+/* builds ITS OWN home page from basic Page Maker elements, so          */
+/* layouts, typography, and scroll flow do not repeat across templates. */
+/* This kit only provides ingredients: themed text, buttons, sections,  */
+/* 3D elements, forms, plain headers/footers, and a scroll effect installer. */
+/* Every result is still a regular Section → Row → Element (fully editable). */
 /* ================================================================== */
 
 export { addCss, col, el, grid, inline, stack, tilt };
 export type { BoxNode, ElementNode };
 
-/** Teks dwibahasa: [Indonesia, Inggris]. */
+/** Bilingual text: [Indonesian, English]. */
 export type B = [string, string];
 
 export interface LookJ {
   p: Palette;
-  /** Latar halaman. */
+  /** Page background. */
   bg: string;
   head: string;
   body: string;
@@ -43,19 +43,19 @@ export function lookJ(o: { ink: string; muted: string; primary: string; primaryD
   return { p: { ink, muted, primary, primaryDark, soft, line }, bg: o.bg, head: TF[o.head], body: TF[o.body], r: o.r };
 }
 
-/** Konteks saat membangun halaman. */
+/** Context while building pages. */
 export interface J {
   L: LookJ;
   t: (b: B) => string;
   tr: Tr;
   href: (key: string) => string;
-  /** Gambar template (kunci aset v10j-<id>-<nama>). */
+  /** Template image (asset key v10j-<id>-<name>). */
   img: (name: string) => string;
 }
 
 export const artKeyJ = (id: string, name: string) => `v10j-${id}-${name}`;
 
-/* ------------------------------ teks ------------------------------- */
+/* ------------------------------ text ------------------------------- */
 
 interface TxtO {
   size?: number;
@@ -66,12 +66,12 @@ interface TxtO {
   upper?: boolean;
   lh?: number;
   css?: string;
-  /** Pakai font isi (bukan font judul) untuk judul. */
+  /** Use the body font (not the heading font) for headings. */
   bodyFont?: boolean;
   full?: boolean;
 }
 
-/** Judul berfont tema. Ukuran di HP mengecil otomatis (heading()). */
+/** A themed heading. The size shrinks automatically on phones (heading()). */
 export function H(L: LookJ, text: string, tag: "h1" | "h2" | "h3" | "h4", o: TxtO = {}): ElementNode {
   const n = heading(text, tag, { size: o.size, color: o.color ?? L.p.ink, weight: o.weight, align: o.align, spacing: o.spacing, transform: o.upper ? "uppercase" : "none", full: o.full });
   addCss(n, `font-family: ${o.bodyFont ? L.body : L.head};${o.lh ? ` line-height: ${o.lh};` : ""}`);
@@ -87,7 +87,7 @@ export function Tx(L: LookJ, text: string, o: TxtO = {}): ElementNode {
   return n;
 }
 
-/** Label kecil berhuruf kapital (kode, nomor, kategori). */
+/** Small uppercase label (code, number, category). */
 export const Lbl = (L: LookJ, text: string, color?: string, o: TxtO = {}) => Tx(L, text, { size: 12, weight: 600, spacing: 1.5, upper: true, color: color ?? L.p.primary, ...o });
 
 /* ------------------------------ aksi ------------------------------- */
@@ -103,7 +103,7 @@ export interface BtnO {
   full?: boolean;
 }
 
-/** Tautan bergaya tombol dengan warna bebas (bukan gaya bawaan). */
+/** A button-styled link with free colors (not the default style). */
 export function btn(L: LookJ, label: string, href: string, o: BtnO = {}): ElementNode {
   const b = linkButton(label, href, "primary", L.p, { full: o.full });
   const bg = o.bg ?? L.p.primary;
@@ -136,11 +136,11 @@ export interface SecO {
   padX?: number;
 }
 
-/** Section; elemen lepas di `rows` otomatis dibungkus Row. */
+/** Section; loose elements in `rows` are wrapped in a Row automatically. */
 export function sec(name: string, rows: (BoxNode | ElementNode)[], o: SecO = {}): BoxNode {
   const s = section(name, rows.map((r) => (isBox(r) && r.row ? r : stack([r], { gap: 0, align: "stretch" }))), { bg: o.bg, padY: o.padY, width: o.width, tag: o.tag });
-  // Hanya anak langsung section yang boleh berupa Row; grid/baris di dalamnya jadi box biasa
-  // (tata letak grid/baris dan perilaku HP tetap sama).
+  // Only a section's direct children may be Rows; grids/rows inside become regular boxes
+  // (the grid/row layout and phone behavior stay the same).
   const demote = (n: BoxNode | ElementNode) => {
     if (!isBox(n)) return;
     for (const c of n.children) {
@@ -157,13 +157,13 @@ export function sec(name: string, rows: (BoxNode | ElementNode)[], o: SecO = {})
   return s;
 }
 
-/** Row berjajar (baris) dengan anak lebar tetap; di HP bertumpuk. */
+/** A side-by-side Row (row) with fixed-width children; stacked on phones. */
 export function line(kids: (BoxNode | ElementNode)[], o: { gap?: number; align?: "start" | "center" | "end" | "stretch"; justify?: "start" | "center" | "end" | "between"; name?: string; wrap?: boolean; stack?: boolean } = {}): BoxNode {
   return createRow({ name: o.name ?? "Row", padding: 0, layout: "row", gap: o.gap ?? 24, align: o.align ?? "start", justify: o.justify ?? "start", wrap: o.wrap ?? false, stackOnMobile: o.stack ?? true, children: kids });
 }
 
-/** Kolom dengan CSS tambahan. */
-/** Kolom dengan CSS tambahan. `bg` = latar (dipakai juga oleh perbaikan kontras otomatis; jangan taruh latar di `css`). */
+/** Column with extra CSS. */
+/** A column with extra CSS. `bg` = background (also used by the automatic contrast fix; do not put the background in `css`). */
 export function box(kids: (BoxNode | ElementNode)[], o: { gap?: number; name?: string; css?: string; bg?: string; align?: "start" | "center" | "end" | "stretch"; width?: number; row?: boolean; wrap?: boolean; stackOnMobile?: boolean } = {}): BoxNode {
   const c = col(kids, { gap: o.gap ?? 12, name: o.name, align: o.align ?? "stretch", width: o.width, layout: o.row ? "row" : "stack", wrap: o.wrap, stackOnMobile: o.stackOnMobile });
   if (o.bg) Object.assign(c, { bgEnabled: true, bgColor: o.bg });
@@ -173,7 +173,7 @@ export function box(kids: (BoxNode | ElementNode)[], o: { gap?: number; name?: s
 
 /* --------------------------- efek scroll --------------------------- */
 
-/** Pasang efek OWD Scroll pada node (bisa diubah di Pengaturan → Library). */
+/** Applies an OWD Scroll effect to a node (can be changed in Settings → Library). */
 export function fx<T extends ComponentNode>(n: T, effect: ScrollEffect, amount = 0, delay = 0): T {
   n.libs = { ...n.libs, scroll: { effect, amount, delay } };
   return n;
@@ -212,7 +212,7 @@ export const globe3 = (o: ThreeO & { color: string; ocean: string; glow: string;
 export const particles3 = (o: ThreeO & { shape: "wave" | "galaxy" | "sphere"; color: string; accent: string; density?: "low" | "normal" | "high"; glow?: boolean; size?: number }) =>
   el("three-particles", { ...common(o), shape: o.shape, color: o.color, accent: o.accent, density: o.density ?? "normal", glow: o.glow ?? false, size: o.size ?? 3, background: o.bg ?? "transparent" }, "Partikel 3D");
 
-/* ------------------------------ daftar ----------------------------- */
+/* ------------------------------ lists ----------------------------- */
 
 export const list = (items: string[], color: string, o: { size?: number; gap?: number } = {}) =>
   el(
@@ -227,7 +227,7 @@ export type FieldJ = { kind: "input"; label: string; ph: string; type?: string }
 
 export function field(L: LookJ, f: FieldJ, i: number, radius = L.r, labelColor?: string): ElementNode {
   const n = fieldEl(L, f, i, radius, labelColor);
-  // Label input/select memakai warna teks isian; di formulir berlatar gelap labelnya diberi warna sendiri.
+  // Input/select labels use the field text color; on dark-background forms the labels get their own color.
   if (labelColor && f.kind !== "date") addCss(n, `& label { color: ${labelColor} !important; }`);
   return n;
 }
@@ -238,7 +238,7 @@ function fieldEl(L: LookJ, f: FieldJ, i: number, radius: number, labelColor?: st
   return el("input", { labelText: f.label, text: f.ph, inputType: f.type ?? "text", hoverBorderColor: L.p.primary, hoverShadowColor: L.p.primary, borderRadius: radius }, f.label);
 }
 
-/** Formulir (tanpa server) dengan tombol kirim. */
+/** A form (no server) with a submit button. */
 export function form(L: LookJ, fields: FieldJ[], submit: string, o: { css?: string; bg?: string; btn?: BtnO; radius?: number; note?: string; noteColor?: string; labelColor?: string } = {}): BoxNode {
   const send = el("button", { text: submit, buttonType: "submit", bgColor: o.btn?.bg ?? L.p.primary, textColor: o.btn?.fg ?? "#ffffff", hoverBgColor: o.btn?.hoverBg ?? L.p.primaryDark, hoverTextColor: "#ffffff", hoverBorderColor: L.p.primaryDark, borderRadius: o.btn?.radius ?? L.r, paddingTop: 13, paddingBottom: 13, paddingLeft: 22, paddingRight: 22, fontSize: 15, widthMode: "full" }, "Tombol kirim");
   const kids: ElementNode[] = [...fields.map((f, i) => field(L, f, i, o.radius ?? L.r, o.labelColor)), send];
@@ -258,7 +258,7 @@ export interface HeadO {
   cta?: [string, string];
   btn?: BtnO;
   css?: string;
-  /** Teks kecil di samping logo (mis. kode lembar). */
+  /** Small text next to the logo (e.g. a sheet code). */
   tag?: string;
   logoSize?: number;
   upper?: boolean;
@@ -271,7 +271,7 @@ export function header(L: LookJ, brand: string, o: HeadO): BoxNode {
   const nav = menu({ ...L.p, primary: o.hover ?? L.p.primary }, o.menuInk ?? o.ink, { gap: 26 });
   nav.state = { ...nav.state, activeColor: o.hover ?? L.p.primary };
   addCss(nav, `font-family: ${L.body};`);
-  // Di HP tombol CTA header disembunyikan (menu hamburger sudah memuat semua halaman) agar header tidak melebar.
+  // On phones the header CTA button is hidden (the hamburger menu already lists every page) so the header does not overflow.
   const right = [nav, ...(o.cta ? [btn(L, o.cta[0], o.cta[1], { ...o.btn, css: "& { white-space: nowrap; }\n@media (max-width: 640px) { & { display: none; } }" })] : [])];
   const row = createRow({ name: "Row Header", padding: 0, layout: "row", align: "center", justify: "between", wrap: false, gap: 16, stackOnMobile: false, children: [left, col(right, { layout: "row", gap: 18, name: "Navigasi", stackOnMobile: false, wrap: false })] });
   const s = sec("Header", [row], { bg: o.bg, padY: 18, tag: "header", css: o.css });
@@ -287,7 +287,7 @@ export interface FootO {
   cols: { title: string; items: string[] }[];
   copy: string;
   css?: string;
-  /** Kalimat besar di atas kolom (penutup). */
+  /** A large sentence above the columns (closing). */
   big?: string;
   bigSize?: number;
 }
@@ -301,7 +301,7 @@ export function footer(L: LookJ, brand: string, o: FootO): BoxNode {
   return sec("Footer", rows, { bg: o.bg, padY: 56, tag: "footer", css: o.css });
 }
 
-/* ------------------------------ halaman ---------------------------- */
+/* ------------------------------ pages ---------------------------- */
 
 export const home = (id = "Beranda", en = "Home"): TemplatePageDef => ({ key: "home", slug: { id: "index", en: "index" }, name: { id, en }, home: true });
 export const pg = (key: string, idv: [string, string], env: [string, string]): TemplatePageDef => ({ key, slug: { id: idv[0], en: env[0] }, name: { id: idv[1], en: env[1] } });
@@ -311,7 +311,7 @@ function walk(n: ComponentNode, f: (n: ComponentNode) => void): void {
   if (isBox(n)) n.children.forEach((c) => walk(c, f));
 }
 
-/** Halaman: font isi + latar, lalu pasang library yang dipakai node (scroll / tilt). */
+/** Page: body font + background, then install the libraries the nodes use (scroll / tilt). */
 export function pageJ(L: LookJ, sections: BoxNode[]): PageDoc {
   const doc = pageWith(sections, L.body, L.bg);
   const used = new Set<LibraryId>();

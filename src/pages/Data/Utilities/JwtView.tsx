@@ -9,7 +9,7 @@ import { encodeBase64 } from "./lib/encoding";
 import { LANG_LABEL, currentLang } from "../../../i18n";
 
 const b64 = (o: unknown) => encodeBase64(JSON.stringify(o), true);
-/** Contoh token (tanda tangan palsu, hanya untuk demo dekode). */
+/** Sample token (fake signature, only for the decode demo). */
 const SAMPLE = `${b64({ alg: "HS256", typ: "JWT" })}.${b64({ sub: "user_42", name: "Hajir", role: "admin", iat: 1767225600, exp: 4102444800 })}.demo-signature-not-verified`;
 
 const STATUS_TONE: Record<DecodedJwt["status"], "green" | "rose" | "amber" | "gray"> = { "valid-time": "green", expired: "rose", "not-yet-valid": "amber", "no-exp": "gray" };

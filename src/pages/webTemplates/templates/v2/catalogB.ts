@@ -2,10 +2,10 @@ import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata 25 template katalog v2 (bagian B). Konten: ./setB/.
- * 1 Free + 24 Premium, 4–10 halaman. Harga Premium mengikuti rumus
- * `templatePrice` (marketplace/templatePricing.ts): 3 kredit per halaman
- * + bonus kualitas; diuji di tests/pricing.test.ts.
+ * Metadata for the 25 catalog v2 templates (part B). Content: ./setB/.
+ * 1 Free + 24 Premium, 4–10 pages. Premium prices follow the
+ * `templatePrice` formula (marketplace/templatePricing.ts): 3 credits per page
+ * + a quality bonus; tested in tests/pricing.test.ts.
  */
 export const V2B_CATALOG: TemplateMeta[] = [
   { id: "personal-resume", version: 1, category: "personal", tier: "free", price: TEMPLATE_PRICE.free, accent: "#c2410c", tags: ["cv", "resume", "riwayat kerja"], isNew: true },

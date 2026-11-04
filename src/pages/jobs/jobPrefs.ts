@@ -1,7 +1,7 @@
 // ─── jobs/jobPrefs.ts ────────────────────────────────────────────────────────
-// v7 (P4): preferensi "email saya bila pekerjaan server yang lama sudah selesai".
-// Disimpan per browser; dikirim sebagai `notify` di setiap job. Server hanya
-// mengirim email bila job berjalan ≥ JOB_NOTIFY_MIN_SECONDS (default 60 dtk).
+// v7 (P4): the "email me when a long server job finishes" preference.
+// Stored per browser; sent as `notify` with every job. The server only
+// sends an email when a job runs ≥ JOB_NOTIFY_MIN_SECONDS (default 60 s).
 
 import { create } from "zustand";
 
@@ -21,7 +21,7 @@ export const useJobPrefs = create<{ notify: boolean; setNotify: (v: boolean) => 
     try {
       globalThis.localStorage?.setItem(KEY, notify ? "1" : "0");
     } catch {
-      /* mode privat: tetap berlaku selama tab terbuka */
+      /* private mode: still applies while the tab is open */
     }
     set({ notify });
   },

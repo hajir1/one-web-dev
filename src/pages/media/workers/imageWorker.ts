@@ -1,8 +1,8 @@
 // ─── workers/imageWorker.ts ──────────────────────────────────────────────────
-// Pekerjaan CPU berat dipindah dari thread UI supaya halaman tidak "hang"
-// (versi lama menjalankan tracing di thread utama: gambar besar membekukan
-// tab hingga puluhan detik dan tidak bisa dibatalkan). Worker dibuat per
-// tugas dan di-terminate saat selesai atau dibatalkan.
+// Heavy CPU work is moved off the UI thread so the page does not "hang"
+// (the old version ran tracing on the main thread: large images froze the
+// tab for tens of seconds and could not be canceled). A worker is created per
+// task and terminated when done or canceled.
 
 import ImageTracer from "imagetracerjs";
 import { unsharpMask, type SharpenOptions } from "../lib/sharpen";

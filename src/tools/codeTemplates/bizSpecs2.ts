@@ -1,7 +1,7 @@
 import type { BizSpec } from "./biz3d";
 import { SENIN_JUMAT, SENIN_SABTU, jam } from "./landingKit";
 
-/* Website 3D bisnis v23, bagian 2: teknologi, SaaS, startup, agensi, portofolio. */
+/* Business 3D websites v23, part 2: technology, SaaS, startup, agency, portfolio. */
 export const BIZ_2: BizSpec[] = [
   {
     id: "biz-servis-gawai-klinik",

@@ -10,5 +10,5 @@ import { LANDING_8 } from "./landingSpecs8";
 import { LANDING_9 } from "./landingSpecs9";
 import { LANDING_10 } from "./landingSpecs10";
 
-/* 100 landing page UMKM (v23), urutan tampil di katalog. */
+/* 100 small business landing pages (v23), in catalog display order. */
 export const LANDING_SPECS: LandingSpec[] = [...LANDING_1, ...LANDING_2, ...LANDING_3, ...LANDING_4, ...LANDING_5, ...LANDING_6, ...LANDING_7, ...LANDING_8, ...LANDING_9, ...LANDING_10];

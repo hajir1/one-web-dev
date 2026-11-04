@@ -5,13 +5,15 @@ import Modal from "../../../components/app/Modal";
 import { packForFramework } from "../../../assetLibrary/resolve";
 import { blobToBase64 } from "../../../assetLibrary/pack";
 import { INPUT, Notice, btn } from "../../../components/app/ui";
+import { getDeploy, saveDeploy } from "../helpers/deployHistory";
+import { formatDate } from "../core/helpers/formatDate";
 import { deployToGitHub, GitHubDeployError, sanitizeRepoName, type DeployFile, type DeployStep, type GitHubDeployResult } from "../helpers/githubDeploy";
 
 /* ================================================================== */
-/* Dialog "Deploy" ekspor HTML (v14): push ke repo GitHub + aktifkan     */
-/* GitHub Pages, lalu tombol lanjut ke Vercel (impor repo yang sama).    */
-/* Token GitHub dipakai langsung dari browser ke api.github.com, tidak   */
-/* pernah dikirim ke server OneWebDev. "Ingat" = sessionStorage (tab ini).*/
+/* "Deploy" dialog for the HTML export (v14): push to a GitHub repo + enable */
+/* GitHub Pages, then a button to continue to Vercel (importing the same repo). */
+/* The GitHub token is used directly from the browser to api.github.com, never */
+/* sent to the OneWebDev server. "Remember" = sessionStorage (this tab). */
 /* ================================================================== */
 
 const TOKEN_KEY = "owd-github-token";
@@ -39,21 +41,24 @@ const writeSession = (key: string, value: string | null) => {
 interface Props {
   open: boolean;
   onClose: () => void;
-  /** Nama repo bawaan (dari nama desain/website). */
+  /** Default repo name (from the design/website name). */
   defaultRepo: string;
   /**
-   * Menyiapkan berkas HTML lalu memanggil `push(files)`. Mode demo: berkas lokal;
-   * produksi: berkas dari server (dihitung sebagai satu ekspor). "blocked" = menunggu
-   * pembayaran kredit (push dipanggil setelah dibayar).
+   * Prepares the HTML files, then calls `push(files)`. Demo mode: local files;
+   * production: files from the server (counted as one export). "blocked" = waiting for
+   * credit payment (push is called after paying).
    */
   withFiles: (push: (files: DeployFile[]) => Promise<void>) => Promise<"done" | "blocked" | "failed">;
+  /** v29.1: project key (see deployHistory.ts). Remembers the last deploy and reuses its repo. */
+  projectKey?: string;
 }
 
-export default function DeployDialog({ open, onClose, defaultRepo, withFiles }: Props) {
+export default function DeployDialog({ open, onClose, defaultRepo, withFiles, projectKey }: Props) {
   const { t } = useTranslation();
   const [token, setToken] = useState(() => readSession(TOKEN_KEY));
   const [remember, setRemember] = useState(() => !!readSession(TOKEN_KEY));
-  const [repo, setRepo] = useState(() => readSession(REPO_KEY + defaultRepo) || sanitizeRepoName(defaultRepo));
+  const [last] = useState(() => (projectKey ? getDeploy(projectKey) : null));
+  const [repo, setRepo] = useState(() => last?.repo || readSession(REPO_KEY + defaultRepo) || sanitizeRepoName(defaultRepo));
   const [step, setStep] = useState<DeployStep | null>(null);
   const [result, setResult] = useState<GitHubDeployResult | null>(null);
   const [error, setError] = useState<{ code: string; detail: string } | null>(null);
@@ -73,10 +78,12 @@ export default function DeployDialog({ open, onClose, defaultRepo, withFiles }: 
     const push = async (files: DeployFile[]) => {
       setError(null);
       try {
-        // v21: gambar Pustaka Aset ikut sebagai berkas assets/img/… (deploy hanya format HTML).
+        // v21: Asset Library images go along as assets/img/… files (deploy is HTML format only).
         const packed = await packForFramework(files, "html");
         const images = await Promise.all(packed.binaries.map(async (b) => ({ name: b.name, content: "", base64: await blobToBase64(b.blob) })));
-        setResult(await deployToGitHub({ token, repo: repoName, files: [...packed.files, ...images], onStep: setStep }));
+        const res = await deployToGitHub({ token, repo: repoName, files: [...packed.files, ...images], onStep: setStep });
+        if (projectKey) saveDeploy(projectKey, { owner: res.owner, repo: res.repo, repoUrl: res.repoUrl, pagesUrl: res.pagesUrl, vercelUrl: res.vercelUrl });
+        setResult(res);
         pushed = true;
       } catch (e) {
         failure = e instanceof GitHubDeployError ? { code: e.code, detail: e.message } : { code: "unknown", detail: e instanceof Error ? e.message : String(e) };
@@ -116,7 +123,7 @@ export default function DeployDialog({ open, onClose, defaultRepo, withFiles }: 
               {t("common.cancel")}
             </button>
             <button type="button" onClick={start} disabled={busy || !token.trim() || !repoName} className={btn.primary} data-testid="deploy-start">
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Github className="h-4 w-4" />} {t("pm.deploy.start")}
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Github className="h-4 w-4" />} {t(last ? "pm.deploy.restart" : "pm.deploy.start")}
             </button>
           </>
         )
@@ -143,6 +150,19 @@ export default function DeployDialog({ open, onClose, defaultRepo, withFiles }: 
         </div>
       ) : (
         <div className="space-y-4">
+          {last && (
+            <Notice tone="info" title={t("pm.deploy.lastTitle", { repo: `${last.owner}/${last.repo}`, date: formatDate(Date.parse(last.at)) })} testId="deploy-last">
+              <span className="flex flex-wrap gap-x-3 gap-y-1">
+                <a href={last.pagesUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold underline">
+                  <ExternalLink className="h-3.5 w-3.5" /> {last.pagesUrl}
+                </a>
+                <a href={last.repoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline">
+                  <Github className="h-3.5 w-3.5" /> {t("pm.deploy.openRepo")}
+                </a>
+              </span>
+              <span className="mt-1 block text-xs opacity-80">{t("pm.deploy.lastHint")}</span>
+            </Notice>
+          )}
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">{t("pm.deploy.token")}</span>
             <input

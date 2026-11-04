@@ -8,15 +8,15 @@ import { itemIdOf } from "../entitlements";
 import type { ElementCatalogItem, ItemId, SectionCatalogItem, TemplateCatalogItem } from "../types";
 
 /* ================================================================== */
-/* Metadata template dari SUMBER template di frontend (registry).        */
+/* Template metadata from the template SOURCES in the frontend (registry). */
 /*                                                                    */
-/* Hanya dipakai skrip ekspor seed (src/tools/exportTemplates.ts → data   */
-/* awal backend) dan tes. Aplikasi membaca template dari GET /templates; */
-/* file ini sengaja tidak diimpor kode aplikasi agar isi 250 template    */
-/* tidak ikut bundle.                                                   */
+/* Only used by the seed export script (src/tools/exportTemplates.ts → initial */
+/* backend data) and tests. The app reads templates from GET /templates; */
+/* this file is deliberately not imported by app code so the content of 250 templates */
+/* is not bundled.                                                      */
 /* ================================================================== */
 
-/** Isi template: section preset & elemen yang dipakai di semua halamannya (urut kemunculan). */
+/** Template content: section presets & elements used across all its pages (in order of appearance). */
 export function templateContents(t: WebTemplate): { sectionIds: ItemId[]; elementIds: ItemId[]; sectionCount: number; libraries: LibraryId[]; fonts: string[] } {
   const sections: ItemId[] = [];
   const elements: ItemId[] = [];
@@ -57,7 +57,7 @@ export function buildTemplateCatalog(pieces: { sections: SectionCatalogItem[]; e
       pages: t.content.pages.map((p) => ({ key: p.key, name: p.name[lang] })),
       sectionIds: c.sectionIds,
       elementIds: c.elementIds,
-      // Template Free tidak menyertakan item Premium; hanya template Premium yang membuka item bawaannya.
+      // Free templates do not include Premium items; only Premium templates unlock their built-in items.
       premiumItemIds: t.tier === "premium" ? [...c.sectionIds, ...c.elementIds].filter((id) => premium.has(id)) : [],
       sectionCount: c.sectionCount,
       libraries: c.libraries,

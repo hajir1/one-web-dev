@@ -17,7 +17,7 @@ function hariLabel(d: number[]): string {
   return s.map((x) => NAMA_HARI[x]).join(", ");
 }
 
-/** Jam buka: [[hari, buka, tutup], ...] → baris tampil + data status. Format jam "08.00". */
+/** Opening hours: [[day, open, close], ...] → displayed rows + status data. Time format "08.00". */
 export function jam(...rows: [number[], string, string][]): Pick<LandingSpec, "hours" | "open"> {
   const hours: [string, string][] = rows.map(([d, a, b]) => [hariLabel(d), `${a} - ${b} WIB`]);
   const all = new Set(rows.flatMap((r) => r[0]));
@@ -25,7 +25,7 @@ export function jam(...rows: [number[], string, string][]): Pick<LandingSpec, "h
   if (tutup.length) hours.push([hariLabel(tutup), "Tutup"]);
   return { hours, open: rows };
 }
-/** Sama dengan jam(), zona WITA/WIT hanya mengubah label. */
+/** Same as jam(); the WITA/WIT time zone only changes the label. */
 export function jamZona(z: "WITA" | "WIT", ...rows: [number[], string, string][]) {
   const r = jam(...rows);
   return { ...r, hours: r.hours.map(([d, h]) => [d, h.replace("WIB", z)] as [string, string]) };

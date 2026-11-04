@@ -62,7 +62,7 @@ test("infinite scroll (v7): 12 per muatan, muatan berikutnya sampai habis, gabun
     flattenTemplatePages([pg(1, 2, ["a", "b"]), pg(2, 2, ["b", "c"])]).map((t) => t.refId),
     ["a", "b", "c"],
   );
-  // Filter berbeda → kunci berbeda (daftar direset); spasi pencarian dinormalkan.
+  // Different filter → different key (list resets); search whitespace is normalized.
   const k1 = JSON.stringify(o.queryKey);
   assert.notEqual(k1, JSON.stringify(templatesInfiniteQuery({ ...base, category: "shop" }).queryKey));
   assert.equal(k1, JSON.stringify(templatesInfiniteQuery({ ...base, q: "admin" }).queryKey));

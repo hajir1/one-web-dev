@@ -1,6 +1,6 @@
 // ─── api/bootstrap.ts ────────────────────────────────────────────────────────
-// Dipanggil sekali saat aplikasi dibuka: cek sesi login ke backend Nest dan
-// sambungkan store yang bergantung pada akun (kredit, marketplace, desain).
+// Called once when the app opens: checks the login session with the Nest backend and
+// connects the stores that depend on the account (credits, marketplace, designs).
 
 import { loadSession, onUserChange } from "../auth/session";
 import { refreshMarketAccount, resetMarketAccount } from "../marketplace/account";
@@ -18,7 +18,7 @@ let started = false;
 export function bootstrapApi() {
   if (started) return;
   started = true;
-  // v21.2: HTML Template Kode diambil dari backend (hak akses dicek server).
+  // v21.2: Code Template HTML is fetched from the backend (access is checked by the server).
   if (!isDemoMode()) setCodeTemplateSource(acquireCodeTemplateHtml);
   installDesignSync();
   onUserChange((user) => {
@@ -33,8 +33,8 @@ export function bootstrapApi() {
   void loadSession().then((user) => {
     if (user) void refreshMarketAccount();
     else resetMarketAccount();
-    // Setelah data utama dimuat: siapkan halaman yang paling sering dibuka
-    // (katalog template halaman 1) saat browser senggang.
+    // After the main data loads: prepare the most frequently opened page
+    // (template catalog page 1) while the browser is idle.
     prefetchCommonPages();
   });
 }

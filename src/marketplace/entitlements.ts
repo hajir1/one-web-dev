@@ -1,16 +1,16 @@
 import type { AccessContext, AccessReason, EntitlementSnapshot, ItemId, Tier } from "./types";
 
 /* ================================================================== */
-/* Aturan akses Free/Premium — fungsi MURNI (tanpa React/penyimpanan)    */
+/* Free/Premium access rules: PURE functions (no React/storage)          */
 /*                                                                    */
-/* - Item Free selalu boleh dipakai.                                    */
-/* - Item yang dibeli individual boleh dipakai di semua desain.          */
-/* - Item yang DISERTAKAN template hanya boleh dipakai di desain yang     */
-/*   berasal dari template milik pengguna. Bila pengguna memiliki        */
-/*   beberapa template, akses item bawaan semua template itu digabung.   */
-/* - Desain dari nol (tanpa template) tidak mendapat akses bawaan        */
-/*   template: item Premium yang tidak dibeli tetap terkunci.            */
-/* - Membeli template TIDAK membuka seluruh katalog Premium.            */
+/* - Free items can always be used.                                     */
+/* - Individually purchased items may be used in every design.          */
+/* - Items INCLUDED with a template may only be used in designs that     */
+/*   come from a template the user owns. If the user owns                */
+/*   several templates, the built-in item access of all of them is merged. */
+/* - Designs from scratch (no template) do not get built-in template     */
+/*   access: Premium items that were not purchased stay locked.         */
+/* - Buying a template does NOT unlock the whole Premium catalog.       */
 /* ================================================================== */
 
 export const EMPTY_ENTITLEMENTS: EntitlementSnapshot = { templates: [], templateGrants: [], items: [] };
@@ -22,7 +22,7 @@ export const itemIdOf = {
   feature: (id: string): ItemId => `feature:${id}`,
 };
 
-/** Bagian dari kunci item: { kind, ref }. null bila format tidak dikenal. */
+/** Parts of an item key: { kind, ref }. null when the format is unknown. */
 export function parseItemId(id: string): { kind: "template" | "section" | "element" | "feature"; ref: string } | null {
   const m = /^(template|preset|element|feature):([\w-]{1,80})$/.exec(id);
   if (!m) return null;
@@ -32,13 +32,13 @@ export function parseItemId(id: string): { kind: "template" | "section" | "eleme
 export const ownsTemplate = (snap: EntitlementSnapshot, templateId: string) => snap.templates.some((t) => t.templateId === templateId);
 const ownsItem = (snap: EntitlementSnapshot, itemId: ItemId) => snap.items.some((i) => i.itemId === itemId);
 
-/** Template yang aktif sebagai konteks: hanya bila template itu dimiliki pengguna. */
+/** The template active as context: only when the user owns that template. */
 export function activeTemplateContext(snap: EntitlementSnapshot, ctx: AccessContext | undefined): string | null {
   const id = ctx?.templateId;
   return id && ownsTemplate(snap, id) ? id : null;
 }
 
-/** Gabungan item bawaan dari SEMUA template yang dimiliki. */
+/** Union of the built-in items of EVERY owned template. */
 export function templateGrantedItems(snap: EntitlementSnapshot): Set<ItemId> {
   const owned = new Set(snap.templates.map((t) => t.templateId));
   const out = new Set<ItemId>();
@@ -46,7 +46,7 @@ export function templateGrantedItems(snap: EntitlementSnapshot): Set<ItemId> {
   return out;
 }
 
-/** Alasan akses untuk satu item (section/element). */
+/** Access reason for one item (section/element). */
 export function accessReason(itemId: ItemId, tier: Tier, snap: EntitlementSnapshot, ctx?: AccessContext): AccessReason {
   if (tier === "free") return "free";
   if (ownsItem(snap, itemId)) return "owned";
@@ -56,7 +56,7 @@ export function accessReason(itemId: ItemId, tier: Tier, snap: EntitlementSnapsh
 
 export const canUse = (itemId: ItemId, tier: Tier, snap: EntitlementSnapshot, ctx?: AccessContext) => accessReason(itemId, tier, snap, ctx) !== "locked";
 
-/** Status template: free (tanpa beli), owned (sudah dibeli), locked. */
+/** Template status: free (no purchase), owned (already purchased), locked. */
 export function templateStatus(templateId: string, tier: Tier, snap: EntitlementSnapshot): "free" | "owned" | "locked" {
   if (tier === "free") return "free";
   return ownsTemplate(snap, templateId) ? "owned" : "locked";

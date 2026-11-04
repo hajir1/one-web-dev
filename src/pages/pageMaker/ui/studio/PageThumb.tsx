@@ -1,7 +1,7 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { useResolvedAssets } from "../../../../assetLibrary/resolve";
 
-/* Gambar kecil halaman: HTML+CSS statis di iframe tanpa skrip, diperkecil. */
+/* A small page image: static HTML+CSS in an iframe without scripts, scaled down. */
 const BASE_W = 1280;
 
 function PageThumb({ css: rawCss, body: rawBody, title }: { css: string; body: string; title: string }) {

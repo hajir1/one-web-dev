@@ -222,7 +222,7 @@ function buildMarkup(s: ListState, cls: string) {
 function listSections(s: ListState, update: Updater<ListState>): PanelSection[] {
   const p = { s, update };
 
-  // Ganti tag ul/ol sekalian pindah ke marker yang cocok (bullet ↔ angka).
+  // Switch the ul/ol tag and move to the matching marker at the same time (bullet ↔ number).
   const setListType = (t: ListState["listType"]) => {
     update("listType", t);
     const isBullet = BULLETS.includes(s.listStyleType);
@@ -337,7 +337,7 @@ function listSections(s: ListState, update: Updater<ListState>): PanelSection[] 
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const listElement = defineElement<ListState>({

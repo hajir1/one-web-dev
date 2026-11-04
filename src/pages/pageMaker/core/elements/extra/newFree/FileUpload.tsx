@@ -6,7 +6,7 @@ import { h } from "../../../helpers/markup";
 import { clamp, color, fieldName } from "../shared";
 import { tr, f, SR_ONLY, focusCss } from "./kit";
 
-/* --------------------------- Unggah Berkas -------------------------- */
+/* --------------------------- File Upload -------------------------- */
 
 export interface FileUploadState {
   title: string;

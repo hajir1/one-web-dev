@@ -11,7 +11,7 @@ import { ColumnBars } from "./LayoutThumb";
 
 export type AddTab = "element" | "box" | "row" | "library";
 
-/** Label = kunci i18n (diterjemahkan saat render). */
+/** Label = i18n key (translated at render time). */
 const TABS: { id: AddTab; icon: typeof Shapes }[] = [
   { id: "element", icon: Shapes },
   { id: "box", icon: LayoutPanelTop },
@@ -28,22 +28,22 @@ const BOXES: { layout: BoxLayout; icon: typeof Rows3 }[] = [
 interface Props {
   icons: IconLookup;
   targetLabel: string;
-  /** Belum ada section → penambahan dikunci. */
+  /** No section yet → adding is locked. */
   locked: boolean;
   tab: AddTab;
   onTab: (t: AddTab) => void;
   onAddRow: (variantId: string) => void;
-  /** Penjelasan posisi sisip untuk tab Row (mis. "di bawah Row “Hero”"). */
+  /** Explanation of the insertion position for the Row tab (e.g. "below Row “Hero”"). */
   rowLabel: string;
   onCreateSection: () => void;
   onAddElement: (p: LibraryPick) => void;
   onAddBox: (layout: BoxLayout) => void;
-  /** Library CDN yang terpasang di halaman ini (root.libraries). */
+  /** CDN libraries installed on this page (root.libraries). */
   libraries: LibraryId[];
   onToggleLibrary: (id: LibraryId) => void;
 }
 
-/** Isi popup (+): elemen bawaan, grup, dan Row — bisa diklik atau diseret ke canvas. */
+/** Content of the (+) popup: built-in elements, groups, and Rows; clickable or draggable onto the canvas. */
 export default function AddPanel({ icons, targetLabel, locked, tab, onTab, onAddRow, rowLabel, onCreateSection, onAddElement, onAddBox, libraries, onToggleLibrary }: Props) {
   const { t } = useTranslation();
   if (locked) {

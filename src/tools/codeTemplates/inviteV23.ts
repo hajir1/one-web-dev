@@ -2,15 +2,15 @@ import type { InviteSpec } from "./invite";
 import { C4, DECO_CSS, ISLAM, NADA_A, NADA_B, NADA_C, NADA_D, OPEN_BASE, RSVP_NIKAH, cfg, deco, type Opening } from "./inviteV22";
 
 /* ================================================================== */
-/* 5 undangan baru (v23). Mesin dan fitur sama dengan undangan v22:      */
-/* sampul transparan, potongan sampul (.op) yang bergerak saat tombol   */
-/* "Buka Undangan" ditekan. Lima animasi pembuka baru: kipas lipat,     */
-/* kotak cincin, tiket disobek, kelambu tersingkap, dan resleting.      */
-/* Semua animasi selesai di bawah 900 ms (sampul disembunyikan setelah  */
-/* itu). Semua nama, alamat, nomor, dan rekening fiktif.               */
+/* 5 new invitations (v23). The engine and features are the same as the v22 invitations: */
+/* a transparent cover, cover pieces (.op) that move when the button    */
+/* "Buka Undangan" is pressed. Five new opening animations: folding fan, */
+/* ring box, torn ticket, parted canopy, and zipper.                    */
+/* Every animation finishes under 900 ms (the cover is hidden after     */
+/* that). All names, addresses, numbers, and bank accounts are fictional. */
 /* ================================================================== */
 
-/** Kipas lipat: sampul terbagi 9 bilah yang melipat ke satu titik di bawah, lalu turun. */
+/** Folding fan: the cover splits into 9 slats that fold to one point below, then drop. */
 const KIPAS: Opening = (() => {
   const n = 9;
   const blades = Array.from({ length: n }, (_, i) => {
@@ -29,7 +29,7 @@ const KIPAS: Opening = (() => {
   };
 })();
 
-/** Kotak cincin: tutup beludru berengsel terangkat ke atas, alas kotak turun, kilau cincin muncul sesaat. */
+/** Ring box: the hinged velvet lid lifts up, the box base drops, the ring sparkles briefly. */
 const KOTAK_CINCIN: Opening = {
   html: `<div class="op rb-base" aria-hidden="true"><i class="rb-slot"></i></div><div class="op rb-lid" aria-hidden="true"><i class="rb-satin"></i></div><b class="rb-shine" aria-hidden="true"></b>`,
   css: `
@@ -45,7 +45,7 @@ const KOTAK_CINCIN: Opening = {
 `,
 };
 
-/** Tiket disobek: garis perforasi, bagian atas tersobek miring ke kiri atas, bagian bawah jatuh. */
+/** Torn ticket: a perforation line, the top part tears diagonally to the top left, the bottom part falls. */
 const TIKET: Opening = (() => {
   const zig = Array.from({ length: 21 }, (_, i) => `${i * 5}% ${i % 2 ? 61 : 59}%`).join(", ");
   const zigR = Array.from({ length: 21 }, (_, i) => `${100 - i * 5}% ${(20 - i) % 2 ? 61 : 59}%`).join(", ");
@@ -65,7 +65,7 @@ const TIKET: Opening = (() => {
   };
 })();
 
-/** Kelambu: tiga lapis kain tipis tersingkap ke atas bergantian dengan tepi bergelombang. */
+/** Canopy: three layers of sheer fabric lift up in turn with wavy edges. */
 const KELAMBU: Opening = {
   html: `<div class="op veil v1" aria-hidden="true"></div><div class="op veil v2" aria-hidden="true"></div><div class="op veil v3" aria-hidden="true"></div>`,
   css: `
@@ -77,7 +77,7 @@ const KELAMBU: Opening = {
 `,
 };
 
-/** Resleting: gigi resleting di tengah, kedua sisi sampul terbuka membentuk V dari atas lalu lepas ke samping. */
+/** Zipper: zipper teeth in the middle, both sides of the cover open into a V from the top, then come off sideways. */
 const RESLETING: Opening = {
   html: `<div class="op zp zp-l" aria-hidden="true"></div><div class="op zp zp-r" aria-hidden="true"></div><b class="op zp-pull" aria-hidden="true"></b>`,
   css: `

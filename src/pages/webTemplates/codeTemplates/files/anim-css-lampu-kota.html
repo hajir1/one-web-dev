@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Lampu Kota</title>
+<meta name="description" content="Animasi CSS murni: senja turun di atas deretan gedung, jendela menyala bergelombang, bulan naik, dan bintang jatuh melintas.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#0f1530">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #0f1530; /* Latar bawah */
+  --bg-2: #3a2f6b; /* Latar atas */
+  --c-1: #ffd76a; /* Lampu jendela */
+  --c-2: #232a4d; /* Gedung */
+  --c-3: #f4f1de; /* Bulan */
+  --ink: #f6f4ff; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Outfit", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: 50%; top: clamp(56px, 9vh, 96px); transform: translateX(-50%); text-align: center; align-items: center; z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: center; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap {  }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.stage { animation: night calc(var(--k) * 14) ease-in-out infinite alternate; }
+@keyframes night { from { filter: brightness(1.25) saturate(.9); } to { filter: none; } }
+.moon { right: 14%; top: 12%; width: 14vmin; height: 14vmin; border-radius: 50%; background: var(--c-3); box-shadow: inset -3vmin -1vmin 0 color-mix(in srgb, var(--c-3) 70%, #000), 0 0 40px 6px color-mix(in srgb, var(--c-3) 40%, transparent); animation: moon calc(var(--k) * 14) ease-in-out infinite alternate; }
+@keyframes moon { from { translate: 0 30vh; } to { translate: 0 0; } }
+.shoot { left: 10%; top: 10%; width: 120px; height: 2px; background: linear-gradient(90deg, transparent, #fff); rotate: 18deg; opacity: 0; animation: shoot calc(var(--k) * 7) ease-in infinite; }
+@keyframes shoot { 0%, 70% { opacity: 0; translate: 0 0; } 74% { opacity: 1; } 84%, 100% { opacity: 0; translate: 50vw 16vh; } }
+.bld { bottom: 0; display: grid; grid-template-columns: repeat(3, 1fr); align-content: start; gap: 10px 8px; padding: 14px 10px; background: linear-gradient(var(--c-2), color-mix(in srgb, var(--c-2) 70%, #000)); border-radius: 4px 4px 0 0; }
+.bld i { position: relative; height: 14px; border-radius: 2px; background: color-mix(in srgb, var(--c-2) 80%, #000); animation: lamp calc(var(--k) * 8) steps(1) infinite; animation-delay: calc(var(--k) * var(--d) * -1); }
+@keyframes lamp { 0% { background: color-mix(in srgb, var(--c-2) 80%, #000); box-shadow: none; } 40% { background: var(--c-1); box-shadow: 0 0 10px color-mix(in srgb, var(--c-1) 70%, transparent); } 85% { background: color-mix(in srgb, var(--c-2) 80%, #000); box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="moon"></div><i class="shoot"></i><div class="bld" style="left:2%;width:14%;height:30vh"><i style="--d:2.55"></i><i style="--d:0.25"></i><i style="--d:4.18"></i><i style="--d:2.92"></i><i style="--d:0.69"></i><i style="--d:4.96"></i><i style="--d:5.30"></i><i style="--d:4.70"></i><i style="--d:0.34"></i><i style="--d:1.08"></i><i style="--d:5.46"></i><i style="--d:3.50"></i></div><div class="bld" style="left:15%;width:12%;height:42vh"><i style="--d:2.98"></i><i style="--d:4.14"></i><i style="--d:2.53"></i><i style="--d:0.32"></i><i style="--d:0.78"></i><i style="--d:0.45"></i><i style="--d:2.50"></i><i style="--d:3.04"></i><i style="--d:5.86"></i><i style="--d:0.35"></i><i style="--d:1.73"></i><i style="--d:1.50"></i></div><div class="bld" style="left:26%;width:16%;height:26vh"><i style="--d:0.82"></i><i style="--d:1.25"></i><i style="--d:1.31"></i><i style="--d:0.05"></i><i style="--d:4.89"></i><i style="--d:3.13"></i><i style="--d:2.86"></i><i style="--d:3.64"></i><i style="--d:1.82"></i><i style="--d:1.55"></i><i style="--d:3.59"></i><i style="--d:1.65"></i></div><div class="bld" style="left:41%;width:10%;height:48vh"><i style="--d:4.26"></i><i style="--d:2.66"></i><i style="--d:3.75"></i><i style="--d:3.53"></i><i style="--d:2.40"></i><i style="--d:0.70"></i><i style="--d:1.83"></i><i style="--d:3.37"></i><i style="--d:0.04"></i><i style="--d:5.58"></i><i style="--d:0.76"></i><i style="--d:5.44"></i></div><div class="bld" style="left:50%;width:15%;height:34vh"><i style="--d:2.93"></i><i style="--d:4.90"></i><i style="--d:1.91"></i><i style="--d:2.26"></i><i style="--d:1.64"></i><i style="--d:3.90"></i><i style="--d:5.08"></i><i style="--d:2.48"></i><i style="--d:2.33"></i><i style="--d:3.40"></i><i style="--d:1.79"></i><i style="--d:4.57"></i></div><div class="bld" style="left:64%;width:12%;height:44vh"><i style="--d:2.25"></i><i style="--d:2.46"></i><i style="--d:2.03"></i><i style="--d:2.85"></i><i style="--d:3.79"></i><i style="--d:3.27"></i><i style="--d:4.85"></i><i style="--d:3.07"></i><i style="--d:3.13"></i><i style="--d:3.11"></i><i style="--d:2.14"></i><i style="--d:2.82"></i></div><div class="bld" style="left:75%;width:13%;height:28vh"><i style="--d:3.65"></i><i style="--d:3.63"></i><i style="--d:2.10"></i><i style="--d:2.73"></i><i style="--d:0.45"></i><i style="--d:0.70"></i><i style="--d:0.21"></i><i style="--d:2.43"></i><i style="--d:1.86"></i><i style="--d:2.62"></i><i style="--d:1.47"></i><i style="--d:1.87"></i></div><div class="bld" style="left:87%;width:12%;height:38vh"><i style="--d:3.72"></i><i style="--d:0.34"></i><i style="--d:2.71"></i><i style="--d:4.89"></i><i style="--d:4.06"></i><i style="--d:3.27"></i><i style="--d:3.56"></i><i style="--d:1.91"></i><i style="--d:4.84"></i><i style="--d:3.16"></i><i style="--d:5.95"></i><i style="--d:1.74"></i></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Selamat malam</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Kota tidak pernah benar-benar tidur.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Cocok untuk acara malam, promo jam malam, atau kartu ucapan untuk teman di kota lain.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Lihat acara malam ini</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 6
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

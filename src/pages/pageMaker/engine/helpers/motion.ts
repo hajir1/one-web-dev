@@ -1,15 +1,15 @@
 /* ================================================================== */
-/* Animasi CSS per node (v9) — tanpa library                            */
+/* Per-node CSS animation (v9) — no library                             */
 /*                                                                    */
-/* Pengguna memilih animasi di panel Styling elemen/box (`node.anim`).   */
+/* Users pick an animation in the element/box Styling panel (`node.anim`). */
 /* compose() menambah class `owd-anim owd-anim--<preset>` + atribut     */
-/* pemicu ke elemen terluar, lalu menulis @keyframes HANYA untuk preset  */
-/* yang dipakai. Nilai yang tidak diisi mengikuti Pengaturan Global →    */
-/* Animasi & 3D, yang ditulis sebagai variabel CSS di :root:            */
+/* the trigger to the outermost element, then writes @keyframes ONLY for the presets */
+/* in use. Unset values follow Global Settings →                        */
+/* Animation & 3D, which are written as CSS variables on :root:         */
 /*   --owd-anim-duration, --owd-anim-delay, --owd-anim-easing,          */
 /*   --owd-anim-distance, --owd-anim-once                               */
-/* Pemicu "saat terlihat" memakai IntersectionObserver kecil (lewat      */
-/* runtime Custom JS, jadi ikut dibersihkan di React/Vue/Svelte/Angular).*/
+/* The "when visible" trigger uses a small IntersectionObserver (through */
+/* the Custom JS runtime, so it is cleaned up in React/Vue/Svelte/Angular). */
 /* prefers-reduced-motion selalu dihormati.                             */
 /* ================================================================== */
 
@@ -20,7 +20,7 @@ export type AnimTrigger = "load" | "scroll";
 
 interface PresetDef {
   kind: AnimKind;
-  /** Isi @keyframes (entrance/loop) atau deklarasi saat :hover (hover). */
+  /** @keyframes content (entrance/loop) or declarations on :hover (hover). */
   css: string;
 }
 
@@ -66,19 +66,19 @@ export const ANIM_EASINGS = {
 export type AnimEasing = keyof typeof ANIM_EASINGS;
 export const ANIM_EASING_IDS = Object.keys(ANIM_EASINGS) as AnimEasing[];
 
-/** Pengaturan animasi satu node. Field kosong = ikut Pengaturan Global. */
+/** Animation settings of one node. Empty field = follow Global Settings. */
 export interface NodeAnim {
   preset: AnimPreset;
-  /** Hanya animasi masuk: saat halaman dimuat atau saat elemen terlihat. */
+  /** Entrance animations only: on page load or when the element becomes visible. */
   trigger?: AnimTrigger;
   /** ms 0–10000. */
   duration?: number;
   /** ms 0–10000. */
   delay?: number;
   easing?: AnimEasing;
-  /** Hanya animasi berulang: jumlah putaran, 0 = terus-menerus. */
+  /** Looping animations only: number of iterations, 0 = infinite. */
   repeat?: number;
-  /** Hanya pemicu scroll: false = diputar ulang setiap kali terlihat. */
+  /** Scroll trigger only: false = replayed every time it becomes visible. */
   once?: boolean;
 }
 
@@ -109,16 +109,16 @@ export interface MotionDefaults {
   duration: number;
   delay: number;
   easing: AnimEasing;
-  /** Jarak geser animasi masuk (px). */
+  /** Entrance animation slide distance (px). */
   distance: number;
-  /** Pemicu bawaan animasi masuk baru. */
+  /** Default trigger for new entrance animations. */
   trigger: AnimTrigger;
   once: boolean;
 }
 
 export const DEFAULT_MOTION: MotionDefaults = { duration: 700, delay: 0, easing: "smooth", distance: 24, trigger: "scroll", once: true };
 
-/** Pemicu efektif node (entrance tanpa pilihan → bawaan global). */
+/** Effective trigger of a node (entrance with no choice → global default). */
 export const animTrigger = (a: NodeAnim, defaults: Pick<MotionDefaults, "trigger"> = DEFAULT_MOTION): AnimTrigger | "hover" | "loop" => {
   const kind = ANIM_PRESETS[a.preset].kind;
   return kind === "entrance" ? (a.trigger ?? defaults.trigger) : kind;
@@ -128,7 +128,7 @@ export const animTrigger = (a: NodeAnim, defaults: Pick<MotionDefaults, "trigger
 /* Keluaran                                                             */
 /* ------------------------------------------------------------------ */
 
-/** Class + atribut di elemen terluar node. */
+/** Classes + attributes on the node's outermost element. */
 export function animAttrs(a: NodeAnim | undefined, defaults: Pick<MotionDefaults, "trigger"> = DEFAULT_MOTION): { classes: string[]; attrs: Record<string, string> } {
   if (!a) return { classes: [], attrs: {} };
   const trigger = animTrigger(a, defaults);
@@ -142,7 +142,7 @@ export function animAttrs(a: NodeAnim | undefined, defaults: Pick<MotionDefaults
   return { classes, attrs };
 }
 
-/** Aturan override per node (durasi/jeda/easing/ulang yang diisi sendiri). */
+/** Per-node override rules (custom duration/delay/easing/repeat). */
 export function animNodeCss(a: NodeAnim, selector: string): string {
   const kind = ANIM_PRESETS[a.preset].kind;
   const decl: string[] = [];
@@ -161,8 +161,8 @@ export function animNodeCss(a: NodeAnim, selector: string): string {
 }
 
 /**
- * CSS bersama untuk preset yang dipakai. `svelte` membungkus selector
- * dengan :global() dan memberi awalan -global- pada @keyframes.
+ * Shared CSS for the presets in use. `svelte` wraps selectors
+ * in :global() and prefixes @keyframes with -global-.
  */
 export function motionCss(presets: Iterable<AnimPreset>, flavor: CssFlavor = "plain"): string {
   const used = [...new Set(presets)].filter((p) => p in ANIM_PRESETS).sort();
@@ -202,7 +202,7 @@ export function motionCss(presets: Iterable<AnimPreset>, flavor: CssFlavor = "pl
   return out.join("\n") + "\n";
 }
 
-/** Kode pemicu scroll (dijalankan lewat runtime Custom JS: `element` = root halaman). */
+/** Scroll trigger code (run through the Custom JS runtime: `element` = the page root). */
 export const MOTION_OBSERVER_JS = `// Animasi CSS: putar animasi "saat terlihat" ketika elemen masuk layar.
 var doc = element.ownerDocument || document;
 var list = element.querySelectorAll('[data-owd-trigger="scroll"]');

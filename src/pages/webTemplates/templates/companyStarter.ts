@@ -2,7 +2,7 @@ import { asset } from "../assets";
 import { badge, col, el, eyebrow, grid, heading, image, inline, linkButton, page, para, section, siteFooter, siteHeader, stack, button, type Palette } from "../build";
 import type { TemplateContent, Tr } from "../types";
 
-/* Company Profile — GRATIS: konsultan bisnis, 3 halaman (Beranda, Tentang, Kontak). */
+/* Company Profile — FREE: business consultant, 3 pages (Home, About, Contact). */
 
 const P: Palette = { ink: "#0f172a", muted: "#475569", primary: "#1d4ed8", primaryDark: "#1e3a8a", soft: "#eff6ff", line: "#e2e8f0" };
 const BRAND = "Nusantara Consulting";

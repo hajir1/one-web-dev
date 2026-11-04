@@ -5,9 +5,9 @@ export type FontStatus = "loading" | "ready" | "failed";
 const clean = (family: string) => family.replace(/^["']|["']$/g, "").trim();
 
 /**
- * Apakah font `name` benar-benar termuat (mis. nama Google Fonts salah atau
- * URL tidak bisa dibuka → "failed"). @font-face dari stylesheet impor baru
- * muncul setelah CSS-nya selesai diunduh, jadi dicek berkala (maks. ~10 detik).
+ * Whether the font `name` really loaded (e.g. a wrong Google Fonts name or an
+ * unreachable URL → "failed"). @font-face from an imported stylesheet only
+ * appears after its CSS finishes downloading, so it is checked periodically (max. ~10 seconds).
  */
 export function useFontStatus(name: string, version: string): FontStatus {
   const [status, setStatus] = useState<FontStatus>("loading");

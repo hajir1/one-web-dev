@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Toples Bintang</title>
 <meta name="description" content="Animasi cerita: bintang jatuh masuk ke toples kaca, toples bersinar, tutupnya terbuka, dan cahayanya menyusun rasi berbentuk hati.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #070b1c; /* Latar bawah */
   --bg-2: #111a3d; /* Latar tengah */
@@ -98,7 +98,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true
@@ -120,17 +120,17 @@ function scene(api) {
       const fall = seg(B, 0.1, 0.8), glow = seg(B, 0.7, 1.2), lid = seg(B, 1.1, 1.5), free = seg(B, 1.3, 2.0), form = seg(B, 2.05, 2.9);
       /* Bintang jatuh. */
       if (fall > 0 && fall < 1) { const sx = lerp(W * 0.9, jx, ease(fall)), sy = lerp(H * 0.05, jy - jh * 0.4, ease(fall)); g.strokeStyle = rgba(COL["c-1"], 0.7); g.lineWidth = 2; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + u * 12, sy - u * 8); g.stroke(); glowDot(sx, sy, u * 4, COL["c-1"], 0.9); }
-      /* Cahaya di dalam toples. */
+      /* Light inside the jar. */
       const inside = glow * (1 - free * 0.7);
       if (inside > 0) { glowDot(jx, jy, jw * 4, COL["c-1"], 0.35 * inside); glowDot(jx, jy, jw * 1.2, "#fffbe6", 0.8 * inside); }
       /* Toples kaca. */
       g.strokeStyle = rgba(COL.ink, 0.7); g.lineWidth = 2; g.fillStyle = rgba(COL["c-3"], 0.12);
       g.beginPath(); g.moveTo(jx - jw * 0.7, jy - jh * 0.75); g.quadraticCurveTo(jx - jw, jy - jh * 0.7, jx - jw, jy - jh * 0.4); g.lineTo(jx - jw, jy + jh * 0.45); g.quadraticCurveTo(jx - jw, jy + jh * 0.55, jx - jw * 0.8, jy + jh * 0.55); g.lineTo(jx + jw * 0.8, jy + jh * 0.55); g.quadraticCurveTo(jx + jw, jy + jh * 0.55, jx + jw, jy + jh * 0.45); g.lineTo(jx + jw, jy - jh * 0.4); g.quadraticCurveTo(jx + jw, jy - jh * 0.7, jx + jw * 0.7, jy - jh * 0.75); g.closePath(); g.fill(); g.stroke();
       g.strokeStyle = rgba("#ffffff", 0.35); g.beginPath(); g.moveTo(jx - jw * 0.7, jy - jh * 0.3); g.lineTo(jx - jw * 0.7, jy + jh * 0.3); g.stroke();
-      /* Tutup yang terangkat. */
+      /* The lifting lid. */
       g.save(); g.translate(jx + lid * jw * 2.1, jy - jh * 0.8 + Math.sin(lid * Math.PI) * -jh * 0.6 + lid * jh * 1.32); g.rotate(lid * 0.18);
       g.fillStyle = COL["c-2"]; g.fillRect(-jw * 0.78, -u * 1.2, jw * 1.56, u * 2.4); g.restore();
-      /* Cahaya keluar lalu menjadi rasi berbentuk hati. */
+      /* Light escapes, then becomes a heart-shaped constellation. */
       if (free > 0) {
         const cx = W / 2, cy = H * 0.3, R = Math.min(W * 0.3, H * 0.19);
         const pos = lights.map((l, i) => { const fx = jx + l.ox * W * 0.6 * free + Math.sin(t + l.w) * u * 2, fy = lerp(jy, H * (0.25 + l.oy * 0.3), ease(free)) + Math.cos(t * 0.8 + l.w) * u * 2; const k = ease(seg(form, i * 0.03, i * 0.03 + 0.6)); return [lerp(fx, cx + l.h[0] * R, k), lerp(fy, cy + l.h[1] * R, k)]; });
@@ -150,16 +150,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -178,7 +178,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -201,7 +201,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

@@ -1,42 +1,42 @@
 // ─── processing/pricing.ts ───────────────────────────────────────────────────
-// KONFIGURASI HARGA TERPUSAT untuk fitur server Media. Komponen UI tidak
-// pernah menulis angka biaya sendiri — semua membaca dari sini (atau dari
-// harga yang dikirim backend lewat `mergePricing`).
+// CENTRAL PRICING CONFIGURATION for Media server features. UI components never
+// hardcode costs; everything reads from here (or from
+// prices sent by the backend through `mergePricing`).
 //
-// ATURAN PRODUK (konsisten di seluruh Media):
-//   1 kredit = Rp1.000 (harga dasar; paket besar lebih murah). Kredit dibeli
-//   dulu lewat Midtrans dalam Rupiah (bayar dulu, baru fitur terbuka).
+// PRODUCT RULES (consistent across Media):
+//   1 credit = Rp1,000 (base price; large packs are cheaper). Credits are bought
+//   first through Midtrans in Rupiah (pay first, then the feature unlocks).
 //
-//   Dua hal yang DIPISAH:
-//   a) SALDO KREDIT  — dompet umum, dipakai membayar setiap penggunaan
-//                      (`costPerUse` kredit per penggunaan berhasil).
-//   b) AKSES FITUR   — status terkunci/terbuka per fitur. Akses dibuka dengan
-//                      membeli PAKET FITUR seharga `packPrice` kredit yang
-//                      berisi `usesPerCredit` penggunaan (lebih hemat daripada
-//                      bayar per pakai). Pembelian paket pertama membuka
+//   Two SEPARATE things:
+//   a) CREDIT BALANCE — a general wallet, used to pay for each use
+//                      (`costPerUse` credits per successful use).
+//   b) FEATURE ACCESS — locked/unlocked status per feature. Access is unlocked by
+//                      buying a FEATURE PACK costing `packPrice` credits that
+//                      holds `usesPerCredit` uses (cheaper than
+//                      pay per use). Buying the first pack unlocks
 //                      fitur secara permanen.
 //
-//   Saat dipakai: kuota paket fitur dipakai lebih dulu; bila habis, biaya
-//   `costPerUse` diambil dari saldo. Fitur dengan `unlockRequired: false`
-//   bisa langsung dibayar dari saldo tanpa membeli paket.
+//   On use: the feature pack quota is used first; when it runs out, the cost
+//   `costPerUse` is taken from the balance. Features with `unlockRequired: false`
+//   can be paid from the balance right away without buying a pack.
 //
-//   Kredit / kuota paket hanya berkurang setelah pemrosesan BERHASIL dan
-//   dikonfirmasi backend. Gagal / dibatalkan = gratis.
+//   Credits / pack quota only decrease after processing SUCCEEDS and
+//   confirmed by the backend. Failed / cancelled = free.
 //
-// Angka di bawah = cadangan tampilan dan SAMA dengan backend
-// (src/billing/catalog/feature-pricing.ts); backend yang menagih.
-// Contoh: hapus latar belakang 0,5 kredit = Rp500 per gambar.
+// The numbers below are display fallbacks and MATCH the backend
+// (src/billing/catalog/feature-pricing.ts); the backend does the charging.
+// Example: background removal 0.5 credit = Rp500 per image.
 //
-// Tabel ini juga memuat fitur server menu DATA (konversi spreadsheet lama &
-// ekstraksi tabel PDF) agar seluruh tarif server ada di SATU tempat.
-// Paket kredit (harga bertingkat) ada di config/pricing.ts.
+// This table also holds the DATA menu server features (old spreadsheet conversion &
+// PDF table extraction) so every server rate lives in ONE place.
+// Credit packs (tiered pricing) live in config/pricing.ts.
 
 import i18n, { currentLang, LANG_LABEL } from "../../../i18n";
 import { isAdminFree } from "../../../auth/adminFree";
 import { BASE_IDR_PER_CREDIT, DEFAULT_CREDIT_PACKAGES, formatIdr } from "../../../config/pricing";
 import { planQuota, sanitizePlanView, type PlanView, type QuotaPlan } from "../../plans/planCore";
 
-/** Harga dasar 1 kredit (Rupiah). Paket lebih besar lebih murah per kredit. */
+/** Base price of 1 credit (Rupiah). Larger packs are cheaper per credit. */
 const CREDIT_IDR = BASE_IDR_PER_CREDIT;
 
 export type MediaServerFeatureId = "remove-background" | "image-upscaler" | "video-to-frames" | "video-to-gif" | "audio-extract" | "video-compress";
@@ -45,11 +45,11 @@ export type DataServerFeatureId = "data-legacy-sheet" | "data-pdf-table" | "data
 export type VrServerFeatureId = "vr-panorama-stitch";
 export type ServerFeatureId = MediaServerFeatureId | DataServerFeatureId | VrServerFeatureId;
 
-/** Satuan penggunaan (teks UI: pricing.units.<unit>). */
+/** Usage unit (UI text: pricing.units.<unit>). */
 export type UsageUnit = "image" | "gif" | "video" | "audio" | "file" | "page" | "panorama";
 
 interface CostTier {
-  /** Batas atas (inklusif) dalam satuan `by`; Infinity untuk tingkat terakhir. */
+  /** Upper bound (inclusive) in `by` units; Infinity for the last tier. */
   upTo: number;
   /** Pengali biaya standar. */
   factor: number;
@@ -57,23 +57,23 @@ interface CostTier {
 
 export interface FeaturePricing {
   feature: ServerFeatureId;
-  /** Satuan penggunaan (diterjemahkan lewat pricing.units.<unit>). */
+  /** Usage unit (translated via pricing.units.<unit>). */
   unit: UsageUnit;
-  /** Kredit per penggunaan standar (bayar per pakai dari saldo). */
+  /** Credits per standard use (pay per use from the balance). */
   costPerUse: number;
-  /** Isi satu paket fitur (jumlah penggunaan standar). */
+  /** Contents of one feature pack (number of standard uses). */
   usesPerCredit: number;
-  /** Harga satu paket fitur (kredit). */
+  /** Price of one feature pack (credits). */
   packPrice: number;
-  /** Wajib membuka akses (membeli paket) sebelum bisa membayar per pakai. */
+  /** Access must be unlocked (by buying a pack) before paying per use. */
   unlockRequired: boolean;
-  /** Biaya bisa naik berdasarkan ukuran/durasi/skala. */
+  /** The cost can rise with size/duration/scale. */
   tiers?: { by: "bytes" | "seconds" | "scale" | "pages" | "photos"; steps: CostTier[] };
-  /** Batas input pekerjaan server (divalidasi frontend & WAJIB backend). */
+  /** Server job input limits (validated by the frontend & REQUIRED on the backend). */
   limits: { maxBytes: number; maxSeconds?: number };
-  /** Backend bisa menonaktifkan fitur tertentu. */
+  /** The backend can disable specific features. */
   enabled: boolean;
-  /** v11: termasuk paket langganan Media & Data (kuota bulanan, bukan kredit per pakai). */
+  /** v11: included in the Media & Data subscription plans (monthly quota, not credits per use). */
   inPlan: boolean;
 }
 
@@ -172,7 +172,7 @@ const BASE_PRICING: Record<ServerFeatureId, Omit<FeaturePricing, "inPlan">> = {
   },
   "data-pdf-ocr": {
     feature: "data-pdf-ocr",
-    // v7 (P8): OCR PDF hasil scan → PDF bisa dicari + .txt. Per berkas; ≤10 hlm ×1, ≤50 ×3, >50 ×6 (maks. 100 hlm).
+    // v7 (P8): OCR for scanned PDFs → searchable PDF + .txt. Per file; ≤10 pages ×1, ≤50 ×3, >50 ×6 (max. 100 pages).
     unit: "file",
     costPerUse: 1,
     usesPerCredit: 6,
@@ -185,7 +185,7 @@ const BASE_PRICING: Record<ServerFeatureId, Omit<FeaturePricing, "inPlan">> = {
   /* ----------------------------- menu VR ----------------------------- */
   "vr-panorama-stitch": {
     feature: "vr-panorama-stitch",
-    // v7: ZIP 2–24 foto → panorama 360°. Per panorama; ≤8 foto ×1, ≤16 ×1,5, >16 ×2.
+    // v7: ZIP of 2–24 photos → 360° panorama. Per panorama; ≤8 photos ×1, ≤16 ×1.5, >16 ×2.
     unit: "panorama",
     costPerUse: 1,
     usesPerCredit: 6,
@@ -197,16 +197,16 @@ const BASE_PRICING: Record<ServerFeatureId, Omit<FeaturePricing, "inPlan">> = {
   },
 };
 
-/** Fitur server milik menu Media. */
+/** Server features of the Media menu. */
 export const MEDIA_SERVER_FEATURES: MediaServerFeatureId[] = ["remove-background", "image-upscaler", "video-to-frames", "video-to-gif", "audio-extract", "video-compress"];
-/** Fitur server milik menu Data. */
+/** Server features of the Data menu. */
 export const DATA_SERVER_FEATURES: DataServerFeatureId[] = ["data-legacy-sheet", "data-pdf-table", "data-pdf-ocr"];
-/** Fitur server milik menu VR (v7). */
+/** Server features of the VR menu (v7). */
 export const VR_SERVER_FEATURES: VrServerFeatureId[] = ["vr-panorama-stitch"];
 
 /**
- * v11: Media & Data memakai paket langganan (tanpa paket fitur / kredit per
- * pakai). Tarif kredit di atas tetap dipakai VR dan sisa paket fitur lama.
+ * v11: Media & Data use subscription plans (no feature packs / pay-per-use
+ * credits). The credit rates above are still used by VR and leftover old feature packs.
  */
 export const DEFAULT_PRICING: Record<ServerFeatureId, FeaturePricing> = Object.fromEntries(
   Object.entries(BASE_PRICING).map(([id, p]) => {
@@ -215,18 +215,18 @@ export const DEFAULT_PRICING: Record<ServerFeatureId, FeaturePricing> = Object.f
   }),
 ) as Record<ServerFeatureId, FeaturePricing>;
 
-/** @deprecated pakai DEFAULT_CREDIT_PACKAGES dari config/pricing.ts (harga bertingkat). */
+/** @deprecated use DEFAULT_CREDIT_PACKAGES from config/pricing.ts (tiered prices). */
 export const CREDIT_PACKAGES = DEFAULT_CREDIT_PACKAGES;
 
 /* ------------------------------ format ------------------------------ */
 
 const round = (n: number) => Math.round(n * 1e6) / 1e6;
 
-/** Nama fitur server yang sudah diterjemahkan (pricing.features.<id>). */
+/** Translated server feature name (pricing.features.<id>). */
 export const featureName = (f: ServerFeatureId) => i18n.t(`pricing.features.${f}`, { defaultValue: f });
-/** Nama satuan penggunaan yang sudah diterjemahkan. */
+/** Translated usage unit name. */
 export const unitName = (u: UsageUnit) => i18n.t(`pricing.units.${u}`);
-/** Keterangan pengali tarif bertingkat, mis. "hingga ×3 untuk file besar"; null bila tanpa tingkat. */
+/** Tiered rate multiplier note, e.g. "up to ×3 for large files"; null when there are no tiers. */
 export function tierNote(p: FeaturePricing): string | null {
   if (!p.tiers || p.tiers.steps.length < 2) return null;
   return i18n.t(`pricing.tierNote.${p.tiers.by}`, { factor: p.tiers.steps[p.tiers.steps.length - 1].factor });
@@ -239,12 +239,12 @@ export function formatCredits(n: number, withUnit = true): string {
   return withUnit ? i18n.t("pricing.credits", { count: v, value: s }) : s;
 }
 
-/** Nilai kredit dalam Rupiah pada harga DASAR (Rp1.000/kredit), mis. 0,5 → "Rp500". */
+/** Credit value in Rupiah at the BASE price (Rp1,000/credit), e.g. 0.5 → "Rp500". */
 export function formatCreditValue(credits: number): string {
   return formatMoney(credits * CREDIT_IDR);
 }
 
-/** Rupiah tanpa desimal, mis. 47500 → "Rp47.500". */
+/** Rupiah without decimals, e.g. 47500 → "Rp47.500". */
 export function formatMoney(idr: number): string {
   return formatIdr(idr);
 }
@@ -259,7 +259,7 @@ export interface UsageInput {
   photos?: number;
 }
 
-/** Pengali biaya untuk satu input (1 bila tidak ada tingkat / data). */
+/** Cost multiplier for one input (1 when there are no tiers / data). */
 export function usageFactor(p: FeaturePricing, input: UsageInput = {}): number {
   if (!p.tiers) return 1;
   const v = input[p.tiers.by];
@@ -267,13 +267,13 @@ export function usageFactor(p: FeaturePricing, input: UsageInput = {}): number {
   return p.tiers.steps.find((s) => v <= s.upTo)?.factor ?? p.tiers.steps[p.tiers.steps.length - 1].factor;
 }
 
-/** Biaya satu penggunaan bila dibayar dari saldo. */
+/** Cost of one use when paid from the balance. */
 export const costOf = (p: FeaturePricing, input?: UsageInput) => round(p.costPerUse * usageFactor(p, input));
 
-/** Kuota paket yang terpakai untuk satu penggunaan. */
+/** Pack quota consumed by one use. */
 export const packUsesOf = (p: FeaturePricing, input?: UsageInput) => Math.ceil(usageFactor(p, input) - 1e-9);
 
-/** Harga per penggunaan bila membeli paket (untuk perbandingan). */
+/** Price per use when buying a pack (for comparison). */
 export const packCostPerUse = (p: FeaturePricing) => round(p.packPrice / p.usesPerCredit);
 
 /** Validasi input terhadap batas server. null = valid. */
@@ -286,29 +286,29 @@ export function validateServerInput(p: FeaturePricing, input: UsageInput): strin
   return null;
 }
 
-/* --------------------------- akun & akses --------------------------- */
+/* --------------------------- account & access --------------------------- */
 
 /** Hak akses per fitur menurut BACKEND. */
 interface FeatureEntitlement {
   unlocked: boolean;
-  /** Sisa kuota paket (penggunaan standar). */
+  /** Remaining plan quota (standard uses). */
   packUses: number;
 }
 
-/** Data akun dari backend (frontend tidak pernah mengubahnya sendiri). */
+/** Account data from the backend (the frontend never changes it itself). */
 export interface BillingAccount {
   balance: number;
   entitlements: Partial<Record<ServerFeatureId, FeatureEntitlement>>;
-  /** Item sekali-beli yang sudah dibuka server (mis. "template:shop-premium", "site-slot"). */
+  /** One-time items already unlocked by the server (e.g. "template:shop-premium", "site-slot"). */
   items: string[];
-  /** Slot folder website tambahan yang sudah dibeli. */
+  /** Extra website folder slots already purchased. */
   extraSiteSlots: number;
   syncedAt: number;
-  /** v6: mode admin tanpa kredit (dari backend / profil sesi). Hanya untuk tampilan; server yang menagih. */
+  /** v6: admin no-credit mode (from the backend / session profile). Display only; the server does the billing. */
   adminFree?: boolean;
-  /** v7 (P6): tim pengguna. `payWithTeam` = job server dibayar dari dompet tim (tanpa kuota paket pribadi). */
+  /** v7 (P6): the user's team. `payWithTeam` = server jobs are paid from the team wallet (no personal plan quota). */
   team?: TeamAccount | null;
-  /** v11: paket langganan Media & Data yang berlaku + sisa kuota bulan ini. */
+  /** v11: the active Media & Data subscription plan + this month's remaining quota. */
   subscription?: PlanView | null;
 }
 
@@ -320,30 +320,30 @@ interface TeamAccount {
   payWithTeam: boolean;
   monthlyLimit: number | null;
   spentMonth: number;
-  /** Kredit tim yang masih boleh dipakai bulan ini (min(saldo tim, sisa batas)). */
+  /** Team credits still usable this month (min(team balance, remaining limit)). */
   available: number;
 }
 
-/** Saldo yang membayar job server: kredit tim (bila sumber "Tim") atau saldo pribadi. */
+/** The balance that pays for server jobs: team credits (when the source is "Team") or the personal balance. */
 export const payingBalance = (a: BillingAccount) => (a.team?.payWithTeam ? a.team.available : a.balance);
 
 export interface ChargePlan {
-  /** Kuota paket yang akan dipakai. */
+  /** Plan quota that will be used. */
   packUses: number;
-  /** Kredit dari saldo. */
+  /** Credits from the balance. */
   credits: number;
-  /** Total bila semua dibayar dari saldo (tanpa paket). */
+  /** Total if everything is paid from the balance (no pack). */
   creditsWithoutPack: number;
-  /** null = saldo tidak diketahui. */
+  /** null = balance unknown. */
   affordable: boolean | null;
-  /** Kekurangan kredit (0 bila cukup / tidak diketahui). */
+  /** Credit shortfall (0 when sufficient / unknown). */
   shortfall: number;
 }
 
-/** Rencana biaya untuk sekumpulan input (urut: kuota paket dulu, lalu saldo). */
+/** Cost plan for a set of inputs (order: plan quota first, then the balance). */
 export function planCharge(p: FeaturePricing, inputs: UsageInput[], account: BillingAccount | null): ChargePlan {
-  // v6: admin → tanpa biaya (server juga tidak menagih).
-  // v11: fitur paket langganan → tanpa kredit (sisa paket fitur lama dipakai dulu, sisanya kuota paket).
+  // v6: admin → no cost (the server does not charge either).
+  // v11: subscription plan features → no credits (leftover old feature packs are used first, the rest from plan quota).
   if (account?.adminFree || p.inPlan) {
     if (p.inPlan && !account?.adminFree) {
       let pack = account?.entitlements[p.feature]?.packUses ?? 0;
@@ -360,7 +360,7 @@ export function planCharge(p: FeaturePricing, inputs: UsageInput[], account: Bil
     const list = round(inputs.reduce((n, inp) => n + costOf(p, inp), 0));
     return { packUses: 0, credits: 0, creditsWithoutPack: list, affordable: true, shortfall: 0 };
   }
-  // v7: sumber "Tim" → semua dibayar kredit tim, kuota paket pribadi tidak dipakai.
+  // v7: "Team" source → everything is paid with team credits, the personal plan quota is not used.
   const viaTeam = !!account?.team?.payWithTeam;
   let pack = viaTeam ? 0 : (account?.entitlements[p.feature]?.packUses ?? 0);
   let packUses = 0;
@@ -381,7 +381,7 @@ export function planCharge(p: FeaturePricing, inputs: UsageInput[], account: Bil
   return { packUses, credits, creditsWithoutPack: round(without), affordable: short === 0, shortfall: short };
 }
 
-/** Perkiraan jumlah penggunaan standar yang bisa dibayar sekarang. null = tidak diketahui. */
+/** Estimated number of standard uses that can be paid now. null = unknown. */
 export function estimateUses(p: FeaturePricing, account: BillingAccount | null): number | null {
   if (!account) return null;
   if (account.adminFree) return Infinity;
@@ -397,7 +397,7 @@ export function estimateUses(p: FeaturePricing, account: BillingAccount | null):
   return (ent?.packUses ?? 0) + Math.floor(round(account.balance / p.costPerUse));
 }
 
-/** Berapa penggunaan yang didapat dari `credits` kredit (paket vs bayar per pakai). */
+/** How many uses `credits` credits buy (pack vs pay per use). */
 export function usesForCredits(p: FeaturePricing, credits: number) {
   return {
     payPerUse: Math.floor(round(credits / p.costPerUse)),
@@ -407,18 +407,18 @@ export function usesForCredits(p: FeaturePricing, credits: number) {
 
 export type AccessState = "unavailable" | "unknown" | "locked" | "insufficient" | "quota" | "ready";
 
-/** Fitur paket yang kuotanya menit video (perkiraan "≈ N menit"). */
+/** Plan feature whose quota is in video minutes (estimate "≈ N minutes"). */
 const VIDEO_MINUTES = new Set<ServerFeatureId>(["video-compress", "audio-extract"]);
 
-/** v11: label biaya singkat — kuota paket untuk Media & Data, kredit per pakai untuk lainnya. */
+/** v11: short cost label: plan quota for Media & Data, credits per use for the rest. */
 export function serverCostLabel(p: FeaturePricing): string {
   if (p.inPlan) return i18n.t(VIDEO_MINUTES.has(p.feature) ? "plans.cost.minute" : "plans.cost.unit");
   return i18n.t("media.shell.perUse", { cost: formatCredits(costOf(p)) });
 }
 
 /**
- * v11: rencana kuota paket untuk input saat ini. Input yang tertutup sisa
- * paket fitur lama tidak memakai kuota paket langganan. null = bukan fitur paket.
+ * v11: plan quota plan for the current input. Input covered by leftover
+ * old feature packs does not use subscription quota. null = not a plan feature.
  */
 export function quotaFor(p: FeaturePricing, inputs: UsageInput[], account: BillingAccount | null): QuotaPlan | null {
   if (!p.inPlan) return null;
@@ -434,12 +434,12 @@ export function quotaFor(p: FeaturePricing, inputs: UsageInput[], account: Billi
   return planQuota(p.feature, rest, account?.subscription ?? null, p.limits.maxBytes);
 }
 
-/** Label status akses (teks dari locales: pricing.access.<state>). */
+/** Access status label (text from the locales: pricing.access.<state>). */
 export const ACCESS_LABEL: Record<AccessState, string> = new Proxy({} as Record<AccessState, string>, {
   get: (_t, key: string) => i18n.t(`pricing.access.${key}`),
 });
 
-/** Status akses gabungan untuk ditampilkan & untuk menentukan aksi. */
+/** Combined access status for display & for choosing the action. */
 export function accessState(p: FeaturePricing, opts: { serverAvailable: boolean; account: BillingAccount | null; plan?: ChargePlan; quota?: QuotaPlan | null }): AccessState {
   if (!opts.serverAvailable || !p.enabled) return "unavailable";
   if (!opts.account) return "unknown";
@@ -454,11 +454,11 @@ export function accessState(p: FeaturePricing, opts: { serverAvailable: boolean;
   return plan.affordable === false ? "insufficient" : "ready";
 }
 
-/* ------------------------ harga dari backend ------------------------ */
+/* ------------------------ prices from the backend ------------------------ */
 
 const num = (v: unknown, min = 0) => (typeof v === "number" && Number.isFinite(v) && v >= min ? v : null);
 
-/** Gabungkan harga dari backend (bila ada) dengan bawaan; nilai tidak valid diabaikan. */
+/** Merges prices from the backend (if any) with the defaults; invalid values are ignored. */
 export function mergePricing(base: Record<ServerFeatureId, FeaturePricing>, remote: unknown): Record<ServerFeatureId, FeaturePricing> {
   const out = { ...base };
   if (!remote || typeof remote !== "object") return out;
@@ -483,7 +483,7 @@ export function mergePricing(base: Record<ServerFeatureId, FeaturePricing>, remo
 export function sanitizeAccount(raw: unknown): BillingAccount | null {
   if (!raw || typeof raw !== "object") return null;
   const v = raw as Record<string, unknown>;
-  // Saldo boleh negatif (kredit ditarik setelah refund/chargeback); dulu akun negatif dibuang → saldo "tidak dapat dimuat".
+  // The balance may be negative (credits clawed back after a refund/chargeback); negative accounts used to be dropped → balance "could not be loaded".
   const balance = num(v.balance, -Infinity);
   if (balance === null) return null;
   const entitlements: BillingAccount["entitlements"] = {};

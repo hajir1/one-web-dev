@@ -1,7 +1,7 @@
 // ─── converters/index.ts ─────────────────────────────────────────────────────
-// Dispatcher konversi per KOMBINASI KATEGORI (raster/vektor), bukan per
-// pasangan format. Semua jalur kini: menerima AbortSignal, memeriksa batas
-// ukuran, memverifikasi format hasil, dan membebaskan Canvas setelah dipakai.
+// Conversion dispatcher per CATEGORY COMBINATION (raster/vector), not per
+// format pair. Every path now: accepts an AbortSignal, checks limits
+// size, verifies the output format, and frees the Canvas after use.
 
 import i18n from "../../../i18n";
 import type { SniffedKind } from "../lib/fileSniff";
@@ -32,17 +32,17 @@ export interface ConvertResult {
   format: FormatDefinition;
   width?: number;
   height?: number;
-  /** Catatan untuk pengguna (mis. gambar diperkecil sebelum tracing). */
+  /** Note for the user (e.g. the image was downscaled before tracing). */
   notes: string[];
 }
 
-/** Batas piksel sebelum tracing; di atas ini gambar diperkecil dulu. */
+/** Pixel limit before tracing; above this the image is downscaled first. */
 const TRACE_MAX_PIXELS = 1_500_000;
 
 const qualityFor = (target: FormatDefinition, o: ConversionOptions) =>
   target.id === "png" ? undefined : target.id === "webp" && o.losslessWebp ? 1 : Math.min(Math.max(o.quality / 100, 0.01), 1);
 
-/** Format yang masih bisa dibuat Canvas bila codec WASM gagal dimuat (mis. CSP memblokir WebAssembly). */
+/** Formats Canvas can still create if the WASM codec fails to load (e.g. a CSP blocks WebAssembly). */
 const CANVAS_FALLBACK = new Set(["png", "jpeg", "webp"]);
 
 async function encodeTarget(canvas: HTMLCanvasElement, ctx2d: CanvasRenderingContext2D, target: FormatDefinition, o: ConversionOptions, cctx: ConvertContext, notes: string[]): Promise<Blob> {
@@ -61,7 +61,7 @@ async function encodeTarget(canvas: HTMLCanvasElement, ctx2d: CanvasRenderingCon
     return new Blob([bytes], { type: target.mime });
   } catch (e) {
     if ((e as Error)?.name === "AbortError" || !CANVAS_FALLBACK.has(target.id)) throw e;
-    // Codec WASM tidak tersedia → encoder bawaan browser (kualitas sedikit berbeda).
+    // WASM codec unavailable → the browser's built-in encoder (slightly different quality).
     notes.push(i18n.t("media.codec.canvasFallback"));
     return encodeCanvas(canvas, target.mime, qualityFor(target, o));
   }
@@ -80,7 +80,7 @@ async function drawToFormat(
   try {
     const ctx = context2d(canvas, { willReadFrequently: true });
     if (!target.alpha) {
-      // JPEG tanpa alpha: isi latar dulu (warna sudah divalidasi di UI).
+      // JPEG without alpha: fill the background first (the color is already validated in the UI).
       ctx.fillStyle = o.jpegBackgroundColor;
       ctx.fillRect(0, 0, width, height);
     }
@@ -98,8 +98,8 @@ async function drawToFormat(
 }
 
 /**
- * Baca gambar raster: decoder browser bila bisa; TIFF/JXL/QOI (dan AVIF/WebP
- * di browser lama) lewat codec WASM di worker.
+ * Reads a raster image: the browser decoder when possible; TIFF/JXL/QOI (and AVIF/WebP
+ * in old browsers) via the WASM codec in the worker.
  */
 async function loadRaster(file: Blob, kind: SniffedKind, signal?: AbortSignal): Promise<{ source: CanvasImageSource; width: number; height: number; close: () => void }> {
   const viaWorker = async () => {
@@ -157,7 +157,7 @@ async function rasterToVector(file: Blob, kind: SniffedKind, o: ConversionOption
     );
     let svg = res.svg ?? "";
     if (!svg.includes("<path")) throw new Error(i18n.t("media.convert.traceEmpty"));
-    // Kembalikan ke ukuran asli: viewBox tetap ukuran tracing, width/height ukuran asli.
+    // Restore the original size: viewBox stays at the tracing size, width/height at the original size.
     svg = svg.replace(/^\s*<svg\s/, `<svg width="${img.width}" height="${img.height}" `);
     return { blob: new Blob([svg], { type: "image/svg+xml" }), format: getFormat("svg"), width: img.width, height: img.height, notes };
   } finally {
@@ -181,7 +181,7 @@ async function vectorToRaster(file: Blob, target: FormatDefinition, o: Conversio
   );
   const w = Math.max(1, Math.round(size.width));
   const h = Math.max(1, Math.round(size.height));
-  // Pastikan SVG punya ukuran eksplisit agar <img> merender dengan rasio benar.
+  // Make sure the SVG has an explicit size so <img> renders with the right ratio.
   svg.setAttribute("width", String(w));
   svg.setAttribute("height", String(h));
   if (!svg.getAttribute("viewBox") && size.known) svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
@@ -210,7 +210,7 @@ async function vectorToVector(file: Blob, o: ConversionOptions): Promise<Convert
   }
   if (o.vectorBackgroundColor) {
     const rect = doc.createElementNS("http://www.w3.org/2000/svg", "rect");
-    // Menutupi seluruh viewBox (bukan 100% yang bisa meleset bila viewBox tidak mulai dari 0).
+    // Covers the whole viewBox (not 100%, which can be off when the viewBox does not start at 0).
     const vb = (svg.getAttribute("viewBox") ?? "0 0 0 0").trim().split(/[\s,]+/).map(Number);
     rect.setAttribute("x", String(vb[0] || 0));
     rect.setAttribute("y", String(vb[1] || 0));

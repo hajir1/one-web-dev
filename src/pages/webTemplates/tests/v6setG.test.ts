@@ -21,7 +21,7 @@ import { templateFiles } from "../exportTemplate";
 import { WEB_TEMPLATES, buildTemplatePages, getTemplate, type BuiltTemplatePage, type WebTemplate } from "../registry";
 import type { TplLang } from "../types";
 
-/* Katalog v6 bagian G: template dari spesifikasi data (setG/g*.ts), dibangun kitG. */
+/* v6 catalog part G: templates from data specs (setG/g*.ts), built by kitG. */
 
 type SectionBox = { tag?: string; name: string };
 
@@ -164,9 +164,9 @@ test("aset v6g: SVG ASCII kecil tanpa URL luar, semua gambar template ada & terp
   for (const tpl of templates()) {
     const json = JSON.stringify(LANGS.flatMap((l) => buildTemplatePages(tpl, l).map((p) => p.doc)));
     assert.doesNotMatch(json, /unsplash|placehold\.co|picsum/, `${tpl.id}: gambar eksternal`);
-    // Setiap src gambar adalah data URI SVG yang terdaftar (tidak ada gambar rusak).
+    // Every image src is a registered SVG data URI (no broken images).
     for (const m of json.matchAll(/"(src|bgImage|image|before|after|avatar|photo)":"([^"]*)"/g)) {
-      if (m[1] === "bgImage" && !m[2]) continue; // latar tanpa gambar (bawaan)
+      if (m[1] === "bgImage" && !m[2]) continue; // background without an image (default)
       assert.match(m[2], /^data:image\/svg\+xml;base64,/, `${tpl.id}: gambar ${m[1]}=${m[2].slice(0, 40)}`);
     }
     assert.doesNotMatch(json, /undefined|NaN/, `${tpl.id}: nilai kosong di isi`);

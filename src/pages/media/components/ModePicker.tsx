@@ -9,9 +9,9 @@ import { Chip } from "./ui";
 import { isDemoMode } from "../../../demo/demoMode";
 
 /**
- * Pemilih mode pemrosesan (browser gratis / server berbayar) + batasan tiap
- * mode. Saat mode server dipilih, kartu akses (biaya, saldo, status akses)
- * ikut tampil. Harga dibaca dari konfigurasi terpusat, bukan ditulis di sini.
+ * Processing mode picker (free browser / paid server) + each mode's
+ * limits. When server mode is selected, the access card (cost, balance, access status)
+ * shows too. Prices are read from the central config, not written here.
  */
 export default function ModePicker({
   tool,
@@ -24,7 +24,7 @@ export default function ModePicker({
   value: ProcessingMode;
   onChange: (m: ProcessingMode) => void;
   disabled?: boolean;
-  /** Input saat ini untuk perkiraan biaya (ukuran/durasi/skala). */
+  /** Current input for the cost estimate (size/duration/scale). */
   inputs?: UsageInput[];
 }) {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ export default function ModePicker({
   const current = spec.modes[value];
   const options: { mode: ProcessingMode; title: string; Icon: typeof Cpu; badge: React.ReactNode }[] = [];
   if (spec.modes.browser) options.push({ mode: "browser", title: "Browser", Icon: Cpu, badge: isDemoMode() ? null : <Chip tone="green">{t("common.free")}</Chip> });
-  // Mode demo (v12): mode server berbayar disembunyikan, hanya mode browser.
+  // Demo mode (v12): paid server mode is hidden, browser mode only.
   if (spec.modes.server && !isDemoMode())
     options.push({
       mode: "server",

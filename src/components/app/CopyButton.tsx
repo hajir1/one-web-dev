@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Check, Copy } from "lucide-react";
 import { notify } from "./Toaster";
 
-/** Salin teks ke clipboard dengan umpan balik (ikon centang + toast saat gagal). */
+/** Copy text to the clipboard with feedback (check icon + toast on failure). */
 export default function CopyButton({
   text,
   className,

@@ -5,5 +5,5 @@ import { I4 } from "./i4";
 import { I5 } from "./i5";
 import type { ISpec } from "./spec";
 
-/** Semua spesifikasi set I, urut sesuai katalog (batch 10 template). */
+/** All set I specifications, in catalog order (batches of 10 templates). */
 export const V9I_SPECS: ISpec[] = [...I1, ...I2, ...I3, ...I4, ...I5];

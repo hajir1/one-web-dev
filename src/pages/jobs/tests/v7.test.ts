@@ -1,12 +1,12 @@
 // @ts-nocheck
-// v7: riwayat pekerjaan (P1) & kredit tim (P6) di sisi frontend.
+// v7: job history (P1) & team credits (P6) on the frontend side.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_PRICING, estimateUses, payingBalance, planCharge, sanitizeAccount } from "../../media/processing/pricing";
 import { historyQuery } from "../history";
 import { TEAM_MAX_MEMBERS } from "../../team/team";
 
-// v11: Media & Data memakai kuota paket; mesin kredit/paket fitur di bawah diuji dengan tarif kredit (seperti VR).
+// v11: Media & Data use plan quotas; the credit/plan feature engine below is tested with credit rates (like VR).
 const legacy = (p) => ({ ...p, inPlan: false, unlockRequired: true });
 const team = (o = {}) => ({ id: "t1", name: "Studio", role: "member", balance: 20, payWithTeam: true, monthlyLimit: 5, spentMonth: 1, available: 4, ...o });
 const acct = (balance, ents = {}, t = undefined) => ({ balance, entitlements: ents, syncedAt: 0, ...(t ? { team: t } : {}) });

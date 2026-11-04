@@ -1,16 +1,16 @@
 import type { RegionRenderer } from "../editModel";
 
 /* ================================================================== */
-/* Render HTML proyek Portofolio 3D. SATU sumber untuk:                  */
-/*   - generator (HTML statis untuk pembaca tanpa JS),                  */
-/*   - skrip template (render ulang dari PROJECTS),                     */
-/*   - editor tanpa kode (bangun ulang HTML statis setelah diedit).     */
-/* Ditulis sebagai teks JS karena juga disalin apa adanya ke template.  */
+/* Renders the 3D Portfolio project HTML. ONE source for:                */
+/*   - the generator (static HTML for readers without JS),              */
+/*   - the template script (re-render from PROJECTS),                   */
+/*   - the no-code editor (rebuild the static HTML after editing).      */
+/* Written as JS text because it is also copied as is into the template. */
 /* ================================================================== */
 
 export const FOLIO_RENDER = String.raw`
 function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-/* Gambar proyek: placeholder SVG (ganti dengan <img> bila punya gambar). */
+/* Project image: SVG placeholder (replace with an <img> if you have a picture). */
 function safeImg(u) { u = String(u || "").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);)/i.test(u) ? u : ""; }
 function projectArt(p, i, c1, c2) {
   if (safeImg(p.gambar)) return '<img class="art" src="' + escHtml(safeImg(p.gambar)) + '" alt="Gambar proyek ' + escHtml(p.judul) + '" loading="lazy">';
@@ -22,7 +22,7 @@ function projectArt(p, i, c1, c2) {
     '<path d="M0 ' + (200 - (i * 13) % 40) + ' Q 200 ' + (150 + (i * 31) % 60) + ' 400 ' + (210 - (i * 7) % 30) + ' V260 H0Z" fill="#000" fill-opacity=".14"/>' +
     '</svg>';
 }
-/* Kunci jangkar proyek: slug, atau dibuat dari judul (proyek baru dari editor). */
+/* Project anchor key: slug, or generated from the title (new projects from the editor). */
 function slugOf(p, i) { var s = String(p.slug || p.judul || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); return (s || "proyek") + (p.slug ? "" : "-" + (i + 1)); }
 function listOf(v) { return Array.isArray(v) ? v : []; }
 function renderCards(list, c1, c2) {
@@ -53,13 +53,13 @@ interface FolioApi {
   renderDetails: (list: unknown[], c1: string, c2: string) => string;
 }
 let api: FolioApi | null = null;
-/** Fungsi render dari FOLIO_RENDER (teks konstan milik aplikasi, bukan masukan pengguna). */
+/** Render functions from FOLIO_RENDER (constant text owned by the app, not user input). */
 export function folioApi(): FolioApi {
   api ??= new Function(`${FOLIO_RENDER}; return { renderCards, renderDetails };`)() as FolioApi;
   return api;
 }
 
-/** Pembangun ulang wilayah statis untuk editor (data PROJECTS + warna aksen tema). */
+/** Static region rebuilder for the editor (PROJECTS data + the theme accent color). */
 export const FOLIO_REGIONS: Record<string, RegionRenderer> = {
   cards: (data, vars) => folioApi().renderCards((data.PROJECTS as unknown[]) ?? [], vars["--accent"] ?? "#888", vars["--accent-2"] ?? "#444"),
   details: (data, vars) => folioApi().renderDetails((data.PROJECTS as unknown[]) ?? [], vars["--accent"] ?? "#888", vars["--accent-2"] ?? "#444"),

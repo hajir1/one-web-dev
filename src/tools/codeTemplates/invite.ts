@@ -2,14 +2,15 @@ import { dataBlock, doc, ot, type ThemeVar } from "./shared";
 import { INVITE_SPECS_V18 } from "./inviteMore";
 import { INVITE_SPECS_V22 } from "./inviteV22";
 import { INVITE_SPECS_V23 } from "./inviteV23";
+import { INVITE_SPECS_V29 } from "./inviteV29";
 
 /* ================================================================== */
-/* Kategori UNDANGAN DIGITAL: nikah, ulang tahun, khitanan.              */
-/* Library: AOS (animasi masuk), Swiper (galeri saja), canvas-confetti. */
+/* DIGITAL INVITATION category: weddings, birthdays, circumcisions.      */
+/* Libraries: AOS (entrance animations), Swiper (gallery only), canvas-confetti. */
 /*                                                                    */
-/* Semua data acara ada di satu objek CONFIG di awal skrip; halaman     */
-/* dibangun dari objek itu. Nama tamu dari ?to=. Musik baru diputar      */
-/* setelah tombol "Buka Undangan" ditekan (tanpa putar otomatis).        */
+/* All event data lives in one CONFIG object at the start of the script; the page */
+/* is built from that object. The guest name comes from ?to=. Music only plays */
+/* after the "Open Invitation" button is pressed (no autoplay).        */
 /* ================================================================== */
 
 const LIB = {
@@ -30,9 +31,9 @@ export interface InviteSpec {
   theme: string;
   fonts: { display: string; script: string; text: string; href: string };
   colors: Record<string, string>;
-  /** Objek CONFIG (ditulis apa adanya ke awal skrip). */
+  /** CONFIG object (written as is at the top of the script). */
   config: Record<string, unknown>;
-  /** Ornamen SVG di sampul. */
+  /** SVG ornament on the cover. */
   ornament: string;
   /** CSS khusus tema. */
   css: string;
@@ -57,7 +58,7 @@ const TOGA = `<svg viewBox="0 0 240 190" aria-hidden="true" focusable="false"><p
 
 /* ------------------------------- CSS ------------------------------- */
 
-/** Variabel tema (form Warna & gaya di editor). */
+/** Theme variables (the Colors & style form in the editor). */
 function themeVars(s: InviteSpec): ThemeVar[] {
   const c = s.colors;
   return [
@@ -113,7 +114,7 @@ button { font: inherit; }
 .btn svg { width: 18px; height: 18px; }
 .cover .btn { background: var(--cover-ink); color: var(--cover-bg); }
 
-/* Bagian */
+/* Sections */
 section { padding: clamp(64px, 10vw, 104px) 20px; }
 .wrap { max-width: 880px; margin: 0 auto; }
 .center { text-align: center; }
@@ -190,7 +191,7 @@ textarea { min-height: 110px; resize: vertical; }
 .closing .names { margin: 18px 0 0; font-family: var(--font-script); font-size: clamp(40px, 9vw, 60px); color: var(--primary); line-height: 1.1; }
 footer { padding: 28px 20px 96px; text-align: center; font-size: 13px; color: var(--ink-soft); }
 
-/* Tombol musik & toast */
+/* Music button & toast */
 .music { position: fixed; right: 16px; bottom: 16px; z-index: 40; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--primary); color: var(--on-primary); display: grid; place-items: center; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); }
 .music[hidden] { display: none; }
 .music svg { width: 22px; height: 22px; }
@@ -213,19 +214,19 @@ footer { padding: 28px 20px 96px; text-align: center; font-size: 13px; color: va
 
 const RUNTIME = String.raw`
 /* ================================================================== */
-/* Di bawah ini mesin undangan. Ubah data di CONFIG saja.              */
+/* Below is the invitation engine. Only edit the data in CONFIG.       */
 /* ================================================================== */
 (function () {
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var tz = CONFIG.zonaWaktu || "Asia/Jakarta";
-  /* Bagian yang ditampilkan (bisa dimatikan satu per satu). */
+  /* Sections shown (each one can be turned off). */
   var show = Object.assign({ hitungMundur: true, galeri: true, ucapan: true, amplop: true, rsvp: true }, CONFIG.tampilkan || {});
-  /* Gambar dari pengguna: hanya http(s) atau data:image. */
+  /* User images: only http(s) or data:image. */
   function imgSrc(u) { u = String(u || "").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);)/i.test(u) ? u : ""; }
 
-  /* Buat elemen dengan aman (teks lewat textContent, bukan innerHTML). */
+  /* Create elements safely (text via textContent, not innerHTML). */
   function h(tag, attrs, kids) {
     var el = document.createElement(tag);
     if (attrs) for (var k in attrs) {
@@ -248,7 +249,7 @@ const RUNTIME = String.raw`
   };
   function icon(name) { var s = document.createElement("span"); s.innerHTML = ICON[name]; return s.firstChild; }
 
-  /* Tanggal & waktu dalam zona acara. */
+  /* Date & time in the event's time zone. */
   function fmtDate(iso) { return new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: tz }).format(new Date(iso)); }
   function fmtTime(iso) { return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }).format(new Date(iso)).replace(".", ":"); }
   function mapUrl(ev) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ev.peta || (ev.tempat + ", " + ev.alamat)); }
@@ -268,7 +269,7 @@ const RUNTIME = String.raw`
   $("#cover-date").textContent = fmtDate(CONFIG.acara[0].mulai);
   document.title = CONFIG.judul + " · " + CONFIG.namaSampul;
 
-  /* ------------------------------ isi --------------------------------- */
+  /* ------------------------------ content --------------------------------- */
   var main = $("#main");
   function section(id, cls, kids) { return h("section", { id: id, class: cls || null }, [h("div", { class: "wrap" }, kids)]); }
   function aos(el, anim, delay) { if (!window.AOS) return el; el.setAttribute("data-aos", anim || "fade-up"); if (delay) el.setAttribute("data-aos-delay", String(delay)); return el; }
@@ -276,7 +277,7 @@ const RUNTIME = String.raw`
   // Pembuka & profil
   var people = CONFIG.tokoh.map(function (p, i) {
     return aos(h("article", { class: "profile" }, [
-      // data-owd-img: di editor, klik foto langsung membuka isian foto ini (v21).
+      // data-owd-img: in the editor, clicking a photo opens that photo's field directly (v21).
       imgSrc(p.foto) ? h("div", { class: "avatar", "data-owd-img": "tokoh." + i + ".foto" }, [h("img", { src: imgSrc(p.foto), alt: "Foto " + p.panggilan, loading: "lazy" })]) : h("div", { class: "avatar", "aria-hidden": "true", "data-owd-img": "tokoh." + i + ".foto", text: p.panggilan.charAt(0) }),
       h("h3", { text: p.panggilan }),
       h("p", { class: "full", text: p.nama }),
@@ -296,7 +297,7 @@ const RUNTIME = String.raw`
   var units = [["hari", 864e5], ["jam", 36e5], ["menit", 6e4], ["detik", 1e3]];
   var countEl = h("div", { class: "count", role: "timer", "aria-live": "off" }, units.map(function (u) { return h("div", null, [h("b", { "data-u": u[0], text: "0" }), h("span", { text: u[0].charAt(0).toUpperCase() + u[0].slice(1) })]); }));
   var doneEl = h("p", { class: "count-done", hidden: true, text: CONFIG.teksSelesai });
-  // v21: tanggal tujuan bisa diatur sendiri; kosong/tidak valid → waktu mulai acara pertama.
+  // v21: the target date can be set separately; empty/invalid → the start time of the first event.
   var countDate = CONFIG.tanggalHitungMundur && !isNaN(new Date(CONFIG.tanggalHitungMundur)) ? CONFIG.tanggalHitungMundur : CONFIG.acara[0].mulai;
   if (show.hitungMundur) main.append(section("hitung-mundur", "alt center", [aos(h("h2", { class: "title", text: CONFIG.judulHitungMundur })), aos(h("p", { class: "lead", text: fmtDate(countDate) })), aos(countEl), doneEl]));
   var target = new Date(countDate).getTime();
@@ -333,7 +334,7 @@ const RUNTIME = String.raw`
   var gal = h("div", { class: "swiper gallery", "aria-label": "Galeri foto" }, [h("div", { class: "swiper-wrapper" }, slides), h("div", { class: "swiper-pagination" })]);
   if (show.galeri && CONFIG.galeri.length) main.append(section("galeri", "alt center", [aos(h("h2", { class: "title", text: CONFIG.judulGaleri })), aos(h("p", { class: "lead", text: CONFIG.pengantarGaleri })), gal]));
 
-  /* Gambar pengganti (SVG) untuk galeri. Ganti dengan <img> foto asli bila ada. */
+  /* Placeholder (SVG) images for the gallery. Replace with real <img> photos when available. */
   function placeholder(i) {
     var c = getComputedStyle(document.documentElement);
     var a = c.getPropertyValue("--c" + ((i % 4) + 1)).trim();
@@ -353,8 +354,8 @@ const RUNTIME = String.raw`
     return svg;
   }
 
-  // v20: penerima kiriman OneWebDev (diisi saat deploy/unduh oleh pemilik yang login).
-  // Tanpa itu: ucapan tersimpan di perangkat tamu dan RSVP lewat WhatsApp saja.
+  // v20: OneWebDev submission receiver (filled in on deploy/download by the signed-in owner).
+  // Without it: wishes are stored on the guest's device and RSVPs go through WhatsApp only.
   var SERVER = window.OWD_FORM && typeof window.OWD_FORM.submit === "string" ? window.OWD_FORM : null;
   function send(data) {
     if (!SERVER) return Promise.resolve(false);
@@ -370,7 +371,7 @@ const RUNTIME = String.raw`
   var wishList = h("div", { class: "wishes", "aria-live": "polite" });
   function renderWishes() {
     wishList.replaceChildren();
-    // Ucapan sendiri yang baru dikirim tampil dulu, lalu ucapan semua tamu dari server, lalu contoh.
+    // The guest's own just-sent wishes show first, then all guests' wishes from the server, then the samples.
     var seen = {};
     loadWishes().concat(remoteWishes).filter(function (w) { var k = w.nama + "\n" + w.teks; if (seen[k]) return false; seen[k] = 1; return true; })
       .concat(remoteWishes.length ? [] : CONFIG.ucapanContoh).forEach(function (w) {
@@ -423,14 +424,14 @@ const RUNTIME = String.raw`
     ]));
   }
 
-  // RSVP: tercatat di OneWebDev (bila tersambung) dan/atau dikirim lewat WhatsApp.
+  // RSVP: recorded in OneWebDev (when connected) and/or sent via WhatsApp.
   var waNumber = String(CONFIG.rsvp.whatsapp || "").replace(/\D/g, "");
   var rsvp = h("form", { onsubmit: function (e) {
     e.preventDefault();
     var f = e.target, nama = f.nama.value.trim();
     if (!nama) { say("Mohon isi nama Anda."); return; }
     var msg = CONFIG.rsvp.templatPesan.replace("{nama}", nama).replace("{hadir}", f.hadir.value).replace("{jumlah}", f.jumlah.value).replace("{acara}", CONFIG.rsvp.namaAcara || CONFIG.namaSampul);
-    // WhatsApp dibuka langsung di event klik (pemblokir popup); pencatatan berjalan di belakang.
+    // WhatsApp opens directly in the click event (popup blockers); recording runs in the background.
     if (waNumber) window.open("https://wa.me/" + waNumber + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
     send({ _kind: "rsvp", nama: nama.slice(0, 60), hadir: f.hadir.value, jumlah: f.jumlah.value, _hp: f._hp.value }).then(function (ok) {
       if (ok) { say("Terima kasih, konfirmasi Anda sudah tercatat."); f.reset(); f.nama.value = nama; }
@@ -475,7 +476,7 @@ const RUNTIME = String.raw`
   }
 
   /* ------------------------------- musik ------------------------------- */
-  /* Bila CONFIG.musik.url kosong, melodi lembut dibuat dengan Web Audio (tanpa berkas). */
+  /* If CONFIG.musik.url is empty, a soft melody is made with Web Audio (no file). */
   var musicBtn = $("#music");
   var audio = null, actx = null, synthTimer = null, playing = false;
   function synthStart() {
@@ -514,7 +515,7 @@ const RUNTIME = String.raw`
   function stopMusic() { if (audio) audio.pause(); else synthStop(); setPlaying(false); }
   musicBtn.addEventListener("click", function () { playing ? stopMusic() : startMusic(); });
 
-  /* ------------------------- buka undangan ----------------------------- */
+  /* ------------------------- open the invitation ----------------------------- */
   $("#open").addEventListener("click", function () {
     var cover = $("#cover");
     cover.classList.add("open");
@@ -529,7 +530,7 @@ const RUNTIME = String.raw`
     setTimeout(function () { cover.hidden = true; $("#profil").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }, reduce ? 50 : 900);
   });
 
-  /* Library: AOS & Swiper (opsional; halaman tetap jalan tanpa keduanya). */
+  /* Libraries: AOS & Swiper (optional; the page still works without them). */
   if (window.AOS) AOS.init({ once: true, duration: 800, easing: "ease-out-cubic", offset: 60, disable: reduce });
   if (window.Swiper && document.querySelector(".gallery")) new Swiper(".gallery", { slidesPerView: 1.15, spaceBetween: 14, centeredSlides: true, loop: false, grabCursor: true, keyboard: { enabled: true }, a11y: { enabled: true }, pagination: { el: ".swiper-pagination", clickable: true }, breakpoints: { 640: { slidesPerView: 2.2 }, 960: { slidesPerView: 3 } } });
 
@@ -557,19 +558,19 @@ function body(s: InviteSpec): string {
 <script src="${LIB.swiperJs}"></script>
 <script src="${LIB.confetti}"></script>
 <script>
-/* ==== KONFIGURASI UNDANGAN: ubah semua data acara di sini (atau lewat editor OneWebDev) ==== */
+/* ==== INVITATION SETTINGS: edit all event data here (or in the OneWebDev editor) ==== */
 const CONFIG = ${dataBlock("CONFIG", "Data undangan", s.config, ["id", "musik.nada", "musik.tempoMs", "konfeti"])};
 /* ============================================================== */
 ${RUNTIME.trim()}
 </script>`;
 }
 
-/** Lengkapi CONFIG dengan field yang bisa diisi lewat editor (foto, judul RSVP, bagian yang tampil). */
+/** Completes CONFIG with fields fillable through the editor (photos, RSVP title, visible sections). */
 function withDefaults(c: Record<string, unknown>): Record<string, unknown> {
   const rsvp = c.rsvp as Record<string, unknown>;
   return {
     ...c,
-    // v21: tanggal & jam tujuan hitung mundur (isian sendiri di popup Hitung mundur), awalnya = acara pertama.
+    // v21: the countdown target date & time (its own field in the Countdown popup), initially = the first event.
     tanggalHitungMundur: c.tanggalHitungMundur ?? (c.acara as { mulai: string }[])[0].mulai,
     tokoh: (c.tokoh as Record<string, unknown>[]).map((t) => ({ ...t, foto: t.foto ?? "" })),
     galeri: (c.galeri as Record<string, unknown>[]).map((g) => ({ ...g, gambar: g.gambar ?? "" })),
@@ -594,7 +595,7 @@ export function buildInvite(spec: InviteSpec): string {
     css: baseCss(s) + s.css,
     body: body(s),
   });
-  // Kunci gulir sampai undangan dibuka.
+  // Lock scrolling until the invitation is opened.
   return html.replace("<html lang=\"id\">", "<html lang=\"id\" class=\"locked\">").replace("<body>", "<body class=\"locked\">");
 }
 
@@ -1041,4 +1042,4 @@ section.alt { background-image: linear-gradient(90deg, color-mix(in srgb, var(--
   },
 ];
 
-export const INVITE_SPECS: InviteSpec[] = [...INVITE_SPECS_V17, ...INVITE_SPECS_V18, ...INVITE_SPECS_V22, ...INVITE_SPECS_V23];
+export const INVITE_SPECS: InviteSpec[] = [...INVITE_SPECS_V17, ...INVITE_SPECS_V18, ...INVITE_SPECS_V22, ...INVITE_SPECS_V23, ...INVITE_SPECS_V29];

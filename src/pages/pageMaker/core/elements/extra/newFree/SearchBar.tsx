@@ -7,7 +7,7 @@ import { safeUrl } from "../../../helpers/generatorCss";
 import { clamp, color, fieldName } from "../shared";
 import { tr, f, SR_ONLY, focusCss } from "./kit";
 
-/* -------------------------- Kolom Pencarian ------------------------- */
+/* -------------------------- Search Field ------------------------- */
 
 export interface SearchBarState {
   placeholder: string;

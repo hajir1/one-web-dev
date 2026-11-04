@@ -1,21 +1,21 @@
 /* ================================================================== */
-/* Library pihak ketiga lewat CDN (menu Library di Page Maker)          */
+/* Third-party libraries via CDN (the Library menu in Page Maker)       */
 /*                                                                    */
-/* Pengguna "memasang" library ke desain (disimpan di node root:         */
-/* `root.libraries`), lalu mengatur efeknya per elemen/box (`node.libs`).*/
-/* compose() menambah atribut/class ke markup, dan hasil ekspor memuat   */
-/* CSS/JS library dari CDN jsDelivr (versi dikunci).                     */
-/* v25: AOS, Animate.css, dan Vanilla Tilt tidak lagi dari CDN: diganti  */
-/* runtime OWD Motion (motionRuntime.ts) yang ditanam di HTML, dengan    */
-/* atribut/class yang sama.                                             */
+/* Users "install" a library into the design (stored on the root node:  */
+/* `root.libraries`), then configure its effects per element/box (`node.libs`). */
+/* compose() adds attributes/classes to the markup, and the exported output loads */
+/* CSS/JS libraries from the jsDelivr CDN (pinned versions).             */
+/* v25: AOS, Animate.css, and Vanilla Tilt no longer come from a CDN: replaced by */
+/* the OWD Motion runtime (motionRuntime.ts) embedded in the HTML, with  */
+/* the same attributes/classes.                                         */
 /*                                                                    */
-/* Di canvas Desain library tidak dimuat (AOS menyembunyikan elemen      */
-/* sebelum di-scroll); efek terlihat di Pratinjau & hasil ekspor.        */
+/* Libraries are not loaded on the Design canvas (AOS hides elements    */
+/* before scrolling); effects show in Preview & the exported output.   */
 /* ================================================================== */
 
 export type LibraryId = "aos" | "animate" | "tilt" | "scroll" | "chartjs" | "aframe" | "three";
 
-/** Library efek yang dipasang/dilepas pengguna lewat menu Library. */
+/** Effect libraries users install/remove through the Library menu. */
 export type EffectLibraryId = Exclude<LibraryId, "chartjs" | "aframe" | "three">;
 
 import { MOTION_CSS, MOTION_HEAD_FLAG, MOTION_JS } from "./motionRuntime";
@@ -30,29 +30,29 @@ export interface LibraryDef {
   css?: string;
   /** URL skrip CDN. */
   js?: string;
-  /** Kode inisialisasi setelah skrip dimuat. */
+  /** Initialization code after the script loads. */
   init?: string;
-  /** Nama paket npm (untuk proyek React/Vue/Svelte/Angular). */
+  /** npm package name (for React/Vue/Svelte/Angular projects). */
   npm: string;
   homepage: string;
   license: string;
   /**
-   * Dipasang OTOMATIS oleh elemen yang membutuhkannya (mis. Chart.js oleh
-   * elemen Chart) — tampil di menu Library sebagai info, tanpa tombol pasang.
+   * Installed AUTOMATICALLY by elements that need it (e.g. Chart.js by the
+   * Chart element); shown in the Library menu as info, without an install button.
    */
   auto?: boolean;
-  /** Aman dimuat di canvas Desain (tidak menyembunyikan elemen). */
+  /** Safe to load on the Design canvas (does not hide elements). */
   editSafe?: boolean;
-  /** Skrip CDN ditaruh di <head> (bukan akhir <body>). */
+  /** The CDN script goes in <head> (not at the end of <body>). */
   headScript?: boolean;
   /**
-   * v9: modul ES yang dimuat dinamis (`import()`) oleh runtime elemen saat
-   * elemen mendekati layar — tidak ada tag <script> di <head>/<body>.
+   * v9: an ES module loaded dynamically (`import()`) by the element runtime when
+   * the element approaches the screen; no <script> tag in <head>/<body>.
    */
   esm?: string;
-  /** v25: dijalankan runtime OWD Motion yang ditanam di HTML (tanpa CDN). */
+  /** v25: run by the OWD Motion runtime embedded in the HTML (no CDN). */
   builtin?: boolean;
-  /** Skrip <head> boleh `defer` (kode pemakainya menunggu library siap). */
+  /** <head> scripts may use `defer` (the code using them waits for the library). */
   defer?: boolean;
 }
 
@@ -87,7 +87,7 @@ export const LIBRARIES: LibraryDef[] = [
     license: "MIT",
   },
   {
-    // v26: efek scroll sinematik (split teks, pin, scroll horizontal, dst.), ditulis sendiri.
+    // v26: cinematic scroll effects (text split, pin, horizontal scroll, etc.), written in-house.
     id: "scroll",
     name: "OWD Scroll",
     version: "1.0",
@@ -108,7 +108,7 @@ export const LIBRARIES: LibraryDef[] = [
     auto: true,
     editSafe: true,
     headScript: true,
-    // Elemen Chart menunggu window.Chart (whenChartReady), jadi aman ditunda.
+    // The Chart element waits for window.Chart (whenChartReady), so it is safe to defer.
     defer: true,
   },
   {
@@ -138,7 +138,7 @@ export const LIBRARIES: LibraryDef[] = [
 export const LIBRARY_IDS = LIBRARIES.map((l) => l.id);
 export const LIBRARY_BY_ID = Object.fromEntries(LIBRARIES.map((l) => [l.id, l])) as Record<LibraryId, LibraryDef>;
 export const isLibraryId = (v: unknown): v is LibraryId => typeof v === "string" && (LIBRARY_IDS as string[]).includes(v);
-/** Library yang bisa dipasang manual (menu Library → Pasang). */
+/** Libraries that can be installed manually (Library menu → Install). */
 export const EFFECT_LIBRARY_IDS = LIBRARIES.filter((l) => !l.auto).map((l) => l.id) as EffectLibraryId[];
 
 /* ------------------------------------------------------------------ */
@@ -155,14 +155,14 @@ export interface AosSettings {
   duration: number;
   /** ms, 0–3000 (kelipatan 50). */
   delay: number;
-  /** false = animasi diulang tiap kali terlihat. */
+  /** false = the animation repeats every time it becomes visible. */
   once: boolean;
 }
 
 export interface AnimateSettings {
   effect: (typeof ANIMATE_EFFECTS)[number];
   speed: (typeof ANIMATE_SPEEDS)[number];
-  /** Jeda 0–5 detik. */
+  /** Delay 0–5 seconds. */
   delay: number;
   /** 1–3 kali, 0 = terus-menerus. */
   repeat: number;
@@ -171,16 +171,16 @@ export interface AnimateSettings {
 export interface TiltSettings {
   /** Kemiringan maksimum (derajat) 1–35. */
   max: number;
-  /** Skala saat hover (1–1.2). */
+  /** Scale on hover (1–1.2). */
   scale: number;
   glare: boolean;
 }
 
 export interface ScrollSettings {
   effect: ScrollEffect;
-  /** Kekuatan efek (satuan per efek, lihat SCROLL_AMOUNT); 0 = bawaan. */
+  /** Effect strength (unit depends on the effect, see SCROLL_AMOUNT); 0 = default. */
   amount: number;
-  /** Jeda sebelum mulai (ms), untuk efek sekali muncul. */
+  /** Delay before starting (ms), for one-time entrance effects. */
   delay: number;
 }
 
@@ -203,7 +203,7 @@ const pick = <T extends string>(v: unknown, list: readonly T[], d: T): T => (lis
 const int = (v: unknown, d: number, min: number, max: number, step = 1) =>
   typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v / step) * step)) : d;
 
-/** Bersihkan `libs` dari data tersimpan (nilai di luar daftar → bawaan). */
+/** Sanitizes `libs` from stored data (values outside the list → default). */
 export function sanitizeLibs(v: unknown): NodeLibs | undefined {
   if (!isObj(v)) return undefined;
   const out: NodeLibs = {};
@@ -230,7 +230,7 @@ export function sanitizeLibs(v: unknown): NodeLibs | undefined {
   return Object.keys(out).length ? out : undefined;
 }
 
-/** Bersihkan daftar library terpasang (unik, hanya yang dikenal). */
+/** Sanitizes the installed library list (unique, known ones only). */
 export function sanitizeLibraryList(v: unknown): LibraryId[] | undefined {
   if (!Array.isArray(v)) return undefined;
   const out = LIBRARY_IDS.filter((id) => v.includes(id));
@@ -238,8 +238,8 @@ export function sanitizeLibraryList(v: unknown): LibraryId[] | undefined {
 }
 
 /**
- * Atribut & class yang ditambahkan ke elemen terluar node, hanya untuk
- * library yang terpasang di desain.
+ * Attributes & classes added to the node's outermost element, only for
+ * libraries installed in the design.
  */
 export function libraryAttrs(libs: NodeLibs | undefined, installed: readonly LibraryId[]): { attrs: Record<string, string>; classes: string[] } {
   const attrs: Record<string, string> = {};
@@ -274,7 +274,7 @@ export function libraryAttrs(libs: NodeLibs | undefined, installed: readonly Lib
   return { attrs, classes: classes.filter(Boolean) };
 }
 
-/** Library yang dipakai node mana pun di pohon (untuk daftar isi template). */
+/** Libraries used by any node in the tree (for the template content list). */
 export function librariesInTree(root: { libraries?: LibraryId[] }): LibraryId[] {
   return root.libraries ? LIBRARY_IDS.filter((id) => root.libraries!.includes(id)) : [];
 }
@@ -283,12 +283,12 @@ export function librariesInTree(root: { libraries?: LibraryId[] }): LibraryId[] 
 /* Keluaran HTML                                                        */
 /* ------------------------------------------------------------------ */
 
-/** Tag <link> untuk <head>. */
+/** <link> tags for <head>. */
 const usesMotion = (ids: readonly LibraryId[]) => ids.some((id) => LIBRARY_BY_ID[id]?.builtin && id !== "scroll");
-/** v26: runtime OWD Scroll (terpisah dari OWD Motion agar template lama tidak bertambah berat). */
+/** v26: the OWD Scroll runtime (separate from OWD Motion so old templates do not get heavier). */
 const usesScroll = (ids: readonly LibraryId[]) => ids.includes("scroll");
 
-/** Tag untuk <head>. Skrip yang ditandai `defer` tidak memblokir render (Chart.js). */
+/** Tags for <head>. Scripts marked `defer` do not block rendering (Chart.js). */
 export function libraryHead(ids: readonly LibraryId[]): string {
   const libs = ids.map((id) => LIBRARY_BY_ID[id]);
   return [
@@ -299,7 +299,7 @@ export function libraryHead(ids: readonly LibraryId[]): string {
   ].join("\n");
 }
 
-/** Tag <script> akhir <body> TANPA baris init (runtime OWD Motion + skrip CDN non-head). */
+/** <script> tags at the end of <body> WITHOUT the init line (OWD Motion runtime + non-head CDN scripts). */
 export function libraryTailTags(ids: readonly LibraryId[]): string {
   const libs = ids.map((id) => LIBRARY_BY_ID[id]);
   return [
@@ -309,17 +309,17 @@ export function libraryTailTags(ids: readonly LibraryId[]): string {
   ].join("\n");
 }
 
-/** Tag <script> (kecuali `headScript`) + inisialisasi untuk akhir <body>. */
+/** <script> tags (except `headScript`) + initialization for the end of <body>. */
 export function libraryScripts(ids: readonly LibraryId[]): string {
   const libs = ids.map((id) => LIBRARY_BY_ID[id]);
   const tags = libraryTailTags(ids);
-  // Runtime OWD Motion menginisialisasi dirinya sendiri; init hanya untuk library CDN.
+  // The OWD Motion runtime initializes itself; init is only for CDN libraries.
   const init = [...new Set(libs.filter((l) => !l.builtin).map((l) => l.init).filter(Boolean))];
   const initTag = init.length ? `<script>\n  ${init.join("\n  ")}\n</script>` : "";
   return [tags, initTag].filter(Boolean).join("\n");
 }
 
-/** CSS/JS runtime untuk pratinjau iframe (data URL, tanpa CDN). */
+/** Runtime CSS/JS for the iframe preview (data URL, no CDN). */
 export const MOTION_PREVIEW = {
   css: `data:text/css;charset=utf-8,${encodeURIComponent(MOTION_CSS)}`,
   js: `data:text/javascript;charset=utf-8,${encodeURIComponent(MOTION_JS)}`,
@@ -330,7 +330,7 @@ export const SCROLL_PREVIEW = {
 };
 export { usesMotion, usesScroll, SCROLL_CSS, SCROLL_JS };
 
-/** Catatan pemasangan untuk proyek framework (README). */
+/** Installation notes for framework projects (README). */
 export function libraryReadme(ids: readonly LibraryId[]): string {
   if (!ids.length) return "";
   const libs = ids.map((id) => LIBRARY_BY_ID[id]);
@@ -363,11 +363,11 @@ ${libs.map((l) => `- **${l.name} ${l.version}** (${l.license})${l.homepage ? ` �
 Tempel di \`index.html\` proyek Anda:
 
 \`\`\`html
-<!-- di dalam <head> -->
-${libraryHead(tagIds) || "<!-- (tidak ada CSS) -->"}
+<!-- inside <head> -->
+${libraryHead(tagIds) || "<!-- (no CSS) -->"}
 
-<!-- sebelum </body> -->
-${libraryScripts(tagIds) || "<!-- (tidak ada JS) -->"}
+<!-- before </body> -->
+${libraryScripts(tagIds) || "<!-- (no JS) -->"}
 \`\`\`
 
 Atau pasang lewat npm: \`npm i ${tagIds.map((id) => LIBRARY_BY_ID[id].npm).join(" ")}\`.

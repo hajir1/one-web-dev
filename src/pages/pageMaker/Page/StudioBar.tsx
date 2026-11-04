@@ -6,7 +6,7 @@ import type { SaveTarget } from "../ui/studio/saveTarget";
 import type { ResolvedSitePage } from "../helpers/site";
 import { BAR_BTN } from "./editorUi";
 
-/* Studio: bilah website (halaman, Situs, Kiriman, Deploy). Dipisah dari PageMaker.tsx (no. 15). */
+/* Studio: website bar (pages, Site, Submissions, Deploy). Split out of PageMaker.tsx (no. 15). */
 
 interface Props {
   siteName: string;

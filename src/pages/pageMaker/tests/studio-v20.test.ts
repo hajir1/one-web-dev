@@ -50,10 +50,10 @@ test("studio: samakan header & footer mengganti yang lama, tidak menyentuh isi",
   const { doc, changed } = applyChrome(home, other);
   assert.ok(changed);
   assert.equal(doc.root.children.length, before + 2);
-  // Jalankan lagi: header/footer diganti, jumlah tetap.
+  // Run again: header/footer replaced, count unchanged.
   const again = applyChrome(home, doc).doc;
   assert.equal(again.root.children.length, before + 2);
-  // Sumber tanpa header/footer → tidak berubah.
+  // A source without header/footer → unchanged.
   assert.equal(applyChrome(other, doc).changed, false);
 });
 
@@ -69,7 +69,7 @@ test("studio: tautan Studio", () => {
   assert.equal(studioPath("a b", "p1"), `${STUDIO_PATH}/a%20b?page=p1`);
 });
 
-/* ------------------------- halaman & menu -------------------------- */
+/* ------------------------- pages & menu -------------------------- */
 
 test("situs: sisipkan halaman setelah halaman aktif, sembunyikan dari menu", () => {
   let doc = createSiteDoc();
@@ -94,7 +94,7 @@ test("situs: sisipkan halaman setelah halaman aktif, sembunyikan dari menu", () 
   assert.deepEqual(picked.map((p) => p.designId), ["c"], "pilihan manual tetap dihormati");
 });
 
-/* ------------------------ kiriman & undangan ------------------------ */
+/* ------------------------ submissions & invitations ------------------------ */
 
 test("kiriman: alamat server disisipkan sekali sebelum </head>", () => {
   const ep = { submitUrl: "https://api.contoh.id/f/abc", wishesUrl: "https://api.contoh.id/f/abc/wishes" };

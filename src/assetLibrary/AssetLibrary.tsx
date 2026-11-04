@@ -14,7 +14,7 @@ export const ACCEPT = ASSET_LIMITS.types.join(",");
 
 export const fmtBytes = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
-/** Unggah + pesan hasil (dipakai pustaka & pemilih). */
+/** Upload + result message (used by the library & picker). */
 export function useUploader() {
   const { t } = useTranslation();
   const upload = useAssets((s) => s.upload);
@@ -33,7 +33,7 @@ export function useUploader() {
   return { run, progress };
 }
 
-/** Area seret-lepas + tombol pilih berkas. */
+/** Drag-and-drop area + file picker button. */
 export function DropZone({ onFiles, busy, compact }: { onFiles: (f: File[]) => void; busy: string | null; compact?: boolean }) {
   const { t } = useTranslation();
   const input = useRef<HTMLInputElement>(null);
@@ -85,9 +85,9 @@ function useTypeLabel() {
 }
 
 /**
- * Grid Pustaka Aset.
- *   mode "manage": unggah, ganti nama, salin rujukan, hapus (dicegah bila masih dipakai).
- *   mode "pick":   klik untuk memilih (bisa banyak bila `multiple`).
+ * Asset Library grid.
+ *   "manage" mode: upload, rename, copy reference, delete (blocked while still in use).
+ *   "pick" mode:   click to select (multiple when `multiple`).
  */
 export default function AssetLibrary({
   mode,
@@ -100,7 +100,7 @@ export default function AssetLibrary({
   multiple?: boolean;
   selected?: string[];
   onSelect?: (ids: string[]) => void;
-  /** Klik ganda / Enter di mode pick. */
+  /** Double-click / Enter in pick mode. */
   onConfirm?: (ids: string[]) => void;
 }) {
   const { t } = useTranslation();

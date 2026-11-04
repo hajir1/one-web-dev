@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Orbit Planet</title>
+<meta name="description" content="Animasi CSS murni: empat planet mengelilingi matahari pada orbit miring 3D, planet bercincin ikut berputar, dan komet melesat lewat.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#070a1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #070a1a; /* Latar bawah */
+  --bg-2: #1b1f45; /* Latar atas */
+  --c-1: #ffb347; /* Matahari & tombol */
+  --c-2: #6ec6ff; /* Planet biru & komet */
+  --c-3: #c38bff; /* Planet bercincin */
+  --ink: #eef2ff; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Orbitron", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: clamp(16px, 6vw, 96px); top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: flex-start; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap { left: 16px; right: auto; top: clamp(56px, 9vh, 96px); transform: none; }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.stars i { width: 2px; height: 2px; border-radius: 50%; background: #fff; animation: tw calc(var(--k) * 3) ease-in-out infinite alternate; animation-delay: calc(var(--k) * var(--d)); }
+@keyframes tw { from { opacity: .2; } to { opacity: .9; } }
+.system { left: 66%; top: 55%; width: 0; height: 0; transform: rotateX(64deg) rotateZ(-14deg); transform-style: preserve-3d; }
+.sun { left: -7vmin; top: -7vmin; width: 14vmin; height: 14vmin; border-radius: 50%; background: radial-gradient(circle, #fff7d6, var(--c-1) 70%); box-shadow: 0 0 60px 20px color-mix(in srgb, var(--c-1) 60%, transparent); transform: rotateZ(14deg) rotateX(-64deg); animation: pulse calc(var(--k) * 2) ease-in-out infinite alternate; }
+@keyframes pulse { to { box-shadow: 0 0 90px 34px color-mix(in srgb, var(--c-1) 50%, transparent); } }
+.orbit { left: calc(var(--r) * -1); top: calc(var(--r) * -1); width: calc(var(--r) * 2); height: calc(var(--r) * 2); border-radius: 50%; border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent); transform-style: preserve-3d; animation: orbit calc(var(--k) * var(--t)) linear infinite; animation-delay: calc(var(--k) * var(--d)); }
+@keyframes orbit { to { rotate: 360deg; } }
+.planet { left: 50%; top: calc(var(--s) / -2); width: var(--s); height: var(--s); margin-left: calc(var(--s) / -2); border-radius: 50%; background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--c) 40%, #fff), var(--c) 60%, color-mix(in srgb, var(--c) 50%, #000)); transform: rotateX(-64deg); }
+.ringed::after { content: ""; position: absolute; left: -45%; top: 38%; width: 190%; height: 24%; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--c) 60%, #fff); rotate: -18deg; }
+.comet { left: -10%; top: 20%; width: 160px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, #fff); rotate: 12deg; animation: comet calc(var(--k) * 9) ease-in infinite; }
+.comet::after { content: ""; position: absolute; right: -4px; top: -3px; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px 4px var(--c-2); }
+@keyframes comet { 0%, 60% { translate: 0 0; opacity: 0; } 64% { opacity: 1; } 80%, 100% { translate: 120vw 26vh; opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="stars"><i style="left:66.5%;top:2.8%;--d:-2.92"></i><i style="left:43.2%;top:29.0%;--d:-2.34"></i><i style="left:46.9%;top:16.5%;--d:-1.22"></i><i style="left:28.7%;top:99.7%;--d:-0.65"></i><i style="left:48.8%;top:7.4%;--d:-1.64"></i><i style="left:81.1%;top:4.0%;--d:-1.07"></i><i style="left:86.8%;top:81.3%;--d:-1.40"></i><i style="left:2.8%;top:49.9%;--d:-0.93"></i><i style="left:51.0%;top:82.5%;--d:-0.29"></i><i style="left:93.2%;top:98.3%;--d:-2.15"></i><i style="left:12.1%;top:66.7%;--d:-1.91"></i><i style="left:99.3%;top:76.7%;--d:-2.76"></i><i style="left:67.4%;top:23.0%;--d:-0.84"></i><i style="left:94.9%;top:86.9%;--d:-1.30"></i><i style="left:62.5%;top:11.3%;--d:-2.84"></i><i style="left:50.6%;top:31.7%;--d:-2.68"></i><i style="left:59.9%;top:96.0%;--d:-2.34"></i><i style="left:82.7%;top:53.1%;--d:-2.95"></i><i style="left:62.4%;top:33.9%;--d:-0.59"></i><i style="left:85.6%;top:8.1%;--d:-1.88"></i><i style="left:72.2%;top:1.9%;--d:-2.30"></i><i style="left:75.6%;top:74.6%;--d:-0.01"></i><i style="left:9.8%;top:58.1%;--d:-2.72"></i><i style="left:33.7%;top:49.5%;--d:-1.28"></i><i style="left:48.4%;top:77.5%;--d:-1.15"></i><i style="left:69.0%;top:73.8%;--d:-2.19"></i><i style="left:44.7%;top:90.6%;--d:-2.88"></i><i style="left:37.0%;top:4.2%;--d:-1.59"></i><i style="left:92.2%;top:41.8%;--d:-1.46"></i><i style="left:83.2%;top:23.4%;--d:-1.23"></i><i style="left:33.7%;top:8.0%;--d:-1.55"></i><i style="left:0.6%;top:23.9%;--d:-1.54"></i><i style="left:55.9%;top:70.8%;--d:-1.39"></i><i style="left:22.0%;top:15.0%;--d:-2.84"></i><i style="left:15.4%;top:75.1%;--d:-2.73"></i><i style="left:60.5%;top:37.1%;--d:-0.06"></i><i style="left:53.9%;top:99.2%;--d:-0.67"></i><i style="left:61.7%;top:45.0%;--d:-2.55"></i><i style="left:4.7%;top:53.4%;--d:-1.54"></i><i style="left:77.8%;top:15.9%;--d:-1.73"></i><i style="left:76.4%;top:34.9%;--d:-1.98"></i><i style="left:38.3%;top:13.5%;--d:-2.41"></i><i style="left:9.3%;top:67.5%;--d:-2.94"></i><i style="left:27.8%;top:50.0%;--d:-0.28"></i><i style="left:78.8%;top:20.0%;--d:-0.56"></i><i style="left:23.9%;top:70.5%;--d:-0.83"></i><i style="left:80.6%;top:9.3%;--d:-2.68"></i><i style="left:92.7%;top:86.2%;--d:-0.26"></i><i style="left:54.9%;top:91.3%;--d:-1.81"></i><i style="left:87.4%;top:11.3%;--d:-2.84"></i><i style="left:55.9%;top:40.3%;--d:-0.05"></i><i style="left:23.5%;top:36.5%;--d:-0.75"></i><i style="left:14.8%;top:29.8%;--d:-0.18"></i><i style="left:79.4%;top:84.3%;--d:-2.62"></i><i style="left:66.2%;top:24.2%;--d:-0.09"></i><i style="left:50.3%;top:27.7%;--d:-2.16"></i><i style="left:92.1%;top:90.0%;--d:-0.26"></i><i style="left:54.4%;top:34.0%;--d:-0.10"></i><i style="left:39.6%;top:14.3%;--d:-2.38"></i><i style="left:43.7%;top:22.3%;--d:-2.15"></i></div>
+<i class="comet"></i><div class="system"><b class="sun"></b><div class="orbit" style="--r:18vmin;--t:6;--d:0"><i class="planet" style="--s:3.2vmin;--c:var(--c-2)"></i></div><div class="orbit" style="--r:28vmin;--t:10;--d:-2.3"><i class="planet" style="--s:4.4vmin;--c:var(--c-1)"></i></div><div class="orbit" style="--r:40vmin;--t:16;--d:-4.6"><i class="planet ringed" style="--s:6vmin;--c:var(--c-3)"></i></div><div class="orbit" style="--r:52vmin;--t:24;--d:-6.8999999999999995"><i class="planet" style="--s:4vmin;--c:var(--c-2)"></i></div></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Kelas sains anak</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Jelajahi tata surya dari rumah.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Hero animasi untuk kelas sains, planetarium, atau acara edukasi. Semua orbit dibuat dengan CSS murni.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Ikut kelas</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 6
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

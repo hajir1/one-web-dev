@@ -9,9 +9,9 @@ import { csvToJson, hashText, jsonToCsv, uuids, type HashAlgo } from "./lib/misc
 import { convertCase, describeCron, dummyText, nextRuns, parseCron, type CaseId } from "./lib/textTools";
 
 /* ================================================================== */
-/* Daftar Utilitas Developer — SATU sumber untuk hub, rute, dan docs.     */
-/* Semua alat berjalan 100% di browser: input tidak dikirim ke server.    */
-/* Teks UI: data.util.tools.<id>.* (locales).                            */
+/* Developer Utilities list: the ONE source for the hub, routes, and docs. */
+/* Every tool runs 100% in the browser: input is never sent to a server. */
+/* UI text: data.util.tools.<id>.* (locales).                            */
 /* ================================================================== */
 
 export type ToolId =
@@ -46,7 +46,7 @@ export type OptionValues = Record<string, string | boolean | number>;
 
 export interface ToolResult {
   output: string;
-  /** Ringkasan kecil di bawah output (label sudah diterjemahkan). */
+  /** Small summary under the output (labels already translated). */
   stats?: { label: string; value: string }[];
   warnings?: string[];
 }
@@ -54,7 +54,7 @@ export interface ToolResult {
 interface ToolAction {
   id: string;
   run: (input: string, o: OptionValues) => ToolResult | Promise<ToolResult>;
-  /** Hasil bisa dibalik jadi input untuk aksi lain (mis. encode ↔ decode). */
+  /** The result can be swapped into the input for another action (e.g. encode ↔ decode). */
   primary?: boolean;
 }
 
@@ -64,11 +64,11 @@ export interface ToolDef {
   icon: LucideIcon;
   /** "text" = input→output generik; "custom" = tampilan khusus (JWT, timestamp). */
   view: "text" | "jwt" | "timestamp" | "regex" | "diff" | "contrast";
-  /** Bahasa input/output untuk penamaan file unduhan. */
+  /** Input/output language for naming the downloaded file. */
   ext?: string;
   options?: OptionDef[];
   actions?: ToolAction[];
-  /** Alat tanpa input (generator). */
+  /** Tools without input (generators). */
   noInput?: boolean;
   sample?: string;
 }
@@ -164,7 +164,7 @@ export const TOOLS: ToolDef[] = [
         },
       },
     ],
-    sample: "const product = {\n  name: 'Kopi Susu', // nama produk\n  price: 18_000,\n  sizes: ['S', 'M', 'L',],\n  promo: undefined,\n};",
+    sample: "const product = {\n  name: 'Kopi Susu', // product name\n  price: 18_000,\n  sizes: ['S', 'M', 'L',],\n  promo: undefined,\n};",
   },
   {
     id: "json-csv",
@@ -340,7 +340,7 @@ export const TOOLS: ToolDef[] = [
         },
       },
     ],
-    sample: '<?xml version="1.0" encoding="UTF-8"?>\n<!-- Dibuat dengan editor -->\n<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">\n  <g>\n    <circle cx="12.000" cy="12.000" r="10.000" fill="#3B68F0"/>\n  </g>\n</svg>',
+    sample: '<?xml version="1.0" encoding="UTF-8"?>\n<!-- Made with the editor -->\n<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">\n  <g>\n    <circle cx="12.000" cy="12.000" r="10.000" fill="#3B68F0"/>\n  </g>\n</svg>',
   },
 ];
 

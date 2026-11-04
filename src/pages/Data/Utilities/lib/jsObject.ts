@@ -2,14 +2,14 @@ import { DataError } from "../../shared/errors";
 import { lineCol, parseJsonStrict, type Indent } from "../../shared/json";
 
 /* ================================================================== */
-/* JS Object ↔ JSON — TANPA eval/new Function.                          */
-/* Parser literal objek JavaScript yang aman: hanya data (objek, array, */
-/* string, angka, boolean, null). Ekspresi/fungsi ditolak dengan posisi. */
+/* JS Object ↔ JSON — WITHOUT eval/new Function.                        */
+/* Safe JavaScript object literal parser: data only (objects, arrays,   */
+/* strings, numbers, booleans, null). Expressions/functions are rejected with a position. */
 /* ================================================================== */
 
 export interface JsParseResult {
   value: unknown;
-  /** Catatan konversi (mis. undefined dibuang), berupa kode i18n. */
+  /** Conversion notes (e.g. undefined dropped), as i18n codes. */
   warnings: { code: string; params?: Record<string, string | number> }[];
 }
 
@@ -64,7 +64,7 @@ class Parser {
     const v = this.value();
     this.ws();
     if (this.s[this.i] === ";") this.i++;
-    // "as const" / "satisfies X" dari TypeScript di akhir diabaikan.
+    // A trailing TypeScript "as const" / "satisfies X" is ignored.
     this.ws();
     const tail = /^(as\s+const|satisfies\s+[\w.<>[\], ]+)\s*;?/.exec(this.s.slice(this.i));
     if (tail) this.i += tail[0].length;
@@ -206,7 +206,7 @@ class Parser {
           }
           case "\r":
             if (this.s[this.i] === "\n") this.i++;
-            break; // sambungan baris
+            break; // line continuation
           case "\n":
             break;
           case undefined:
@@ -249,7 +249,7 @@ class Parser {
 
 const UNDEF = Symbol("undefined");
 
-/** Literal objek/array JavaScript → nilai JSON (aman, tanpa eksekusi kode). */
+/** JavaScript object/array literal → JSON value (safe, no code execution). */
 export function parseJsObject(text: string): JsParseResult {
   const p = new Parser(text);
   const value = p.parse();
@@ -266,10 +266,10 @@ export function jsObjectToJson(text: string, indent: Indent = "2"): JsParseResul
 export interface JsPrintOptions {
   quote: "single" | "double";
   indent: Indent;
-  /** Tanpa kutip untuk kunci yang merupakan identifier valid. */
+  /** No quotes for keys that are valid identifiers. */
   unquoteKeys: boolean;
   trailingComma: boolean;
-  /** Nama variabel untuk `const <nama> = ...;` — kosong = literal saja. */
+  /** Variable name for `const <name> = ...;`; empty = literal only. */
   variable: string;
 }
 

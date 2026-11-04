@@ -12,7 +12,7 @@ import type { FileRules } from "../../lib/validate";
 import { AUDIO_BITRATES, AUDIO_SAMPLE_RATES, AUDIO_TARGETS, DEFAULT_AUDIO_SETTINGS, audioTarget, type AudioConvertSettings, type AudioTargetId } from "../../lib/audioFormats";
 import { canEncodeOpus, convertAudioInWorker } from "../../workers/audioClient";
 
-// Video juga diterima: trek audionya diambil lalu dikonversi.
+// Video is accepted too: its audio track is extracted and converted.
 const RULES: FileRules = { kinds: [...new Set([...AUDIO_KINDS, "mp4", "mov", "webm", "mkv"] as const)], maxBytes: 1024 * 1024 * 1024, maxFiles: 100 };
 
 const ACCEPT = "audio/*,.mp3,.wav,.ogg,.oga,.opus,.flac,.aac,.m4a,.aif,.aiff,.mp4,.mov,.webm,.mkv";

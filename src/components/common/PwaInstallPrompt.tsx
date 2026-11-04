@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-/* Tombol "Pasang aplikasi" (Chrome/Edge/Android) bila browser menawarkan instalasi.
-   iOS Safari tidak punya event ini: pemasangan lewat Bagikan → Tambah ke Layar Utama. */
+/* "Install app" button (Chrome/Edge/Android) when the browser offers installation.
+   iOS Safari has no such event: install via Share → Add to Home Screen. */
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -45,7 +45,7 @@ export default function PwaInstallPrompt() {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch {
-      /* penyimpanan diblokir: cukup sembunyikan untuk sesi ini */
+      /* storage blocked: just hide it for this session */
     }
     setEvt(null);
   };

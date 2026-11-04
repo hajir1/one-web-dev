@@ -19,9 +19,9 @@ const SELECT =
   "w-full rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100";
 
 /**
- * Tab "Library" di panel Tambah: pasang/lepas library CDN untuk desain ini.
- * Library yang terpasang dimuat di Pratinjau & hasil ekspor; efeknya diatur
- * per elemen/box di Pengaturan → Library.
+ * The "Library" tab in the Add panel: installs/removes CDN libraries for this design.
+ * Installed libraries load in Preview & the exported output; their effects are configured
+ * per element/box in Settings → Library.
  */
 export function LibraryManager({ installed, onToggle }: { installed: readonly LibraryId[]; onToggle: (id: LibraryId) => void }) {
   const { t } = useTranslation();
@@ -83,7 +83,7 @@ export function LibraryManager({ installed, onToggle }: { installed: readonly Li
   );
 }
 
-/** Pengaturan → Library: efek per elemen/box untuk library yang terpasang. */
+/** Settings → Library: per-element/box effects for installed libraries. */
 export function NodeLibraryPanel({
   node,
   installed,

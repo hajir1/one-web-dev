@@ -2,10 +2,10 @@ import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata 20 template katalog v4 (bagian E). Konten: ./setE/.
- * 1 Free + 19 Premium, 4–9 halaman. Beberapa template data memakai elemen
- * Chart (Chart.js dipasang otomatis lewat CDN saat diekspor). Harga Premium
- * mengikuti rumus `templatePrice` (marketplace/templatePricing.ts).
+ * Metadata for the 20 catalog v4 templates (part E). Content: ./setE/.
+ * 1 Free + 19 Premium, 4–9 pages. Some data templates use the
+ * Chart element (Chart.js is added automatically via CDN on export). Premium prices
+ * follow the `templatePrice` formula (marketplace/templatePricing.ts).
  */
 export const V4E_CATALOG: TemplateMeta[] = [
   { id: "coworking-ruang-temu", version: 1, category: "coworking", tier: "free", price: TEMPLATE_PRICE.free, accent: "#0f766e", tags: ["coworking", "ruang kerja", "meeting room"], isNew: true },

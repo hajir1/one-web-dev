@@ -1,4 +1,4 @@
-/** Kategori baru yang diperkenalkan set G (label [id, en] ditulis ke locales oleh genTemplatesG). */
+/** New categories introduced by set G (labels [id, en] are written to the locales by genTemplatesG). */
 export const NEW_CATEGORIES_G = {
   pharmacy: ["Apotek", "Pharmacy"],
   carwash: ["Cuci mobil", "Car wash"],

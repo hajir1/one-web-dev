@@ -5481,7 +5481,10 @@
         "files": "The website files couldn't be prepared. Try again.",
         "blocked": "Free export quota used up. Once the credit payment is approved, the deploy runs automatically.",
         "unknown": "Deploy failed."
-      }
+      },
+      "lastTitle": "Already deployed to {{repo}} · {{date}}",
+      "lastHint": "Deploying again updates the same repo, so the site address stays the same.",
+      "restart": "Redeploy"
     }
   },
   "designLimit": {
@@ -7551,6 +7554,66 @@
         "name": "3D Story Forest Door",
         "description": "Forest resort: a lone door in the desert opens with light, the camera steps through and the world becomes a night forest."
       },
+      "story-benang-rajut": {
+        "name": "3D Story Yarn & Knit",
+        "description": "Yarn shop and knitting classes: a ball of yarn unwinds, traces a sweater outline, then the knit fills in and sways."
+      },
+      "story-sawah-terasering": {
+        "name": "3D Story Rice Terraces",
+        "description": "Farm-direct rice: a raindrop ripples, terraces rise, rice grows and ripens, then sacks of rice appear."
+      },
+      "story-seribu-bangau": {
+        "name": "3D Story Thousand Cranes",
+        "description": "Wedding organizer: paper folds into a crane, flies off with a flock, then they form a heart."
+      },
+      "story-senar-gitar": {
+        "name": "3D Story Guitar String",
+        "description": "Music school: a string is plucked, the sound wave travels, turns into equalizer bars, then stage lights sweep."
+      },
+      "story-lilin-aroma": {
+        "name": "3D Story Scented Candle",
+        "description": "Scented candles: the wick lights, the room dims, wax melts, aroma rises, then shelves of candles glow."
+      },
+      "story-ombak-selancar": {
+        "name": "3D Story Surf Wave",
+        "description": "Surf school: the sea curls into a barrel, the board rides through it, then a palm beach appears."
+      },
+      "story-pizza-tungku": {
+        "name": "3D Story Wood-Fired Pizza",
+        "description": "Wood-fired pizza: dough spins flat, sauce and toppings drop, the oven fires, then a slice lifts away."
+      },
+      "story-satelit-jaringan": {
+        "name": "3D Story Satellite Network",
+        "description": "Rural internet: a dish tilts up, signal rings rise, a satellite orbits the globe, then cities connect."
+      },
+      "story-sepeda-lembah": {
+        "name": "3D Story Valley Bike",
+        "description": "Bike tours: a wheel rolls in, the frame assembles, a route draws over the hills, then the bike rides it."
+      },
+      "story-kotak-musik": {
+        "name": "3D Story Music Box",
+        "description": "Kids music classes: a music box opens, a little dancer spins, notes float up, then a starry sky appears."
+      },
+      "story-teh-kebun": {
+        "name": "3D Story Tea Garden",
+        "description": "Tea house: tea leaves drop into a cup, the water brews, steam rises, then a terraced tea garden appears."
+      },
+      "story-jahit-busana": {
+        "name": "3D Story Tailored Dress",
+        "description": "Tailor and boutique: a needle pulls thread, stitches run down the seam, then panels close into a dress on a form."
+      },
+      "story-kompas-properti": {
+        "name": "3D Story Property Compass",
+        "description": "Real estate agent: a compass needle settles, a map unfolds, city blocks rise, then a location pin drops."
+      },
+      "story-daur-kertas": {
+        "name": "3D Story Paper Recycling",
+        "description": "Waste bank: a bin opens, paper scraps swirl into pulp, then it flattens into a brand-new book."
+      },
+      "story-cat-sanggar": {
+        "name": "3D Story Paint Studio",
+        "description": "Painting studio: a paint drop splashes, color spreads across a canvas, then canvases hang on a gallery wall."
+      },
       "anim-surat-merpati": {
         "name": "Paper Dove Letter",
         "description": "Story animation: an envelope opens, the letter folds into a paper bird that flies a heart across the sky. No libraries."
@@ -8263,6 +8326,66 @@
         "name": "Zipper Sweet Seventeen",
         "description": "Denim-and-neon sweet seventeen invitation: the zipper pulls down and both sides of the cover open."
       },
+      "undangan-nikah-segel-lilin": {
+        "name": "Wax Seal Vintage Letter",
+        "description": "Maroon wedding invitation: the wax seal cracks and four envelope flaps fly to the screen edges."
+      },
+      "undangan-nikah-lensa-kamera": {
+        "name": "Monochrome Camera Iris",
+        "description": "Monochrome wedding invitation: six aperture blades swirl open like a camera lens."
+      },
+      "undangan-ultah-60-lampion": {
+        "name": "60th Birthday Sky Lanterns",
+        "description": "60th birthday thanksgiving: seven cover strips carry glowing lanterns up into the night sky."
+      },
+      "undangan-reuni-kalender-sobek": {
+        "name": "Tear-Off Calendar Reunion",
+        "description": "25-year reunion invitation: three calendar pages are torn off upward one by one."
+      },
+      "undangan-tujuh-bulan-anyaman": {
+        "name": "Woven Mat Baby Blessing",
+        "description": "Seven-month pregnancy blessing: woven pandan strips are pulled out in opposite directions."
+      },
+      "undangan-nikah-candi-bentar": {
+        "name": "Balinese Split Gate Wedding",
+        "description": "Balinese wedding: both halves of the split temple gate sink, then slide open onto a sunset glow."
+      },
+      "undangan-wisuda-ubin-balik": {
+        "name": "Flip Tile Graduation",
+        "description": "Graduation party: 48 cover tiles flip over in a diagonal wave."
+      },
+      "undangan-rumah-jendela-kayu": {
+        "name": "Wooden Shutters Housewarming",
+        "description": "Housewarming: louvered wooden shutters swing open and a beam of morning light falls in."
+      },
+      "undangan-ultah-anak-kue-lapis": {
+        "name": "Layer Cake Kids Birthday",
+        "description": "Kids birthday: colorful cake layers slide out alternately to the left and right."
+      },
+      "undangan-khitanan-balon-letus": {
+        "name": "Balloon Pop Circumcision",
+        "description": "Circumcision thanksgiving: a cluster of colorful balloons swells and pops one by one."
+      },
+      "undangan-nikah-kartu-pos": {
+        "name": "Postcard Beach Wedding",
+        "description": "Beach wedding: a postcard flips to show its stamp, then slides into the mailbox."
+      },
+      "undangan-ultah-30-kaca-pecah": {
+        "name": "Shattered Glass 30th Party",
+        "description": "30th birthday party: the glass cover cracks into eight shards that spin and fall."
+      },
+      "undangan-aqiqah-tetes-madu": {
+        "name": "Honey Drip Aqiqah",
+        "description": "Aqiqah invitation: the golden cover melts down like dripping honey."
+      },
+      "undangan-lamaran-surat-lipat": {
+        "name": "Folded Letter Engagement",
+        "description": "Engagement invitation: a lined letter folds in half, then slides out to the right."
+      },
+      "undangan-nikah-tirai-manik": {
+        "name": "Bead Curtain Minang Wedding",
+        "description": "Minang wedding: strands of a bead curtain part from the center, swaying to both sides."
+      },
       "anim-layangan-bukit": {
         "name": "Hilltop Kite",
         "description": "Encouragement animation: the wind lifts a kite off the hill, then other kites rise and circle it. No libraries."
@@ -8282,6 +8405,46 @@
       "anim-piringan-lagu": {
         "name": "Our Song Record",
         "description": "Our-song animation: a vinyl record spins, music notes fly out and gather into a heart. No libraries."
+      },
+      "anim-css-matahari-terbit": {
+        "name": "CSS Sunrise",
+        "description": "Pure CSS animation: the sun rises behind three layers of hills, the sky warms, clouds drift and birds fly by."
+      },
+      "anim-css-kincir-angin": {
+        "name": "CSS Windmill",
+        "description": "Pure CSS animation: windmill blades turn, three bands of tulip fields roll at different speeds and clouds drift past."
+      },
+      "anim-css-kapal-kertas": {
+        "name": "CSS Paper Boat",
+        "description": "Pure CSS animation: a paper boat rocks on three layers of waves while the sun sets, the moon rises and stars twinkle."
+      },
+      "anim-css-roket-luncur": {
+        "name": "CSS Rocket Launch",
+        "description": "Pure CSS animation: a three, two, one countdown, smoke billows on the pad, the rocket lifts off and stars streak past."
+      },
+      "anim-css-kebun-bunga": {
+        "name": "CSS Flower Garden",
+        "description": "Pure CSS animation: stems grow, petals bloom one after another, leaves open and two bees fly figure-eight paths."
+      },
+      "anim-css-api-unggun": {
+        "name": "CSS Campfire",
+        "description": "Pure CSS animation: three flame layers flicker, sparks rise into the sky, the warm glow breathes and a tent stands under the stars."
+      },
+      "anim-css-lampu-kota": {
+        "name": "CSS City Lights",
+        "description": "Pure CSS animation: dusk falls over a row of buildings, windows light up in waves, the moon rises and a shooting star crosses."
+      },
+      "anim-css-pesawat-spanduk": {
+        "name": "CSS Banner Plane",
+        "description": "Pure CSS animation: a small plane flies through three layers of clouds towing a banner and a dotted trail."
+      },
+      "anim-css-mesin-ketik": {
+        "name": "CSS Typewriter",
+        "description": "Pure CSS animation: typewriter keys strike, three lines are typed onto the paper one by one and the paper rolls up."
+      },
+      "anim-css-orbit-planet": {
+        "name": "CSS Planet Orbit",
+        "description": "Pure CSS animation: four planets circle the sun on tilted 3D orbits, a ringed planet turns and a comet streaks by."
       },
       "j3d-tanah-liat-kasongan": {
         "name": "Kasongan Clay",
@@ -10314,7 +10477,9 @@
       "button": "Download",
       "title": "Download {{name}}",
       "text": "Code for the whole website ({{count}} pages) in one ZIP. Tick Include CRUD if you need a dashboard and backend for the data collections."
-    }
+    },
+    "deployed": "Deployed {{date}}",
+    "redeploy": "Redeploy"
   },
   "codeEditor": {
     "title": "No-code editor",

@@ -41,7 +41,7 @@ import {
 } from "./kitB";
 
 /* ================================================================== */
-/* Set B · bagian 5: Apotek, Film Pernikahan, Keamanan Siber, Notaris,   */
+/* Set B · part 5: Pharmacy, Wedding Films, Cybersecurity, Notary,       */
 /* Coworking.                                                           */
 /* ================================================================== */
 

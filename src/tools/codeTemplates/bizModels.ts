@@ -1,15 +1,15 @@
 /* ================================================================== */
-/* MODEL 3D PROSEDURAL untuk Website 3D Bisnis (v23).                    */
+/* PROCEDURAL 3D MODELS for the Business 3D Websites (v23).              */
 /*                                                                    */
-/* Setiap model = badan fungsi JS yang menerima K (alat bantu dari mesin */
-/* biz3d) dan menyusun objek dari bentuk dasar three.js: lathe, kotak    */
-/* membulat, silinder, torus, kapsul, ekstrusi. Tanpa model/tekstur      */
+/* Each model = a JS function body that receives K (helpers from the   */
+/* biz3d engine) and builds the object from three.js primitives: lathe, box */
+/* rounded, cylinders, tori, capsules, extrusions. No models/textures    */
 /* eksternal. Bahan:                                                    */
-/*   M.m1 / M.m2 = warna varian (berubah saat chip warna ditekan)       */
+/*   M.m1 / M.m2 = variant colors (change when a color chip is pressed) */
 /*   M.m3 = netral terang, M.dk = gelap, M.mt = logam, M.gl = kaca,     */
 /*   M.au = emas.                                                       */
 /* Opsi posisi o = { p: [x,y,z], r: [x,y,z], s: [x,y,z], to: grup }.     */
-/* K.tick = (t, dt) => {} untuk gerak kecil (uap, baling-baling, dst).   */
+/* K.tick = (t, dt) => {} for small motion (steam, propellers, etc.).   */
 /* ================================================================== */
 
 const PI = "Math.PI";
@@ -42,7 +42,7 @@ export const MODELS: Record<string, string> = {
   const steam = [0, 1, 2].map((i) => K.spr("#ffffff", .7, { p: [(i - 1) * .25, 1.3, 0] }));
   K.tick = (t) => steam.forEach((s, i) => { const k = (t * .35 + i / 3) % 1; s.position.y = 1.2 + k * 1.3; s.position.x = (i - 1) * .22 + Math.sin(t * 1.4 + i * 2) * .12; s.material.opacity = Math.sin(k * ${PI}) * .28; s.scale.setScalar(.35 + k * .5); });`,
 
-  /* Kue dua tingkat dengan lelehan, ceri, dan lilin. */
+  /* A two-tier cake with drips, cherries, and candles. */
   cake: `
   K.lathe([[0,0],[1.45,0],[1.55,.08],[1.5,.1],[0,.1]], M.m3);
   K.cyl(1.05, 1.05, .75, M.m3, { p: [0, .48, 0] }, 56);
@@ -67,7 +67,7 @@ export const MODELS: Record<string, string> = {
   K.cyl(.26, .26, 1.9, M.m2, { p: [.2, .26, 1.05], r: [0, 0, ${PI} / 2] }, 40);
   K.tick = (t) => { drape.rotation.z = .05 + Math.sin(t * .8) * .03; };`,
 
-  /* Guci gerabah + mangkuk + pot kecil. */
+  /* Earthenware jar + bowl + small pot. */
   vase: `
   K.lathe([[0,0],[.48,0],[.6,.1],[.82,.62],[.8,1.05],[.5,1.6],[.36,1.92],[.46,2.12],[.42,2.15],[.3,1.98],[0,1.98]], M.m1, {}, 64);
   K.tor(.82, .025, M.m2, { p: [0, .72, 0], r: [${PI} / 2, 0, 0] });
@@ -87,7 +87,7 @@ export const MODELS: Record<string, string> = {
   for (let i = 0; i < 6; i++) { const a = i / 6 * ${PI} * 2; K.cyl(.22, .22, .16, M.m1, { p: [-1.2 + Math.cos(a) * .4, .08, .4 + Math.sin(a) * .4] }, 6); }
   K.cyl(.22, .22, .16, M.m1, { p: [-1.2, .08, .4] }, 6);`,
 
-  /* Ponsel dengan layar aplikasi + wadah earbud. */
+  /* Phone with an app screen + earbud case. */
   phone: `
   const ph = K.grp({ r: [0, 0, 0] });
   K.box(1.15, 2.3, .13, .17, M.m1, { to: ph });
@@ -103,7 +103,7 @@ export const MODELS: Record<string, string> = {
   K.box(.7, .5, .32, .16, M.m3, { p: [1.05, -.95, .2], r: [0, -.4, 0] });
   K.box(.68, .04, .3, .02, M.m2, { p: [1.05, -.83, .2], r: [0, -.4, 0] });`,
 
-  /* Laptop terbuka dengan dasbor aplikasi. */
+  /* Open laptop with an app dashboard. */
   laptop: `
   K.box(2.8, .09, 1.9, .06, M.m1, { p: [0, 0, .1] });
   K.plane(2.4, 1.0, K.std("#1b1d22", { roughness: .8 }), { p: [0, .05, -.05], r: [-${PI} / 2, 0, 0] });
@@ -134,7 +134,7 @@ export const MODELS: Record<string, string> = {
   const puffs = []; for (let i = 0; i < 7; i++) { const a = i / 7 * ${PI} * 2; puffs.push(K.sph(.24 + (i % 3) * .06, M.m3, { p: [Math.cos(a) * .7, -1.05, Math.sin(a) * .5] })); }
   K.tick = (t) => { fl.forEach((s, i) => s.scale.setScalar((i ? .6 : .9) + Math.sin(t * 18 + i) * .08)); rk.position.y = Math.sin(t * 1.3) * .06; puffs.forEach((p, i) => p.scale.setScalar(1 + Math.sin(t * 1.5 + i) * .08)); };`,
 
-  /* Simpul torus mengilap + bola yang mengorbit. */
+  /* Glossy torus knot + an orbiting ball. */
   knot: `
   const k = K.mesh(new THREE.TorusKnotGeometry(.78, .26, 220, 28, 2, 3), K.std(M.m1.color.getStyle(), { roughness: .18, metalness: .35 }));
   M.m1 = k.material;
@@ -164,14 +164,14 @@ export const MODELS: Record<string, string> = {
   K.cyl(.012, .012, .7, M.m2, { p: [.55, .82, .55] }); K.sph(.07, M.m2, { p: [.55, .45, .55], s: [1, 1.8, 1] });
   K.cyl(.07, .07, 1.6, M.m2, { p: [.2, .05, 1.0], r: [0, .5, ${PI} / 2] }, 6);`,
 
-  /* Kapsul obat + tanda tambah. */
+  /* Medicine capsules + plus sign. */
   pill: `
   const pill = (p, r) => { const g = K.grp({ p, r }); K.cyl(.32, .32, .62, M.m1, { p: [0, .31, 0], to: g }, 40); K.sph(.32, M.m1, { p: [0, .62, 0], to: g }); K.cyl(.32, .32, .62, M.m3, { p: [0, -.31, 0], to: g }, 40); K.sph(.32, M.m3, { p: [0, -.62, 0], to: g }); return g; };
   const a = pill([-.45, .2, .3], [.3, 0, .9]), b = pill([.6, -.15, .5], [-.4, .3, -.5]);
   K.ext([[-.25,-.8],[.25,-.8],[.25,-.25],[.8,-.25],[.8,.25],[.25,.25],[.25,.8],[-.25,.8],[-.25,.25],[-.8,.25],[-.8,-.25],[-.25,-.25]], .3, M.m2, { p: [0, .3, -.7] }, .07);
   K.tick = (t) => { a.rotation.y = t * .5; b.rotation.y = -t * .4; };`,
 
-  /* Koper + bola dunia kecil. */
+  /* Suitcase + small globe. */
   suitcase: `
   K.box(1.5, 2.0, .72, .16, M.m1, { p: [0, 1.15, 0] });
   for (let i = -1; i <= 1; i++) K.box(.1, 1.9, .06, .03, M.m2, { p: [i * .42, 1.15, .37] });
@@ -183,7 +183,7 @@ export const MODELS: Record<string, string> = {
   K.tor(.6, .025, M.mt, { p: [1.35, .8, .2], r: [0, ${PI} / 2, .4] }, ${PI} * 1.2); K.cyl(.05, .05, .4, M.mt, { p: [1.35, .1, .2] }); K.cyl(.3, .3, .06, M.mt, { p: [1.35, -.1, .2] });
   K.tick = (t) => { gl.rotation.y = t * .4; };`,
 
-  /* Mangkuk ramen dengan mi, telur, nori, sumpit. */
+  /* Ramen bowl with noodles, egg, nori, chopsticks. */
   bowl: `
   K.lathe([[0,0],[.5,0],[.56,.06],[1.12,.82],[1.17,.88],[1.1,.88],[.52,.14],[0,.14]], M.m1, {}, 64);
   K.cyl(1.06, 1.06, .02, K.std("#e3ae5f", { roughness: .25 }), { p: [0, .74, 0] }, 56);
@@ -194,7 +194,7 @@ export const MODELS: Record<string, string> = {
   K.cyl(.28, .28, .07, M.m2, { p: [-.35, .79, .35] }); K.cyl(.26, .26, .07, M.m2, { p: [-.05, .8, .55] });
   K.cyl(.02, .035, 2.3, M.m2, { p: [.1, .95, -.05], r: [0, .4, ${PI} / 2 - .06] }); K.cyl(.02, .035, 2.3, M.m2, { p: [.1, .95, .07], r: [0, .3, ${PI} / 2 - .06] });`,
 
-  /* Rumah dengan atap, pintu, jendela, pohon. */
+  /* House with roof, door, windows, tree. */
   house: `
   K.box(3.4, .12, 2.6, .05, K.std("#7fb069", { roughness: .9 }), { p: [0, -.06, 0] });
   K.box(2.0, 1.25, 1.4, .03, M.m3, { p: [0, .62, 0] });
@@ -265,7 +265,7 @@ export const MODELS: Record<string, string> = {
   const bub = []; for (let i = 0; i < 16; i++) bub.push(K.sph(.08 + (i % 4) * .04, M.gl, { p: [(i / 16 - .5) * 4, .6 + (i % 5) * .35, (i % 2 ? 1 : -1) * (.9 + (i % 3) * .2)] }));
   K.tick = (t) => bub.forEach((b, i) => { b.position.y = .4 + ((t * .25 + i * .13) % 1) * 2.2; });`,
 
-  /* Piringan hitam di atas pemutar + sampul album. */
+  /* A vinyl record on a turntable + an album sleeve. */
   vinyl: `
   K.box(2.6, .26, 2.0, .08, M.m2, { p: [0, .13, 0] });
   K.cyl(.88, .88, .07, M.mt, { p: [-.3, .3, 0] }, 64);
@@ -304,7 +304,7 @@ export const MODELS: Record<string, string> = {
   const leaf = M.m2;
   for (let i = 0; i < 9; i++) { const a = i / 9 * ${PI} * 2, l = K.grp({ p: [0, .95, 0], r: [0, a, 0] }); K.sph(.32, leaf, { p: [.35 + (i % 2) * .1, .5 + (i % 3) * .2, 0], r: [0, 0, -.7], s: [1.6, .3, .7], to: l }); K.cyl(.02, .02, .7, leaf, { p: [.18, .25, 0], r: [0, 0, -.5], to: l }); }`,
 
-  /* Kardus paket bertumpuk dengan label. */
+  /* Stacked parcel boxes with labels. */
   parcel: `
   const lab = K.screen(256, 160, (g, w, h) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.fillStyle = "#111"; for (let i = 0; i < 40; i++) g.fillRect(16 + i * 5.6, 70, (i % 3) + 1.5, 70); g.font = "700 26px system-ui, sans-serif"; g.fillText(BRAND.slice(0, 14), 16, 44); });
   const bx = (w, h, d, p, ry) => { const g = K.grp({ p, r: [0, ry, 0] }); K.box(w, h, d, .03, M.m1, { to: g }); K.box(w + .01, .04, .28, 0, M.m2, { p: [0, h / 2, 0], to: g }); K.box(.28, h + .01, d + .01, 0, M.m2, { p: [0, 0, 0], to: g }); K.plane(w * .35, w * .22, lab, { p: [-w * .22, -h * .15, d / 2 + .012], to: g }); return g; };
@@ -349,7 +349,7 @@ export const MODELS: Record<string, string> = {
   K.box(.6, .45, .5, .02, card, { p: [-2.2, .22, .6] }); K.box(.45, .35, .4, .02, card, { p: [-2.15, .62, .55], r: [0, .3, 0] });
   K.box(.08, .12, .3, .02, K.std("#fff6d8", { emissive: "#fff2c4", emissiveIntensity: 1.2 }), { p: [1.9, .62, .5] });`,
 
-  /* Gembok + perisai + kunci. */
+  /* Padlock + shield + key. */
   lock: `
   K.ext([[0,1.3],[1.1,1.0],[1.0,-.2],[0,-1.2],[-1.0,-.2],[-1.1,1.0]], .18, M.m2, { p: [0, .9, -.5] }, .06);
   K.box(1.4, 1.2, .5, .18, M.m1, { p: [0, .65, .1] });
@@ -359,7 +359,7 @@ export const MODELS: Record<string, string> = {
   const key = K.grp({ p: [1.25, .25, .5], r: [0, -.3, -.4] });
   K.tor(.2, .06, M.au, { to: key }); K.cyl(.05, .05, .9, M.au, { p: [0, -.65, 0], to: key }); K.box(.18, .08, .05, .01, M.au, { p: [.1, -.9, 0], to: key }); K.box(.14, .08, .05, .01, M.au, { p: [.08, -.72, 0], to: key });`,
 
-  /* Kacamata + kotak kacamata. */
+  /* Glasses + glasses case. */
   glasses: `
   const gs = K.grp({ p: [0, .9, 0], r: [-.15, 0, 0] });
   [-1, 1].forEach((s) => { K.tor(.52, .065, M.m1, { p: [s * .66, 0, 0], to: gs }); K.cyl(.5, .5, .02, M.gl, { p: [s * .66, 0, 0], r: [${PI} / 2, 0, 0], to: gs }, 48); K.cyl(.035, .035, 1.6, M.m1, { p: [s * 1.17, .05, -.8], r: [${PI} / 2, 0, 0], to: gs }); K.cyl(.035, .03, .4, M.m1, { p: [s * 1.17, -.1, -1.65], r: [-.5, 0, 0], to: gs }); });
@@ -388,7 +388,7 @@ export const MODELS: Record<string, string> = {
   [[0,2.0,0],[.45,1.85,.2],[-.45,1.85,.15],[.2,1.7,-.4],[-.25,1.72,-.38],[.05,1.62,.48],[-.55,1.55,-.05],[.6,1.55,-.15]].forEach((p, i) => flower(p, i % 2 ? M.m2 : M.m1, i ? .9 : 1.1));
   for (let i = 0; i < 6; i++) { const a = i / 6 * ${PI} * 2; K.sph(.3, stem, { p: [Math.cos(a) * .6, 1.55, Math.sin(a) * .6], r: [0, -a, .8], s: [1.2, .2, .45] }); }`,
 
-  /* Tiang museum + guci di atas alas + bingkai lukisan. */
+  /* A museum pillar + a vase on a plinth + a painting frame. */
   museum: `
   K.box(1.0, .2, 1.0, .02, M.m3, { p: [-1.2, .1, -.3] }); K.cyl(.32, .36, 2.4, M.m3, { p: [-1.2, 1.4, -.3] }, 20); K.box(.9, .2, .9, .02, M.m3, { p: [-1.2, 2.7, -.3] });
   K.box(.9, 1.1, .9, .03, M.m3, { p: [.5, .55, .3] });
@@ -398,7 +398,7 @@ export const MODELS: Record<string, string> = {
   K.box(1.7, 1.2, .08, .02, M.au, { p: [.6, 2.4, -.9] });
   K.plane(1.5, 1.0, K.screen(450, 300, (g, w, h) => { g.fillStyle = COL.bg; g.fillRect(0, 0, w, h); g.fillStyle = COL.accent; g.beginPath(); g.arc(w * .3, h * .45, 70, 0, 7); g.fill(); g.fillStyle = COL.accent2; g.fillRect(w * .45, h * .2, 160, 150); g.fillStyle = COL.ink; g.fillRect(0, h * .78, w, 6); }), { p: [.6, 2.4, -.85] });`,
 
-  /* Kapal layar + ombak + pelampung. */
+  /* Sailboat + waves + buoy. */
   boat: `
   const b = K.grp();
   K.ext([[-1.6,.62],[1.9,.62],[1.3,0],[-1.25,0]], 1.0, M.m1, { keep: 1, p: [0, 0, -.5], to: b }, .08);

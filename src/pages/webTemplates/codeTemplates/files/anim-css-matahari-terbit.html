@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Matahari Terbit</title>
+<meta name="description" content="Animasi CSS murni: matahari naik perlahan di balik tiga lapis bukit, langit menghangat, awan bergeser, dan burung melintas.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#fde6c8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #fde6c8; /* Latar bawah */
+  --bg-2: #8ec5e8; /* Latar atas */
+  --c-1: #e2632b; /* Matahari */
+  --c-2: #ff8a5c; /* Langit pagi */
+  --c-3: #4f8a5b; /* Bukit */
+  --ink: #1f2a37; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Fraunces", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: 50%; top: clamp(56px, 9vh, 96px); transform: translateX(-50%); text-align: center; align-items: center; z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: center; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap {  }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.sky { inset: 0; background: linear-gradient(180deg, transparent 20%, var(--c-2) 85%); opacity: 0; animation: skyWarm calc(var(--k) * 8) ease-in-out infinite alternate; }
+@keyframes skyWarm { to { opacity: .85; } }
+.sun { left: 50%; bottom: 24%; width: 26vmin; height: 26vmin; margin-left: -13vmin; border-radius: 50%; background: radial-gradient(circle, #fffbe8 0 30%, var(--c-1) 70%); box-shadow: 0 0 90px 30px color-mix(in srgb, var(--c-1) 55%, transparent); animation: sunRise calc(var(--k) * 8) ease-in-out infinite alternate; }
+@keyframes sunRise { from { transform: translateY(26vh) scale(1.15); } to { transform: translateY(-18vh) scale(.9); } }
+.cloud { width: 30vmin; height: 8vmin; border-radius: 99px; background: color-mix(in srgb, #fff 80%, var(--c-2)); opacity: .8; animation: drift calc(var(--k) * 40) linear infinite; }
+.cloud::before { content: ""; position: absolute; left: 22%; bottom: 40%; width: 45%; height: 140%; border-radius: 50%; background: inherit; }
+.c1 { top: 16%; animation-delay: calc(var(--k) * -8); }
+.c2 { top: 30%; scale: .7; animation-delay: calc(var(--k) * -26); }
+@keyframes drift { from { left: -35vmin; } to { left: 105%; } }
+.birds i { top: var(--y); width: 22px; height: 10px; border: 3px solid var(--ink); border-color: var(--ink) transparent transparent; border-radius: 50% 50% 0 0; opacity: .7; animation: fly calc(var(--k) * 13) linear infinite, flap calc(var(--k) * .5) ease-in-out infinite alternate; animation-delay: calc(var(--d) / var(--speed)), 0s; }
+@keyframes fly { from { left: -5%; translate: 0 0; } 50% { translate: 0 -3vh; } to { left: 105%; translate: 0 1vh; } }
+@keyframes flap { to { scale: 1 .4; } }
+.hill { left: -20%; right: -20%; border-radius: 50% 50% 0 0 / 100% 100% 0 0; animation: sway calc(var(--k) * 9) ease-in-out infinite alternate; }
+.h3 { bottom: -18%; height: 52%; background: color-mix(in srgb, var(--c-3) 55%, var(--bg-2)); animation-duration: calc(var(--k) * 14); }
+.h2 { bottom: -26%; height: 50%; left: -45%; right: 10%; background: color-mix(in srgb, var(--c-3) 78%, var(--bg-1)); }
+.h1 { bottom: -30%; height: 46%; left: 15%; right: -40%; background: var(--c-3); animation-duration: calc(var(--k) * 7); }
+@keyframes sway { to { translate: 3vw 0; } }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="sky"></div><div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+<div class="birds"><i style="--d:0s;--y:18%"></i><i style="--d:-3.2s;--y:25%"></i><i style="--d:-6.4s;--y:32%"></i><i style="--d:-9.600000000000001s;--y:39%"></i></div>
+<div class="hill h3"></div><div class="hill h2"></div><div class="hill h1"></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Selamat pagi</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Hari baru, kesempatan baru.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Kartu ucapan pagi yang bisa dikirim ke siapa saja. Ganti teks dan warnanya, lalu bagikan tautannya.</p>
+  <a class="cta" href="https://wa.me/?text=Selamat%20pagi!" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Kirim semangat</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 9
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

@@ -28,9 +28,9 @@ const FAMILY_BADGE: Record<SectionPreset["family"], string> = {
 };
 
 /**
- * Thumbnail = PERSIS section yang akan ditambahkan: dengan contoh isi bila
- * dicentang, atau kerangka kosongnya (Row & kolom) bila tidak. Tidak ada
- * balok hiasan yang tidak ikut ditambahkan.
+ * Thumbnail = EXACTLY the section that will be added: with sample content when
+ * ticked, or its empty skeleton (Rows & columns) when not. There are no
+ * decorative blocks that are not added.
  */
 function SectionThumb({ preset, withContent }: { preset: SectionPreset; withContent: boolean }) {
   const root = useMemo(() => presetTree(preset, withContent), [preset, withContent]);
@@ -121,7 +121,7 @@ const KIND_STYLE: Record<SectionKind, string> = {
   fullwidth: "bg-violet-600 hover:bg-violet-700 focus-visible:outline-violet-600",
 };
 
-/** Tombol tipe section (warna mengikuti Divi: biru, merah, ungu). */
+/** Section type buttons (colors follow Divi: blue, red, purple). */
 function KindButton({ kind, onClick }: { kind: SectionKind; onClick: () => void }) {
   const { t } = useTranslation();
   return (
@@ -152,17 +152,17 @@ export default function SectionPicker({
   onClose,
 }: {
   positionLabel: string;
-  /** Section dari pustaka preset. */
+  /** Sections from the preset library. */
   onPick: (preset: SectionPreset, withContent: boolean) => void;
-  /** Section baru kosong (Reguler / Spesialisasi / Lebar Penuh). */
+  /** A new empty section (Regular / Specialty / Full Width). */
   onCreate: (node: BoxNode, kind: SectionKind) => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("new");
   const [step, setStep] = useState<Step>("kind");
-  // Pustaka = desain jadi: bawaan DENGAN contoh isi (thumbnail ikut pilihan ini).
-  // Section kosong dibuat lewat tab "Section Baru".
+  // Library = ready-made designs: built-ins WITH sample content (thumbnails follow this choice).
+  // Empty sections are created through the "New Section" tab.
   const [withContent, setWithContent] = useState(true);
   const pick = (p: SectionPreset) => onPick(p, withContent);
   const create = (node: BoxNode | null, kind: SectionKind) => node && onCreate(node, kind);
@@ -287,7 +287,7 @@ export default function SectionPicker({
               </span>
             </label>
             <div className="flex flex-col gap-6 overflow-y-auto p-5">
-              {/* Mode demo (v15): satu daftar tanpa pembagian Gratis/Premium. */}
+              {/* Demo mode (v15): one list without a Free/Premium split. */}
               {isDemoMode() ? (
                 <PresetGroup
                   title={t("demo.pm.allTitle", { count: FREE_PRESETS.length + PREMIUM_PRESETS_LIST.length })}

@@ -9,7 +9,7 @@ import {
   type BgKind,
 } from "../helpers/background";
 
-/** Kunci i18n label jenis & posisi background. */
+/** i18n keys for background type & position labels. */
 const KIND_LABEL: Record<BgKind, string> = {
   none: "pm.bg.kind.none",
   solid: "pm.bg.kind.solid",
@@ -32,15 +32,15 @@ const POSITION_LABEL: Record<(typeof BG_POSITIONS)[number], string> = {
 export interface BackgroundEditorProps {
   value: Partial<BgFields> & { bgType?: string };
   set: (key: keyof BgFields, value: unknown) => void;
-  /** Jenis yang boleh dipilih (default semua). */
+  /** Kinds that may be selected (default: all). */
   kinds?: BgKind[];
   colorLabel?: string;
 }
 
 /**
- * Editor background lengkap: none / warna / gradient / gambar (+ ukuran,
- * posisi, ulangi, parallax, warna dasar, overlay). Dipakai elemen dan
- * kontainer (section, Row, grup) supaya perilakunya sama.
+ * Full background editor: none / color / gradient / image (+ size,
+ * position, repeat, parallax, base color, overlay). Used by elements and
+ * containers (section, Row, group) so they behave the same.
  */
 export default function BackgroundEditor({
   value: v,

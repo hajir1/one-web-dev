@@ -1,4 +1,4 @@
-/** Satu gambar di Pustaka Aset. */
+/** One image in the Asset Library. */
 export interface AssetMeta {
   id: string;
   name: string;
@@ -7,11 +7,11 @@ export interface AssetMeta {
   width: number;
   height: number;
   createdAt: number;
-  /** Mode server: URL unduh sementara (diperbarui tiap daftar dimuat). */
+  /** Server mode: temporary download URL (refreshed each time the list loads). */
   url?: string;
 }
 
-/** Gambar yang sudah diproses di browser, siap disimpan. */
+/** An image already processed in the browser, ready to store. */
 export interface PreparedImage {
   blob: Blob;
   name: string;
@@ -20,7 +20,7 @@ export interface PreparedImage {
   height: number;
 }
 
-/** Tempat penyimpanan aset: IndexedDB (demo / belum masuk) atau server (akun). */
+/** Asset storage: IndexedDB (demo / signed out) or server (account). */
 export interface AssetBackend {
   readonly kind: "local" | "server";
   list(): Promise<AssetMeta[]>;
@@ -31,11 +31,11 @@ export interface AssetBackend {
 }
 
 export const ASSET_LIMITS = {
-  /** Berkas masuk sebelum diproses. */
+  /** Incoming file before processing. */
   maxInputBytes: 15 * 1024 * 1024,
-  /** Berkas tersimpan setelah diperkecil (sama dengan batas server). */
+  /** Stored file after downscaling (same as the server limit). */
   maxBytes: 5 * 1024 * 1024,
-  /** Sisi terpanjang setelah diperkecil. */
+  /** Longest side after downscaling. */
   maxSide: 2000,
   maxCount: 500,
   types: ["image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"] as readonly string[],

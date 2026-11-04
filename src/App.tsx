@@ -6,12 +6,12 @@ import { Navigate as LocaleNavigate } from "./components/app/LocaleLink";
 import { activateLanguage, isLang, preferredLang, splitLangPath, withFullLocale } from "./i18n";
 import { isDemoHiddenPath, isDemoMode } from "./demo/demoMode";
 
-/** v13: awalan path situs (Vite `base`, mis. "/repo" di GitHub Pages); kosong di root domain. */
+/** v13: site path prefix (Vite `base`, e.g. "/repo" on GitHub Pages); empty at the domain root. */
 const ROUTER_BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, "") || undefined;
 
-/* Setiap halaman dimuat terpisah (code-splitting): pembukaan pertama hanya
-   mengunduh kerangka aplikasi + halaman yang dibuka, bukan Page Maker,
-   ExcelJS, transformers.js, dll. sekaligus. */
+/* Every page is loaded separately (code splitting): the first visit only
+   downloads the app shell plus the opened page, not Page Maker,
+   ExcelJS, transformers.js, etc. all at once. */
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
 const SignUp = lazy(() => import("./pages/AuthPages/SignUp"));
 const VerifyEmail = lazy(() => import("./pages/AuthPages/VerifyEmail"));
@@ -68,20 +68,20 @@ function PageFallback() {
 }
 
 /* ================================================================== */
-/* Rute aplikasi — semua halaman berada di bawah prefix bahasa:          */
-/*   /id/...  (Bahasa Indonesia)   /en/...  (English)                   */
-/* URL tanpa prefix (termasuk tautan lama seperti /page-maker?design=…)  */
-/* diarahkan ke bahasa pilihan dengan path, query, dan hash yang sama.   */
+/* App routes: every page lives under a language prefix.                */
+/*   /id/...  (Indonesian)   /en/...  (English)                         */
+/* URLs without a prefix (including old links like /page-maker?design=…) */
+/* are redirected to the chosen language with the same path, query, and hash. */
 /* ================================================================== */
 
-/** "/" atau path tanpa prefix → /<bahasa>/<path>. */
+/** "/" or a path without a prefix → /<lang>/<path>. */
 function AddLangPrefix() {
   const { pathname, search, hash } = useLocation();
   const { rest } = splitLangPath(pathname);
   return <Navigate to={`/${preferredLang()}${rest === "/" ? "" : rest}${search}${hash}`} replace />;
 }
 
-/** Validasi segmen bahasa, muat bundle bahasa, lalu render halaman. */
+/** Validate the language segment, load the language bundle, then render the page. */
 function LangRoute() {
   const { lang } = useParams();
   const { pathname } = useLocation();
@@ -93,7 +93,7 @@ function LangRoute() {
     let alive = true;
     activateLanguage(lang).then(
       () => alive && setReady(lang),
-      () => alive && setReady(lang), // gagal memuat bundle: tetap tampil dengan fallback (Indonesia)
+      () => alive && setReady(lang), // failed to load the bundle: still render with the fallback (Indonesian)
     );
     return () => {
       alive = false;
@@ -101,9 +101,9 @@ function LangRoute() {
   }, [lang]);
 
   if (!valid) return <AddLangPrefix />;
-  // Mode demo (v12): halaman akun, pembayaran & alat server tidak ada → Dashboard.
+  // Demo mode (v12): account, payment, and server tool pages do not exist → Dashboard.
   if (isDemoMode() && isDemoHiddenPath(splitLangPath(pathname).rest)) return <LocaleNavigate to="/" replace />;
-  // Tunggu bundle bahasa pertama kali saja; saat berganti bahasa, halaman tetap tampil.
+  // Wait for the language bundle only the first time; when switching languages, the page stays visible.
   if (ready === null) return null;
   return (
     <Suspense fallback={<PageFallback />}>
@@ -112,7 +112,7 @@ function LangRoute() {
   );
 }
 
-/** /media-tools/kredit lama → halaman Credits (parameter ?fitur dipertahankan). */
+/** Old /media-tools/kredit → Credits page (the ?fitur parameter is kept). */
 function LegacyCreditRedirect() {
   const { search } = useLocation();
   return <LocaleNavigate to={`/credits${search}`} replace />;
@@ -155,7 +155,7 @@ export default function App() {
               <Route path="video-compress" element={<VideoCompress />} />
               <Route path="favicon-generator" element={<FaviconGenerator />} />
               <Route path="og-image" element={<OgImageMaker />} />
-              {/* Pembelian kredit dipindah dari Media ke halaman Credits. */}
+              {/* Credit purchases moved from Media to the Credits page. */}
               <Route path="kredit" element={<LegacyCreditRedirect />} />
             </Route>
 
@@ -170,41 +170,41 @@ export default function App() {
               <Route path="server-convert" element={<ServerConvert />} />
             </Route>
 
-            {/* Element Maker, Component Maker & Section Maker sudah dihapus:
-                Page Maker satu-satunya builder. URL lama diarahkan ke Page Maker. */}
+            {/* Element Maker, Component Maker & Section Maker were removed:
+                Page Maker is the only builder. Old URLs redirect to Page Maker. */}
             <Route path="element-maker/*" element={<LocaleNavigate to="/page-maker" replace />} />
             <Route path="component-maker" element={<LocaleNavigate to="/page-maker" replace />} />
             <Route path="section-maker" element={<LocaleNavigate to="/page-maker" replace />} />
 
-            {/* v17: beranda Pembuat Website (Pilih → Modifikasi → Deploy) & editor tanpa kode Template Kode */}
+            {/* v17: Website Builder home (Choose → Modify → Deploy) & no-code editor for Code Templates */}
             <Route path="website-builder" element={<WebsiteHub />} />
             <Route path="website-builder/code/:projectId" element={<CodeTemplateEditor />} />
 
-            {/* v20: Studio = satu website, banyak halaman, deploy dari editor. */}
+            {/* v20: Studio = one website, many pages, deploy from the editor. */}
             <Route path="studio/:siteId" element={<PageMaker />} />
-            {/* Alamat lama: Editor Halaman & Susun & Deploy → Studio (lihat LegacyRoutes.tsx). */}
+            {/* Old addresses: Page Editor & Compose & Deploy → Studio (see LegacyRoutes.tsx). */}
             <Route path="page-maker" element={<LegacyPageMakerRoute />} />
             <Route path="website" element={<LegacyWebsiteRoute />} />
-            {/* Page Composer lama → Website (data lama dimigrasikan di sana) */}
+            {/* Old Page Composer → Website (old data is migrated there) */}
             <Route path="page-composer" element={<LocaleNavigate to="/website" replace />} />
 
-            {/* Template website siap pakai (gratis & premium) */}
+            {/* Ready-made website templates (free & premium) */}
             <Route path="web-templates" element={<WebTemplates />} />
             <Route path="web-templates/:templateId" element={<WebTemplates />} />
-            {/* Paket desain, saldo demo & item Premium (simulasi lokal) */}
+            {/* Design packs, demo balance & Premium items (local simulation) */}
             <Route path="web-market" element={<WebMarket />} />
 
-            {/* Web Maker: pustaka ikon, font, dan konfigurasi global */}
+            {/* Web Maker: icon library, fonts, and global configuration */}
             <Route path="global-setting" element={<GlobalSetting />} />
 
-            {/* VR: pembuat tur 360° (A-Frame dari CDN) */}
+            {/* VR: 360° tour builder (A-Frame from a CDN) */}
             <Route path="vr" element={<LocaleNavigate to="/vr/tour-360" replace />} />
             <Route path="vr/tour-360" element={<VrTour />} />
 
             <Route path="dokumentasi" element={<Dokumentasi />} />
           </Route>
 
-          {/* VR: pratinjau tur layar penuh (tanpa sidebar), dibuka di tab baru */}
+          {/* VR: full-screen tour preview (no sidebar), opened in a new tab */}
           <Route path="vr/tour-360/pratinjau/:tourId" element={<TourViewer />} />
 
           {/* Auth Layout */}
@@ -214,7 +214,7 @@ export default function App() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
 
-          {/* Dokumen legal publik & invoice siap cetak (tanpa sidebar) */}
+          {/* Public legal documents & print-ready invoices (no sidebar) */}
           <Route path="legal" element={<LocaleNavigate to="/legal/terms" replace />} />
           <Route path="legal/:doc" element={<LegalPage />} />
           <Route path="invoice/:id" element={<InvoicePage />} />

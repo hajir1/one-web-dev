@@ -55,8 +55,8 @@ import type { SavedDesign } from "../store/designStore";
 export type { Updater } from "./fields";
 
 /**
- * Teks UI untuk section generik di file ini. Dipanggil saat render, jadi
- * selalu mengikuti bahasa aktif (PanelStyling berlangganan lewat useTranslation).
+ * UI text for the generic sections in this file. Called at render time, so
+ * it always follows the active language (PanelStyling subscribes via useTranslation).
  */
 const t = (key: string, opts?: Record<string, unknown>): string => i18n.t(key, opts);
 
@@ -65,8 +65,8 @@ const t = (key: string, opts?: Record<string, unknown>): string => i18n.t(key, o
 /* ==================================================================== */
 
 /**
- * Semua state & aksi untuk mengelola daftar desain tersimpan (Zustand).
- * Sama untuk elemen apa pun — dihasilkan oleh `useDesignSaver`.
+ * All state & actions for managing the saved design list (Zustand).
+ * The same for any element; produced by `useDesignSaver`.
  */
 export interface DesignManagerProps {
   designs: SavedDesign[];
@@ -80,18 +80,18 @@ export interface DesignManagerProps {
   renameValue: string;
   setRenameValue: Dispatch<SetStateAction<string>>;
 
-  /** Simpan sebagai desain BARU. Mengembalikan id, atau null bila kuota gratis penuh. */
+  /** Saves as a NEW design. Returns the id, or null when the free quota is full. */
   handleSaveNew: (name?: string) => string | null;
-  /** Perbarui desain yang sedang dibuka (tidak memakai kuota). */
+  /** Updates the currently open design (does not use quota). */
   handleSaveChanges: () => boolean;
   handleNewDesign: () => void;
-  /** Simpan salinan desain aktif (dihitung sebagai desain baru). null bila kuota penuh. */
+  /** Saves a copy of the active design (counts as a new design). null when the quota is full. */
   handleDuplicate: () => string | null;
-  /** Batas desain gratis (undefined = tanpa batas). */
+  /** Free design limit (undefined = unlimited). */
   freeLimit?: number;
-  /** true bila jumlah desain sudah mencapai batas gratis. */
+  /** true when the design count has reached the free limit. */
   limitReached: boolean;
-  /** true jika ada perubahan yang belum disimpan. */
+  /** true when there are unsaved changes. */
   isDirty: boolean;
   handleLoad: (design: SavedDesign) => void;
   handleDelete: (id: string) => void;
@@ -100,34 +100,34 @@ export interface DesignManagerProps {
   cancelRename: () => void;
 }
 
-/** Satu kategori di accordion panel. */
+/** One category in the panel accordion. */
 export interface PanelSection {
   id: string;
   label: string;
   icon: LucideIcon;
   content: ReactNode;
-  /** true = tidak ditampilkan (praktis untuk section kondisional). */
+  /** true = not shown (handy for conditional sections). */
   hidden?: boolean;
-  /** true = ditaruh paling atas (dan terbuka) di Pengaturan, mis. Koleksi data. */
+  /** true = placed at the very top (and open) in Settings, e.g. Data collection. */
   lead?: boolean;
 }
 
 /**
- * Props semua section bersama. Section bersifat "adaptif": setiap field
- * hanya ditampilkan kalau key-nya MEMANG ADA di state `s`. Jadi elemen
- * dengan bentuk state berbeda (Checkbox tanpa borderStyle, Table tanpa
- * padding, dst) cukup memakai section yang sama — tidak perlu lagi
- * adapter `toBoxLike()` yang mengisi field palsu.
+ * Props for every shared section. Sections are "adaptive": each field
+ * is only shown when its key REALLY EXISTS in the state `s`. So elements
+ * with different state shapes (Checkbox without borderStyle, Table without
+ * padding, etc.) can use the same section; there is no longer any need for
+ * a `toBoxLike()` adapter that fills in fake fields.
  *
- * Nama key bisa dioper lewat `keys` kalau berbeda dari default
- * (mis. Card: `keys={{ size: "titleFontSize" }}`).
+ * Key names can be passed through `keys` when they differ from the default
+ * (e.g. Card: `keys={{ size: "titleFontSize" }}`).
  */
 export interface SectionProps<S> {
   s: S;
   update: Updater<S>;
 }
 
-/** Akses longgar berbasis string — dipakai internal oleh section generik. */
+/** Loose string-based access, used internally by the generic sections. */
 function loose<S>(s: S, update: Updater<S>) {
   const o = s as unknown as Record<string, unknown>;
   const setter = update as unknown as (k: string, v: unknown) => void;
@@ -141,7 +141,7 @@ function loose<S>(s: S, update: Updater<S>) {
 }
 type Loose = ReturnType<typeof loose>;
 
-/* -------- kontrol kecil untuk akses longgar (internal) -------- */
+/* -------- small controls for loose access (internal) -------- */
 
 function LNum({
   f,
@@ -243,7 +243,7 @@ function LToggle({ f, k, label }: { f: Loose; k: string; label: string }) {
   );
 }
 
-/** Row 2 kolom yang otomatis jadi 1 kolom kalau salah satu field tidak ada. */
+/** A 2-column row that automatically becomes 1 column when one of the fields is missing. */
 function AutoRow({ children }: { children: ReactNode[] }) {
   const items = children.filter(Boolean);
   if (items.length === 0) return null;
@@ -255,7 +255,7 @@ function AutoRow({ children }: { children: ReactNode[] }) {
 /* Section bersama                                                      */
 /* ==================================================================== */
 
-/** Teks konten + alignment. `children` = field tambahan khusus elemen. */
+/** Content text + alignment. `children` = extra element-specific fields. */
 function ContentSection<S>({
   s,
   update,
@@ -296,7 +296,7 @@ function ContentSection<S>({
   );
 }
 
-/** Ikon dari pustaka global + posisi, ukuran, jarak, mode warna. */
+/** Icon from the global library + position, size, spacing, color mode. */
 export function IconSection<S>({
   s,
   update,
@@ -345,7 +345,7 @@ export function IconSection<S>({
   );
 }
 
-/** Lebar elemen (auto / tetap / penuh). */
+/** Element width (auto / fixed / full). */
 export function SizingSection<S>({
   s,
   update,
@@ -364,7 +364,7 @@ export function SizingSection<S>({
   );
 }
 
-/** 4 sisi dengan toggle "sama rata". `base` = "padding" | "margin" | prefix lain. */
+/** 4 sides with a "uniform" toggle. `base` = "padding" | "margin" | another prefix. */
 function BoxSidesGroup({
   f,
   base,
@@ -409,7 +409,7 @@ function BoxSidesGroup({
   );
 }
 
-/** Padding + margin (masing-masing tampil hanya kalau ada di state). */
+/** Padding + margin (each shown only when present in the state). */
 export function SpacingSection<S>({
   s,
   update,
@@ -431,7 +431,7 @@ export function SpacingSection<S>({
   );
 }
 
-/** v7: true = font elemen diatur di bagian "Font" tersendiri (Inspector), jangan tampilkan lagi di Tipografi. */
+/** v7: true = the element font is set in its own "Font" section (Inspector); do not show it again in Typography. */
 export const GenericFontContext = createContext(false);
 
 export interface TypographyKeys {
@@ -455,7 +455,7 @@ const DEFAULT_TYPO_KEYS: TypographyKeys = {
   lineHeight: "lineHeight",
 };
 
-/** Ukuran, ketebalan, warna, jarak huruf, transformasi teks. */
+/** Size, weight, color, letter spacing, text transform. */
 export function TypographySection<S>({
   s,
   update,
@@ -530,8 +530,8 @@ export function TypographySection<S>({
 }
 
 /**
- * Background. Dengan key `bgType` → editor lengkap (none / warna / gradient /
- * gambar). Tanpa `bgType` → hanya pemilih warna.
+ * Background. With a `bgType` key → the full editor (none / color / gradient /
+ * image). Without `bgType` → only a color picker.
  */
 export function BackgroundSection<S>({
   s,
@@ -560,7 +560,7 @@ export interface BorderKeys {
   pill?: string;
 }
 
-/** Ketebalan, gaya, warna, radius, pill. */
+/** Width, style, color, radius, pill. */
 export function BorderSection<S>({
   s,
   update,
@@ -706,9 +706,9 @@ export interface HoverLabels {
 }
 
 /**
- * Hover: toggle, transisi, warna (bg/teks/border), efek gerak, shadow hover.
- * Field yang tidak ada di state otomatis disembunyikan. `children` =
- * field hover tambahan khusus elemen (mis. zoom gambar).
+ * Hover: toggle, transition, colors (bg/text/border), motion effects, hover shadow.
+ * Fields missing from the state are hidden automatically. `children` =
+ * extra element-specific hover fields (e.g. image zoom).
  */
 export function HoverSection<S>({
   s,
@@ -781,7 +781,7 @@ export function FocusRingSection<S>({ s, update }: SectionProps<S>) {
 }
 
 /* ==================================================================== */
-/* Ikon kategori — dipakai semua elemen supaya ikon kategori sama        */
+/* Category icons: used by every element so the category icons match    */
 /* ==================================================================== */
 
 export const SECTION_ICONS = {
@@ -805,7 +805,7 @@ export const SECTION_ICONS = {
 } as const satisfies Record<string, LucideIcon>;
 
 /* ==================================================================== */
-/* Paket section standar untuk elemen "konten tunggal" (StyleState)      */
+/* Standard section bundle for "single content" elements (StyleState)   */
 /* ==================================================================== */
 
 type StandardSectionId =
@@ -821,19 +821,19 @@ type StandardSectionId =
   | "hover";
 
 export interface StandardSectionOptions {
-  /** Label field teks di section Konten (mis. "Placeholder"). */
+  /** Text field label in the Content section (e.g. "Placeholder"). */
   textLabel?: string;
   multiline?: boolean;
-  /** Field tambahan di dalam section Konten (tag HTML, href, dst). */
+  /** Extra fields inside the Content section (HTML tag, href, etc.). */
   contentExtra?: ReactNode;
-  /** Jenis background yang boleh dipilih (default semua). */
+  /** Background kinds that may be chosen (default: all). */
   backgroundKinds?: BgKind[];
-  /** Section standar yang tidak dipakai elemen ini. */
+  /** Standard sections this element does not use. */
   omit?: StandardSectionId[];
   hoverLabels?: HoverLabels;
   hoverTitle?: string;
   withHoverTransform?: boolean;
-  /** Section tambahan; disisipkan setelah section dengan id `after` (default di akhir). */
+  /** Extra sections; inserted after the section with id `after` (default: at the end). */
   extra?: (PanelSection & { after?: string })[];
 }
 
@@ -934,8 +934,8 @@ function AccordionItem({
         />
       </button>
 
-      {/* Animasi buka/tutup lewat grid-rows; `invisible` saat tertutup
-          supaya isinya tidak bisa difokus lewat keyboard. */}
+      {/* Open/close animation via grid-rows; `invisible` when closed
+          so its content cannot be focused with the keyboard. */}
       <div
         className={`grid transition-[grid-template-rows,visibility] duration-200 ease-out ${
           isOpen ? "grid-rows-[1fr] visible" : "grid-rows-[0fr] invisible"
@@ -950,30 +950,30 @@ function AccordionItem({
 }
 
 /* ==================================================================== */
-/* PanelStyling — SATU-SATUNYA panel yang dipakai semua element maker    */
+/* PanelStyling: the ONLY panel used by every element maker             */
 /* ==================================================================== */
 
 export interface PanelStylingProps {
   /** Kategori accordion, berurutan. */
   sections: PanelSection[];
-  /** Kembalikan state ke default. */
+  /** Reset the state to defaults. */
   onReset: () => void;
-  /** Field "Nama Class" di atas accordion (semua elemen memakainya). */
+  /** The "Class Name" field above the accordion (used by every element). */
   classNameField?: {
     value: string;
     onChange: (v: string) => void;
     placeholder: string;
-    /** Nama class yang benar-benar dipakai (untuk pesan kalau input tidak valid). */
+    /** The class name actually used (for the message when the input is invalid). */
     effective?: string;
   };
-  /** Id kategori yang terbuka pertama kali. Default: kategori pertama. */
+  /** Id of the category opened first. Default: the first category. */
   defaultOpen?: string | null;
   /**
-   * Dipakai di dalam panel lain yang sudah punya area scroll sendiri
-   * (Component Maker): tanpa sticky/tinggi maksimum, scroll diatur induknya.
+   * Used inside another panel that already has its own scroll area
+   * (Component Maker): no sticky/max height, scrolling is handled by the parent.
    */
   embedded?: boolean;
-  /** Teks tombol & konfirmasi reset (default: reset ke default). */
+  /** Reset button & confirmation text (default: reset to defaults). */
   resetLabel?: string;
   resetConfirmText?: string;
 }
@@ -1041,7 +1041,7 @@ export default function PanelStyling({
           ))}
         </div>
 
-        {/* Tombol reset tetap terlihat di bawah, di luar area scroll */}
+        {/* The reset button stays visible at the bottom, outside the scroll area */}
         <div className="shrink-0 border-t border-gray-200 dark:border-gray-800 px-4 py-4">
           {confirmReset ? (
             <div className="flex items-center gap-2">

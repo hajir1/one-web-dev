@@ -4,7 +4,7 @@ import { furnitureMinimalis, languageKursusBahasa, languageLesPrivat, maritimeDi
 import { agricultureHidroponik, craftAnyaman, craftKeramik, financeInvestasi, saasAnalitikData } from "./e3";
 import { educationBimbelOnline, energyAngin, logisticsGudang, nonprofitLaporanDampak, startupPitch } from "./e4";
 
-/** Konten template katalog v4 (bagian E), dikunci dengan ID di ../catalogE.ts. */
+/** Catalog v4 template content (part E), keyed by the IDs in ../catalogE.ts. */
 export const V4E_TEMPLATES: Record<string, TemplateContent> = {
   "coworking-ruang-temu": coworkingRuangTemu,
   "coworking-hub-kreatif": coworkingHubKreatif,

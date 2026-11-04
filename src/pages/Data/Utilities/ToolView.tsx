@@ -10,7 +10,7 @@ import { defaultOptions, type OptionDef, type OptionValues, type ToolDef, type T
 
 const MAX_INPUT_BYTES = 5 * 1024 * 1024;
 
-/** Label opsi: data.util.options.<id>.label, nilai: data.util.options.<id>.values.<v>. */
+/** Option label: data.util.options.<id>.label, value: data.util.options.<id>.values.<v>. */
 function OptionControl({ tool, def, value, onChange }: { tool: ToolDef; def: OptionDef; value: string | boolean | number; onChange: (v: string | boolean | number) => void }) {
   const { t } = useTranslation();
   const id = useId();
@@ -38,7 +38,7 @@ function OptionControl({ tool, def, value, onChange }: { tool: ToolDef; def: Opt
   );
 }
 
-/** Tampilan generik: input → aksi → output (+ salin, unduh, jadikan input). */
+/** Generic view: input → action → output (+ copy, download, use as input). */
 export default function ToolView({ tool }: { tool: ToolDef }) {
   const { t } = useTranslation();
   const [input, setInput] = useState("");
@@ -52,7 +52,7 @@ export default function ToolView({ tool }: { tool: ToolDef }) {
   const inputId = useId();
   const outputId = useId();
 
-  // Ganti alat → reset state.
+  // Tool change → reset state.
   useEffect(() => {
     setInput("");
     setOpts(defaultOptions(tool));

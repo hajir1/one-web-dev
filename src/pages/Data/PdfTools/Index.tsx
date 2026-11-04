@@ -33,12 +33,12 @@ import { MAX_IMAGES, MAX_PDF_BYTES, MAX_PDF_FILES } from "./pdfLimits";
 import type { ImageInput, PageSize } from "./pdfLib";
 import { isDemoMode } from "../../../demo/demoMode";
 
-/** pdf-lib (±400 KB) dimuat saat alat pertama kali dipakai. */
+/** pdf-lib (about 400 KB) loads when a tool is first used. */
 const lib = () => import("./pdfLib");
 
 /* ================================================================== */
-/* Alat PDF (v10): gabung, pisah, ambil/hapus/putar/susun halaman,       */
-/* kompres, PDF → gambar, gambar → PDF. 100% di browser, gratis.        */
+/* PDF tools (v10): merge, split, extract/delete/rotate/reorder pages,   */
+/* compress, PDF → images, images → PDF. 100% in the browser, free.    */
 /* ================================================================== */
 
 const BASE = "/data-tools/pdf-tools";
@@ -68,7 +68,7 @@ async function zipAndDownload(entries: { name: string; data: Blob | Uint8Array }
   triggerDownload(await zip.generateAsync({ type: "blob" }), zipName);
 }
 
-/** Satu berkas PDF terpilih + jumlah halamannya. */
+/** One selected PDF file + its page count. */
 function usePdfFile() {
   const [file, setFile] = useState<File | null>(null);
   const [pages, setPages] = useState<number | null>(null);
@@ -113,7 +113,7 @@ function PdfPicker({ state }: { state: ReturnType<typeof usePdfFile> }) {
   );
 }
 
-/** Tombol proses + progres + hasil. */
+/** Process button + progress + result. */
 function useRunner() {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -224,7 +224,7 @@ function MergeTool() {
   );
 }
 
-/* ------------------- satu PDF + rentang halaman ------------------- */
+/* ------------------- one PDF + page range ------------------- */
 
 function RangeTool({ tool }: { tool: "extract" | "delete" | "rotate" | "organize" | "split" }) {
   const { t } = useTranslation();
@@ -333,7 +333,7 @@ function CompressTool() {
   );
 }
 
-/* --------------------------- PDF → gambar --------------------------- */
+/* --------------------------- PDF → image --------------------------- */
 
 function ToImageTool() {
   const { t } = useTranslation();
@@ -372,9 +372,9 @@ function ToImageTool() {
   );
 }
 
-/* --------------------------- gambar → PDF --------------------------- */
+/* --------------------------- image → PDF --------------------------- */
 
-/** Baca gambar; selain JPG/PNG (WebP, GIF, BMP, AVIF) diubah ke PNG lewat canvas. */
+/** Reads an image; anything other than JPG/PNG (WebP, GIF, BMP, AVIF) is converted to PNG via canvas. */
 async function toImageInput(f: File): Promise<ImageInput> {
   const bytes = await readBytes(f);
   const bmp = await createImageBitmap(f).catch(() => {
@@ -446,7 +446,7 @@ function FromImageTool() {
   );
 }
 
-/* ------------------------------ halaman ----------------------------- */
+/* ------------------------------ page ----------------------------- */
 
 function Hub() {
   const { t } = useTranslation();

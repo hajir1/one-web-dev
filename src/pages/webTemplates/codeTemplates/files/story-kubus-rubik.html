@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Sudut Solusi · Konsultan Bisnis</title>
 <meta name="description" content="Konsultan bisnis: kubus rubik teracak yang diselesaikan putaran demi putaran mengikuti scroll, lalu meledak menjadi 26 keping dan merapat kembali.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -33,7 +33,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   }
   function easeOf(name) {
     if (typeof name === "function") return name;
-    if (!name) return power(2, "out"); /* bawaan = power1.out (n=2 di sini setara kuadrat) */
+    if (!name) return power(2, "out"); /* default = power1.out (n=2 here equals quadratic) */
     if (name === "none" || name === "linear") return function (t) { return t; };
     var m = /^(power([0-4])|sine)(?:\.(in|out|inOut))?$/.exec(name);
     if (!m) return power(2, "out");
@@ -52,13 +52,13 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   var TRANSFORM = { x: "px", y: "px", scale: "", scaleX: "", scaleY: "", rotate: "deg", rotateX: "deg", rotateY: "deg" };
   function isEl(o) { return o && o.nodeType === 1; }
 
-  /* Ambil angka-angka di dalam teks (mis. clipPath "inset(0 100% 0 0)") agar bisa di-interpolasi. */
+  /* Pull the numbers out of the text (e.g. clipPath "inset(0 100% 0 0)") so they can be interpolated. */
   function nums(s) { return String(s).match(/-?\d*\.?\d+/g) || []; }
   function mixStr(a, b, k) {
     var na = nums(a), i = 0;
     return String(b).replace(/-?\d*\.?\d+/g, function (m) { var f = na[i] !== undefined ? parseFloat(na[i]) : 0; i++; return String(Math.round((f + (parseFloat(m) - f) * k) * 1000) / 1000); });
   }
-  /* Nilai transform awal diambil dari CSS (mis. scaleX(0) pada garis progres). */
+  /* Initial transform values are read from CSS (e.g. scaleX(0) on the progress bar). */
   function stateOf(el) {
     if (el.__owds) return el.__owds;
     var st = { x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotate: 0, rotateX: 0, rotateY: 0 };
@@ -85,7 +85,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     } else el.style[key] = typeof v === "number" && key !== "opacity" && key !== "zIndex" ? v + "px" : String(v);
   }
 
-  /* Satu tween = satu target, nilai awal & akhir, posisi dalam rentang 0..1. */
+  /* One tween = one target, start & end values, position within the 0..1 range. */
   function makeTween(target, from, to, offset, span) {
     var keys = Object.keys(to).filter(function (k) { return !SPECIAL[k]; });
     var el = isEl(target);
@@ -108,7 +108,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     };
   }
 
-  /* Posisi "<tepi elemen> <tepi layar>" → piksel scroll. */
+  /* Position "<element edge> <screen edge>" → scroll pixels. */
   function edge(word, size) {
     if (word === "top" || word === undefined) return 0;
     if (word === "center") return size / 2;
@@ -153,7 +153,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     var active = y >= this.start && y <= this.end;
     if (active !== this.isActive) { this.isActive = active; if (this.vars.onToggle) this.vars.onToggle(this); }
   };
-  /* Majukan progres (scrub angka = menyusul pelan). Hasil: true bila berubah. */
+  /* Advance progress (numeric scrub = catches up slowly). Returns true when it changed. */
   ST.prototype.advance = function (dt, force) {
     if (this.lag > 0 && !force) this.progress += (this.target - this.progress) * (1 - Math.exp((-dt * 4) / this.lag));
     else this.progress = this.target;
@@ -164,7 +164,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
   };
   ST.prototype.render = function () {
     var first = this.shown < 0;
-    /* Seperti GSAP: tween yang belum pernah dimulai (progres 0) tidak menimpa nilai awal halaman. */
+    /* Like GSAP: a tween that has never started (progress 0) does not overwrite the page's initial values. */
     if (first && this.progress === 0 && this.lazy) { this.shown = 0; return; }
     this.shown = this.progress;
     this.tweens.forEach(function (t) { t.render(this.progress); }, this);
@@ -188,10 +188,10 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
     return st;
   }
 
-  /* Beberapa trigger boleh menggerakkan objek yang sama (pose per bab). Agar hasilnya   */
-  /* selalu "bab yang sedang dibaca", urutan gambar dibuat pasti: trigger yang kembali ke */
-  /* 0 digambar dari belakang ke depan, lalu semua yang sedang/sudah jalan (progres > 0)  */
-  /* digambar dari depan ke belakang, sehingga bab paling akhir yang aktif menang.         */
+  /* Several triggers may move the same object (a pose per chapter). So the result is    */
+  /* always "the chapter being read", the draw order is fixed: triggers that are back at  */
+  /* 0 are drawn from last to first, then all running/finished ones (progress > 0)       */
+  /* are drawn from first to last, so the latest active chapter wins.                     */
   function frame(now) {
     var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
@@ -239,7 +239,7 @@ document.documentElement.classList.add("js", "loading");
 setTimeout(function () { var r = document.documentElement; if (!r.classList.contains("webgl") && !r.classList.contains("no-webgl")) { r.classList.add("no-webgl"); r.classList.remove("loading"); } }, 12000);
 </script>
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg: #121316; /* Latar halaman */
   --bg-2: #2a2c33; /* Latar kedua (cahaya) */
@@ -267,7 +267,7 @@ a { color: inherit; }
 
 #gl { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; display: block; opacity: 0; transition: opacity 1s; pointer-events: none; }
 html.webgl #gl { opacity: 1; }
-/* Tirai warna: dipakai saat kamera "masuk" ke objek (layar, mata, cangkir), lalu teks muncul dari situ. */
+/* Color curtain: used when the camera "enters" the object (screen, eye, cup), then the text appears from there. */
 #veil { position: fixed; inset: 0; z-index: 1; background: var(--veil); opacity: 0; pointer-events: none; }
 .loader { position: fixed; left: 20px; bottom: 20px; z-index: 40; display: none; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); color: var(--ink-soft); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; pointer-events: none; }
 html.loading .loader { display: flex; }
@@ -385,7 +385,7 @@ function race(path, get) {
     let i = 0, fails = 0, done = false;
     const next = () => {
       const cdn = order[i++], url = cdn + path;
-      /* CDN yang menang dipakai lebih dulu untuk library berikutnya. */
+      /* The CDN that wins is tried first for the next library. */
       get(url).then((v) => { if (!done) { done = true; CDN.splice(CDN.indexOf(cdn), 1); CDN.unshift(cdn); ok(v); } }, () => { if (++fails === CDN.length) no(new Error("Gagal memuat " + path)); else if (i < CDN.length) next(); });
       if (i < CDN.length) setTimeout(() => { if (!done && i < CDN.length) next(); }, 4000);
     };
@@ -396,18 +396,18 @@ const esm = (path) => race(path, (u) => import(u));
 const umd = (path) => race(path, (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })).then((code) => { const s = document.createElement("script"); s.textContent = code; document.head.appendChild(s); });
 const libFail = (e) => { document.documentElement.classList.add("no-webgl"); document.documentElement.classList.remove("loading"); throw e; };
 const [THREE, { default: Lenis }] = await Promise.all([esm("three@0.169.0/build/three.module.min.js"), esm("lenis@1.1.13/dist/lenis.mjs")]).catch(libFail);
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, halaman tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the page still works. */
 await umd("motion@11.11.13/dist/motion.js").catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* ==== TEKS DI DALAM ADEGAN 3D: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== TEXT INSIDE THE 3D SCENE: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan adegan"*/{}/*owd:end*/;
 /* ============================================================================ */
 const BRAND = ((document.querySelector(".nav .brand") || {}).textContent || "").trim() || "Sudut Solusi";
-/* Keadaan adegan per babak (urutan sama dengan section data-act). cam/look = kamera. */
+/* Scene state per act (same order as the data-act sections). cam/look = camera. */
 const KEYS = [{"veil":0,"sway":0.4,"cx":4.6,"cy":3,"cz":7,"lx":-1.8,"ly":0,"lz":0,"solve":0,"explode":0,"still":0,"spin":0},{"veil":0,"sway":0.4,"cx":-4.2,"cy":2.6,"cz":6.2,"lx":1.6,"ly":0,"lz":0,"solve":0.35,"explode":0,"still":0,"spin":0},{"veil":0,"sway":0.4,"cx":4.2,"cy":3.2,"cz":6.6,"lx":-1.6,"ly":0,"lz":0,"solve":1,"explode":0,"still":0,"spin":0},{"veil":0,"sway":0.4,"cx":0,"cy":1,"cz":12,"lx":0,"ly":0.4,"lz":0,"solve":1,"explode":1,"still":0,"spin":0},{"veil":0,"sway":0.4,"cx":-6.4,"cy":2.2,"cz":9,"lx":2.6,"ly":0,"lz":0,"solve":1,"explode":1,"still":0,"spin":0},{"veil":0,"sway":0.4,"cx":5,"cy":4,"cz":7,"lx":-1.8,"ly":0,"lz":0,"solve":1,"explode":0,"still":1,"spin":0.125},{"veil":0,"sway":0.4,"cx":-4,"cy":-2.6,"cz":8,"lx":2,"ly":0,"lz":0,"solve":1,"explode":0,"still":1,"spin":0.125}];
 const THUMB = 1;
 
-/* ---- Adegan 3D (prosedural, tanpa model/tekstur eksternal) ---- */
+/* ---- 3D scene (procedural, no external models/textures) ---- */
 function scene_(ctx) {
   const { THREE, scene, COL, mat, seg, lerp } = ctx;
   const cube = new THREE.Group(); scene.add(cube);
@@ -445,7 +445,7 @@ function scene_(ctx) {
       for (let i = 0; i < SOLVE.length; i++) { const k = Math.max(0, Math.min(1, n - i)); if (k <= 0) break; const e = k < 1 ? k * k * (3 - 2 * k) : 1; if (e > 0) turn(cubies, SOLVE[i], e); }
       const ex = S.explode;
       cubies.forEach((c, i) => {
-        /* Putaran parsial membuat posisi tidak bulat; ledakan memakai arah rumah keping. */
+        /* Partial rotations leave positions off-grid; the explosion uses each piece's home direction. */
         c.g.position.copy(c.p).addScaledVector(dirs[i], ex * (1.6 + (i % 5) * 0.25));
         c.g.quaternion.copy(c.q);
         if (ex > 0) c.g.rotateOnAxis(dirs[i], ex * (t * 0.6 + i));
@@ -456,7 +456,7 @@ function scene_(ctx) {
 }
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, M = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -464,11 +464,11 @@ const COL = { bg: cssv("--bg"), bg2: cssv("--bg-2"), ink: cssv("--ink"), accent:
 const acts = Array.prototype.slice.call(document.querySelectorAll("[data-act]"));
 const navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav ul a"));
 const veil = document.getElementById("veil");
-/* Keadaan cerita saat ini (di-tween OWD Scrub di antara KEYS). */
+/* Current story state (tweened by OWD Scrub between KEYS). */
 const S = Object.assign({}, KEYS[0]);
 const animated = !reduce && hasG && !!M;
 
-/* 1) Teks: pecah per kata / huruf. */
+/* 1) Text: split into words / letters. */
 function splitWords(el) {
   const words = el.textContent.trim().split(/\s+/);
   el.setAttribute("aria-label", el.textContent.trim());
@@ -488,7 +488,7 @@ function splitChars(el) {
   return Array.prototype.slice.call(el.querySelectorAll(".c"));
 }
 
-/* 2) Gulir halus + progres + keadaan adegan per babak. */
+/* 2) Smooth scrolling + progress + scene state per act. */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 function setNav(i) { navLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + acts[i].id)); }
@@ -505,19 +505,19 @@ if (animated) {
     lenis.scrollTo(el, { offset: 0, duration: 1.6 });
   });
   G.to(".progress i", { scaleX: 1, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: true } });
-  /* Keadaan babak i dicapai saat babak i naik dari bawah layar sampai 20% dari atas. */
+  /* The state of act i is reached as act i rises from the bottom of the screen to 20% from the top. */
   for (let i = 1; i < acts.length; i++) {
     G.timeline({ scrollTrigger: { trigger: acts[i], start: "top bottom", end: "top 20%", scrub: 1 } })
       .fromTo(S, Object.assign({}, KEYS[i - 1]), Object.assign({}, KEYS[i], { ease: "none", immediateRender: false }));
   }
   acts.forEach((sec, i) => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%", onToggle: (st) => { if (st.isActive) setNav(i); } }));
 } else if ("IntersectionObserver" in window) {
-  /* Tanpa mesin scroll / kurangi gerak: keadaan melompat ke babak yang sedang dibaca. */
+  /* No scroll engine / reduced motion: the state jumps to the act being read. */
   const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { const i = acts.indexOf(e.target); Object.assign(S, KEYS[i]); setNav(i); } }), { rootMargin: "-50% 0px -50% 0px" });
   acts.forEach((s) => io.observe(s));
 }
 
-/* 3) Efek teks per babak (data-fx). */
+/* 3) Text effects per act (data-fx). */
 if (animated) {
   const { animate, inView, stagger } = M;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -534,13 +534,13 @@ if (animated) {
       const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
       inView(sec, () => { animate(c, { opacity: [0, 1], y: [-30, 0], rotate: [-14, 0] }, { delay: stagger(0.02), duration: 0.55, ease }); showRest(0.4); }, { amount: 0.25 });
     } else if (fx === "type") {
-      /* Mengetik mengikuti scroll (seperti keluar dari layar). */
+      /* Typing with the scroll (as if coming out of the screen). */
       const c = splitChars(head); c.forEach((x) => { x.style.opacity = "0"; });
       let shown = -1;
       ST.create({ trigger: sec, start: "top 70%", end: "top 15%", scrub: true, onUpdate: (st) => { const n = Math.round(st.progress * c.length); if (n === shown) return; shown = n; c.forEach((x, k) => { x.style.opacity = k < n ? "1" : "0"; }); } });
       inView(head, () => showRest(0.2), { amount: 0.9 });
     } else if (fx === "zoom") {
-      /* Panel membesar dari titik tengah layar (dari dalam objek). */
+      /* The panel grows from the center of the screen (from inside the object). */
       G.fromTo(panel, { scale: 0.18, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: sec, start: "top 85%", end: "top 25%", scrub: true } });
       rest.forEach((el) => { el.style.opacity = ""; });
     } else if (fx === "wipe") {
@@ -594,7 +594,7 @@ function start() {
   const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(4, 8, 6); scene.add(key);
   const rim = new THREE.DirectionalLight(COL.accent, 2.2); rim.position.set(-6, 3, -5); scene.add(rim);
 
-  /* Bantuan untuk adegan. */
+  /* Scene helpers. */
   const textures = [];
   function glow() {
     const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -603,7 +603,7 @@ function start() {
     g.fillStyle = r; g.fillRect(0, 0, 128, 128);
     const t = new THREE.CanvasTexture(c); textures.push(t); return t;
   }
-  /* Kanvas yang bisa digambar ulang (layar, peta, label). */
+  /* Canvases that can be redrawn (screen, map, labels). */
   function paint(w, h, draw) {
     const c = document.createElement("canvas"); c.width = w; c.height = h;
     const g = c.getContext("2d"), tex = new THREE.CanvasTexture(c);
@@ -614,7 +614,7 @@ function start() {
   }
   const mat = (color, o) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.55, metalness: 0.05 }, o || {}));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  /* Potongan progres: 0 sebelum a, 1 setelah b, halus di antaranya. */
+  /* Progress slice: 0 before a, 1 after b, smooth in between. */
   const seg = (v, a, b) => { const x = clamp((v - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
   const lerp = (a, b, k) => a + (b - a) * k;
   let seed = 7;
@@ -633,7 +633,7 @@ function start() {
   const io = new IntersectionObserver((en) => { visible = en[0].isIntersecting; });
   io.observe(canvas);
 
-  /* Kamera dari keadaan: cam (posisi) & look (titik pandang). Layar sempit: mundur & ke tengah. */
+  /* Camera from the state: cam (position) & look (look-at point). Narrow screens: pull back & center. */
   function applyCamera() {
     const narrow = camera.aspect < 0.9, k = narrow ? Math.pow(0.9 / camera.aspect, 0.8) : 1;
     const lx = S.lx * (narrow ? 0.15 : 1);

@@ -1,7 +1,7 @@
 // ─── auth/session.ts ─────────────────────────────────────────────────────────
-// Sesi login dari backend Nest. Token ada di cookie httpOnly (tidak bisa
-// dibaca JavaScript); frontend hanya menyimpan PROFIL di memori. Status
-// login selalu dicek ulang ke GET /auth/me saat aplikasi dibuka.
+// Login session from the Nest backend. Tokens live in httpOnly cookies (not
+// readable by JavaScript); the frontend only keeps the PROFILE in memory. Login
+// status is always rechecked with GET /auth/me when the app opens.
 
 import { create } from "zustand";
 import { api, ApiError, apiUrl, onSessionExpired } from "../api/client";
@@ -20,14 +20,14 @@ export interface SessionUser {
   referralCode?: string | null;
   hasPassword: boolean;
   providers: string[];
-  /** Versi S&K yang berlaku di server. */
+  /** The terms version in effect on the server. */
   termsVersion?: string;
-  /** User sudah menyetujui versi yang berlaku (wajib sebelum membeli). */
+  /** The user has accepted the current version (required before purchasing). */
   termsAccepted?: boolean;
   mfaEnabled?: boolean;
-  /** v6: admin dengan sesi tervalidasi → semua fitur tanpa kredit (dihitung server). */
+  /** v6: admin with a validated session → every feature without credits (computed by the server). */
   adminFree?: boolean;
-  /** v6: admin, tetapi sesi belum lolos 2FA (mode tanpa kredit belum aktif). */
+  /** v6: admin, but the session has not passed 2FA (no-credit mode not active yet). */
   adminFreePendingMfa?: boolean;
 }
 
@@ -47,7 +47,7 @@ interface SessionState {
 export const useSession = create<SessionState>(() => ({ status: "idle", user: null, methods: null }));
 
 const listeners = new Set<(u: SessionUser | null) => void>();
-/** Dipanggil saat user berganti (masuk/keluar) — store lain memuat ulang datanya. */
+/** Called when the user changes (sign in/out): other stores reload their data. */
 export const onUserChange = (cb: (u: SessionUser | null) => void) => {
   listeners.add(cb);
   return () => listeners.delete(cb);
@@ -58,14 +58,14 @@ function setUser(user: SessionUser | null) {
   const prev = before?.id ?? null;
   setAdminFree(user?.adminFree === true, user?.adminFreePendingMfa === true);
   useSession.setState({ user, status: user ? "authenticated" : "anonymous" });
-  // Ganti akun, atau mode admin tanpa kredit berubah (mis. setelah 2FA) → store lain memuat ulang.
+  // Account switched, or admin no-credit mode changed (e.g. after 2FA) → other stores reload.
   if ((user?.id ?? null) !== prev || !!user?.adminFree !== !!before?.adminFree) listeners.forEach((cb) => cb(user));
 }
 
 onSessionExpired(() => setUser(null));
 
 let loading: Promise<SessionUser | null> | null = null;
-/** Muat profil (sekali; panggilan paralel digabung). */
+/** Load the profile (once; parallel calls are merged). */
 export function loadSession(force = false): Promise<SessionUser | null> {
   if (!isBackendConfigured()) {
     useSession.setState({ status: "unavailable", user: null });
@@ -80,7 +80,7 @@ export function loadSession(force = false): Promise<SessionUser | null> {
       setUser(user);
       return user;
     } catch (e) {
-      // 401 = belum masuk; 403 EMAIL_NOT_VERIFIED/ACCOUNT_SUSPENDED = sesi tidak berlaku.
+      // 401 = not signed in; 403 EMAIL_NOT_VERIFIED/ACCOUNT_SUSPENDED = session not valid.
       if (e instanceof ApiError && (e.status === 401 || e.status === 403)) setUser(null);
       else useSession.setState({ status: "unavailable", user: null });
       return null;
@@ -105,7 +105,7 @@ export async function signIn(email: string, password: string): Promise<SessionUs
   return r.user;
 }
 
-/** Balasan daftar / kirim ulang: selalu sama (backend tidak membocorkan email terdaftar). */
+/** Sign-up / resend response: always the same (the backend does not leak registered emails). */
 export interface VerificationPending {
   status: "verification_pending";
   email: string;
@@ -114,8 +114,8 @@ export interface VerificationPending {
 
 
 /**
- * Daftar email + sandi. Akun baru BELUM bisa dipakai: backend mengirim
- * tautan verifikasi ke email, user baru masuk setelah tautan diklik.
+ * Sign up with email + password. The new account CANNOT be used yet: the backend sends
+ * a verification link by email, and the user signs in after clicking it.
  */
 export async function signUp(email: string, password: string, name?: string, lang = currentLang(), referralCode?: string | null): Promise<VerificationPending> {
   return api<VerificationPending>("/auth/register", {
@@ -123,12 +123,12 @@ export async function signUp(email: string, password: string, name?: string, lan
   });
 }
 
-/** Kirim ulang tautan verifikasi (respons generik). */
+/** Resend the verification link (generic response). */
 export async function resendVerification(email: string, lang = currentLang()): Promise<VerificationPending> {
   return api<VerificationPending>("/auth/verify-email/resend", { body: { email, lang } });
 }
 
-/** Klik tautan verifikasi → akun aktif dan langsung masuk. */
+/** Clicking the verification link → account activated and signed in. */
 export async function verifyEmail(token: string): Promise<SessionUser> {
   const r = await api<{ user: SessionUser }>("/auth/verify-email", { body: { token } });
   setUser(r.user);
@@ -145,15 +145,15 @@ export async function changePassword(currentPassword: string | undefined, newPas
 }
 
 /**
- * URL login Google di backend; setelah selesai backend mengarahkan kembali ke `redirect`.
- * `accept` = user mencentang persetujuan S&K (akun baru tercatat setuju).
+ * Google login URL on the backend; when done the backend redirects back to `redirect`.
+ * `accept` = the user ticked the terms consent (new accounts are recorded as agreeing).
  */
 export const googleSignInUrl = (redirect: string, accept = false, referralCode?: string | null) =>
   apiUrl(`/auth/google?redirect=${encodeURIComponent(redirect)}${accept ? "&accept=1" : ""}${referralCode ? `&ref=${encodeURIComponent(referralCode)}` : ""}`);
 
-// ─── v4: S&K, lupa sandi, hapus akun, unduh data, 2FA ───────────────────────
+// ─── v4: Terms, forgot password, delete account, data download, 2FA ───────────────────────
 
-/** Setujui versi S&K + Kebijakan Privasi yang berlaku. */
+/** Accept the current Terms + Privacy Policy version. */
 export async function acceptTerms(version: string): Promise<void> {
   await api("/auth/terms/accept", { body: { version } });
   await loadSession(true);
@@ -168,13 +168,13 @@ export async function resetPassword(token: string, newPassword: string): Promise
   setUser(null);
 }
 
-/** Hapus akun permanen (data pribadi dianonimkan). `confirm` = "HAPUS"/"DELETE". */
+/** Permanently delete the account (personal data is anonymized). `confirm` = "HAPUS"/"DELETE". */
 export async function deleteAccount(confirm: string, password?: string): Promise<void> {
   await api("/auth/me", { method: "DELETE", body: { confirm, ...(password ? { password } : {}) } });
   setUser(null);
 }
 
-/** Unduh salinan data pribadi (JSON) sebagai berkas. */
+/** Download a copy of personal data (JSON) as a file. */
 export async function downloadMyData(): Promise<void> {
   const data = await api<Record<string, unknown>>("/auth/me/export");
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -195,7 +195,7 @@ export interface MfaStatus {
 export const mfaStatus = () => api<MfaStatus>("/auth/2fa");
 export const mfaSetup = () => api<{ secret: string; otpauthUrl: string }>("/auth/2fa/setup", { method: "POST" });
 export const mfaEnable = (code: string) => api("/auth/2fa/enable", { body: { code } });
-/** Verifikasi 2FA sesi ini, lalu muat ulang profil (mode admin tanpa kredit bisa aktif). */
+/** Verify 2FA for this session, then reload the profile (admin no-credit mode may activate). */
 export async function mfaVerify(code: string) {
   await api("/auth/2fa/verify", { body: { code } });
   await loadSession(true);

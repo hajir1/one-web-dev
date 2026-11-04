@@ -7,17 +7,17 @@ import { serverPiece } from "../serverCatalog";
 import type { ElementCatalogItem, ItemId, SectionCatalogItem } from "../types";
 
 /* ================================================================== */
-/* Data katalog section & elemen (kode editor ada di frontend; tier &    */
-/* harga ditimpa nilai server dari GET /catalog). Template TIDAK lagi    */
-/* dirakit di sini untuk aplikasi: metadata & isinya ada di server.      */
-/* Metadata template dari isi registry: lihat ./templateCatalog.ts       */
-/* (hanya untuk skrip ekspor seed & tes, tidak masuk bundle aplikasi).   */
+/* Section & element catalog data (editor code lives in the frontend; tiers & */
+/* prices are overridden by server values from GET /catalog). Templates are NO longer */
+/* assembled here for the app: their metadata & content live on the server. */
+/* Template metadata from the registry content: see ./templateCatalog.ts */
+/* (only for the seed export script & tests, not in the app bundle).   */
 /* ================================================================== */
 
 
 const ELEMENT_CATEGORY: Record<string, string> = { Elemen: "basic", Form: "form", Data: "data", Navigasi: "navigation", "3D": "3d", Premium: "interactive" };
 
-/** Timpa tier & harga dengan nilai server (bila katalog server sudah dimuat). */
+/** Overrides tiers & prices with server values (once the server catalog has loaded). */
 function withServer<T extends { id: ItemId; tier: "free" | "premium"; price: number }>(item: T): T {
   const s = serverPiece(item.id);
   return s ? { ...item, tier: s.tier, price: s.price } : item;

@@ -1,10 +1,10 @@
 import { svg, specks } from "./art";
 
-/* Ilustrasi 07 Sambal Bu Rum: gaya papan warung dicat tangan (bidang rata, garis arang tebal). */
+/* Illustration 07 Sambal Bu Rum: hand-painted food stall sign style (flat areas, thick charcoal lines). */
 
 const INK = "#1A1A1A";
 
-/** Cobek batu dan ulekan dengan sambal merah. */
+/** A stone mortar and pestle with red sambal. */
 function cobek(): string {
   return svg(
     800,
@@ -13,7 +13,7 @@ function cobek(): string {
   );
 }
 
-/** Tumpukan cabai merah dan rawit hijau. */
+/** Piles of red chilies and green bird's eye chilies. */
 function cabai(): string {
   const chili = (x: number, y: number, r: number, c: string, s = 1) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})"><path d="M0 0c60-10 150 10 200 70-70-10-150-20-200-40z" fill="${c}" stroke="${INK}" stroke-width="7" stroke-linejoin="round"/><path d="M0 0c-14-6-24-20-20-40" stroke="#2F5D3A" stroke-width="12" stroke-linecap="round" fill="none"/></g>`;
   return svg(
@@ -23,7 +23,7 @@ function cabai(): string {
   );
 }
 
-/** Jar kaca berjajar di rak dengan label tulisan tangan. */
+/** Glass jars lined up on a shelf with handwritten labels. */
 function rak(): string {
   const jar = (x: number, c: string, lab: string) => `<g transform="translate(${x} 0)"><rect x="0" y="330" width="150" height="190" rx="18" fill="${c}" stroke="${INK}" stroke-width="8"/><rect x="10" y="300" width="130" height="40" rx="6" fill="#F2B705" stroke="${INK}" stroke-width="8"/><rect x="20" y="390" width="110" height="70" fill="#FFF8EC" stroke="${INK}" stroke-width="5"/><text x="75" y="436" font-family="Georgia,serif" font-size="26" font-weight="700" text-anchor="middle" fill="${INK}">${lab}</text></g>`;
   return svg(

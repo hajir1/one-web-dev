@@ -1,6 +1,6 @@
 import { box, btn, contentJ, el, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, sec, stack, tilt, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 10 · Petak Sembilan: perajin tegel semen Kotagede. Ide besar: situs = lantai tegel; semua bagian mengikuti modul petak, dan sampel tegel bisa dimiringkan. */
+/* 10 · Petak Sembilan: a Kotagede cement tile maker. Big idea: the site = a tiled floor; every part follows the tile module, and tile samples can be tilted. */
 
 const C = { semen: "#A7A39A", oker: "#A8442E", hitam: "#1E1E1C", kunyit: "#D8A13A", kapur: "#EFEBE3" };
 export const L10 = lookJ({ ink: C.hitam, muted: "#45433f", primary: C.oker, primaryDark: "#82321f", soft: "#dcd6cb", line: C.hitam, bg: C.kapur, head: "Unbounded", body: "Rethink Sans", r: 0 });
@@ -18,13 +18,13 @@ const MOTIF: { key: string; code: string; name: B }[] = [
   { key: "polos", code: "PS-09", name: ["Oker Polos", "Plain Ochre"] },
 ];
 
-/** Garis nat: tiap keping dipisah celah 6px berwarna semen gelap. */
+/** Grout lines: each tile is separated by a 6px gap in dark cement color. */
 const NAT = `background: #6f6b63; padding: 6px;`;
 
-/** Keping tegel yang bisa dimiringkan. */
+/** A tile piece that can be tilted. */
 const keping = (j: J, m: (typeof MOTIF)[number], max = 14) => tilt(box([pic(j.img(m.key), `${j.t(["Tegel motif", "Tile pattern"])} ${j.t(m.name)}`, { ratio: "1 / 1", radius: 0 })], { name: `Tegel ${m.code}` }), { max, scale: 1.04, glare: true });
 
-/** Petak 3×3 yang tidak berubah jadi carousel di HP. */
+/** A 3×3 grid that does not turn into a carousel on phones. */
 function petak(cells: BoxNode[], cols: number, gap: number, mobile?: "two"): BoxNode {
   const g = grid(cells, cols, { gap });
   if (mobile) g.mobileGrid = mobile;

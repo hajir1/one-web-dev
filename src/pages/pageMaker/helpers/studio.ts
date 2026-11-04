@@ -4,14 +4,14 @@ import { createPageRoot, createSectionForEditor, isSection, normalizePageDoc, ty
 import { getSectionPreset, isPremiumPreset } from "./sectionPresets";
 
 /* ================================================================== */
-/* Studio (v20): satu website = banyak halaman di satu editor.           */
+/* Studio (v20): one website = many pages in one editor.                */
 /*                                                                    */
-/* Fungsi murni untuk papan halaman:                                    */
-/*   - halaman baru dari pola (kosong, Tentang, Layanan, Kontak),        */
-/*     otomatis memakai header & footer halaman beranda;               */
-/*   - "Samakan header & footer": salin header/footer satu halaman ke    */
-/*     halaman lain (yang lain tidak disentuh).                        */
-/* Header = section pertama bertag <header>; footer = section terakhir   */
+/* Pure functions for the page board:                                   */
+/*   - new pages from patterns (empty, About, Services, Contact),       */
+/*     automatically using the home page's header & footer;            */
+/*   - "Match header & footer": copies one page's header/footer to      */
+/*     other pages (the rest is untouched).                            */
+/* Header = the first section tagged <header>; footer = the last section */
 /* bertag <footer>.                                                    */
 /* ================================================================== */
 
@@ -19,11 +19,11 @@ export type PagePatternId = "blank" | "about" | "services" | "contact";
 
 export interface PagePattern {
   id: PagePatternId;
-  /** Kunci i18n: studio.pattern.<id>.{name,text}. */
+  /** i18n key: studio.pattern.<id>.{name,text}. */
   sections: string[];
 }
 
-/** Hanya preset GRATIS (halaman baru tidak boleh memunculkan dialog kredit). */
+/** FREE presets only (new pages must not trigger the credit dialog). */
 export const PAGE_PATTERNS: PagePattern[] = [
   { id: "blank", sections: [] },
   { id: "about", sections: ["hero-center", "content-sidebar", "pro-cta-band"] },
@@ -33,13 +33,13 @@ export const PAGE_PATTERNS: PagePattern[] = [
 
 const sectionTag = (n: ComponentNode | undefined): string | undefined => (n && isBox(n) && isSection(n) ? n.tag : undefined);
 
-/** Section header halaman (section pertama bertag header). */
+/** The page's header section (the first section tagged header). */
 export function headerOf(doc: PageDoc): BoxNode | null {
   const first = doc.root.children[0];
   return first && sectionTag(first) === "header" ? (first as BoxNode) : null;
 }
 
-/** Section footer halaman (section terakhir bertag footer). */
+/** The page's footer section (the last section tagged footer). */
 export function footerOf(doc: PageDoc): BoxNode | null {
   const last = doc.root.children[doc.root.children.length - 1];
   return last && sectionTag(last) === "footer" ? (last as BoxNode) : null;
@@ -56,7 +56,7 @@ function patternSections(p: PagePattern): BoxNode[] {
   return out;
 }
 
-/** Halaman baru: header beranda + isi pola + footer beranda (semuanya salinan ber-id baru). */
+/** A new page: home header + pattern content + home footer (all copies with new ids). */
 export function buildPatternPage(pattern: PagePatternId, home: PageDoc | null): PageDoc {
   const p = PAGE_PATTERNS.find((x) => x.id === pattern) ?? PAGE_PATTERNS[0];
   const head = home ? headerOf(home) : null;
@@ -65,16 +65,16 @@ export function buildPatternPage(pattern: PagePatternId, home: PageDoc | null): 
   return { version: 2, root: createPageRoot(children) };
 }
 
-/** Salinan utuh halaman lain (id node baru supaya tidak bentrok). */
+/** A full copy of another page (new node ids so they do not clash). */
 export function duplicatePageDoc(source: unknown): PageDoc {
   const doc = normalizePageDoc(source);
   return { ...doc, root: { ...doc.root, children: doc.root.children.map((c) => cloneNode(c)) } };
 }
 
 /**
- * Pasang header & footer `source` ke `target`. Header/footer lama di target
- * diganti; bila target belum punya, ditambahkan di awal/akhir. Bila `source`
- * tidak punya header (atau footer), bagian itu di target tidak diubah.
+ * Applies the header & footer of `source` to `target`. The target's old header/footer
+ * is replaced; when the target has none, they are added at the start/end. When `source`
+ * has no header (or footer), that part of the target is unchanged.
  */
 export function applyChrome(source: PageDoc, target: PageDoc): { doc: PageDoc; changed: boolean } {
   const head = headerOf(source);
@@ -93,5 +93,5 @@ export function applyChrome(source: PageDoc, target: PageDoc): { doc: PageDoc; c
   return { doc: { ...target, root: { ...target.root, children: kids } }, changed: true };
 }
 
-/** Teks ringkas isi halaman untuk kartu papan (jumlah section). */
+/** Short text describing the page content for the board card (section count). */
 export const sectionCount = (doc: unknown) => normalizePageDoc(doc).root.children.length;

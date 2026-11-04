@@ -10,7 +10,7 @@ import { FLOATERS, WORLDS, storyChannels, storyboardOf, storyboardText } from ".
 import { BIZ_LOOKS, type BizLook } from "./bizLooks";
 import { BIZ_DAFTAR_HIDE, bizRegion, type BizDaftar } from "../../pages/webTemplates/codeTemplates/render/bizRender";
 
-/** Isi daftar (blok data DAFTAR) dari spesifikasi. */
+/** List content (the DAFTAR data block) from the spec. */
 export function bizDaftar(s: BizSpec): BizDaftar {
   return {
     ikon: s.icon,
@@ -27,49 +27,49 @@ export function bizDaftar(s: BizSpec): BizDaftar {
 }
 
 /* ================================================================== */
-/* WEBSITE 3D BISNIS (v23): situs usaha lengkap dengan objek 3D.         */
+/* BUSINESS 3D WEBSITES (v23): complete business sites with a 3D object. */
 /*                                                                    */
-/* Satu halaman berisi semua bagian situs bisnis sungguhan: hero 3D      */
-/* interaktif (geser untuk memutar + chip varian warna), profil usaha,   */
-/* katalog dengan filter, keunggulan, alur kerja, testimoni, galeri      */
-/* (foto produk dirender dari objek 3D yang sama), harga/paket, lokasi  */
-/* & jam buka dengan status "buka sekarang", FAQ, formulir kontak yang  */
-/* tersusun jadi pesan WhatsApp, dan tombol WhatsApp mengambang.         */
+/* One page with every part of a real business site: an interactive 3D */
+/* hero (drag to rotate + color variant chips), business profile,      */
+/* catalog with filters, highlights, workflow, testimonials, gallery     */
+/* (product photos rendered from the same 3D object), prices/packages, location */
+/* & opening hours with an "open now" status, FAQ, a contact form that  */
+/* is composed into a WhatsApp message, and a floating WhatsApp button. */
 /*                                                                    */
-/* - three.js  : objek prosedural (bizModels.ts), tanpa model/tekstur    */
-/*               eksternal; pantulan dari lingkungan buatan (PMREM).     */
-/* - OWD Scrub : mesin scroll bawaan menggerakkan cerita objek per bagian */
+/* - three.js  : procedural objects (bizModels.ts), no models/textures   */
+/*               from outside; reflections from a generated environment (PMREM). */
+/* - OWD Scrub : the built-in scroll engine drives the object's story per section */
 /*               (bizStory.ts: benih, rakit, urai, menyelam, partikel). */
-/* - Motion    : judul hero, angka berjalan, tombol magnetis.           */
-/* - Lenis     : gulir halus.                                           */
-/* Fallback: tanpa WebGL → ilustrasi ikon + gradasi; tanpa JS → semua    */
-/* konten tetap terbaca; kurangi gerak → tanpa animasi.                  */
+/* - Motion    : hero heading, counting numbers, magnetic buttons.      */
+/* - Lenis     : smooth scrolling.                                      */
+/* Fallback: no WebGL → icon illustration + gradient; no JS → all       */
+/* content stays readable; reduce motion → no animation.               */
 /* ================================================================== */
 
 export interface BizSpec {
   id: string;
   category: string;
-  /** Kunci di MODELS (bizModels.ts). */
+  /** Key in MODELS (bizModels.ts). */
   model: string;
-  /** Objek di kiri pada hero (tata letak dibalik). */
+  /** Object on the left in the hero (layout flipped). */
   flip?: boolean;
   dark?: boolean;
-  /** Radius sudut kartu (px). */
+  /** Card corner radius (px). */
   round?: number;
   font: [string, string];
-  /** [latar, permukaan, teks, teks lembut, aksen, aksen kedua] */
+  /** [background, surface, text, soft text, accent, second accent] */
   colors: [string, string, string, string, string, string];
   icon: string;
   name: string;
   type: string;
   tagline: string;
   intro: string;
-  /** [judul, paragraf 1, paragraf 2] */
+  /** [title, paragraph 1, paragraph 2] */
   about: [string, string, string];
   /** [kutipan, nama, peran] */
   founder: [string, string, string];
   stats: [string, string][];
-  /** [nama varian, warna 1, warna 2] untuk objek 3D. */
+  /** [variant name, color 1, color 2] for the 3D object. */
   variants: [string, string, string][];
   variantLabel?: string;
   city: string;
@@ -82,16 +82,16 @@ export interface BizSpec {
   phone: string;
   catalogTitle: string;
   cats: string[];
-  /** [nama, deskripsi, harga (0 = tanya), satuan, indeks kategori, ikon, label?] */
+  /** [name, description, price (0 = ask), unit, category index, icon, label?] */
   products: [string, string, number, string, number, string, string?][];
   usp: [string, string, string][];
   steps: [string, string][];
   testi: [string, string, string][];
-  /** [nilai, keterangan] mis. ["4,9", "dari 320 ulasan Google"] */
+  /** [value, caption] e.g. ["4,9", "dari 320 ulasan Google"] */
   rating: [string, string];
   gallery: string[];
   planTitle: string;
-  /** [nama, harga, satuan, ringkasan, fitur[], unggulan?] */
+  /** [name, price, unit, summary, features[], featured?] */
   plans: [string, number, string, string, string[], boolean?][];
   faq: [string, string][];
   cta: [string, string];
@@ -99,7 +99,7 @@ export interface BizSpec {
 
 const path = (u: string) => u.slice(CDNS[0].length);
 
-/* Urutan bagian & pose objek. x = sepersekian setengah lebar layar; ny/ns/no = layar sempit. */
+/* Section order & object poses. x = fraction of half the screen width; ny/ns/no = narrow screens. */
 const SECTIONS = ["beranda", "profil", "katalog", "keunggulan", "alur", "testimoni", "galeri", "harga", "lokasi", "faq", "kontak"] as const;
 type Sec = (typeof SECTIONS)[number];
 const POSE: Record<Sec, { x: number; y: number; s: number; ry: number; rx: number; o: number; ny: number; ns: number; no: number }> = {
@@ -115,7 +115,7 @@ const POSE: Record<Sec, { x: number; y: number; s: number; ry: number; rx: numbe
   faq: { x: 0.56, y: 0, s: 0.9, ry: 8.7, rx: 0.2, o: 1, ny: 1.0, ns: 0.5, no: 0.3 },
   kontak: { x: -0.52, y: 0, s: 1.05, ry: 9.6, rx: 0.14, o: 1, ny: 1.0, ns: 0.55, no: 0.35 },
 };
-/** Sudut foto galeri (dirender dari objek 3D). */
+/** Gallery photo angles (rendered from the 3D object). */
 const SHOTS = [
   { ry: -0.6, rx: 0.2, v: 0, z: 6.4, y: 0.4 },
   { ry: 0.9, rx: 0.35, v: 1, z: 5.6, y: 1.2 },
@@ -129,20 +129,20 @@ export function bizPoses(s: BizSpec) {
   return SECTIONS.map((k) => {
     const p = POSE[k];
     const { beat, ...c } = storyChannels(s.model, k);
-    /* Bagian beradegan butuh kanvas lebih terang; "menyelam" paling terang agar dunianya terlihat. */
+    /* Scene sections need a brighter canvas; "dive" is the brightest so its world is visible. */
     const lit = beat ? { o: Math.max(p.o, c.dive ? 0.6 : 0.5), no: Math.max(p.no, 0.32) } : {};
     return { ...p, x: s.flip ? -p.x : p.x, ...c, ...lit };
   }).map((p, i) => (BIZ_LOOKS[s.id]?.pose ? BIZ_LOOKS[s.id].pose!(SECTIONS[i], p, i) : p));
 }
 
-/** Terapkan identitas (v27) ke spesifikasi: palet, font, sudut, dan salinan hero. */
+/** Applies an identity (v27) to a spec: palette, fonts, corners, and hero copy. */
 export function withLook(spec: BizSpec): BizSpec {
   const L = BIZ_LOOKS[spec.id];
   if (!L) return spec;
   return { ...spec, font: L.font, colors: L.colors, dark: !!L.dark, round: L.round, type: L.type ?? spec.type, tagline: L.tagline ?? spec.tagline, intro: L.intro ?? spec.intro, variants: L.variants ?? spec.variants, gallery: L.gallery ?? spec.gallery };
 }
 
-/** Sisipkan elemen & label khas identitas ke HTML badan halaman. */
+/** Inserts the identity's signature elements & labels into the page body HTML. */
 function applyLookHtml(L: BizLook | undefined, body: string): string {
   if (!L) return body;
   let out = body;
@@ -240,7 +240,7 @@ html:not(.webgl) .hint { display: none; }
 .chip i { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--c1) 50%, var(--c2) 50%); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
 .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
 
-/* bagian samping: teks di satu sisi, objek di sisi lain */
+/* side section: text on one side, object on the other */
 .side .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
 .side.r .copy { grid-column: 2; }
 .side .copy { min-width: 0; }
@@ -255,7 +255,7 @@ html:not(.webgl) .hint { display: none; }
 .founder blockquote { margin: 0 0 10px; font: 500 18px/1.5 var(--fd), system-ui, sans-serif; }
 .founder figcaption { font-size: 14px; color: var(--soft); }
 
-/* katalog */
+/* catalog */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: -10px 0 26px; }
 .tab { min-height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 500 14px/1 var(--ft), system-ui, sans-serif; cursor: pointer; }
 .tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -294,7 +294,7 @@ html:not(.webgl) .hint { display: none; }
 .testi .who b { display: block; }
 .testi .who span { font-size: 13px; color: var(--soft); }
 
-/* galeri: foto dirender dari objek 3D */
+/* gallery: photos rendered from the 3D object */
 .gal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
 .gal li { position: relative; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--r); background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 30%, var(--surface)), color-mix(in srgb, var(--accent-2) 30%, var(--bg))); background-size: cover; background-position: center; }
 .gal li:nth-child(1) { grid-row: span 2; aspect-ratio: auto; }
@@ -302,7 +302,7 @@ html:not(.webgl) .hint { display: none; }
 .gal li.shot .ico { display: none; }
 .gal figcaption { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 86%, transparent); font-size: 14px; font-weight: 500; }
 
-/* harga */
+/* pricing */
 .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
 .plan { display: flex; flex-direction: column; padding: 26px; }
 .plan.hot { border: 2px solid var(--accent); box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--accent) 70%, transparent); position: relative; }
@@ -550,30 +550,30 @@ ${heroHtml(s)}
 </div></footer>
 <a class="fab" href="${esc(waText(s))}" target="_blank" rel="noopener" data-wa aria-label="Chat WhatsApp">${WA_SVG.replace('class="wa-ico" ', "")}</a>
 <script>
-/* ==== DATA USAHA: ubah di sini (atau lewat editor OneWebDev) ==== */
+/* ==== BUSINESS DATA: edit here (or in the OneWebDev editor) ==== */
 const CONFIG = ${dataBlock("CONFIG", "Pengaturan usaha (WhatsApp, jam buka, varian 3D)", config)};
-/* Daftar isi: tambah, hapus, urutkan, atau duplikat item lewat editor OneWebDev (HTML di bawah dibangun ulang dari sini). */
+/* Contents: add, remove, reorder, or duplicate items in the OneWebDev editor (the HTML below is rebuilt from here). */
 const DAFTAR = ${dataBlock("DAFTAR", "Daftar isi (katalog, paket, ulasan, FAQ, ...)", daftar, BIZ_DAFTAR_HIDE.split(","))};
 /* ================================================================ */
 ${UI}
 </script>
 <script type="module">
 ${LIB_IMPORTS}
-/* Motion (skrip klasik); animasi scroll memakai OWD Scrub bawaan (tanpa CDN). Bila gagal, situs tetap jalan. */
+/* Motion (classic script); scroll animation uses the built-in OWD Scrub (no CDN). If it fails, the site still works. */
 await umd(${JSON.stringify(path(MOTION_JS))}).catch((e) => console.warn("[owd] Animasi scroll tidak aktif:", e));
 
-/* Pose objek per bagian (urutan = section data-pose) & sudut foto galeri. */
+/* Object pose per section (order = data-pose sections) & gallery photo angles. */
 const POSES = ${JSON.stringify(bizPoses(s))};
 const SHOTS = ${JSON.stringify(SHOTS)};
 /* Cerita scroll: benih di hero (${SEED_LABEL[story[0]]}) lalu objek tersusun dengan gaya "${story[1]}". */
 /* Storyboard: ${storyboardText(s.model)} */
 const STORY = ${JSON.stringify({ seed: story[0], act: story[0] === "hammer" ? "strike" : "burst", build: story[1], world: board.world, variant: board.variant })};
 
-/* ---- Objek 3D (prosedural, tanpa model/tekstur eksternal) ---- */
+/* ---- 3D object (procedural, no external models/textures) ---- */
 function buildModel(K, THREE, COL, BRAND) {
   const M = K.M;${MODELS[s.model]}
 }
-/* ---- Benih cerita (muncul di hero sebelum objek dirakit) ---- */
+/* ---- Story seed (appears in the hero before the object is assembled) ---- */
 function buildSeed(K, THREE, COL) {
   const M = K.M;${SEEDS[story[0]]}
 }
@@ -604,7 +604,7 @@ ${BOOT}`,
 }
 
 /* ------------------------- skrip antarmuka ------------------------- */
-/* Skrip klasik: jalan segera walau library 3D belum termuat. */
+/* Classic script: runs immediately even if the 3D library has not loaded yet. */
 const UI = String.raw`(function () {
   var root = document.documentElement, reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var nama = ((document.querySelector(".logo span") || {}).textContent || "").trim();
@@ -612,7 +612,7 @@ const UI = String.raw`(function () {
   function waLink(text) { return "https://wa.me/" + wa + "?text=" + encodeURIComponent(text); }
   var rp = function (v) { return "Rp" + v.toLocaleString("id-ID").replace(/,/g, "."); };
   document.querySelectorAll("[data-wa]").forEach(function (a) { a.href = waLink("Halo " + nama + ", saya mau tanya."); });
-  /* Tombol Pesan / Pilih paket: pesan tersusun dari teks yang tampil (ikut berubah bila diedit). */
+  /* Order / Choose package buttons: the message is built from the visible text (updates when it is edited). */
   document.querySelectorAll("[data-order]").forEach(function (a) {
     a.addEventListener("click", function () { var it = a.closest(".item"), h = it.querySelector("h3").textContent.trim(), p = it.querySelector(".price").textContent.replace(/\s+/g, " ").trim(); a.href = waLink(CONFIG.pesanPembuka + "\n- " + h + " (" + p + ")\n\nNama:\nCatatan:"); });
   });
@@ -621,11 +621,11 @@ const UI = String.raw`(function () {
   });
   var y = document.querySelector("[data-year]"); if (y) y.textContent = new Date().getFullYear();
 
-  /* Menu ponsel. */
+  /* Mobile menu. */
   var nav = document.querySelector(".nav"), mb = document.querySelector(".menu-btn");
   if (mb) { mb.addEventListener("click", function () { var o = nav.classList.toggle("open"); mb.setAttribute("aria-expanded", o); }); nav.querySelectorAll("ul a").forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); mb.setAttribute("aria-expanded", "false"); }); }); }
 
-  /* Status buka sekarang (waktu usaha = UTC + zonaWaktu). */
+  /* Open-now status (business time = UTC + zonaWaktu). */
   function mins(s) { var p = String(s).split(/[.:]/); return (+p[0] || 0) * 60 + (+p[1] || 0); }
   function status() {
     var now = new Date(Date.now() + (Number(CONFIG.zonaWaktu) || 7) * 3600e3), d = now.getUTCDay(), m = now.getUTCHours() * 60 + now.getUTCMinutes();
@@ -634,11 +634,11 @@ const UI = String.raw`(function () {
   }
   status(); setInterval(status, 60000);
 
-  /* Saring katalog. */
+  /* Filter the catalog. */
   var tabs = document.querySelectorAll(".tab"), items = document.querySelectorAll(".item");
   tabs.forEach(function (t) { t.addEventListener("click", function () { var f = t.getAttribute("data-f"); tabs.forEach(function (x) { x.setAttribute("aria-pressed", String(x === t)); }); items.forEach(function (it) { it.hidden = f !== "all" && it.getAttribute("data-c") !== f; if (!it.hidden) it.classList.add("in"); }); }); });
 
-  /* Chip varian dari CONFIG.varian; objek 3D mendengarkan event owd:varian. */
+  /* Variant chips from CONFIG.varian; the 3D object listens for the owd:varian event. */
   var vbox = document.querySelector("[data-variants]");
   if (vbox && Array.isArray(CONFIG.varian) && CONFIG.varian.length) {
     vbox.querySelectorAll(".chip").forEach(function (c) { c.remove(); });
@@ -651,7 +651,7 @@ const UI = String.raw`(function () {
     });
   }
 
-  /* Formulir kontak → pesan WhatsApp. */
+  /* Contact form → WhatsApp message. */
   var form = document.querySelector("[data-form]");
   if (form) form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -661,12 +661,12 @@ const UI = String.raw`(function () {
     window.open(waLink(lines.join("\n")), "_blank", "noopener");
   });
 
-  /* Muncul saat digulir. */
+  /* Appears on scroll. */
   var rv = document.querySelectorAll("[data-rv]");
   if (window.OWD_THUMB || reduce || !("IntersectionObserver" in window)) rv.forEach(function (el) { el.classList.add("in"); });
   else { var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" }); rv.forEach(function (el) { io.observe(el); }); }
 
-  /* Menu aktif sesuai bagian yang sedang dibaca. */
+  /* Active menu item for the section being read. */
   var links = document.querySelectorAll(".nav ul a");
   if ("IntersectionObserver" in window) { var io2 = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id); }); }); }, { rootMargin: "-45% 0px -50% 0px" }); document.querySelectorAll("main > section").forEach(function (s) { io2.observe(s); }); }
 })();`;
@@ -676,7 +676,7 @@ const UI = String.raw`(function () {
 const ENGINE = String.raw`
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
-/* OWD Scrub: mesin scroll bawaan OneWebDev (API mirip GSAP + ScrollTrigger). */
+/* OWD Scrub: OneWebDev's built-in scroll engine (API similar to GSAP + ScrollTrigger). */
 const G = window.OWDScrub, ST = G && G.ScrollTrigger, Mo = window.Motion;
 const hasG = !!(G && ST);
 const cssv = (n) => getComputedStyle(root).getPropertyValue(n).trim();
@@ -686,7 +686,7 @@ const secs = Array.prototype.slice.call(document.querySelectorAll("[data-pose]")
 const S = Object.assign({}, POSES[0]);
 const animated = !reduce && hasG;
 
-/* 1) Gulir halus + pose objek per bagian (OWD Scrub). */
+/* 1) Smooth scrolling + object pose per section (OWD Scrub). */
 let lenis = null;
 if (hasG) G.registerPlugin(ST);
 if (animated) {
@@ -707,12 +707,12 @@ if (animated) {
       .fromTo(S, Object.assign({}, POSES[i - 1]), Object.assign({}, POSES[i], { ease: "none", immediateRender: false }));
   }
 } else if ("IntersectionObserver" in window) {
-  /* Tanpa mesin scroll / kurangi gerak: pose melompat ke bagian yang sedang dibaca. */
+  /* No scroll engine / reduced motion: the pose jumps to the section being read. */
   const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) Object.assign(S, POSES[secs.indexOf(e.target)]); }), { rootMargin: "-50% 0px -50% 0px" });
   secs.forEach((s) => io.observe(s));
 }
 
-/* 2) Motion: judul hero per kata, angka berjalan, tombol magnetis. */
+/* 2) Motion: per-word hero heading, counting numbers, magnetic buttons. */
 if (!reduce && Mo && !window.OWD_THUMB) {
   const { animate, inView, stagger } = Mo;
   const ease = [0.2, 0.7, 0.2, 1];
@@ -757,7 +757,7 @@ function start() {
   const textures = [], disposables = [];
   const track = (x) => { disposables.push(x); return x; };
 
-  /* Lingkungan pantulan buatan (tanpa HDR eksternal). */
+  /* Generated reflection environment (no external HDR). */
   const pm = new THREE.PMREMGenerator(renderer), env = new THREE.Scene();
   env.add(new THREE.Mesh(new THREE.BoxGeometry(12, 12, 12), new THREE.MeshBasicMaterial({ color: 0x6f6f74, side: THREE.BackSide })));
   const panel = (c, k, p, w, h) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(p[0], p[1], p[2]); m.lookAt(0, 0, 0); env.add(m); };
@@ -786,7 +786,7 @@ function start() {
     if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat, repeat); }
     textures.push(t); return t;
   }
-  /* Pola abu-abu: warna bahan (varian) yang mewarnainya. */
+  /* Gray pattern: the material colors (variants) that tint it. */
   const PATTERNS = {
     batik: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.fillStyle = "#6a6a6a"; for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) { const cx = x * 64 + 32, cy = y * 64 + 32; for (let k = 0; k < 4; k++) { g.save(); g.translate(cx, cy); g.rotate(k * Math.PI / 2 + Math.PI / 4); g.beginPath(); g.ellipse(0, -16, 9, 15, 0, 0, 7); g.fill(); g.restore(); } g.beginPath(); g.arc(cx, cy, 4, 0, 7); g.fill(); } },
     parang: (g, w) => { g.fillStyle = "#fff"; g.fillRect(0, 0, w, w); g.strokeStyle = "#5c5c5c"; g.lineWidth = 12; for (let i = -4; i < 8; i++) { g.beginPath(); for (let t = 0; t <= 1; t += .05) { const x = i * 48 + t * 256, y = t * 256 + Math.sin(t * Math.PI * 6) * 12; t ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } },
@@ -850,7 +850,7 @@ function start() {
   K.g = model;
   buildModel(K, THREE, COL, BRAND);
 
-  /* Ukuran & titik tengah objek diseragamkan. */
+  /* The object's size & center are normalized. */
   model.updateMatrixWorld(true);
   const bb = new THREE.Box3().setFromObject(model), size = bb.getSize(new THREE.Vector3()), mid = bb.getCenter(new THREE.Vector3());
   const k = 2.7 / Math.max(size.x, size.y, size.z);
@@ -860,7 +860,7 @@ function start() {
   const shadow = new THREE.Mesh(track(new THREE.PlaneGeometry(1, 1)), track(new THREE.MeshBasicMaterial({ map: GLOW, color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false })));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -size.y * k / 2 - 0.08; shadow.scale.set(3.4, 3.4, 1); pivot.add(shadow);
 
-  /* Partikel latar: bentuk kecil melayang. */
+  /* Background particles: small floating shapes. */
   const floaters = new THREE.Group(); scene.add(floaters);
   const fm = [std(COL.accent, { roughness: 0.4 }), std(COL.accent2, { roughness: 0.4 }), track(M.m3.clone())].map((x) => { x.transparent = true; x.opacity = 0.55; x.depthWrite = false; return x; });
   const fg = floatGeo(THREE).map(track);
@@ -871,7 +871,7 @@ ${STORY_ENGINE.trim()}
   const tris = (() => { let n = 0; scene.traverse((o) => { if (o.isMesh) { const gg = o.geometry; n += (gg.index ? gg.index.count : gg.attributes.position.count) / 3; } }); return Math.round(n); })();
   window.__OWD_STATS = { triangles: tris, budget: 120000, contexts: 1 };
 
-  /* Warna varian: m1/m2 + bahan turunan (m1b, m2b) bergeser halus ke warna tujuan. */
+  /* Variant colors: m1/m2 + derived materials (m1b, m2b) shift smoothly to the target color. */
   const v1 = [M.m1, M.m1b].filter(Boolean), v2 = [M.m2, M.m2b].filter(Boolean);
   const want = { a: new THREE.Color(VAR[0].warna1), b: new THREE.Color(VAR[0].warna2) };
   function paintVariant(v, instant) {
@@ -881,7 +881,7 @@ ${STORY_ENGINE.trim()}
   let current = 0;
   document.addEventListener("owd:varian", (e) => { current = e.detail % VAR.length; paintVariant(VAR[current], reduce); spinKick(); });
 
-  /* Putar dengan geser (hero). */
+  /* Rotate by dragging (hero). */
   const stage = document.querySelector(".stage");
   const user = { ry: 0, rx: 0, vy: 0, drag: false, lx: 0, ly: 0 };
   function spinKick() { if (!reduce) user.vy += 0.12; }
@@ -914,7 +914,7 @@ ${STORY_ENGINE.trim()}
     canvas.style.opacity = String(narrow ? S.no : S.o);
   }
 
-  /* Galeri: setiap foto dirender dari objek yang sama (sudut & varian berbeda). */
+  /* Gallery: every photo is rendered from the same object (different angles & variants). */
   let shotsDone = false;
   function shots() {
     if (shotsDone) return; shotsDone = true;

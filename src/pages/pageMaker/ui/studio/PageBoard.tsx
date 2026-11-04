@@ -5,9 +5,9 @@ import type { ResolvedSitePage } from "../../helpers/site";
 import PageThumb from "./PageThumb";
 
 /* ================================================================== */
-/* Papan halaman Studio (v20): semua halaman website berjajar seperti    */
-/* kartu, kartu (+) di ujung untuk menambah. Klik kartu = buka halaman.  */
-/* Seret kartu (atau panah) = ubah urutan menu.                          */
+/* Studio page board (v20): every website page lined up like            */
+/* cards, with a (+) card at the end to add one. Clicking a card = open the page. */
+/* Dragging a card (or the arrows) = change the menu order.             */
 /* ================================================================== */
 
 export interface PageBoardActions {
@@ -19,12 +19,12 @@ export interface PageBoardActions {
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
   onMove: (id: string, to: number) => void;
-  /** Salin header & footer halaman ini ke semua halaman lain. */
+  /** Copies this page's header & footer to every other page. */
   onSyncChrome: (id: string) => void;
   onClose: () => void;
 }
 
-/** Perkiraan tinggi menu ⋯ (8 butir + garis), untuk memilih buka ke bawah atau ke atas. */
+/** Estimated height of the ⋯ menu (8 items + divider), to choose opening down or up. */
 const MENU_H = 300;
 
 function CardMenu({ page, index, count, a }: { page: ResolvedSitePage; index: number; count: number; a: PageBoardActions & { rename: () => void } }) {
@@ -32,8 +32,8 @@ function CardMenu({ page, index, count, a }: { page: ResolvedSitePage; index: nu
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
-  // v21: menu "fixed" di atas kartu (kartu ber-overflow-hidden memotong menu, "Hapus halaman" tak terlihat).
-  // Membuka ke atas bila ruang di bawah tombol tidak cukup.
+  // v21: a "fixed" menu above the card (cards with overflow hidden clipped the menu, "Delete page" was not visible).
+  // Opens upward when there is not enough space below the button.
   const [pos, setPos] = useState<CSSProperties>({});
   const toggle = () => {
     if (!open && btnRef.current) {

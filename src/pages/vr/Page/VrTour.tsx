@@ -42,7 +42,7 @@ import PanoramaStitcher from "../ui/PanoramaStitcher";
 
 const PANO_RULES = { kinds: ["jpeg", "png", "webp"] as const, maxBytes: VR_LIMITS.panoramaBytes, maxFiles: 1 };
 
-/** Simpan berkas ke IndexedDB setelah jenisnya dicek dari isi. */
+/** Stores a file in IndexedDB after its type is checked from its content. */
 async function storeFile(file: File, allowed: VrMediaKind[], maxBytes: number): Promise<{ id: string; kind: VrMediaKind } | { error: string }> {
   if (file.size > maxBytes) return { error: "tooBig" };
   const kind = sniffVrMedia(new Uint8Array(await file.slice(0, 16).arrayBuffer()));
@@ -53,7 +53,7 @@ async function storeFile(file: File, allowed: VrMediaKind[], maxBytes: number): 
   return { id, kind };
 }
 
-/** Hapus berkas yang tidak lagi dipakai tur mana pun. */
+/** Removes files no longer used by any tour. */
 function cleanupMedia() {
   const { tours, media, dropMediaMeta } = useTourStore.getState();
   const ids = orphanMedia(tours, media);
@@ -87,7 +87,7 @@ export default function VrTour() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Daftar tur                                                           */
+/* Tour list                                                            */
 /* ------------------------------------------------------------------ */
 
 function TourList({ onOpen }: { onOpen: (id: string) => void }) {
@@ -173,7 +173,7 @@ function TourList({ onOpen }: { onOpen: (id: string) => void }) {
 function PlanCard() {
   const { t } = useTranslation();
   const pro = useAccess().owns(PRO_KEY);
-  // Mode demo (v15): semua fitur terbuka tanpa batas, tanpa label paket.
+  // Demo mode (v15): every feature unlocked without limits, without plan labels.
   if (isDemoMode())
     return (
       <Panel title={t("demo.vr.title")}>
@@ -231,7 +231,7 @@ function TourEditor({ tour, onBack }: { tour: Tour; onBack: () => void }) {
   const updateScene = (patch: Partial<TourScene>) => update({ ...tour, scenes: tour.scenes.map((s) => (s.id === scene.id ? { ...s, ...patch } : s)) });
   const updateHotspot = (id: string, patch: Partial<Hotspot>) => updateScene({ hotspots: scene.hotspots.map((h) => (h.id === id ? { ...h, ...patch } : h)) });
 
-  // Muat berkas yang dipakai tur dari IndexedDB (sekali per id).
+  // Load the files the tour uses from IndexedDB (once per id).
   const ids = mediaIdsOf(tour).join("|");
   useEffect(() => {
     let alive = true;
@@ -251,7 +251,7 @@ function TourEditor({ tour, onBack }: { tour: Tour; onBack: () => void }) {
     setSelected(null);
   };
 
-  /** Pasang berkas panorama ke scene aktif (unggahan biasa atau hasil Panorama Stitcher v7). */
+  /** Applies a panorama file to the active scene (a regular upload or a Panorama Stitcher v7 result). */
   const applyPanorama = async (f: File) => {
     setBusy(true);
     try {
@@ -405,7 +405,7 @@ function TourEditor({ tour, onBack }: { tour: Tour; onBack: () => void }) {
           </div>
         </Panel>
 
-        {/* Pratinjau */}
+        {/* Preview */}
         <div className="flex min-w-0 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <Segmented

@@ -6,10 +6,10 @@ import type { CollectionDef } from "../../helpers/collections";
 import { BIND_FIELDS, RELATED_MAX, canBind, previewItem, type BindField } from "../../helpers/itemPage";
 
 /* ================================================================== */
-/* Uji coba HALAMAN ITEM: panel Pengaturan                               */
-/*   ItemBoxPanel   box detail = satu item koleksi (+ item pratinjau)    */
-/*   RelatedPanel   kartu "Mungkin Anda suka" (label sama, maks N)       */
-/*   BindPanel      elemen di halaman item: isi dari kolom mana          */
+/* ITEM PAGE trial: Settings panels                                      */
+/*   ItemBoxPanel   detail box = one collection item (+ preview item)    */
+/*   RelatedPanel   "You may also like" cards (same label, max N)        */
+/*   BindPanel      elements on the item page: which field they come from */
 /* ================================================================== */
 
 const INPUT =
@@ -143,7 +143,7 @@ export function BindPanel({ el, onBind }: { el: ElementNode; onBind: (f: BindFie
   );
 }
 
-/** Grup chip (badge/teks/tombol) → filter kategori sebuah koleksi. */
+/** A chip group (badge/text/button) → a category filter for a collection. */
 export function FilterBarPanel({
   box,
   cols,

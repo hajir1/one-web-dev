@@ -11,7 +11,7 @@ import { INPUT } from "../../components/app/ui";
 import { isDemoMode } from "../../demo/demoMode";
 
 /* ================================================================== */
-/* Pusat dokumentasi: /docs dan /docs/:topic (ID & EN dari locales).      */
+/* Documentation hub: /docs and /docs/:topic (ID & EN from the locales). */
 /* ================================================================== */
 
 function TopicLink({ id, active }: { id: DocTopicId; active: boolean }) {
@@ -126,7 +126,7 @@ export default function DocsPage() {
               )}
             </div>
             <DocsContent topic={current} />
-            {/* Mode demo (v15): panduan lengkap /dokumentasi berisi aturan kredit, jadi disembunyikan. */}
+            {/* Demo mode (v15): the full /dokumentasi guide contains credit rules, so it is hidden. */}
             {!isDemoMode() && (current === "page-maker" || current === "website" || current === "global-setting") && (
               <p className="mt-6 rounded-xl border border-dashed border-gray-200 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
                 {t("docs.fullGuide")}{" "}

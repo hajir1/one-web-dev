@@ -1,8 +1,8 @@
 // ─── api/client.ts ───────────────────────────────────────────────────────────
-// Satu lapisan layanan untuk semua panggilan ke backend Nest
+// A single service layer for every call to the Nest backend
 // (VITE_API_BASE_URL, default http://localhost:3000). Cookie sesi httpOnly
-// dikirim otomatis (credentials: "include"); 401 → satu kali POST
-// /auth/refresh lalu permintaan diulang. Tidak ada token di localStorage.
+// sent automatically (credentials: "include"); 401 → a single POST
+// /auth/refresh, then the request is retried. No tokens in localStorage.
 
 import i18n from "../i18n";
 import { apiConfig, isBackendConfigured, readJson } from "../pages/media/processing/apiConfig";
@@ -11,7 +11,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    /** Kode error stabil dari backend (mis. "TEMPLATE_LOCKED"). */
+    /** Stable error code from the backend (e.g. "TEMPLATE_LOCKED"). */
     public code: string | null,
     public body: Record<string, unknown> = {},
   ) {
@@ -33,7 +33,7 @@ export const apiUrl = (path: string) => `${apiConfig.baseUrl ?? ""}${path}`;
 const lang = () => (i18n.language?.startsWith("en") ? "en" : "id");
 
 let refreshing: Promise<boolean> | null = null;
-/** Perbarui sesi dari cookie refresh. Panggilan paralel digabung jadi satu. */
+/** Refresh the session from the refresh cookie. Parallel calls are merged into one. */
 function refreshSession(): Promise<boolean> {
   if (!isBackendConfigured()) return Promise.resolve(false);
   refreshing ??= apiConfig
@@ -46,7 +46,7 @@ function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
-/** Dipanggil saat sesi benar-benar berakhir (refresh gagal). */
+/** Called when the session has truly ended (refresh failed). */
 const sessionListeners = new Set<() => void>();
 export const onSessionExpired = (cb: () => void) => {
   sessionListeners.add(cb);
@@ -65,8 +65,8 @@ const NO_REFRESH = new Set([
 ]);
 
 /**
- * fetch mentah ke backend dengan cookie + Accept-Language. 401 pada endpoint
- * terlindungi → refresh sekali lalu ulang. Mengembalikan Response apa adanya.
+ * Raw fetch to the backend with cookies + Accept-Language. A 401 on a protected
+ * endpoint → refresh once, then retry. Returns the Response as is.
  */
 export async function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
   if (!isBackendConfigured()) throw new ApiUnavailableError();
@@ -85,7 +85,7 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
 export interface ApiRequest {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
-  /** Kirim header Idempotency-Key (wajib untuk aksi yang memotong kredit). */
+  /** Sends the Idempotency-Key header (required for actions that charge credits). */
   idempotencyKey?: string;
   signal?: AbortSignal;
 }
@@ -93,7 +93,7 @@ export interface ApiRequest {
 export const newIdempotencyKey = (prefix = "req") =>
   `${prefix}-${typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`.slice(0, 200);
 
-/** Panggil endpoint JSON. Status ≥ 400 dilempar sebagai ApiError (pesan dari server bila ada). */
+/** Calls a JSON endpoint. Status ≥ 400 is thrown as an ApiError (with the server message when present). */
 export async function api<T = Record<string, unknown>>(path: string, req: ApiRequest = {}): Promise<T> {
   const headers: Record<string, string> = {};
   if (req.body !== undefined) headers["Content-Type"] = "application/json";

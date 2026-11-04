@@ -4,7 +4,7 @@ import { SCENE_KARDUS, SCENE_PENA, SCENE_PINTU, SCENE_SEL } from "./storyScenesE
 const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
 
 export const STORY_SPECS_E: StorySpec[] = [
-  /* Kardus tertutup → tutup terbuka → barang melayang keluar → kardus terurai rata → bola dunia muncul dengan jalur kiriman. */
+  /* A closed cardboard box → the lid opens → items float out → the box unfolds flat → a globe appears with shipping routes. */
   {
     id: "story-kardus-dunia",
     title: "Kirimin · Gudang & Pengiriman Toko Online",
@@ -29,7 +29,7 @@ export const STORY_SPECS_E: StorySpec[] = [
     wa: "6281200001014",
     scene: SCENE_KARDUS,
   },
-  /* Pena tinta → setetes tinta jatuh → menyebar di kertas → butir tinta naik membentuk nama kantor → pena menandatangani. */
+  /* Ink pen → a drop of ink falls → spreads on paper → ink grains rise to form the office name → the pen signs. */
   {
     id: "story-pena-tinta",
     title: "Tinta & Rekan · Kantor Hukum",
@@ -53,7 +53,7 @@ export const STORY_SPECS_E: StorySpec[] = [
     wa: "6281200001015",
     scene: SCENE_PENA,
   },
-  /* Satu sel → membelah 2, 4, 8 → kamera masuk ke inti → heliks DNA berputar → anak tangga DNA lepas menjadi grafik batang. */
+  /* One cell → divides into 2, 4, 8 → the camera enters the nucleus → a DNA helix spins → the DNA rungs break off into a bar chart. */
   {
     id: "story-sel-dna",
     title: "Genomika · Laboratorium Tes Genetik",
@@ -78,7 +78,7 @@ export const STORY_SPECS_E: StorySpec[] = [
     wa: "6281200001016",
     scene: SCENE_SEL,
   },
-  /* Pintu berdiri di tengah gurun → terbuka, cahaya keluar → kamera melangkah masuk → dunia berganti hutan → kunang-kunang → menoleh ke pintu. */
+  /* A door standing in the middle of a desert → opens, light pours out → the camera steps in → the world becomes a forest → fireflies → looking back at the door. */
   {
     id: "story-pintu-rimba",
     title: "Pintu Rimba · Resor Hutan",

@@ -5,9 +5,9 @@ import type { ProTheme } from "../../../pageMaker/helpers/sectionPresetsPro";
 import { col, el, heading, linkButton, section, siteFooter, type Palette } from "../../build";
 
 /* ================================================================== */
-/* Perangkat kecil untuk 16 template Pro: tema, font halaman, header.    */
-/* Template disusun dari preset section katalog (sectionPresetsPro) +   */
-/* section khusus dari blok yang sama, jadi semuanya bisa diedit penuh. */
+/* A small toolkit for the 16 Pro templates: theme, page fonts, header. */
+/* Templates are built from catalog section presets (sectionPresetsPro) + */
+/* special sections from the same blocks, so everything is fully editable. */
 /* ================================================================== */
 
 export const FONTS = {
@@ -23,25 +23,25 @@ export function theme(p: Palette, o: Partial<Omit<ProTheme, "p">> = {}): ProThem
   return { p, bg: "#ffffff", alt: "#f8fafc", dark: "#0f172a", radius: 18, ...o };
 }
 
-/** Halaman dengan font & latar root sendiri (identitas visual per template). */
+/** A page with its own root font & background (visual identity per template). */
 export function pageWith(sections: BoxNode[], font: string, bg = "#ffffff"): PageDoc {
   const root = createPageRoot(sections);
   root.advanced = { customCss: `font-family: ${font};\n-webkit-font-smoothing: antialiased;\nbackground: ${bg};` };
   return { version: 2, root };
 }
 
-/** Menu website (Menu Element, otomatis dari halaman folder). */
+/** Website menu (Menu Element, automatic from the folder pages). */
 export const menu = (p: Palette, color = "#334155", o: { gap?: number } = {}) =>
   el("menu", { siteId: "", pageIds: [], textColor: color, hoverColor: p.primary, activeColor: p.primary, gap: o.gap ?? 22, align: "end", stackOnMobile: false }, "Menu");
 
-/** Logo teks. */
+/** Text logo. */
 export const logo = (text: string, color: string, font?: string, size = 20) => {
   const n = heading(text, "h4", { size, color, full: false });
   if (font) n.advanced = { customCss: `${n.advanced?.customCss ?? ""}\nfont-family: ${font};` };
   return n;
 };
 
-/** Header: logo kiri, navigasi (menu atau mega menu) + CTA kanan. */
+/** Header: logo on the left, navigation (menu or mega menu) + CTA on the right. */
 export function header(brand: string, p: Palette, o: { nav?: ElementNode; cta?: ElementNode | null; bg?: string; ink?: string; font?: string; sticky?: boolean } = {}): BoxNode {
   const ink = o.ink ?? p.ink;
   const nav = o.nav ?? menu(p, ink === "#ffffff" ? "#e2e8f0" : "#334155");
@@ -61,7 +61,7 @@ export function header(brand: string, p: Palette, o: { nav?: ElementNode; cta?: 
   return s;
 }
 
-/** Header terpusat: logo di tengah, menu di bawahnya (restoran, fotografi). */
+/** Centered header: logo in the middle, menu below it (restaurants, photography). */
 export function centeredHeader(brand: string, p: Palette, o: { bg?: string; ink?: string; font?: string } = {}): BoxNode {
   const ink = o.ink ?? p.ink;
   const m = menu(p, ink === "#ffffff" ? "#e2e8f0" : "#334155");
@@ -77,7 +77,7 @@ export const cta = (label: string, href: string, p: Palette, kind: "primary" | "
 
 export { siteFooter as footer };
 
-/** Kartu listing (Product Card gratis): destinasi, properti, kelas, menu. */
+/** Listing card (free Product Card): destinations, properties, classes, menus. */
 export function listingCard(o: { image: string; title: string; text: string; price: string; compare?: string; rating?: number; reviews?: string; badge?: string; cta: string; href: string; p: Palette }): ElementNode {
   return el(
     "product-card",

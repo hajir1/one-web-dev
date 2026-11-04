@@ -42,7 +42,7 @@ import {
 } from "./kitB";
 
 /* ================================================================== */
-/* Set B · bagian 1: Resume (Free), Yoga, Barbershop, Dealer, Akuntan.   */
+/* Set B · part 1: Resume (Free), Yoga, Barbershop, Car dealer, Accountant. */
 /* ================================================================== */
 
 /* ------------------- 1. personal-resume (FREE, 5) ------------------ */

@@ -1,13 +1,13 @@
 // ─── processing/policy.ts ────────────────────────────────────────────────────
-// SATU sumber kebenaran: fitur Media mana yang diproses di browser, mana di
-// server, dan bagaimana penagihannya. Halaman, Media Hub, dan dokumentasi
-// membaca dari sini.
+// The ONE source of truth: which Media features run in the browser, which on the
+// server, and how they are billed. Pages, the Media Hub, and the documentation
+// reads from here.
 //
 // Aturan:
-// - Browser  → selalu gratis, file tidak meninggalkan perangkat.
-// - Server   → dipilih karena kebutuhan teknis (model AI besar, codec yang
-//              tidak didukung browser, file sangat besar). Biaya & akses
-//              tiap fitur server diatur TERPISAH di `pricing.ts`.
+// - Browser  → always free, files never leave the device.
+// - Server   → chosen for technical needs (large AI models, codecs the
+//              browser does not support, very large files). Cost & access
+//              per server feature are configured SEPARATELY in `pricing.ts`.
 
 import i18n from "../../../i18n";
 import type { ServerFeatureId } from "./pricing";
@@ -29,9 +29,9 @@ export type MediaToolId =
 
 export type ProcessingMode = "browser" | "server";
 interface ModeSpec {
-  /** Penjelasan singkat untuk pemilih mode. */
+  /** Short explanation for the mode picker. */
   summary: string;
-  /** Batasan teknis yang ditampilkan ke pengguna. */
+  /** Technical limits shown to the user. */
   limits: string[];
 }
 
@@ -41,15 +41,15 @@ export interface MediaToolSpec {
   path: string;
   tagline: string;
   modes: Partial<Record<ProcessingMode, ModeSpec>>;
-  /** Mode bawaan yang direkomendasikan. */
+  /** Recommended default mode. */
   recommended: ProcessingMode;
-  /** Alasan rekomendasi (dipakai di Media Hub & dokumentasi). */
+  /** Reason for the recommendation (used in the Media Hub & documentation). */
   rationale: string;
-  /** Kunci harga di pricing.ts untuk mode server. */
+  /** Price key in pricing.ts for server mode. */
   serverFeature?: ServerFeatureId;
 }
 
-/** Teks kebijakan dibaca saat dipakai (bukan saat modul dimuat) agar mengikuti bahasa aktif. */
+/** Policy text is read at use time (not when the module loads) so it follows the active language. */
 const tt = (key: string) => i18n.t(`media.tools.${key}`);
 
 function modeSpec(tool: MediaToolId, mode: ProcessingMode, limitCount: number): ModeSpec {
@@ -66,7 +66,7 @@ function modeSpec(tool: MediaToolId, mode: ProcessingMode, limitCount: number): 
 function defineTool(t: Omit<MediaToolSpec, "name" | "tagline" | "rationale">): MediaToolSpec {
   return Object.defineProperties(t as MediaToolSpec, {
     name: { get: () => tt(`${t.id}.name`), enumerable: true },
-    // Mode demo (v12): tagline tanpa menyebut mode server (bila ada versi demonya).
+    // Demo mode (v12): tagline without mentioning server mode (when a demo version exists).
     tagline: { get: () => (isDemoMode() && i18n.exists(`demo.media.taglines.${t.id}`) ? i18n.t(`demo.media.taglines.${t.id}`) : tt(`${t.id}.tagline`)), enumerable: true },
     rationale: { get: () => tt(`${t.id}.rationale`), enumerable: true },
   });
@@ -139,7 +139,7 @@ export const MEDIA_TOOLS: MediaToolSpec[] = [
     recommended: "server",
     modes: { server: modeSpec("video-compress", "server", 3) },
   }),
-  // v10: alat aset web (browser, gratis).
+  // v10: web asset tools (browser, free).
   defineTool({
     id: "favicon-generator",
     path: "/media-tools/favicon-generator",
@@ -163,5 +163,5 @@ export function availableModes(id: MediaToolId): ProcessingMode[] {
   return (Object.keys(TOOL_BY_ID[id].modes) as ProcessingMode[]).filter((m) => TOOL_BY_ID[id].modes[m]);
 }
 
-/** Fitur hanya bisa diproses di server. */
+/** The feature can only be processed on the server. */
 export const isServerOnly = (id: MediaToolId) => !TOOL_BY_ID[id].modes.browser && !!TOOL_BY_ID[id].modes.server;

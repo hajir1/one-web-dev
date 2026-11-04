@@ -4,16 +4,16 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 
 interface Props {
-  /** Belum pernah disimpan → minta nama dulu. */
+  /** Never saved → ask for a name first. */
   needsName: boolean;
   defaultName: string;
-  /** true = tersimpan (lalu keluar); false = gagal (mis. kuota penuh) → tetap di editor. */
+  /** true = saved (then exit); false = failed (e.g. quota full) → stay in the editor. */
   onSaveAndLeave: (name: string) => boolean;
   onLeave: () => void;
   onCancel: () => void;
 }
 
-/** Dialog "Simpan dan Keluar / Keluar Tanpa Menyimpan / Batal". */
+/** The "Save and Exit / Exit Without Saving / Cancel" dialog. */
 export default function LeaveDialog({ needsName, defaultName, onSaveAndLeave, onLeave, onCancel }: Props) {
   const { t } = useTranslation();
   const [name, setName] = useState(defaultName);

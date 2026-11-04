@@ -1,5 +1,5 @@
-// Dimuat sebelum setiap berkas test (lihat skrip "test" di package.json):
-// test memakai teks lengkap, bukan hanya bagian "core" yang ikut bundle awal.
+// Loaded before every test file (see the "test" script in package.json):
+// tests use the full text, not just the "core" part shipped in the initial bundle.
 import { ensureFullLocale } from "./i18n";
 
 await ensureFullLocale("id");

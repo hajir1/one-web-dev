@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Botol Pesan</title>
 <meta name="description" content="Animasi rindu: botol hanyut dari cakrawala senja ke pantai, gabusnya meletup, dan gulungan surat terbentang menjadi latar ucapan.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #1e2b4a; /* Latar bawah */
   --bg-2: #3f6c8f; /* Latar tengah */
@@ -98,7 +98,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true
@@ -109,7 +109,7 @@ function scene(api) {
     draw(t, B) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const hz = H * 0.5;
-      /* Matahari senja dan pantulannya. */
+      /* Sunset sun and its reflection. */
       glowDot(W * 0.5, hz, u * 40, COL["c-1"], 0.45); g.fillStyle = COL["c-1"]; g.beginPath(); g.arc(W * 0.5, hz, u * 7, Math.PI, 0); g.fill();
       /* Laut berlapis. */
       for (let k = 0; k < 6; k++) {
@@ -128,13 +128,13 @@ function scene(api) {
       const L = u * 18, R = u * 4.5;
       g.fillStyle = rgba(COL["c-2"], 0.55); g.strokeStyle = rgba("#ffffff", 0.6); g.lineWidth = 1.5;
       g.beginPath(); g.moveTo(-L * 0.5, -R); g.lineTo(L * 0.18, -R); g.quadraticCurveTo(L * 0.3, -R, L * 0.36, -R * 0.4); g.lineTo(L * 0.5, -R * 0.4); g.lineTo(L * 0.5, R * 0.4); g.lineTo(L * 0.36, R * 0.4); g.quadraticCurveTo(L * 0.3, R, L * 0.18, R); g.lineTo(-L * 0.5, R); g.quadraticCurveTo(-L * 0.56, 0, -L * 0.5, -R); g.fill(); g.stroke();
-      /* Gulungan di dalam botol, lalu keluar. */
+      /* Scroll inside a bottle, then it comes out. */
       if (roll < 0.02) { g.fillStyle = "#f4e6c4"; g.fillRect(-L * 0.38, -R * 0.45, L * 0.5, R * 0.9); }
       g.fillStyle = "#a8794a"; if (pop < 0.02) g.fillRect(L * 0.48, -R * 0.36, L * 0.07, R * 0.72);
       g.fillStyle = rgba("#ffffff", 0.4); g.fillRect(-L * 0.4, -R * 0.75, L * 0.5, R * 0.18);
       g.restore();
       if (pop > 0 && pop < 1) { const cx = bx + Math.cos(-0.15) * L * 0.5 * sc + pop * u * 14, cy = by - pop * u * 18 + pop * pop * u * 14; g.fillStyle = "#a8794a"; g.save(); g.translate(cx, cy); g.rotate(pop * 9); g.fillRect(-u, -u * 0.8, u * 2, u * 1.6); g.restore(); glowDot(bx + L * 0.5 * sc, by - u * 2, u * 6 * (1 - pop), "#ffffff", 0.6); }
-      /* Surat: melayang keluar lalu terbentang menutup sebagian layar. */
+      /* Letter: floats out, then unfolds to cover part of the screen. */
       if (roll > 0) {
         const cx = lerp(bx + L * 0.5 * sc, W / 2, ease(roll)), cy = lerp(by, H * 0.5, ease(roll));
         const w = lerp(u * 4, Math.min(W * 0.86, u * 120), ease(roll)), h = lerp(u * 3, Math.min(H * 0.74, u * 92), ease(open));
@@ -156,16 +156,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -184,7 +184,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -207,7 +207,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

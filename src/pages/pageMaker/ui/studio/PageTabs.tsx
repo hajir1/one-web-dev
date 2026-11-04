@@ -4,9 +4,9 @@ import { EyeOff, Home, LayoutGrid, Plus } from "lucide-react";
 import type { ResolvedSitePage } from "../../helpers/site";
 
 /* ================================================================== */
-/* Tab halaman di bilah atas Studio (v20).                              */
-/* Klik = pindah halaman. "Semua halaman" membuka papan; (+) menambah.   */
-/* Layar sempit: daftar pilihan (select).                               */
+/* Page tabs in the Studio top bar (v20).                               */
+/* Click = switch page. "All pages" opens the board; (+) adds one.      */
+/* Narrow screens: a choice list (select).                              */
 /* ================================================================== */
 
 export default function PageTabs({
@@ -48,7 +48,7 @@ export default function PageTabs({
         <span className="rounded-full bg-black/10 px-1.5 text-[10px] dark:bg-white/15">{pages.length}</span>
       </button>
 
-      {/* layar lebar: tab */}
+      {/* wide screens: tabs */}
       <div ref={listRef} role="tablist" aria-label={t("studio.pagesAria")} className="hidden min-w-0 items-center gap-0.5 overflow-x-auto md:flex [scrollbar-width:thin]">
         {pages.map((p) => {
           const on = p.designId === currentId && !boardOpen;
@@ -73,7 +73,7 @@ export default function PageTabs({
         })}
       </div>
 
-      {/* layar sempit: pilihan */}
+      {/* narrow screens: select */}
       <select
         className="h-8 min-w-0 max-w-40 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-700 md:hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
         value={currentId ?? ""}

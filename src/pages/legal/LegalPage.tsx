@@ -11,7 +11,7 @@ import { btn, Notice } from "../../components/app/ui";
 import { isLegalDoc, LEGAL_DOCS, legalPath } from "../../config/legal";
 import { LEGAL_DOCUMENTS, type LegalBlock } from "./documents";
 
-/** Teks dalam [kurung siku] = placeholder yang belum diisi → ditandai kuning. */
+/** Text in [square brackets] = unfilled placeholders → highlighted in yellow. */
 function withPlaceholders(text: string): ReactNode {
   const parts = text.split(/(\[[^\]]+\])/g);
   return parts.map((p, i) =>
@@ -37,7 +37,7 @@ function Block({ block }: { block: LegalBlock }) {
   return <p>{withPlaceholders(block)}</p>;
 }
 
-/** Halaman publik /:lang/legal/:doc — S&K, Privasi, Refund, Kontak (tanpa login). */
+/** Public page /:lang/legal/:doc: Terms, Privacy, Refund, Contact (no login). */
 export default function LegalPage() {
   const { t } = useTranslation();
   const lang = useLang();

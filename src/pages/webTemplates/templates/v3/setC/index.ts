@@ -5,7 +5,7 @@ import { floristKembang, floristWeddingBloom, laundryBersih, printingCetakKilat,
 import { educationTahfidz, healthPsikolog, portfolioIllustrator, restaurantRamen, technologyAiLab } from "./c4";
 import { companyKonsultanPajak, creativeTattoo, hospitalityCapsuleHotel, startupEdtech, travelDiving } from "./c5";
 
-/** Konten template katalog v3 (bagian C), dikunci dengan ID di ../catalogC.ts. */
+/** Catalog v3 template content (part C), keyed by the IDs in ../catalogC.ts. */
 export const V3C_TEMPLATES: Record<string, TemplateContent> = {
   "bakery-roti-hangat": bakeryRotiHangat,
   "sports-futsal-arena": sportsFutsalArena,

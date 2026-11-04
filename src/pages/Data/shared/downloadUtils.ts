@@ -18,7 +18,7 @@ export function triggerDownload(blob: Blob, filename: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-/** Nama file aman (tanpa / \ : * ? " < > | dan karakter kontrol). */
+/** Safe file name (no / \ : * ? " < > | or control characters). */
 export function safeFileName(name: string, fallback = "data"): string {
   const s = name
     // eslint-disable-next-line no-control-regex
@@ -30,5 +30,5 @@ export function safeFileName(name: string, fallback = "data"): string {
   return s || fallback;
 }
 
-/** Nama dasar file tanpa ekstensi. */
+/** File base name without the extension. */
 export const baseName = (name: string) => name.replace(/\.[^/.]+$/, "");

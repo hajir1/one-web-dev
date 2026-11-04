@@ -13,7 +13,7 @@ import type { Framework } from "../../core/helpers/generatorCss";
 import type { SavedDesign } from "../../core/store/designStore";
 import { buildSite, siteZipName as zipName } from "../../helpers/siteExport";
 
-/* Dialog "Deploy" Studio (v20): seluruh website (semua halaman + menu) → GitHub Pages atau zip. */
+/* Studio "Deploy" dialog (v20): the whole website (every page + menu) → GitHub Pages or a zip. */
 
 
 export default function StudioDeployDialog({ site, designs, onClose }: { site: SavedDesign; designs: SavedDesign[]; onClose: () => void }) {

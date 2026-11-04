@@ -13,32 +13,32 @@ import { DEMO_LOADERS, DEMO_PAGES } from "./demoContent.generated";
 import { CODE_TEMPLATE_CATALOG, codeTemplateMeta, loadCodeTemplate, withThumbFlag } from "../pages/webTemplates/codeTemplates/catalog";
 
 /* ================================================================== */
-/* Katalog template MODE DEMO (v12) — sepenuhnya di frontend.          */
+/* DEMO MODE template catalog (v12) — entirely in the frontend.        */
 /*                                                                    */
-/* Menggantikan GET /templates, GET /templates/:id, dan POST             */
-/* /templates/:id/acquire saat backend tidak ada. Modul ini dimuat       */
-/* terpisah (dynamic import) sehingga isi template hanya diunduh di mode */
-/* demo. Daftar halaman & pemuat isi ada di demoContent.generated (v13: */
-/* semua template; dibuat src/tools/genDemoTemplates.ts). Isi template */
-/* dimuat per berkas sumber saat dibuka, bukan sekaligus. Build produksi*/
-/* memakai modul kosong (vite.config.ts). Semua template di sini gratis.*/
-/* Pratinjau & thumbnail dirender di browser (bukan HTML dari server).   */
+/* Replaces GET /templates, GET /templates/:id, and POST                 */
+/* /templates/:id/acquire when there is no backend. This module is loaded */
+/* separately (dynamic import) so template content is only downloaded in */
+/* demo mode. The page list & content loaders live in demoContent.generated (v13: */
+/* every template; built by src/tools/genDemoTemplates.ts). Template content */
+/* is loaded per source file when opened, not all at once. The production build */
+/* uses an empty module (vite.config.ts). Every template here is free.  */
+/* Previews & thumbnails are rendered in the browser (not HTML from the server). */
 /* ================================================================== */
 
 type DemoTemplate = TemplateMeta & { pages: TemplatePageDef[] };
 
 const ID_SET = new Set(DEMO_TEMPLATE_IDS);
-/** v16: Template Kode punya satu halaman (index.html). */
+/** v16: Code Templates have a single page (index.html). */
 const CODE_PAGES: TemplatePageDef[] = [{ key: "home", slug: { id: "index", en: "index" }, name: { id: "Beranda", en: "Home" }, home: true }];
 const TEMPLATES: DemoTemplate[] = latestFirst([
-  // Unggahan terakhir (label "Terbaru") paling atas; lalu Template Kode, lalu template lain.
+  // The last upload ("Latest" label) on top; then Code Templates, then other templates.
   ...CODE_TEMPLATE_CATALOG.map((m) => ({ ...m, pages: CODE_PAGES })),
   ...TEMPLATE_CATALOG.filter((m) => ID_SET.has(m.id) && DEMO_PAGES[m.id] && DEMO_LOADERS[m.id]).map((m) => ({ ...m, pages: DEMO_PAGES[m.id] })),
 ]);
 const BY_ID = new Map(TEMPLATES.map((t) => [t.id, t]));
 
 const contentCache = new Map<string, Promise<TemplateContent>>();
-/** Muat isi satu template (chunk berkas sumbernya diunduh sekali, lalu di-cache). */
+/** Loads one template's content (its source file chunk is downloaded once, then cached). */
 function loadContent(id: string): Promise<TemplateContent> {
   let p = contentCache.get(id);
   if (!p) {
@@ -51,7 +51,7 @@ function loadContent(id: string): Promise<TemplateContent> {
 
 const langOf = (lng?: string): TplLang => (lng?.startsWith("en") ? "en" : "id");
 
-/** Metadata kartu katalog (ringan: tanpa membangun halaman template). */
+/** Catalog card metadata (light: without building the template pages). */
 function toItem(t: DemoTemplate, lang: TplLang): TemplateCatalogItem {
   const tr = i18n.getFixedT(lang);
   return {
@@ -80,7 +80,7 @@ function toItem(t: DemoTemplate, lang: TplLang): TemplateCatalogItem {
 }
 
 const listCache = new Map<TplLang, TemplateCatalogItem[]>();
-/** Semua template demo (urutan katalog) dalam bahasa `lang`. */
+/** All demo templates (catalog order) in language `lang`. */
 export function demoTemplateList(lang?: string): TemplateCatalogItem[] {
   const l = langOf(lang);
   let list = listCache.get(l);
@@ -113,38 +113,38 @@ export function demoTemplatesPage(p: TemplatesPageParams & { limit: number }): T
   };
 }
 
-/** Pengganti GET /templates/:id. null = bukan template demo. */
+/** Replacement for GET /templates/:id. null = not a demo template. */
 export function demoTemplateDetail(lang: string, id: string): TemplateCatalogItem | null {
   return demoTemplateList(lang).find((t) => t.refId === id) ?? null;
 }
 
-/** Pengganti POST /templates/:id/acquire: isi halaman dibangun di browser (salinan baru tiap panggilan). */
+/** Replacement for POST /templates/:id/acquire: page content is built in the browser (a fresh copy per call). */
 export async function demoAcquire(ref: TemplateRef, lang: TplLang): Promise<BuiltTemplatePage[]> {
   const t = BY_ID.get(ref.id);
   if (!t) throw new Error("TEMPLATE_NOT_FOUND");
-  // Template Kode bukan pohon Desain Halaman (tombol Edit tidak ditampilkan untuknya).
+  // Code Templates are not Page Design trees (the Edit button is not shown for them).
   if (codeTemplateMeta(t.id)) throw new Error("CODE_TEMPLATE");
   return buildTemplatePages({ ...t, content: await loadContent(t.id) }, lang);
 }
 
 /* ------------------------------------------------------------------ */
-/* Pratinjau di browser                                                  */
+/* In-browser preview                                                    */
 /* ------------------------------------------------------------------ */
 
-/** Pesan dari iframe pratinjau saat tautan antarhalaman diklik. */
+/** Message from the preview iframe when a link between pages is clicked. */
 export const DEMO_NAV_MESSAGE = "owd-demo-nav";
 
 /**
- * Skrip kecil di dalam pratinjau: tautan ke halaman lain template
- * (mis. "tentang.html") tidak dibuka di iframe, tetapi dikirim ke
- * halaman induk supaya pemilih halaman ikut berganti.
+ * Small script inside the preview: links to other template pages
+ * (e.g. "tentang.html") are not opened in the iframe but sent to the
+ * parent page so the page picker switches too.
  */
 const NAV_SCRIPT = `<script>document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null;if(!a)return;var h=a.getAttribute("href")||"";var m=/^([\\w.-]+\\.html)(#.*)?$/.exec(h);if(m){e.preventDefault();parent.postMessage({type:"${DEMO_NAV_MESSAGE}",file:m[1]},"*");}else if(h.charAt(0)!=="#"){e.preventDefault();}},true);</script>`;
 
 const escapeStyle = (css: string) => css.replace(/<\/style/gi, "<\\/style");
 const escapeScript = (js: string) => js.replace(/<\/script/gi, "<\\/script");
 
-/** Satu berkas HTML mandiri: CSS & JS lokal disisipkan langsung (untuk iframe srcdoc). */
+/** One self-contained HTML file: local CSS & JS are inlined (for iframe srcdoc). */
 function inlineAssets(html: string, files: Map<string, string>): string {
   return html
     .replace(/<link rel="stylesheet" href="(assets\/[^"]+\.css)"\s*\/?>/g, (m, href: string) => {
@@ -159,17 +159,17 @@ function inlineAssets(html: string, files: Map<string, string>): string {
 }
 
 export interface DemoPreview {
-  /** HTML mandiri per halaman, kunci = key halaman template. */
+  /** Self-contained HTML per page, key = template page key. */
   html: Record<string, string>;
-  /** Nama berkas → key halaman (untuk navigasi di dalam pratinjau). */
+  /** File name → page key (for navigation inside the preview). */
   fileToKey: Record<string, string>;
 }
 
 const previewCache = new Map<string, DemoPreview>();
 
 /**
- * Render template di browser untuk pratinjau. `homeOnly` = hanya beranda
- * (thumbnail kartu; lebih ringan). Hasil di-cache selama tab terbuka.
+ * Renders a template in the browser for preview. `homeOnly` = home page only
+ * (card thumbnail; lighter). The result is cached while the tab is open.
  */
 export async function demoPreview(id: string, lang: string, icons: IconLookup, homeOnly = false): Promise<DemoPreview | null> {
   const t = BY_ID.get(id);
@@ -179,7 +179,7 @@ export async function demoPreview(id: string, lang: string, icons: IconLookup, h
   if (codeTemplateMeta(id)) {
     const cached = previewCache.get(key);
     if (cached) return cached;
-    // v16: Template Kode dirender apa adanya (thumbnail: satu frame lalu berhenti).
+    // v16: Code Templates render as is (thumbnail: one frame, then stop).
     const raw = await loadCodeTemplate(id);
     const out = { html: { home: homeOnly ? withThumbFlag(raw) : raw }, fileToKey: { "index.html": "home" } };
     previewCache.set(key, out);

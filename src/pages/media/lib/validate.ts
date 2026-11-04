@@ -1,19 +1,19 @@
 // ─── lib/validate.ts ─────────────────────────────────────────────────────────
-// Validasi file SEBELUM diproses: ukuran, file kosong, dan jenis berdasarkan
-// isi. Satu fungsi untuk semua halaman Media supaya aturan & pesan konsisten.
+// Validates files BEFORE processing: size, empty files, and kind based on
+// content. One function for every Media page so rules & messages stay consistent.
 
 import i18n from "../../../i18n";
 import { KIND_LABEL, sniffFile, type SniffedKind } from "./fileSniff";
 import { formatSize } from "./format";
 
 export interface FileRules {
-  /** Jenis yang diterima (hasil sniffing isi file). */
+  /** Accepted kinds (from content sniffing). */
   kinds: SniffedKind[];
-  /** Batas ukuran per file (byte). */
+  /** Size limit per file (bytes). */
   maxBytes: number;
-  /** Batas jumlah file sekali tambah (default tanpa batas). */
+  /** Limit on files per add (default unlimited). */
   maxFiles?: number;
-  /** Pesan khusus per jenis yang dikenali tapi tidak didukung, mis. HEIC. */
+  /** Specific messages per kind that is recognized but unsupported, e.g. HEIC. */
   unsupportedHint?: Partial<Record<SniffedKind, string>>;
 }
 
@@ -32,7 +32,7 @@ export interface ValidationResult {
   rejected: RejectedFile[];
 }
 
-/** Petunjuk bawaan (dibaca saat dipakai agar mengikuti bahasa aktif). */
+/** Default hint (read at use time so it follows the active language). */
 const defaultHint = (kind: SniffedKind): string | undefined =>
   kind === "heic" || kind === "tiff" ? i18n.t(`media.validate.hints.${kind}`) : undefined;
 
@@ -79,7 +79,7 @@ export async function validateFiles(files: Iterable<File>, rules: FileRules): Pr
   return { accepted, rejected };
 }
 
-/** Ringkas daftar penolakan menjadi pesan pendek (maks. 3 nama). */
+/** Summarize the rejection list into a short message (max. 3 names). */
 export function summarizeRejections(rejected: RejectedFile[]): string | null {
   if (!rejected.length) return null;
   const head = rejected.slice(0, 3).map((r) => `${r.name}: ${r.reason}`);

@@ -1,12 +1,12 @@
-// @ts-nocheck — skrip Node (tsx), tidak ikut bundle aplikasi.
+// @ts-nocheck — Node script (tsx), not part of the app bundle.
 /* ================================================================== */
-/* Tulis contoh ekspor proyek (v7) untuk diuji build.                   */
+/* Write sample project exports (v7) for build testing.                 */
 /*                                                                    */
 /*   npx tsx src/tools/verifyExports.ts <folder> [templateId,...]        */
 /*                                                                    */
-/* Hasil: <folder>/<templateId>/<format>/… untuk html, blade, react,     */
-/* vue, svelte, angular, plus <folder>/design-vars/<format> (desain      */
-/* contoh dengan variabel global & font Google). Build dijalankan oleh   */
+/* Output: <folder>/<templateId>/<format>/… for html, blade, react,      */
+/* vue, svelte, angular, plus <folder>/design-vars/<format> (design      */
+/* sample with global variables & Google fonts). The build is run by    */
 /* tools/verify-exports.sh (npm install + npm run build, Laravel).       */
 /* ================================================================== */
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
@@ -47,7 +47,7 @@ for (const id of ids) {
   }
 }
 
-// Desain contoh: variabel warna/ukuran/font + font Google, dipakai elemen teks, tombol, kartu, input.
+// Sample design: color/size/font variables + a Google font, used by text, button, card, and input elements.
 const poppins = { id: "f1", name: "Poppins", source: "google", fallback: "sans-serif", weights: [400, 600], url: "", createdAt: 1 };
 const vars = mergeVars(libraryFontVars([poppins]), BUILTIN_VARS, [
   { id: "u1", name: "aksen", type: "color", value: "#e11d48" },
@@ -66,7 +66,7 @@ const composed = compose(root, { rootClass: "desain-variabel", icons, fonts: [po
 if (composed.warnings.length) console.log("peringatan:", composed.warnings.map((w) => w.message));
 for (const fw of EXPORT_FORMATS) console.log(`design-vars/${fw}: ${write(join(out, "design-vars", fw), projectFiles(fw, "Desain Variabel", [singlePage(composed, "Desain Variabel")]))} berkas`);
 
-// v9: desain contoh 5 elemen 3D + animasi CSS (runtime owd3d.js, Three.js dimuat dinamis).
+// v9: sample design with 5 3D elements + CSS animation (owd3d.js runtime, Three.js loaded dynamically).
 import { motionVars, DEFAULT_THREE } from "../pages/pageMaker/core/store/motionStore";
 import { DEFAULT_MOTION } from "../pages/pageMaker/engine/helpers/motion";
 const doc3d = createDefaultDoc();

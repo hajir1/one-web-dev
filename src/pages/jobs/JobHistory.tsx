@@ -20,7 +20,7 @@ type Status = "all" | "succeeded" | "failed" | "running";
 
 const STATE_TONE: Record<string, "green" | "rose" | "amber" | "gray"> = { succeeded: "green", failed: "rose", cancelled: "gray", running: "amber", queued: "amber" };
 
-/** v7 (P1): /:lang/job-history — riwayat pekerjaan server (Media, Data, VR) + unduh ulang hasil. */
+/** v7 (P1): /:lang/job-history — server job history (Media, Data, VR) + re-download results. */
 export default function JobHistory() {
   const { t } = useTranslation();
   const planPaid = (j: HistoryItem) =>

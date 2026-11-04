@@ -6,7 +6,7 @@ import { h } from "../../../helpers/markup";
 import { clamp, color, fieldName,     parseOptions } from "../shared";
 import { tr, f, SR_ONLY, focusCss } from "./kit";
 
-/* --------------------------- Tombol Segmen -------------------------- */
+/* --------------------------- Segmented Buttons -------------------------- */
 
 export interface SegmentedState {
   label: string;

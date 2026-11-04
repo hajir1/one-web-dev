@@ -2,10 +2,10 @@ import type { CSSProperties, ReactElement } from "react";
 import { boxRules, placeRules } from "../helpers/compose";
 import type { BoxNode, ComponentNode, ElementNode } from "../helpers/componentTypes";
 
-/** Thumbnail = layout ASLI (aturan CSS yang sama dengan pratinjau), dirender kecil. */
+/** Thumbnail = the REAL layout (the same CSS rules as the preview), rendered small. */
 export function ThumbNode({ node: input, parent, isRoot, leafMin = 10 }: { node: ComponentNode; parent: BoxNode | null; isRoot?: boolean; leafMin?: number }) {
-  // Elemen digambar menurut jenisnya (judul, paragraf, tombol, gambar, …) supaya
-  // thumbnail menyerupai hasil yang ditambahkan.
+  // Elements are drawn by kind (heading, paragraph, button, image, …) so
+  // the thumbnail resembles what gets added.
   if (input.kind !== "box") {
     const place = parent ? placeRules(input.place, parent).base : {};
     return <ThumbElement el={input} place={place as CSSProperties} />;

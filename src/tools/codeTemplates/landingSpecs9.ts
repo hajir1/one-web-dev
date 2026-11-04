@@ -1,7 +1,7 @@
 import type { LandingSpec } from "./landing";
 import { SELASA_MINGGU, SENIN_JUMAT, SENIN_SABTU, SETIAP, jam, langkah } from "./landingKit";
 
-/* Landing v23, bagian 9: kreatif, media & acara (kategori yang masih sedikit). */
+/* Landing v23, part 9: creative, media & events (categories that are still sparse). */
 export const LANDING_9: LandingSpec[] = [
   {
     id: "lp-rumah-produksi-video-gerak",

@@ -1,10 +1,10 @@
 // ─── workers/codecWorker.ts ──────────────────────────────────────────────────
-// Encoder/decoder gambar berbasis WebAssembly, dijalankan di Web Worker agar
-// UI tidak membeku. Setiap codec dimuat (import dinamis) HANYA saat pertama
-// dipakai, jadi bundle awal tidak bertambah: membuka halaman konverter tidak
-// mengunduh codec apa pun sampai ada file yang diproses.
+// WebAssembly-based image encoders/decoders, run in a Web Worker so
+// the UI does not freeze. Each codec is loaded (dynamic import) ONLY on first
+// use, so the initial bundle does not grow: opening the converter page does not
+// downloading any codec until a file is processed.
 //
-// Codec (semua berlisensi permisif, aman untuk produk komersial):
+// Codecs (all permissively licensed, safe for commercial products):
 // - PNG  : @jsquash/png  (Rust `png` crate)            Apache-2.0 / MIT
 // - JPEG : @jsquash/jpeg (MozJPEG)                      Apache-2.0 / IJG + BSD
 // - WebP : @jsquash/webp (libwebp)                      Apache-2.0 / BSD-3
@@ -13,7 +13,7 @@
 // - QOI  : @jsquash/qoi                                 Apache-2.0 / MIT
 // - TIFF : utif2 (JS)                                   MIT
 // - GIF  : gifenc (JS)                                  MIT
-// - BMP & ICO: ditulis sendiri (lib/imageFormats.ts)
+// - BMP & ICO: written in-house (lib/imageFormats.ts)
 
 import { encodeBmp, encodeIco } from "../lib/imageFormats";
 
@@ -23,9 +23,9 @@ export type DecodeFormat = "jxl" | "qoi" | "tiff" | "avif" | "webp" | "png" | "j
 export interface CodecEncodeOptions {
   /** 1–100 (JPEG/WebP/AVIF/JXL). */
   quality: number;
-  /** WebP/AVIF/JXL tanpa kompresi lossy. */
+  /** WebP/AVIF/JXL without lossy compression. */
   lossless: boolean;
-  /** Ukuran ikon untuk ICO (persegi). */
+  /** Icon sizes for ICO (square). */
   icoSizes?: number[];
 }
 
@@ -75,7 +75,7 @@ async function encode(format: EncodeFormat, image: ImageData, o: CodecEncodeOpti
     case "gif": {
       const { GIFEncoder, quantize, applyPalette } = await import("gifenc");
       const rgba = new Uint8Array(image.data.buffer, image.data.byteOffset, image.data.byteLength);
-      // Palet 256 warna; piksel transparan (alpha < 128) memakai indeks transparan.
+      // 256-color palette; transparent pixels (alpha < 128) use the transparent index.
       const palette = quantize(rgba, 256, { format: "rgba4444", oneBitAlpha: true });
       const index = applyPalette(rgba, palette, "rgba4444");
       const tIndex = palette.findIndex((c) => c[3] === 0);
@@ -114,7 +114,7 @@ async function decode(format: DecodeFormat, bytes: ArrayBuffer): Promise<ImageDa
     case "tiff": {
       const UTIF = (await import("utif2")).default;
       const ifds = UTIF.decode(bytes);
-      // Halaman pertama dengan gambar (TIFF bisa berisi thumbnail/halaman lain).
+      // The first page with an image (TIFF can contain thumbnails/other pages).
       const page = ifds.find((f) => Number((f.t256 as number[] | undefined)?.[0]) > 0) ?? ifds[0];
       if (!page) throw new Error("TIFF");
       UTIF.decodeImage(bytes, page);

@@ -6,9 +6,9 @@ import { usePersistentState } from "../engine/helpers/usePersistentState";
 /* ================================================================== */
 /* Popup mengambang (non-modal)                                         */
 /*                                                                    */
-/* Tidak ada backdrop, jadi canvas tetap bisa diklik / jadi tujuan       */
-/* drag & drop selagi popup terbuka. Header bisa diseret; posisi diingat. */
-/* Di layar sempit tampil sebagai bottom sheet.                          */
+/* No backdrop, so the canvas stays clickable / a drop target            */
+/* drag & drop while the popup is open. The header can be dragged; the position is remembered. */
+/* On narrow screens it shows as a bottom sheet.                        */
 /* ================================================================== */
 
 interface Pos {
@@ -35,12 +35,12 @@ interface FloatingPanelProps {
   icon?: ReactNode;
   onClose: () => void;
   children: ReactNode;
-  /** Kunci penyimpanan posisi (per jenis popup). */
+  /** Storage key for the position (per popup type). */
   storageKey: string;
   width?: number;
-  /** Posisi awal bila belum pernah diseret. */
+  /** Initial position when it has never been dragged. */
   initial?: (vw: number, vh: number, w: number) => Pos;
-  /** Konten di bawah header yang tidak ikut menggulir (mis. tab). */
+  /** Content below the header that does not scroll (e.g. tabs). */
   toolbar?: ReactNode;
   testId?: string;
 }
@@ -63,7 +63,7 @@ export default function FloatingPanel({
   const ref = useRef<HTMLElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
 
-  /** Jaga panel tetap terlihat saat jendela mengecil. */
+  /** Keeps the panel visible when the window shrinks. */
   const keepVisible = useCallback(
     (p: Pos): Pos => {
       const w = Math.min(width, window.innerWidth - 16);
@@ -80,7 +80,7 @@ export default function FloatingPanel({
     return () => window.removeEventListener("resize", on);
   }, [keepVisible]);
 
-  // Fokus ke panel saat dibuka (aksesibilitas keyboard).
+  // Focus the panel when it opens (keyboard accessibility).
   useEffect(() => {
     ref.current?.focus({ preventScroll: true });
   }, []);

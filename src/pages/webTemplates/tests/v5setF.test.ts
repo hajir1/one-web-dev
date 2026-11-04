@@ -21,7 +21,7 @@ import type { TplLang } from "../types";
 
 type SectionBox = { tag?: string; name: string };
 
-/* Katalog v5 bagian F: 10 template (1 Free + 9 Premium), 4–6 halaman, memakai section Lebar Penuh & Spesialisasi. */
+/* Catalog v5 part F: 10 templates (1 Free + 9 Premium), 4–6 pages, using Full Width & Specialty sections. */
 
 const LANGS: TplLang[] = ["id", "en"];
 const PAGES: Record<string, number> = {
@@ -49,7 +49,7 @@ function walk(n: ComponentNode, f: (n: ComponentNode) => void): void {
   if (isBox(n)) n.children.forEach((c) => walk(c, f));
 }
 
-/** Item Premium (preset section & elemen) yang dipakai template. */
+/** Premium items (section presets & elements) used by the template. */
 function premiumItems(tpl: WebTemplate): string[] {
   const { sectionIds, elementIds } = templateContents(tpl);
   return [
@@ -109,7 +109,7 @@ test("setiap halaman dibangun di ID & EN: section saja di root, header + isi + f
     const shapes = byLang.id.map((p) => (p.doc.root.children as unknown as SectionBox[]).map((s) => s.name).join("|"));
     assert.equal(new Set(shapes).size, shapes.length, `${tpl.id}: susunan section tiap halaman berbeda`);
     assert.notEqual(JSON.stringify(byLang.id.map((p) => p.name)), JSON.stringify(byLang.en.map((p) => p.name)), `${tpl.id}: nama halaman dwibahasa`);
-    // Isi halaman beranda juga berbeda antarbahasa.
+    // The home page content also differs between languages.
     assert.notEqual(JSON.stringify(byLang.id[0].doc).replace(/"id":"[^"]+"/g, ""), JSON.stringify(byLang.en[0].doc).replace(/"id":"[^"]+"/g, ""), `${tpl.id}: isi beranda dwibahasa`);
   }
 });
@@ -203,7 +203,7 @@ test("aset v5f: nama berawalan, SVG ASCII kecil tanpa URL eksternal, dipakai tem
     assert.ok(svg.length < 8000, `${n}: ${svg.length} byte`);
     assert.doesNotMatch(svg.replace('xmlns="http://www.w3.org/2000/svg"', ""), /https?:/, `${n}: URL eksternal`);
   }
-  // Template tidak memuat gambar dari luar (Unsplash dsb.).
+  // Templates do not load external images (Unsplash etc.).
   for (const tpl of templates()) {
     const json = JSON.stringify(buildTemplatePages(tpl, "id").map((p) => p.doc));
     assert.doesNotMatch(json, /unsplash|placehold\.co/, `${tpl.id}: gambar eksternal`);
@@ -277,7 +277,7 @@ test("tipe section ala Divi: beranda dibuka Header Lebar Penuh, setiap template 
           const sec = (s as { section?: { sectionType?: string } }).section;
           if (sec?.sectionType !== "specialty") continue;
           special++;
-          // satu Row; di dalamnya tidak ada Row lagi (baris dalam = grup grid biasa)
+          // one Row; there are no more Rows inside it (inner rows = regular grid groups)
           assert.equal((s as { children: ComponentNode[] }).children.length, 1);
           let nested = 0;
           walk((s as { children: ComponentNode[] }).children[0], (n) => {
@@ -288,7 +288,7 @@ test("tipe section ala Divi: beranda dibuka Header Lebar Penuh, setiap template 
           assert.ok(special_col, `${tpl.id}/${p.key}: kolom spesial`);
         }
       assert.ok(special >= 1, `${tpl.id}/${lang}: tanpa section Spesialisasi`);
-      // tipe section ikut tersimpan & dimuat ulang
+      // the section type is saved & reloaded too
       const back = normalizePageDoc(JSON.parse(JSON.stringify(pages[0].doc)));
       assert.equal((back.root.children[1] as unknown as { section: { sectionType?: string } }).section.sectionType, "fullwidth");
     }

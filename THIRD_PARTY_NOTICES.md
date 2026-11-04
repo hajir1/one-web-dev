@@ -1,10 +1,10 @@
-# Pemberitahuan pihak ketiga
+# Third-party notices
 
-OneWebDev memakai karya pihak lain berikut. Lisensi masing-masing tetap berlaku untuk bagiannya.
+OneWebDev uses the following work by others. Each license continues to apply to its part.
 
-## Dasar proyek
+## Project base
 
-Kerangka awal dashboard berasal dari **TailAdmin React** (MIT):
+The initial dashboard scaffold comes from **TailAdmin React** (MIT):
 
 ```
 MIT License
@@ -30,30 +30,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Dimuat saat dipakai (tidak dibundel)
+## Loaded at runtime (not bundled)
 
-| Komponen | Lisensi | Dipakai untuk |
+| Component | License | Used for |
 |---|---|---|
-| three.js (CDN jsDelivr) | MIT | Elemen 3D (`owd3d`) |
-| A-Frame (CDN jsDelivr) | MIT | Library A-Frame opsional di Desain Halaman |
-| Chart.js (CDN jsDelivr) | MIT | Elemen grafik |
-| Model BiRefNet lite (`onnx-community/BiRefNet_lite-ONNX`, Hugging Face) | MIT (cek kartu model setiap kali model diganti) | Hapus latar gambar di browser |
-| Plus Jakarta Sans, JetBrains Mono, font Google Fonts lain | SIL OFL 1.1 | Tipografi aplikasi & template |
-| Motion 11 (CDN jsDelivr) | MIT | Animasi di template kode |
-| Lenis 1.1 (CDN jsDelivr) | MIT | Gulir halus di template kode |
-| Swiper 11 (CDN jsDelivr) | MIT | Slider di template kode |
-| AOS 2.3 (CDN jsDelivr) | MIT | Animasi masuk di template kode |
-| canvas-confetti 1.9 (CDN jsDelivr) | ISC | Efek konfeti di template undangan |
+| three.js (jsDelivr CDN) | MIT | 3D elements (`owd3d`) |
+| A-Frame (jsDelivr CDN) | MIT | Optional A-Frame library in Page Design |
+| Chart.js (jsDelivr CDN) | MIT | Chart elements |
+| BiRefNet lite model (`onnx-community/BiRefNet_lite-ONNX`, Hugging Face) | MIT (check the model card whenever the model changes) | In-browser image background removal |
+| Plus Jakarta Sans, JetBrains Mono, other Google Fonts | SIL OFL 1.1 | App and template typography |
+| Motion 11 (jsDelivr CDN) | MIT | Animation in code templates |
+| Lenis 1.1 (jsDelivr CDN) | MIT | Smooth scrolling in code templates |
+| Swiper 11 (jsDelivr CDN) | MIT | Sliders in code templates |
+| AOS 2.3 (jsDelivr CDN) | MIT | Entrance animations in code templates |
+| canvas-confetti 1.9 (jsDelivr CDN) | ISC | Confetti effect in invitation templates |
 
-Animasi scroll template 3D memakai mesin sendiri (OWD Scrub, `src/tools/codeTemplates/scrub.ts`), bukan GSAP. Semua gambar contoh template dan elemen Page Maker adalah SVG buatan sendiri; objek 3D dibuat prosedural tanpa model atau tekstur luar. Nama usaha, orang, mitra, dan testimoni di template adalah fiktif.
+Scroll animation in the 3D templates uses an in-house engine (OWD Scrub, `src/tools/codeTemplates/scrub.ts`), not GSAP. Every sample image in the templates and Page Maker elements is an in-house SVG; 3D objects are procedural, with no external models or textures. Pure CSS animation templates use no library at all. Business names, people, partners, and testimonials in the templates are fictional.
 
-Efek animasi (pengganti AOS, Animate.css, dan Vanilla Tilt) ditulis ulang sebagai `owd-motion`. Keyframe gaya Animate.css mengikuti Animate.css 4.1.1 (MIT, © Daniel Eden).
+Animation effects (replacing AOS, Animate.css, and Vanilla Tilt) are rewritten as `owd-motion`. The Animate.css style keyframes follow Animate.css 4.1.1 (MIT, © Daniel Eden).
 
-## Paket npm yang dibundel (303 paket)
+## Bundled npm packages (303 packages)
 
-Ringkasan: MIT (218), ISC (26), Apache-2.0 (17), BSD-3-Clause (16), BSD-2-Clause (7), MPL-2.0 (5), BlueOak-1.0.0 (5), Unlicense (2), MIT/X11 (README paket) (1), MIT/X11 (1), (MIT OR GPL-3.0-or-later) (1), CC0-1.0 (1), (MIT AND Zlib) (1), 0BSD (1), (MIT OR CC0-1.0) (1).
+Summary: MIT (218), ISC (26), Apache-2.0 (17), BSD-3-Clause (16), BSD-2-Clause (7), MPL-2.0 (5), BlueOak-1.0.0 (5), Unlicense (2), MIT/X11 (package README) (1), MIT/X11 (1), (MIT OR GPL-3.0-or-later) (1), CC0-1.0 (1), (MIT AND Zlib) (1), 0BSD (1), (MIT OR CC0-1.0) (1).
 
-| Paket | Versi | Lisensi | Sumber |
+| Package | Version | License | Source |
 |---|---|---|---|
 | @babel/runtime | 7.29.10 | MIT | https://github.com/babel/babel |
 | @fast-csv/format | 4.3.5 | MIT | https://github.com/C2FO/fast-csv |
@@ -118,7 +118,7 @@ Ringkasan: MIT (218), ISC (26), Apache-2.0 (17), BSD-3-Clause (16), BSD-2-Clause
 | buffer | 5.7.1 | MIT | git://github.com/feross/buffer |
 | buffer-crc32 | 0.2.13 | MIT | git://github.com/brianloveswords/buffer-crc32 |
 | buffer-indexof-polyfill | 1.0.2 | MIT | https://github.com/sarosia/buffer-indexof-polyfill |
-| buffers | 0.1.1 | MIT/X11 (README paket) | http://github.com/substack/node-buffers |
+| buffers | 0.1.1 | MIT/X11 (package README) | http://github.com/substack/node-buffers |
 | call-bind | 1.0.9 | MIT | https://github.com/ljharb/call-bind |
 | call-bind-apply-helpers | 1.0.2 | MIT | https://github.com/ljharb/call-bind-apply-helpers |
 | call-bound | 1.0.4 | MIT | https://github.com/ljharb/call-bound |
@@ -359,4 +359,4 @@ Ringkasan: MIT (218), ISC (26), Apache-2.0 (17), BSD-3-Clause (16), BSD-2-Clause
 | zip-stream | 4.1.1 | MIT | https://github.com/archiverjs/node-zip-stream |
 | zustand | 5.0.16 | MIT | https://github.com/pmndrs/zustand |
 
-_Dibuat otomatis oleh `scripts/third-party-notices.mjs`._
+_Generated automatically by `scripts/third-party-notices.mjs`._

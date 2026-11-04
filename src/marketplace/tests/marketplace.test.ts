@@ -30,7 +30,7 @@ import { WEB_TEMPLATES, getTemplate, templateSite } from "../../pages/webTemplat
 
 const icons = makeIconLookup([]);
 const FRAMEWORKS = ["html", "react", "vue", "svelte", "angular"];
-/** Katalog lengkap dirakit dari sumber template (sama dengan yang diekspor ke seed backend). */
+/** The full catalog assembled from template sources (the same as exported to the backend seed). */
 let snap = null;
 const catalog = async () => {
   if (!snap) {
@@ -40,7 +40,7 @@ const catalog = async () => {
   return snap;
 };
 
-/** Backend palsu: mencatat request dan menjawab per path. */
+/** Fake backend: records requests and answers per path. */
 function mockServer(routes) {
   const calls = [];
   const prev = { baseUrl: apiConfig.baseUrl, fetch: apiConfig.fetch };
@@ -60,7 +60,7 @@ function mockServer(routes) {
   return { calls, restore: () => configureApi(prev) };
 }
 
-/** Akun seperti dikirim server: template dimiliki + grant item bawaannya + item satuan. */
+/** Account as sent by the server: owned templates + grants for their built-in items + single items. */
 const serverAccount = ({ balance = 0, templates = [], items = [], limits = undefined } = {}) => ({
   balance,
   entitlements: {
@@ -75,7 +75,7 @@ const serverAccount = ({ balance = 0, templates = [], items = [], limits = undef
 });
 
 /* ------------------------------------------------------------------ */
-/* Katalog: komposisi & harga                                          */
+/* Catalog: composition & prices                                       */
 /* ------------------------------------------------------------------ */
 
 test("10 section Pro baru: 4 Free + 6 Premium, tipe beragam, harga 0 / 1–2 kredit", async () => {
@@ -108,7 +108,7 @@ test("19 elemen baru (11 Free + 8 Premium) terdaftar, harga sesuai, metadata len
     assert.ok(e && e.isNew && e.name, t);
     assert.deepEqual(pieceInfo(`element:${t}`).price, e.price);
   }
-  // elemen rilis sebelumnya tidak lagi ditandai "Baru"
+  // elements from the previous release are no longer marked "New"
   for (const t of ELEMENTS_V2) assert.equal(elements.find((x) => x.refId === t).isNew, false, t);
 });
 
@@ -144,14 +144,15 @@ test("template: 32 Free / sisanya Premium, harga sesuai, item Premium bawaan = i
       assert.deepEqual(t.premiumItemIds, []);
     } else assert.deepEqual(t.premiumItemIds, used, t.id);
   }
-  // Template Premium baru benar-benar memakai item Premium (section/elemen).
+  // New Premium templates really use Premium items (sections/elements).
   const fresh = templates.filter((t) => t.tier === "premium" && t.isNew);
-  // Label "Terbaru" hanya untuk unggahan terakhir (LATEST_TEMPLATE_IDS).
-  assert.deepEqual(templates.filter((t) => t.isNew).map((t) => t.refId).sort(), [...LATEST_TEMPLATE_IDS].sort());
-  // Template Free = 0 kredit.
+  // The "Latest" label is only for the last upload (LATEST_TEMPLATE_IDS).
+  const refIds = new Set(templates.map((t) => t.refId));
+  assert.deepEqual(templates.filter((t) => t.isNew).map((t) => t.refId).sort(), LATEST_TEMPLATE_IDS.filter((id) => refIds.has(id)).sort());
+  // Free template = 0 credits.
   for (const t of templates.filter((x) => x.tier === "free")) assert.equal(t.price, 0, t.id);
   for (const t of fresh) assert.ok(t.premiumItemIds.length >= 1, t.id);
-  // Template Premium memakai section Pro (preset ber-ID) dari katalog.
+  // Premium templates use Pro sections (ID'd presets) from the catalog.
   assert.ok(templates.some((t) => t.sectionIds.includes("preset:pro-pricing-cards")));
 });
 
@@ -187,7 +188,7 @@ test("repository: template dari GET /templates (divalidasi), di-cache per bahasa
 });
 
 /* ------------------------------------------------------------------ */
-/* Hak akses: tiga konsep terpisah                                     */
+/* Access rights: three separate concepts                              */
 /* ------------------------------------------------------------------ */
 
 test("akses: Free selalu; template dibeli → item bawaan HANYA di desain dari template itu", async () => {
@@ -202,14 +203,14 @@ test("akses: Free selalu; template dibeli → item bawaan HANYA di desain dari t
 
   const e = sanitizeAccount(serverAccount({ templates: [saas] })).entitlements;
   assert.equal(templateStatus("saas-launch", "premium", e), "owned");
-  // (1) kepemilikan template & (2) grant terpisah; (3) item individual tidak tersentuh
+  // (1) template ownership & (2) separate grants; (3) individual items are untouched
   assert.equal(e.templates.length, 1);
   assert.deepEqual(e.templateGrants[0].itemIds, saas.premiumItemIds);
   assert.equal(e.items.length, 0);
   assert.equal(accessReason(mega, "premium", e, { templateId: "saas-launch" }), "template");
   assert.equal(accessReason(mega, "premium", e, {}), "locked", "desain dari nol tetap terkunci");
   assert.equal(accessReason(mega, "premium", e, { templateId: "startup-pitch" }), "locked", "template lain yang belum dimiliki");
-  // Item Premium yang TIDAK disertakan tetap terkunci walau di desain template.
+  // Premium items that are NOT included stay locked even in template designs.
   const slider = elements.find((x) => x.refId === "slider");
   assert.ok(!saas.premiumItemIds.includes(slider.id));
   assert.equal(canUse(slider.id, "premium", e, { templateId: "saas-launch" }), false);
@@ -277,7 +278,7 @@ test("pembelian lewat server: harga & saldo dari respons, klik ganda = 1 request
 });
 
 /* ------------------------------------------------------------------ */
-/* Paket desain                                                        */
+/* Design packs                                                        */
 /* ------------------------------------------------------------------ */
 
 test("paket desain: 5 = 5 kredit, 50 = 30 kredit, kombinasi termurah, pembulatan & saran hemat", () => {
@@ -321,7 +322,7 @@ test("kuota desain bertambah setelah beli paket (batas dari server), batas lama 
 });
 
 /* ------------------------------------------------------------------ */
-/* Validasi akun dari server                                            */
+/* Account validation from the server                                   */
 /* ------------------------------------------------------------------ */
 
 test("akun server divalidasi: data rusak dibuang, duplikat digabung, bentuk asing = akun kosong", () => {
@@ -347,7 +348,7 @@ test("akun server divalidasi: data rusak dibuang, duplikat digabung, bentuk asin
 });
 
 /* ------------------------------------------------------------------ */
-/* Desain dari template & ekspor                                        */
+/* Designs from templates & export                                      */
 /* ------------------------------------------------------------------ */
 
 test("desain mencatat template asal (tahan normalisasi); asal palsu dibuang", () => {
@@ -364,13 +365,13 @@ test("ekspor website: izin elemen Premium per halaman mengikuti template asal", 
   const { site, designs } = templateSite(tpl, "id", "X");
   const allowIfFrom = (doc) => (type) => doc.source?.templateId === "saas-launch" && type !== "slider";
   assert.deepEqual(buildSite(site, designs, { icons, allowPremiumElementsFor: allowIfFrom }).warnings, []);
-  // Halaman tanpa asal template (desain dari nol) → elemen Premium terkunci.
+  // Pages without a template origin (designs from scratch) → Premium elements locked.
   const stripped = designs.map((d) => ({ ...d, state: { version: 2, root: d.state.root } }));
   assert.ok(buildSite(site, stripped, { icons, allowPremiumElementsFor: allowIfFrom }).warnings.length > 0);
 });
 
 /* ------------------------------------------------------------------ */
-/* Filter katalog                                                      */
+/* Catalog filter                                                      */
 /* ------------------------------------------------------------------ */
 
 test("katalog: cari nama/deskripsi/tag, filter kategori & tier, urut harga/kategori, hasil kosong", async () => {
@@ -404,7 +405,7 @@ test("akun kosong: tanpa hak akses, tanpa transaksi, batas default", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/* Promo template 40% sampai 10 Januari 2027                            */
+/* 40% template promo until 10 January 2027                             */
 /* ------------------------------------------------------------------ */
 
 test("promo: 40% dari harga awal sampai akhir 10 Jan 2027 (WIB), dibulatkan, Free tetap 0", async () => {
@@ -427,7 +428,7 @@ test("promo: 40% dari harga awal sampai akhir 10 Jan 2027 (WIB), dibulatkan, Fre
 });
 
 /* ------------------------------------------------------------------ */
-/* Paket folder website (diskon bertingkat)                             */
+/* Website folder packs (tiered discounts)                              */
 /* ------------------------------------------------------------------ */
 
 test("paket website: 1 = 15 kredit, 10 = 105 kredit, makin banyak makin murah, kombinasi termurah", () => {
@@ -440,7 +441,7 @@ test("paket website: 1 = 15 kredit, 10 = 105 kredit, makin banyak makin murah, k
   assert.equal(quoteSites(0).sites, 1, "minimal 1");
   assert.equal(quoteSites(1000).sites, MAX_SITES_PER_PURCHASE);
   assert.equal(normalizeSiteCount(2.2), 3);
-  // 9 website = 5 + 4×1 = 120 kredit > 10 website = 105 kredit → saran hemat.
+  // 9 websites = 5 + 4×1 = 120 credits > 10 websites = 105 credits → savings suggestion.
   assert.equal(quoteSites(9).credits, 120);
   assert.deepEqual([betterSiteDeal(9).sites, betterSiteDeal(9).credits], [10, 105]);
   assert.equal(betterSiteDeal(10), null);

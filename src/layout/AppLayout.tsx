@@ -10,9 +10,9 @@ import TermsGate from "../components/app/TermsGate";
 import { splitLangPath } from "../i18n";
 
 /**
- * Halaman builder layar penuh (mis. Page Maker): tanpa sidebar, header, dan
- * pembatas lebar `max-w-(--breakpoint-2xl)` — halaman itu memenuhi 100% viewport
- * dan menyediakan tombol keluarnya sendiri.
+ * Full-screen builder pages (e.g. Page Maker): no sidebar, header, or
+ * `max-w-(--breakpoint-2xl)` width limit; the page fills 100% of the viewport
+ * and provides its own exit button.
  */
 const IMMERSIVE_ROUTES = ["/page-maker", "/studio", "/website-builder/code"];
 
@@ -50,14 +50,14 @@ const LayoutContent: React.FC = () => {
       >
         <AppHeader />
         <main id="main" className="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
-          {/* Suspense di sini: sidebar & header tetap tampil saat halaman berikutnya dimuat. */}
+          {/* Suspense here: the sidebar & header stay visible while the next page loads. */}
           <Suspense fallback={<div className="flex min-h-[40vh] items-center justify-center"><span className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" /></div>}>
             <Outlet />
           </Suspense>
         </main>
       </div>
 
-      {/* PWA install banner — muncul di sudut bawah jika belum diinstall */}
+      {/* PWA install banner: appears in the bottom corner if not installed yet */}
       <PwaInstallPrompt />
       <Toaster />
       <TermsGate />

@@ -17,7 +17,7 @@ import type { DesignManagerProps } from "./PanelStyling";
 import type { SavedDesign } from "../store/designStore";
 import { formatDate } from "../helpers/formatDate";
 
-/** Aksi yang menunggu konfirmasi karena akan membuang perubahan yang belum disimpan. */
+/** An action awaiting confirmation because it would discard unsaved changes. */
 type PendingAction = { kind: "load"; design: SavedDesign } | { kind: "new" };
 
 const TONE_CLASS = {
@@ -40,18 +40,18 @@ const GHOST_BTN =
   "inline-flex items-center justify-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 rounded px-3 py-2 hover:text-gray-800 dark:hover:text-white/90";
 
 /**
- * Bilah "Desain Saya": simpan, buka, dan kelola desain di browser ini.
- * Dibuat untuk pengguna awam — bahasa sederhana, status yang jelas
- * ("sudah tersimpan" / "ada perubahan"), satu tombol utama yang berubah
- * sesuai konteks, dan konfirmasi sebelum membuang pekerjaan.
- * Tidak tergantung jenis elemen: cukup beri hasil `useDesignSaver`.
+ * The "My Designs" bar: save, open, and manage designs in this browser.
+ * Made for non-technical users: plain language, clear status
+ * ("saved" / "has changes"), one primary button that changes
+ * with the context, and a confirmation before discarding work.
+ * Independent of the element type: just pass the `useDesignSaver` result.
  */
 export default function DesignManagerBar({
   design,
   extra,
 }: {
   design: DesignManagerProps;
-  /** Konten tambahan di bawah daftar desain (mis. tautan Folder Website). */
+  /** Extra content below the design list (e.g. a Website Folder link). */
   extra?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -83,10 +83,10 @@ export default function DesignManagerBar({
   const shown = filterDesigns(designs, query);
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  /** Pesan berhasil sebagai kunci i18n + parameter (diterjemahkan saat render). */
+  /** Success message as an i18n key + parameters (translated at render time). */
   const [notice, setNotice] = useState<{ key: string; opts?: Record<string, unknown> } | null>(null);
 
-  // Pesan "berhasil disimpan" hilang sendiri.
+  // The "saved successfully" message disappears on its own.
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(null), 2500);
@@ -140,7 +140,7 @@ export default function DesignManagerBar({
       aria-label={t("pm.editor.myDesigns")}
       className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-5 flex flex-col gap-4"
     >
-      {/* Judul + penjelasan + status */}
+      {/* Title + explanation + status */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
           <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
@@ -186,7 +186,7 @@ export default function DesignManagerBar({
         </div>
       )}
 
-      {/* Aksi utama — berubah sesuai konteks */}
+      {/* Main action — changes with context */}
       {activeDesign ? (
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -221,7 +221,7 @@ export default function DesignManagerBar({
         </div>
       )}
 
-      {/* Konfirmasi sebelum membuang perubahan */}
+      {/* Confirmation before discarding changes */}
       {pending && (
         <div
           role="alertdialog"
@@ -249,7 +249,7 @@ export default function DesignManagerBar({
         </div>
       )}
 
-      {/* Pesan berhasil */}
+      {/* Success message */}
       <p
         aria-live="polite"
         className={`text-xs text-green-700 dark:text-green-400 flex items-center gap-1.5 ${
@@ -259,7 +259,7 @@ export default function DesignManagerBar({
         <Check size={13} /> {notice ? t(notice.key, notice.opts) : null}
       </p>
 
-      {/* Daftar desain tersimpan */}
+      {/* Saved designs list */}
       <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
         <button
           type="button"

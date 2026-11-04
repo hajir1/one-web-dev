@@ -13,11 +13,11 @@ import { btn } from "./ui";
 /* ================================================================== */
 /* Gerbang pemrosesan server                                            */
 /*                                                                    */
-/* Setiap kali fitur server dijalankan, pengguna melihat nama fitur,     */
+/* Every time a server feature runs, the user sees the feature name,     */
 /* status server, status akses, biaya per penggunaan, perkiraan biaya,   */
-/* saldo & perkiraan penggunaan. Selama server belum tersedia, dialog    */
-/* ini adalah ALERT informatif: tidak ada upload, saldo tidak berubah,    */
-/* tidak ada transaksi.                                                   */
+/* balance & estimated usage. While the server is not available yet, the dialog */
+/* this is an informational ALERT: no upload, the balance does not change, */
+/* there is no transaction.                                               */
 /* ================================================================== */
 
 interface GateRequest {
@@ -33,8 +33,8 @@ const useGate = create<{ req: GateRequest | null; set: (r: GateRequest | null) =
 }));
 
 /**
- * Tampilkan informasi biaya & akses. `true` hanya bila server tersedia,
- * akses terbuka, saldo/kuota cukup, dan pengguna menekan "Jalankan".
+ * Shows cost & access information. `true` only when the server is available,
+ * access is open, balance/quota is sufficient, and the user pressed "Run".
  */
 export function confirmServerRun(tool: MediaToolId, inputs: UsageInput[], onUseBrowser?: () => void): Promise<boolean> {
   useGate.getState().req?.resolve(false);

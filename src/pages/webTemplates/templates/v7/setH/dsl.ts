@@ -1,9 +1,9 @@
 import type { TemplateCategory, TemplateTier } from "../../../../../config/templates";
 import type { CardStyle, Domain, HBlock, HSpec, KpiStyle, PageKind, Shell } from "./spec";
 
-/* Penulisan spesifikasi ringkas: satu baris per template (lihat h1.ts…h5.ts). */
+/* Compact specification format: one line per template (see h1.ts…h5.ts). */
 
-/** Urutan blok beranda. */
+/** Home page block order. */
 const HOME: HBlock[][] = [
   ["kpis", "main", "split-act", "split-goal"],
   ["kpis", "main", "table", "activity"],
@@ -15,7 +15,7 @@ const HOME: HBlock[][] = [
   ["steps", "kpis", "duo", "mini-table"],
 ];
 
-/** Susunan halaman selain beranda. */
+/** Layout of pages other than the home page. */
 const PAGES: PageKind[][] = [
   ["records", "analytics", "settings", "login"],
   ["records", "board", "customers", "settings", "login"],
@@ -62,7 +62,7 @@ export const h = (id: string, brand: string, domain: Domain, r: Row): HSpec => (
   ...(r.fx && r.tier !== "free" ? { fx: r.fx } : {}),
 });
 
-/** Frasa gaya untuk deskripsi katalog [id, en]. */
+/** Style phrase for the catalog description [id, en]. */
 export const SHELL_TEXT: Record<Shell, [string, string]> = {
   "side-dark": ["sidebar gelap", "a dark sidebar"],
   "side-light": ["sidebar terang bergaris", "a light outlined sidebar"],

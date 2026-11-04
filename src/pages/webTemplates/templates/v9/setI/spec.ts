@@ -1,32 +1,32 @@
 import type { B, BlockId, GPage, GSpec } from "../../v6/setG/spec";
 
 /* ================================================================== */
-/* Spesifikasi template v9 bagian I: PREMIUM 3D & ANIMASI               */
+/* v9 template specification part I: PREMIUM 3D & ANIMATION             */
 /*                                                                    */
-/* Ditulis seperti set G (data murni: Look, susunan blok, isi bisnis    */
-/* dwibahasa) dan dibangun dengan mesin set G, ditambah:                 */
-/*  - hero & section 3D (elemen Premium Three.js / kartu tilt),          */
-/*  - animasi CSS per node (tanpa library) sesuai gaya `motion`.         */
-/* Semua template set I Premium, 60–300 kredit sesuai kompleksitas.      */
+/* Written like set G (pure data: Look, block layout, business content  */
+/* bilingual) and built with the set G engine, plus:                    */
+/*  - 3D hero & sections (Premium Three.js elements / tilt cards),       */
+/*  - per-node CSS animation (no library) matching the `motion` style.   */
+/* All set I templates are Premium, 60–300 credits by complexity.        */
 /* ================================================================== */
 
 export type { B };
 
-/** Hero dengan elemen 3D. */
+/** A hero with a 3D element. */
 export type Hero3D =
-  | "h3-globe" // teks + globe 3D di latar gradien gelap
-  | "h3-product" // produk 3D berputar + chip angka
-  | "h3-shape" // bentuk geometris 3D + daftar poin
-  | "h3-particles" // judul di atas latar partikel 3D selebar layar
-  | "h3-cards"; // judul tengah + tiga kartu 3D tilt
+  | "h3-globe" // text + a 3D globe on a dark gradient background
+  | "h3-product" // spinning 3D product + number chips
+  | "h3-shape" // 3D geometric shape + bullet list
+  | "h3-particles" // a heading over a screen-wide 3D particle background
+  | "h3-cards"; // centered heading + three 3D tilt cards
 
-/** Section dengan elemen 3D. */
+/** A section with a 3D element. */
 export type Block3D =
   | "x-globe" // globe + angka jangkauan
-  | "x-product" // produk 3D + spesifikasi
-  | "x-shape" // daftar fitur + bentuk 3D
-  | "x-tilt" // tiga kartu 3D tilt
-  | "x-particles"; // ajakan di atas latar partikel
+  | "x-product" // 3D product + specifications
+  | "x-shape" // feature list + 3D shape
+  | "x-tilt" // three 3D tilt cards
+  | "x-particles"; // a call to action over a particle background
 
 export type IBlockId = BlockId | Block3D;
 export type IBlockRef = IBlockId | [IBlockId, B?, B?];
@@ -35,7 +35,7 @@ export interface IPage extends Omit<GPage, "blocks"> {
   blocks: IBlockRef[];
 }
 
-/** Pengaturan elemen 3D yang dipakai template (warna diambil dari palet). */
+/** Settings for the 3D elements the template uses (colors taken from the palette). */
 export interface Three {
   product?: { model: "bottle" | "can" | "jar" | "cup"; finish: "glossy" | "matte" | "metal"; color?: string; accent?: string };
   shape?: { shape: "torusKnot" | "icosahedron" | "torus" | "octahedron" | "dodecahedron"; material: "metal" | "glass" | "matte" | "wire"; outline?: boolean };
@@ -44,7 +44,7 @@ export interface Three {
   particles?: { shape: "wave" | "galaxy" | "sphere"; density?: "low" | "normal" | "high"; accent?: string };
 }
 
-/** Gaya animasi masuk: tenang, hidup, atau tegas. */
+/** Entrance animation style: calm, lively, or bold. */
 export type Motion = "calm" | "lively" | "bold";
 
 export interface ISpec extends Omit<GSpec, "hero" | "home" | "pages" | "tier"> {
@@ -54,6 +54,6 @@ export interface ISpec extends Omit<GSpec, "hero" | "home" | "pages" | "tier"> {
   pages: IPage[];
   three: Three;
   motion: Motion;
-  /** Sumber kartu 3D tilt: katalog `items` (bawaan bila ada) atau layanan `svc`. */
+  /** Source for 3D tilt cards: the `items` catalog (default when present) or the `svc` services. */
   tiltFrom?: "items" | "svc";
 }

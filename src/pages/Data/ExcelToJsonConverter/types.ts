@@ -15,6 +15,6 @@ export interface ConvertItem {
   resultText?: string;
   resultBlob?: Blob;
   errorMsg?: string;
-  /** Format lama (.xls/.ods) → tampilkan tautan Konversi Server. */
+  /** Old formats (.xls/.ods) → show a Server Conversion link. */
   legacy?: boolean;
 }

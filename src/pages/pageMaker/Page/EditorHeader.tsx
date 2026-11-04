@@ -3,12 +3,12 @@ import { ArrowLeft, Database, FolderOpen, Layers, Plus, Redo2, Rocket, Settings2
 import { Link } from "../../../components/app/LocaleLink";
 import { BAR_BTN, MODES, SEG_OFF, SEG_ON, VIEWPORTS, type Mode, type Viewport } from "./editorUi";
 
-/* Bilah atas editor halaman (lebar pratinjau, undo/redo, struktur, mode, tambah).
-   Dipisah dari PageMaker.tsx (no. 15). */
+/* Page editor top bar (preview width, undo/redo, structure, mode, add).
+   Split out of PageMaker.tsx (no. 15). */
 
 interface Props {
   siteMode: boolean;
-  /** Judul halaman Studio yang sedang diedit. */
+  /** Title of the Studio page being edited. */
   pageTitle: string | null;
   dirty: boolean;
   designsOpen: boolean;
@@ -115,7 +115,7 @@ export default function EditorHeader(p: Props) {
         <Plus className="h-4 w-4" />
         {p.sectionCount === 0 ? t("pm.editor.addSection") : t("pm.editor.add")}
       </button>
-      {/* v17: langkah berikutnya alur Pembuat Website. Link internal tetap dijaga useLeaveGuard. */}
+      {/* v17: next step of the Website Builder flow. Internal links are still guarded by useLeaveGuard. */}
       {!p.siteMode && (
         <Link to={p.nextStepPath} className={BAR_BTN} data-testid="pm-next-step" title={t("pm.editor.nextStepTitle")}>
           <Rocket className="h-4 w-4" />

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 /* ================================================================== */
-/* Editor kode ringan dengan syntax highlighting (tanpa dependensi).    */
-/* Teknik: <textarea> transparan di atas <pre> berwarna, scroll         */
-/* disinkronkan. Tab menyisipkan 2 spasi; Esc melepas fokus (supaya     */
-/* tetap bisa keluar dengan keyboard).                                  */
+/* A lightweight code editor with syntax highlighting (no dependencies). */
+/* Technique: a transparent <textarea> over a colored <pre>, scroll     */
+/* synchronized. Tab inserts 2 spaces; Esc releases focus (so           */
+/* can still be left with the keyboard).                                */
 /* ================================================================== */
 
 export type CodeLang = "html" | "css" | "js";
@@ -51,13 +51,13 @@ const RULES: Record<CodeLang, Rule[]> = {
   ],
 };
 
-/** HTML berwarna untuk `code` (sudah di-escape — aman untuk innerHTML). */
+/** Colored HTML for `code` (already escaped; safe for innerHTML). */
 export function highlight(code: string, lang: CodeLang): string {
   const rules = RULES[lang];
   let out = "";
   let plain = "";
   let i = 0;
-  // Untuk HTML, atribut/string hanya diwarnai di dalam tag.
+  // For HTML, attributes/strings are only colored inside tags.
   let inTag = false;
   while (i < code.length) {
     let matched = false;
@@ -97,7 +97,7 @@ interface Props {
 }
 
 export default function CodeEditor({ value, onChange, lang, label, placeholder, rows = 6, maxLength, testId }: Props) {
-  // Nilai lokal → mengetik tetap lancar walau induk menyimpan ke riwayat.
+  // Local value → typing stays smooth even while the parent saves to history.
   const [text, setText] = useState(value);
   useEffect(() => setText(value), [value]);
   const taRef = useRef<HTMLTextAreaElement>(null);
@@ -120,7 +120,7 @@ export default function CodeEditor({ value, onChange, lang, label, placeholder, 
     } else if (e.key === "Escape") {
       e.currentTarget.blur();
     }
-    e.stopPropagation(); // pintasan builder (Delete, Ctrl+Z) tidak ikut terpicu
+    e.stopPropagation(); // builder shortcuts (Delete, Ctrl+Z) are not triggered as well
   };
 
   const sync = () => {

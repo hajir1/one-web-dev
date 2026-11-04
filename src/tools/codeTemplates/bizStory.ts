@@ -1,20 +1,20 @@
 /* ================================================================== */
-/* Cerita scroll untuk website 3D bisnis (v23.1).                      */
+/* Scroll stories for the business 3D websites (v23.1).                */
 /*                                                                    */
-/* Objek tidak lagi hanya bergeser kiri-kanan. Tiap template punya     */
-/* alur sendiri yang digerakkan scroll (OWD Scrub):                     */
-/*  1. Hero: "benih" cerita (palu, biji kopi, telur, kunci, ...).       */
-/*  2. Scroll pertama: benih beraksi (palu memukul / benih pecah) lalu  */
-/*     potongan-potongan objek utama datang dan tersusun satu per satu  */
-/*     (jatuh bertumpuk seperti bata, berputar dari orbit, atau tumbuh  */
-/*     dari tengah).                                                    */
-/*  3. Urai: objek terbuka menjadi tampilan "exploded view".            */
-/*  4. Menyelam: kamera masuk ke dalam objek, dunia berganti menjadi    */
+/* Objects no longer just shift left and right. Each template has      */
+/* its own scroll-driven flow (OWD Scrub):                              */
+/*  1. Hero: the story "seed" (hammer, coffee bean, egg, key, ...).     */
+/*  2. First scroll: the seed acts (a hammer strikes / the seed bursts), then */
+/*     pieces of the main object arrive and assemble one by one         */
+/*     (falls and stacks like bricks, spins in from orbit, or grows     */
+/*     from the center).                                                */
+/*  3. Explode: the object opens into an "exploded view".               */
+/*  4. Dive: the camera enters the object, and the world changes into   */
 /*     dunia khas template (bizWorlds.ts, 12 jenis).                    */
-/*  5. Partikel: objek luruh menjadi ribuan titik yang menyusun nama    */
-/*     usaha, lalu kembali utuh.                                        */
-/* Ditambah orbit & lapisan berpilin; urutan adegan per template ada    */
-/* di STORYBOARD (bizWorlds.ts).                                        */
+/*  5. Particles: the object dissolves into thousands of dots that form the name */
+/*     business, then becomes whole again.                              */
+/* Plus orbits & twisted layers; the scene order per template lives     */
+/* in STORYBOARD (bizWorlds.ts).                                        */
 /* ================================================================== */
 
 export type SeedKind =
@@ -22,7 +22,7 @@ export type SeedKind =
   | "plane" | "coin" | "key" | "bolt" | "flower" | "drop" | "note" | "bone" | "star" | "sprout" | "pin";
 export type BuildKind = "drop" | "spiral" | "grow";
 
-/** Model 3D → [benih di hero, cara objek tersusun]. */
+/** 3D model → [seed in the hero, how the object assembles]. */
 export const STORY_OF: Record<string, [SeedKind, BuildKind]> = {
   cup: ["bean", "grow"], cake: ["egg", "drop"], cloth: ["spool", "spiral"], vase: ["lump", "grow"], honey: ["bee", "spiral"],
   phone: ["chip", "spiral"], laptop: ["chip", "drop"], rocket: ["spark", "spiral"], knot: ["spark", "spiral"], camera: ["lens", "grow"],
@@ -34,14 +34,14 @@ export const STORY_OF: Record<string, [SeedKind, BuildKind]> = {
   mic: ["note", "grow"], desk: ["pencil", "drop"], atom: ["spark", "spiral"], chair: ["hammer", "drop"], books: ["pencil", "drop"],
 };
 
-/** Nama benih untuk teks petunjuk & laporan. */
+/** Seed name for hint text & reports. */
 export const SEED_LABEL: Record<SeedKind, string> = {
   hammer: "palu", bean: "biji kopi", egg: "telur", spool: "gulungan benang", lump: "gumpalan tanah liat", bee: "lebah", chip: "chip",
   spark: "percik cahaya", lens: "lensa", pencil: "pensil", cross: "tanda plus", plane: "pesawat kertas", coin: "koin", key: "kunci",
   bolt: "petir", flower: "bunga", drop: "tetes air", note: "not musik", bone: "tulang", star: "bintang", sprout: "tunas", pin: "pin peta",
 };
 
-/** Badan fungsi JS: membangun benih dengan alat bantu K (sama dengan objek utama). */
+/** JS function body: builds the seed with the K helpers (same as the main object). */
 export const SEEDS: Record<SeedKind, string> = {
   hammer: `
   const wood = K.std("#a8743f", { roughness: 0.6 });
@@ -150,14 +150,14 @@ export const SEEDS: Record<SeedKind, string> = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Mesin cerita (disisipkan ke dalam start() setelah objek dibuat).     */
-/* Memakai: THREE, K, M, COL, BRAND, model, fit, spin, pivot, mid, k,   */
+/* Story engine (inserted into start() after the object is built).      */
+/* Uses: THREE, K, M, COL, BRAND, model, fit, spin, pivot, mid, k,      */
 /* scene, track, GLOW, reduce, STORY.                                   */
 /* ------------------------------------------------------------------ */
 export const STORY_ENGINE = String.raw`
   /* ---- Cerita scroll: benih → rakit → urai → menyelam → partikel nama ---- */
   const sm = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
-  /* Benih di hero (dinormalkan, ikut diputar). */
+  /* Seed in the hero (normalized, rotates along). */
   const seedG = new THREE.Group();
   K.target(seedG); buildSeed(K, THREE, COL); K.target(model);
   seedG.updateMatrixWorld(true);
@@ -165,8 +165,8 @@ export const STORY_ENGINE = String.raw`
   const seedFit = new THREE.Group(); seedFit.add(seedG); seedG.position.sub(smid); seedFit.scale.setScalar(2.1 / Math.max(ssz.x, ssz.y, ssz.z));
   const seedSpin = new THREE.Group(); seedSpin.add(seedFit); spin.add(seedSpin);
 
-  /* Potongan objek: tiap mesh dibungkus dua grup supaya bisa digeser, diputar, dan diskalakan di titik tengahnya
-     tanpa mengganggu animasi bawaan objek (K.tick). */
+  /* Object pieces: each mesh is wrapped in two groups so it can be moved, rotated, and scaled around its center
+     without disturbing the object's built-in animation (K.tick). */
   model.updateMatrixWorld(true);
   const invModel = new THREE.Matrix4().copy(model.matrixWorld).invert();
   const leaves = []; model.traverse((o) => { if ((o.isMesh || o.isSprite) && o !== model) leaves.push(o); });
@@ -177,10 +177,10 @@ export const STORY_ENGINE = String.raw`
     const box = new THREE.Box3().setFromObject(o);
     if (box.isEmpty()) continue;
     const cw = box.getCenter(new THREE.Vector3());
-    const cm = cw.clone().applyMatrix4(invModel).sub(mid);               /* pusat di ruang objek (relatif titik tengah) */
+    const cm = cw.clone().applyMatrix4(invModel).sub(mid);               /* center in object space (relative to the center point) */
     const A = new THREE.Matrix4().copy(par.matrixWorld).invert().multiply(model.matrixWorld);
     const A3 = new THREE.Matrix3().setFromMatrix4(A);
-    const cl = cw.clone().applyMatrix4(new THREE.Matrix4().copy(par.matrixWorld).invert()); /* pusat di ruang induk */
+    const cl = cw.clone().applyMatrix4(new THREE.Matrix4().copy(par.matrixWorld).invert()); /* center in parent space */
     const w1 = new THREE.Group(), w2 = new THREE.Group();
     w1.position.copy(cl); w2.position.copy(cl).negate();
     const idx = par.children.indexOf(o); par.remove(o); w2.add(o); w1.add(w2); par.add(w1);
@@ -193,9 +193,9 @@ export const STORY_ENGINE = String.raw`
   parts.forEach((p, i) => (p.oa = (i / Math.max(1, parts.length)) * Math.PI * 2));
   parts.forEach((p) => { p.rank = STORY.build === "drop" ? (p.cm.y - minY) / spanY * 0.85 + p.r * 0.15 : STORY.build === "grow" ? p.cm.length() / Math.max(1e-3, maxR) * 0.7 + p.r * 0.3 : p.r; });
   const tmp = new THREE.Vector3();
-  const U = 1 / k; /* satu satuan layar (objek dinormalkan 2,7) dalam satuan objek */
+  const U = 1 / k; /* one screen unit (object normalized to 2.7) in object units */
 
-  /* Partikel: titik dari permukaan objek, berubah menjadi nama usaha. */
+  /* Particles: points from the object's surface that turn into the business name. */
   const NP = 3200;
   const base = new Float32Array(NP * 3), txt = new Float32Array(NP * 3), pos = new Float32Array(NP * 3), del = new Float32Array(NP);
   {
@@ -216,14 +216,14 @@ export const STORY_ENGINE = String.raw`
     const n = Math.max(1, tp.length / 2), sc = 3.2 / W;
     for (let i = 0; i < NP; i++) { const j = ((i * 7919) % n) * 2; txt[i * 3] = (tp[j] - W / 2) * sc + (K.rnd() - 0.5) * 0.02; txt[i * 3 + 1] = -(tp[j + 1] - H / 2) * sc; txt[i * 3 + 2] = (K.rnd() - 0.5) * 0.12; }
   }
-  /* Latar gelap: titik bercahaya (aditif); latar terang: titik biasa supaya tetap kontras. */
+  /* Dark background: glowing points (additive); light background: plain points so they keep contrast. */
   const darkBg = new THREE.Color(COL.bg).getHSL({ h: 0, s: 0, l: 0 }).l < 0.4;
   const blend = darkBg ? THREE.AdditiveBlending : THREE.NormalBlending;
   const pgeo = track(new THREE.BufferGeometry()); pgeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   const pmat = track(new THREE.PointsMaterial({ size: darkBg ? 0.09 : 0.07, map: GLOW, color: new THREE.Color(COL.accent).lerp(new THREE.Color("#ffffff"), darkBg ? 0.45 : 0), transparent: true, opacity: 0, depthWrite: false, sizeAttenuation: true, blending: blend, toneMapped: false }));
   const points = new THREE.Points(pgeo, pmat); points.visible = false; points.frustumCulled = false; pivot.add(points);
 
-  /* Dunia di dalam objek: berbeda per template (buildWorld, lihat bizWorlds.ts). */
+  /* The world inside the object: different per template (buildWorld, see bizWorlds.ts). */
   const world = new THREE.Group(); world.visible = false; scene.add(world);
   const ink = darkBg ? "#ffffff" : COL.ink, wm = [];
   const fade = (m, o) => { m.transparent = true; m.opacity = 0; m.depthWrite = false; m.userData.o = o == null ? 0.85 : o; wm.push(track(m)); return m; };
@@ -243,7 +243,7 @@ export const STORY_ENGINE = String.raw`
   const FIXED = { bld: 1, exp: 0, orb: 0, lay: 0, dive: 0, dis: 0 };
   const qv = new THREE.Quaternion(), ev = new THREE.Euler();
   let lastKey = "";
-  /** Terapkan kanal cerita ke potongan, benih, partikel, dan dunia. */
+  /** Apply the story channels to the pieces, seed, particles, and world. */
   function story(C, t, dt) {
     const bld = C.bld, exp = C.exp, dis = C.dis, orb = C.orb || 0, lay = C.lay || 0;
     const key = bld.toFixed(4) + exp.toFixed(4) + dis.toFixed(4) + orb.toFixed(4) + lay.toFixed(4) + (orb > 0.001 ? t.toFixed(3) : "");
@@ -258,7 +258,7 @@ export const STORY_ENGINE = String.raw`
         if (exp > 0) { const L = p.cm.length() || 1, f = exp * (0.38 + p.r * 0.32); ox += p.cm.x / L * f; oy += p.cm.y / L * f * 0.9 + exp * (p.cm.y > 0 ? 0.12 : -0.12); oz += p.cm.z / L * f; rx += exp * p.rx * 0.25; rz += exp * p.rz * 0.25; }
         /* Orbit: potongan berputar mengelilingi pusat seperti korsel. */
         if (orb > 0) { const a = p.oa + t * 0.45, R = 2.2 + p.r * 0.5; ox += orb * (Math.cos(a) * R - p.cm.x / U); oy += orb * ((p.r - 0.5) * 0.7 + Math.sin(a * 2) * 0.18 - p.cm.y / U); oz += orb * (Math.sin(a) * R - p.cm.z / U); rx += orb * a * 0.5; s *= 1 - orb * 0.3; }
-        /* Lapisan berpilin: potongan terpisah per ketinggian lalu tiap lapis diputar. */
+        /* Twisted layers: pieces split by height, then each layer is rotated. */
         let ry = 0;
         if (lay > 0) { const ly = (p.cm.y - minY) / spanY - 0.5; oy += lay * ly * 2.4; ox += lay * (p.r - 0.5) * 0.35; ry = lay * ly * 2.2; }
         if (dis > 0) s *= 1 - sm(0.02 + p.r * 0.18, 0.2 + p.r * 0.18, dis);
@@ -269,16 +269,16 @@ export const STORY_ENGINE = String.raw`
         p.w1.visible = s > 0.002;
       }
     }
-    /* Benih: diam di hero, lalu beraksi dan menghilang. */
+    /* Seed: rests in the hero, then acts and disappears. */
     const sk = Math.min(1, bld / 0.42), seedVis = 1 - sm(0.28, 0.5, bld);
     seedSpin.visible = seedVis > 0.002;
     if (seedSpin.visible) {
       if (STORY.act === "strike") { seedSpin.rotation.set(0, 0, sk > 0 ? Math.sin(sk * Math.PI * 5) * 0.9 : 0); seedSpin.position.set(-0.6 * sk, 0.3 * sk, 0.4 * sk); seedSpin.scale.setScalar(Math.max(1e-4, seedVis)); }
       else { const pop = 1 + sm(0, 0.55, sk) * 0.45; seedSpin.rotation.set(0, sk * 4, 0); seedSpin.position.set(0, 0, 0); seedSpin.scale.setScalar(Math.max(1e-4, pop * seedVis)); }
-      /* Benih selalu menghadap layar (tidak ikut putar otomatis), tetap bisa digeser. */
+      /* The seed always faces the screen (does not auto-rotate), but can still be dragged. */
       seedFit.rotation.y = -(spin.rotation.y - user.ry) + (dt ? Math.sin(t * 0.8) * 0.55 : 0.35);
     }
-    /* Partikel nama usaha. */
+    /* Business name particles. */
     points.visible = dis > 0.01;
     if (points.visible) {
       pmat.opacity = sm(0.02, 0.22, dis) * (0.85 + 0.15 * Math.sin(t * 3));
@@ -293,7 +293,7 @@ export const STORY_ENGINE = String.raw`
       }
       pgeo.attributes.position.needsUpdate = true;
     }
-    /* Menyelam: kamera masuk ke objek, lalu lorong cahaya. */
+    /* Dive: the camera enters the object, then a tunnel of light. */
     const wv = sm(0.45, 0.85, C.dive);
     world.visible = wv > 0.01;
     if (world.visible) { W3.tick(dt || 0, t); for (const m of wm) m.opacity = wv * m.userData.o; }

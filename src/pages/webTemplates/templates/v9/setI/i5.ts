@@ -3,7 +3,7 @@ import type { ISpec } from "./spec";
 
 /* ================================================================== */
 /* Set I batch 5 (I41–I50): studio yoga, SPKLU, sekolah dasar, klinik    */
-/* kecantikan, mebel jati, analitika data, toko roti, coworking,         */
+/* beauty, teak furniture, data analytics, bakery, coworking,            */
 /* maraton, florist.                                                    */
 /* ================================================================== */
 
@@ -586,7 +586,7 @@ export const I5: ISpec[] = [
     },
   },
 
-  /* ---------------- I47. Roti Gandum Nusa — toko roti ---------------- */
+  /* ---------------- I47. Roti Gandum Nusa — bakery ---------------- */
   {
     id: "x3d-roti-gandum",
     brand: "Roti Gandum Nusa",

@@ -1,48 +1,48 @@
 /* ================================================================== */
-/* Identitas per template untuk website 3D bisnis (desain ulang v27).   */
+/* Per-template identity for the business 3D websites (v27 redesign).   */
 /*                                                                    */
-/* Audit v26: ke-40 template memakai kerangka yang sama persis (hero   */
-/* teks kiri + lingkaran 3D kanan, kartu bersudut bulat, latar krem,   */
-/* 11 bagian berurutan, objek bergeser kiri-kanan), dan 16 di antaranya */
-/* memakai Inter. Satu "look" memberi tiap template:                   */
-/*  - palet, pasangan font, dan sudut sendiri;                          */
-/*  - CSS yang mengubah tata letak & cara bagian disajikan;             */
-/*  - elemen khas (label, kurva, struk, papan hitung mundur, ...);      */
-/*  - efek scroll khas yang digerakkan OWD Scrub (pengganti GSAP);       */
-/*  - jalur pose objek 3D yang sesuai idenya.                           */
-/* Fungsi usaha (katalog, paket, lokasi, FAQ, WhatsApp) tetap sama.     */
+/* v26 audit: all 40 templates used exactly the same skeleton (hero     */
+/* text on the left + a 3D circle on the right, rounded cards, a cream background, */
+/* 11 sections in order, objects shifting left and right), and 16 of them */
+/* used Inter. One "look" gives each template:                         */
+/*  - its own palette, font pair, and corners;                          */
+/*  - CSS that changes the layout & how sections are presented;         */
+/*  - signature elements (labels, curves, receipts, countdown boards, ...); */
+/*  - signature scroll effects driven by OWD Scrub (replacing GSAP);     */
+/*  - a 3D object pose path that fits the idea.                         */
+/* Business functions (catalog, packages, location, FAQ, WhatsApp) stay the same. */
 /* ================================================================== */
 
 export type PoseKey = "beranda" | "profil" | "katalog" | "keunggulan" | "alur" | "testimoni" | "galeri" | "harga" | "lokasi" | "faq" | "kontak";
 export interface PoseLike { x: number; y: number; s: number; ry: number; rx: number; o: number; ny: number; ns: number; no: number }
 
 export interface BizLook {
-  /** Nama identitas (tampil di laporan & komentar sumber). */
+  /** Identity name (shown in reports & source comments). */
   name: string;
   font: [string, string];
-  /** [latar, permukaan, teks, teks lembut, aksen, aksen kedua] */
+  /** [background, surface, text, soft text, accent, second accent] */
   colors: [string, string, string, string, string, string];
   dark?: boolean;
   round: number;
-  /** Salinan hero baru (opsional). */
+  /** New hero copy (optional). */
   type?: string;
   tagline?: string;
   intro?: string;
   hint?: string;
-  /** Varian warna objek 3D & keterangan galeri baru (opsional). */
+  /** 3D object color variants & new gallery captions (optional). */
   variants?: [string, string, string][];
   gallery?: string[];
-  /** Teks label kecil per bagian (opsional), mis. { profil: "No. 01 · Kebun" }. */
+  /** Small label text per section (optional), e.g. { profil: "No. 01 · Kebun" }. */
   kicks?: Partial<Record<PoseKey, string>>;
   css: string;
-  /** HTML tambahan: di awal teks hero, di dalam panggung 3D, di header, dan elemen tetap (dekorasi). */
+  /** Extra HTML: at the start of the hero text, inside the 3D stage, in the header, and fixed elements (decoration). */
   heroTop?: string;
   stage?: string;
   nav?: string;
   fixed?: string;
-  /** JS khas (modul, setelah mesin): boleh memakai G, ST, animated, lenis, reduce, secs, root. */
+  /** Signature JS (module, after the engine): may use G, ST, animated, lenis, reduce, secs, root. */
   js?: string;
-  /** Ubah pose objek per bagian. */
+  /** Change the object pose per section. */
   pose?: (k: PoseKey, p: PoseLike, i: number) => PoseLike;
 }
 
@@ -509,7 +509,7 @@ h2 em, .hero h1 { font-style: italic; }
   pose: (k, p) => (k === "galeri" ? { ...p, o: 0.02, no: 0.02 } : p),
 };
 
-/** Identitas per id template. Template yang belum didesain ulang tetap memakai tampilan v23. */
+/** Identity per template id. Templates not yet redesigned keep the v23 look. */
 export const BIZ_LOOKS: Record<string, BizLook> = {
   "biz-kopi-lereng-ijen": KOPI,
   "biz-roti-sobat-oven": ROTI,

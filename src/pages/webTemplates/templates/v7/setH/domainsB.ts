@@ -1,8 +1,8 @@
 import type { Domain } from "./spec";
 
 /* ================================================================== */
-/* Isi domain dashboard (bagian 2): manajemen proyek, metrik SaaS, SDM, */
-/* inventaris gudang, layanan pelanggan. Semua data adalah contoh.      */
+/* Dashboard domain content (part 2): project management, SaaS metrics, HR, */
+/* warehouse inventory, customer service. All data is sample data.      */
 /* ================================================================== */
 
 const M6 = ["Jan|Jan", "Feb|Feb", "Mar|Mar", "Apr|Apr", "Mei|May", "Jun|Jun"];

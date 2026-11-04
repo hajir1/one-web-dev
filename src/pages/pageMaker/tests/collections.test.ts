@@ -71,10 +71,10 @@ test("CRUD murni + materialize menyusun ulang kartu dari data", () => {
   assert.equal(cards[0].state.comparePriceText, "");
   assert.equal(cards[0].state.badgeText, "Baru");
   assert.equal(cards[1].state.priceText, "Rp99.000");
-  // Gaya ikut pola (kartu pertama lama).
+  // Styles follow the pattern (the old first card).
   const first = cardsOf(findNode(root, boxId))[0];
   assert.equal(cards[3].state.ctaBgColor, first.state.ctaBgColor);
-  // Semua item dihapus → kartu habis, pola tersimpan dipakai lagi.
+  // Every item deleted → no cards left, the stored pattern is used again.
   const empty = applyCollection(r2, boxId, { ...next, items: [] });
   assert.equal(findNode(empty, boxId).children.length, 0);
   const back = applyCollection(empty, boxId, addItem({ ...next, items: [] }, { name: "Satu", price: 1000 }));
@@ -162,7 +162,7 @@ test("Include CRUD Laravel: berkas lengkap + PHP valid", () => {
   assert.match(ctrl, /->paginate\(\$perPage\)/);
   const page = out.find((f) => f.name.startsWith("resources/views/pages/")).content;
   assert.match(page, /assets\/collections\.js/);
-  // Cek sintaks PHP (bila php tersedia).
+  // PHP syntax check (when php is available).
   let php = true;
   try {
     execFileSync("php", ["-v"], { stdio: "ignore" });
@@ -206,17 +206,17 @@ test("materialize tanpa pola aman", () => {
   assert.equal(materialize(box).children.length, 0);
 });
 
-/* ---------------- putaran 2: tampilan data, ekspor seluruh website ---------------- */
+/* ---------------- round 2: data views, whole website export ---------------- */
 
 test("tampilan data opsional: default semua; pagination membatasi kartu statis + atribut", async () => {
   const { setCollectionDisplay, collectionDisplayCss, sanitizeCollection } = await import("../helpers/collections");
   let root = home().root;
   const { boxId, col } = collectionsIn(root)[0];
-  // Default: tanpa field display, semua kartu, tanpa atribut mode.
+  // Default: no display field, every card, no mode attribute.
   assert.equal(col.display, undefined);
   let html = compose(root, { rootClass: "p", icons }).html.body;
   assert.doesNotMatch(html, /data-collection-mode/);
-  // Tambah item sampai 9, lalu pagination 4 per muatan.
+  // Add items up to 9, then paginate 4 per batch.
   let c = col;
   for (let i = 0; i < 3; i++) c = addItem(c, { ...c.items[0].values, name: `Ekstra ${i}` });
   root = applyCollection(root, boxId, c);
@@ -227,7 +227,7 @@ test("tampilan data opsional: default semua; pagination membatasi kartu statis +
   html = compose(root, { rootClass: "p", icons }).html.body;
   assert.match(html, /data-collection-mode="pages"/);
   assert.match(html, /data-per-page="4"/);
-  // Scroll: CSS horizontal di box; kembali ke "all" = field dihapus, semua kartu.
+  // Scroll: horizontal CSS on the box; back to "all" = the field is removed, every card.
   root = setCollectionDisplay(root, boxId, { mode: "scroll", perPage: 3 });
   const comp = compose(root, { rootClass: "p", icons });
   assert.match(comp.html.css, /grid-auto-flow: column !important/);
@@ -299,19 +299,19 @@ test("halaman item: detail terikat ke data + Mungkin Anda suka berlabel sama", a
   assert.equal(box.itemOf.collection, col.slug);
   const binds = collectElements(box).map((e) => e.bind).filter(Boolean);
   for (const f of ["name", "price", "image", "description"]) assert.ok(binds.includes(f), f);
-  // Pratinjau item lain → isi berubah.
+  // Preview another item → the content changes.
   const v60 = col.items.find((it) => it.slug === "set-v60-pemula");
   const root = syncItemPage(detail.root, [col], v60.id);
   const name = collectElements(itemBoxIn(root)).find((e) => e.bind === "name");
   assert.match(JSON.stringify(name.state), /Set V60 Pemula/);
-  // Related: label sama didahulukan, item sendiri tidak ikut.
+  // Related: same label first, the item itself is excluded.
   const first = col.items[0];
   const rel = relatedItems(col, first, 3);
   assert.equal(rel.length, 3);
   assert.ok(!rel.some((it) => it.id === first.id));
   const same = col.items.filter((it) => it.id !== first.id && it.values.label && it.values.label === first.values.label);
   assert.deepEqual(rel.slice(0, same.length).map((it) => it.id), same.slice(0, 3).map((it) => it.id));
-  // Dimuat ulang: itemOf/related/bind bertahan.
+  // Reloaded: itemOf/related/bind persist.
   const again = normalizePageDoc(JSON.parse(JSON.stringify(detail)));
   assert.equal(itemBoxIn(again.root).itemOf.collection, col.slug);
   assert.ok(collectElements(itemBoxIn(again.root)).some((e) => e.bind === "price"));
@@ -358,10 +358,10 @@ test("kategori: kolom data, tampil per kategori + urutan, data lama mendapat kol
   const col = ref.col;
   assert.ok(col.fields.some((f) => f.key === "category" && f.type === "category"));
   assert.deepEqual(categoriesOf(col), ["Biji kopi", "Alat seduh", "Camilan"]);
-  // Kartu membawa data-category.
+  // Cards carry data-category.
   const body = compose(h, { rootClass: "p", icons }).html.body;
   assert.match(body, /data-category="Biji kopi"/);
-  // Hanya "Alat seduh", harga termurah dulu.
+  // Only "Brewing tools", cheapest first.
   let root = setCollectionView(h, ref.boxId, { category: "alat seduh", sort: "price_asc" });
   const box = findNode(root, ref.boxId);
   assert.deepEqual(cardsOf(box).map((c) => c.state.name), ["Mug Keramik Senja", "Tumbler Termos 500 ml", "Set V60 Pemula"]);
@@ -372,7 +372,7 @@ test("kategori: kolom data, tampil per kategori + urutan, data lama mendapat kol
   assert.equal(findNode(root, ref.boxId).collection.view, undefined);
   assert.equal(cardsOf(findNode(root, ref.boxId)).length, 6);
   assert.deepEqual(viewItems({ ...col, view: { sort: "rating_desc" } }).map((it) => it.values.rating)[0], 4.9);
-  // Data lama tanpa kolom kategori → ditambahkan setelah Label; view tak valid dibuang.
+  // Old data without a category column → added after Label; invalid views are dropped.
   const old = { ...col, fields: col.fields.filter((f) => f.key !== "category"), view: { category: "  Camilan ", sort: "zzz" } };
   const clean = sanitizeCollection(JSON.parse(JSON.stringify(old)), (n) => n);
   const keys = clean.fields.map((f) => f.key);
@@ -393,9 +393,9 @@ test("chip filter kategori: template terhubung, chip mengikuti data, skrip stati
   assert.match(comp.html.body, new RegExp(`data-filter="${col.slug}"`));
   assert.match(comp.html.body, /data-chip="" aria-pressed="true"|aria-pressed="true"[^>]*data-chip=""/);
   assert.ok(comp.html.script.includes("owd-category-filter"));
-  // Canvas desain: skrip tidak dijalankan.
+  // Design canvas: scripts are not run.
   assert.ok(!compose(h, { rootClass: "p", icons, preview: true }).html.script.includes("owd-category-filter"));
-  // Kategori baru di data → chip baru (gaya chip biasa), id chip lama tetap.
+  // A new category in the data → a new chip (normal chip style), old chip ids stay.
   const first = col.items[0];
   const next = updateItem(col, first.id, { ...first.values, category: "Merchandise" });
   const synced = filterBarsIn(syncFilterBars(h, [next]))[0];
@@ -403,19 +403,19 @@ test("chip filter kategori: template terhubung, chip mengikuti data, skrip stati
   assert.equal(synced.children[2].id, bar.children[1].id);
   assert.equal(synced.children[1].state.text, "Merchandise");
   assert.equal(synced.children[1].state.bgColor, bar.children[1].state.bgColor);
-  // Lepas lalu tandai lagi.
+  // Unmark, then mark again.
   let root = unmarkFilterBar(h, bar.id);
   assert.equal(filterBarsIn(root).length, 0);
   assert.ok(canBeFilterBar(findNode(root, bar.id)));
   root = markFilterBar(root, bar.id, col);
   assert.equal(filterBarsIn(root)[0].children.length, 4);
-  // Dimuat ulang: filterOf, chip, itemCategory bertahan.
+  // Reloaded: filterOf, chips, itemCategory persist.
   const again = normalizePageDoc(JSON.parse(JSON.stringify({ version: 2, root: h })));
   assert.equal(filterBarsIn(again.root)[0].filterOf, col.slug);
   assert.match(compose(again.root, { rootClass: "p", icons }).html.body, /data-category="Camilan"/);
-  // Skrip statis menyaring kartu; berhenti bila collections.js (backend) aktif.
+  // The static script filters cards; it stops when collections.js (backend) is active.
   assert.match(FILTER_JS, /window\.OWD_COLLECTIONS/);
-  // Express: kolom kategori, filter & urutan di API, rute kategori sebelum :slug.
+  // Express: category column, filter & sort in the API, category route before :slug.
   const out = withCrud("express", [{ name: "index.html", content: `<html><head></head><body>${comp.html.body}</body></html>` }], [col], "Kopi Senja");
   const model = out.find((f) => f.name === `src/collections/${col.slug}.js`).content;
   assert.match(model, /HAS_CATEGORY = true/);
@@ -444,7 +444,7 @@ test("Express db.js: database lama (tanpa slug & kategori) dimigrasi tanpa galat
   }
   fs.mkdirSync(path.join(dir, "data"));
   const run = (code) => execFileSync(process.execPath, ["--no-warnings", "--input-type=module", "-e", code], { cwd: dir, encoding: "utf8" });
-  // Tabel versi lama: tanpa kolom slug dan category; satu nama "Kategori" (slug cadangan).
+  // Old-version table: no slug and category columns; one name "Kategori" (fallback slug).
   run(`import { DatabaseSync } from "node:sqlite";
 const d = new DatabaseSync("data/app.db");
 d.exec("CREATE TABLE produk (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, price INTEGER NOT NULL, compare_price INTEGER, rating REAL NOT NULL DEFAULT 0, reviews INTEGER NOT NULL DEFAULT 0, description TEXT, label TEXT, image TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))");
@@ -457,7 +457,7 @@ console.log(JSON.stringify({ rows: rows.map((r) => r.slug), cats: M.categories()
   assert.deepEqual(res.rows, ["kopi-a", "kopi-a-2", "kategori-2"]);
   assert.deepEqual(res.cats, []);
   assert.ok(res.err);
-  // Database baru (seed) juga jalan.
+  // A new database (seed) works too.
   fs.rmSync(path.join(dir, "data"), { recursive: true });
   fs.mkdirSync(path.join(dir, "data"));
   const fresh = JSON.parse(run(`import { db } from "./src/db.js";

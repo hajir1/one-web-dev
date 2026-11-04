@@ -5,29 +5,29 @@ import { badge, col, eyebrow, grid, image, section, stack } from "../../../build
 import { acts, addCss, card, fxBlock, fxCard, fxHero, fxImg, glyph, introEls, P, T, type Act, type HeroC, type Intro, type Item, type LookD } from "../../v4/setE/kitE";
 
 /* ================================================================== */
-/* Perangkat template v5 bagian F — tata letak ala Divi                  */
+/* Template kit v5 part F — Divi-style layouts                           */
 /*                                                                    */
-/* Dasar (Look, header, footer, kartu, efek) memakai kitE/kitD. File ini */
-/* menambah section bertipe LEBAR PENUH (selebar layar, tanpa padding)  */
-/* dan SPESIALISASI (kolom samping setinggi section + kolom berisi       */
-/* beberapa baris dalam), ditandai `section.sectionType` sehingga di     */
-/* Page Maker tampil sebagai tipe yang sama dengan buatan pengguna.      */
+/* The basics (Look, header, footer, cards, effects) use kitE/kitD. This file */
+/* adds FULL WIDTH sections (screen-wide, no padding)                   */
+/* and SPECIALTY sections (a side column as tall as the section + a column holding */
+/* several inner rows), marked with `section.sectionType` so that in     */
+/* Page Maker shows them as the same type as user-made ones.            */
 /* ================================================================== */
 
 export * from "../../v4/setE/kitE";
 
-/** Tandai tipe section; lebar penuh = tanpa batas lebar & padding samping. */
+/** Marks the section type; full width = no width limit & side padding. */
 function kind(s: BoxNode, k: SectionKind): BoxNode {
   s.section = { ...s.section!, sectionType: k, ...(k === "fullwidth" ? { contentWidth: 0, padX: 0, padY: 0 } : {}) };
   if (k === "fullwidth") s.children.forEach((r) => isBox(r) && (r.rowWidth = "full"));
   return s;
 }
 
-/* --------------------------- lebar penuh --------------------------- */
+/* --------------------------- full width --------------------------- */
 
 /**
- * Header Lebar Penuh: gambar latar selebar layar + overlay, judul & tombol
- * (setara modul "Fullwidth Header" Divi).
+ * Full Width Header: a screen-wide background image + overlay, heading & buttons
+ * (equivalent to Divi's "Fullwidth Header" module).
  */
 export function fullHeader(L: LookD, c: HeroC & { image: string; align?: "left" | "center"; height?: number; overlay?: number; chips?: string[] }): BoxNode {
   const align = c.align ?? "center";
@@ -57,7 +57,7 @@ export function fullHeader(L: LookD, c: HeroC & { image: string; align?: "left" 
   return kind(s, "fullwidth");
 }
 
-/** Gambar Lebar Penuh: satu foto selebar layar (+ keterangan opsional di atasnya). */
+/** Full Width Image: one screen-wide photo (+ an optional caption above it). */
 export function fullImage(L: LookD, c: { image: string; alt: string; ratio?: string; caption?: string; name?: string }): BoxNode {
   const pic = image(c.image, c.alt, { ratio: c.ratio ?? "21 / 7", radius: 0 });
   addCss(pic, "@media (max-width: 640px) { & img { aspect-ratio: 4 / 3 !important; } }");
@@ -71,7 +71,7 @@ export function fullImage(L: LookD, c: { image: string; alt: string; ratio?: str
   return kind(section(c.name ?? "Gambar Lebar Penuh", rows, { bg: L.bg }), "fullwidth");
 }
 
-/** Belah Lebar Penuh: foto di satu sisi, panel warna di sisi lain, selebar layar. */
+/** Full Width Split: a photo on one side, a color panel on the other, screen-wide. */
 export function fullSplit(L: LookD, c: Intro & { image: string; alt: string; bullets?: string[]; actions?: Act[]; reverse?: boolean; name?: string; tone?: "inv" | "primary" }): BoxNode {
   const light = true;
   const bg = c.tone === "primary" ? L.p.primaryDark : L.inv;
@@ -92,11 +92,11 @@ export interface SideC {
   text?: string;
   items?: string[];
   action?: Act;
-  /** Kartu gelap (inv) atau terang. */
+  /** Dark card (inv) or light. */
   inv?: boolean;
 }
 
-/** Kolom samping (sidebar) yang menempel saat di-scroll. */
+/** A side column (sidebar) that sticks while scrolling. */
 function sidebar(L: LookD, s: SideC): BoxNode {
   const ink = s.inv ? "#ffffff" : L.p.ink;
   const kids: (ElementNode | BoxNode)[] = [T(L, s.title, "h3", { size: 21, color: ink })];
@@ -114,7 +114,7 @@ function sidebar(L: LookD, s: SideC): BoxNode {
   return c;
 }
 
-/** Baris dalam (grup grid — bukan Row, karena Row tidak boleh bersarang). */
+/** An inner row (a grid group, not a Row, because Rows may not nest). */
 function innerGrid(cells: BoxNode[], n: number, name = "Baris Dalam"): BoxNode {
   return createBox("grid", {
     innerRow: true,
@@ -130,8 +130,8 @@ function innerGrid(cells: BoxNode[], n: number, name = "Baris Dalam"): BoxNode {
 }
 
 /**
- * Section Spesialisasi: sidebar setinggi section + kolom spesial berisi
- * baris intro, baris kartu, dan (opsional) baris gambar lebar.
+ * Specialty section: a section-height sidebar + a special column holding
+ * an intro row, a card row, and (optionally) a wide image row.
  */
 export function specialty(
   L: LookD,
@@ -143,7 +143,7 @@ export function specialty(
   );
   const rows: BoxNode[] = [fxBlock(L, col([...(c.eyebrow ? [eyebrow(c.eyebrow, L.p.primary)] : []), ...introEls(L, { ...c, eyebrow: undefined })], { gap: 10, name: "Baris Dalam 1", align: "stretch" })), innerGrid(cards, cols, "Baris Dalam 2")];
   if (c.image) rows.push(col([fxImg(L, image(c.image.src, c.image.alt, { ratio: "21 / 9", radius: L.shape === "sharp" || L.shape === "brutal" ? 0 : L.radius }))], { name: "Baris Dalam 3", align: "stretch" }));
-  // Tiap baris dalam ditandai Row dalam (ala Divi): bisa disalin & ditambah tepat di bawahnya.
+  // Each inner row is marked as an inner Row (Divi style): it can be copied & added right below.
   rows.forEach((r) => (r.innerRow = true));
   const main = col(rows, { gap: 28, name: "Kolom Spesial", align: "stretch" });
   const side = sidebar(L, c.side);

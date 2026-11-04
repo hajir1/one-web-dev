@@ -5,7 +5,7 @@ import { agriTani, gamingArena, kidsPreschool, logisticsKirim, petsVetSahabat } 
 import { architectureRuang, educationUniversity, newsWarta, saasCrmRelasi, shopSkincare } from "./t4";
 import { agencyMarketing, companyManufaktur, eventMusicFest, healthDental, travelUmrah } from "./t5";
 
-/** Konten template katalog v2 (bagian A), dikunci dengan ID di ../catalogA.ts. */
+/** Catalog v2 template content (part A), keyed by the IDs in ../catalogA.ts. */
 export const V2A_TEMPLATES: Record<string, TemplateContent> = {
   "cafe-kopi-senja": cafeKopiSenja,
   "fitness-gym-pulse": fitnessGymPulse,

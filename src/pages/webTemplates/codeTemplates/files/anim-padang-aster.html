@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Padang Aster</title>
 <meta name="description" content="Animasi padang bunga aster putih di senja ungu, kupu-kupu bercahaya, dan kunang-kunang.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;1,500&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --sky-1: #120d2a; /* Langit bawah */
   --sky-2: #2b1f5c; /* Langit tengah */
@@ -62,7 +62,7 @@ body { background: var(--sky-1); color: var(--ink); font-family: var(--font-text
 .p3 { fill: none; stroke: var(--glow); stroke-opacity: .5; stroke-width: 1.5; }
 .ct { fill: var(--flower-center); }
 
-/* Ayunan: tiap bunga & rumpun rumput berayun dari pangkalnya, jeda tiap lapis berbeda (--ld). */
+/* Sway: each flower & grass tuft sways from its base, with a different delay per layer (--ld). */
 .sw { transform-box: fill-box; transform-origin: 50% 100%; animation: sway calc(var(--t, 6s) / var(--speed)) ease-in-out calc(var(--ld, 0s) + var(--d, 0s)) infinite alternate; }
 .bloom use { animation: pulse calc(5s / var(--speed)) ease-in-out var(--d, 0s) infinite alternate; }
 
@@ -105,7 +105,7 @@ body { background: var(--sky-1); color: var(--ink); font-family: var(--font-text
 .hearts i { bottom: -8vh; width: calc(26px * var(--s)); opacity: .8; animation: rise calc(var(--t) / var(--speed)) linear var(--d) infinite; }
 .hearts svg { width: 100%; fill: var(--flower); filter: drop-shadow(0 0 8px var(--glow)); }
 
-/* Teks */
+/* Text */
 .note { position: absolute; left: clamp(20px, 6vw, 96px); top: clamp(56px, 13vh, 140px); max-width: min(560px, calc(100vw - 40px)); z-index: 2; }
 .note .to { margin: 0 0 14px; font-size: 15px; letter-spacing: .08em; color: var(--glow); }
 .note h1 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: clamp(34px, 5.6vw, 68px); line-height: 1.08; color: #fffaf0; text-shadow: 0 2px 18px rgba(0,0,0,.55); }
@@ -171,11 +171,11 @@ body { background: var(--sky-1); color: var(--ink); font-family: var(--font-text
 </div>
 </div>
 <script>
-/* ==== KONFIGURASI (bisa juga diubah lewat editor OneWebDev) ====
-   fireflies        : jumlah maksimum kunang-kunang (batas 60)
-   firefliesNarrow  : jumlah di layar sempit (< 640px)
-   parallax         : parallax mengikuti pointer
-   parallaxOnMobile : aktifkan juga di HP/tablet sentuh */
+/* ==== CONFIGURATION (can also be changed in the OneWebDev editor) ====
+   fireflies        : maximum number of fireflies (limit 60)
+   firefliesNarrow  : number on narrow screens (< 640px)
+   parallax         : parallax follows the pointer
+   parallaxOnMobile : also enable on touch phones/tablets */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "fireflies": 60,
   "firefliesNarrow": 24,
@@ -196,7 +196,7 @@ let w = 0, h = 0, dpr = 1, raf = 0;
 const css = getComputedStyle(document.documentElement);
 const speed = () => parseFloat(css.getPropertyValue("--speed")) || 1;
 
-/* Sprite cahaya: digambar sekali, lalu disalin (lebih ringan daripada gradien per partikel). */
+/* Light sprite: drawn once, then copied (lighter than a gradient per particle). */
 const sprite = document.createElement("canvas");
 function makeSprite() {
   const color = css.getPropertyValue("--firefly").trim() || "#ffe08a";
@@ -246,7 +246,7 @@ function frame(now) {
 }
 function start() { cancelAnimationFrame(raf); last = performance.now(); raf = requestAnimationFrame(frame); }
 
-/* Parallax: tiap lapisan bergeser sesuai kedalaman (data-depth, piksel). */
+/* Parallax: each layer shifts by its depth (data-depth, pixels). */
 const layers = [...document.querySelectorAll(".px")].map((el) => ({ el, d: +el.dataset.depth || 0 }));
 let parallaxOn = CONFIG.parallax && (CONFIG.parallaxOnMobile || !coarse.matches);
 function onPointer(e) {

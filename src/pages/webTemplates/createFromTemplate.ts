@@ -3,19 +3,19 @@ import { PAGE_DESIGN_TYPE, SITE_TYPE, normalizeSiteDoc, type SiteDoc } from "../
 import type { BuiltTemplatePage, TemplateRef } from "./templateContent";
 
 /* ================================================================== */
-/* "Edit di Page Maker": salin template menjadi folder website BARU      */
-/* milik pengguna (desain halaman + folder). Isi template diambil dari   */
-/* server (acquire); template asli tidak pernah diubah. Kuota (desain &   */
-/* folder) diperiksa PEMANGGIL sebelum ini, dan ditegakkan server saat    */
-/* desain disinkronkan.                                                  */
+/* "Edit in Page Maker": copies the template into a NEW website folder  */
+/* owned by the user (page designs + folder). Template content comes from */
+/* the server (acquire); the original template is never changed. Quotas (designs & */
+/* folders) are checked by the CALLER before this, and enforced by the server on */
+/* designs are synced.                                                   */
 /* ================================================================== */
 
-/** Folder website pengguna yang dibuat dari template ini (terbaru dulu). */
+/** The user's website folders created from this template (newest first). */
 export function sitesFromTemplate(templateId: string, sites: SavedDesign[] = useDesignStore.getState().designs[SITE_TYPE] ?? []): SavedDesign[] {
   return sites.filter((s) => normalizeSiteDoc(s.state).source?.templateId === templateId).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-/** Desain beranda sebuah folder (untuk dibuka di Page Maker). */
+/** A folder's home design (to open in Page Maker). */
 export function homeDesignOf(site: SavedDesign): string | null {
   const doc = normalizeSiteDoc(site.state);
   const designs = useDesignStore.getState().designs[PAGE_DESIGN_TYPE] ?? [];
@@ -36,7 +36,7 @@ export interface CreatedSite {
   designIds: string[];
 }
 
-/** Simpan desain halaman + folder website dari template. Mengembalikan ID baru. */
+/** Saves the page designs + website folder from a template. Returns the new ID. */
 export function createSiteFromTemplate(t: TemplateRef, pages: BuiltTemplatePage[], siteName: string): CreatedSite {
   const { saveDesign } = useDesignStore.getState();
   const name = uniqueSiteName(siteName);

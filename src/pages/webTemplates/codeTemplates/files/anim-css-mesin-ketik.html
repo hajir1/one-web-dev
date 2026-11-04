@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Mesin Ketik</title>
+<meta name="description" content="Animasi CSS murni: tuts mesin ketik menghentak, tiga baris kalimat terketik satu per satu di kertas, dan rol kertas bergeser naik.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#efe7da">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #efe7da; /* Latar bawah */
+  --bg-2: #f8f3ea; /* Latar atas */
+  --c-1: #2b2d42; /* Tinta */
+  --c-2: #8d99ae; /* Garis kertas */
+  --c-3: #3d5a80; /* Badan mesin */
+  --ink: #1b1b1f; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Playfair Display", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: clamp(16px, 6vw, 96px); top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: flex-start; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap { left: 16px; right: auto; top: clamp(56px, 9vh, 96px); transform: none; }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.paper { left: 72%; bottom: calc(12vh + 22vmin); width: 44vmin; height: 46vmin; margin-left: -22vmin; overflow: hidden; }
+.sheet { left: 0; right: 0; bottom: 0; height: 100%; padding: 6vmin 5vmin; background: repeating-linear-gradient(180deg, transparent 0 calc(4.6vmin - 1px), color-mix(in srgb, var(--c-2) 30%, transparent) 4.6vmin), #fffdf6; box-shadow: 0 0 0 1px rgba(0,0,0,.06); animation: roll calc(var(--k) * 12) steps(1) infinite; }
+@keyframes roll { 0% { translate: 0 60%; } 30% { translate: 0 45%; } 58% { translate: 0 30%; } 92% { translate: 0 30%; } 100% { translate: 0 60%; } }
+.ln { position: relative; display: block; width: 0; height: 4.6vmin; overflow: hidden; white-space: nowrap; font: 600 3.6vmin/4.6vmin "Courier New", monospace; color: var(--c-1); animation-duration: calc(var(--k) * 12); animation-iteration-count: infinite; animation-timing-function: steps(var(--n)); }
+@keyframes type0 { 0%, 6% { width: 0; } 24%, 92% { width: 5ch; } 100% { width: 0; } }
+@keyframes type1 { 0%, 32% { width: 0; } 50%, 92% { width: 14ch; } 100% { width: 0; } }
+@keyframes type2 { 0%, 58% { width: 0; } 76%, 92% { width: 9ch; } 100% { width: 0; } }
+.tw { left: 72%; bottom: 10vh; width: 64vmin; height: 26vmin; margin-left: -32vmin; border-radius: 3vmin 3vmin 2vmin 2vmin; background: linear-gradient(180deg, color-mix(in srgb, var(--c-3) 85%, #fff), var(--c-3)); box-shadow: 0 30px 50px -20px rgba(0,0,0,.5); }
+.roller { left: 6%; right: 6%; top: -3vmin; height: 5vmin; border-radius: 3vmin; background: linear-gradient(#333, #111); animation: carriage calc(var(--k) * 12) ease-in-out infinite; }
+@keyframes carriage { 0%, 6% { translate: 4vmin 0; } 24% { translate: -4vmin 0; } 30% { translate: 4vmin 0; } 50% { translate: -4vmin 0; } 56% { translate: 4vmin 0; } 76%, 100% { translate: -2vmin 0; } }
+.keys { left: 8%; right: 8%; top: 32%; bottom: 12%; display: grid; grid-template-columns: repeat(10, 1fr); gap: 1.2vmin; }
+.keys i { position: relative; border-radius: 50%; aspect-ratio: 1; background: radial-gradient(circle at 40% 35%, #fff, #d8d2c4); box-shadow: 0 .6vmin 0 #6a6152; animation: press calc(var(--k) * 1.1) steps(1) infinite; animation-delay: calc(var(--k) * var(--d)); }
+@keyframes press { 0% { translate: 0 .5vmin; box-shadow: 0 .1vmin 0 #6a6152; } 18% { translate: 0 0; box-shadow: 0 .6vmin 0 #6a6152; } }
+@media (max-width: 640px) { .paper, .tw { left: 50%; } .paper { height: 34vmin; } }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="paper"><div class="sheet"><span class="ln" style="--n:5;animation-name:type0">Halo,</span><span class="ln" style="--n:14;animation-name:type1">ada kabar baik</span><span class="ln" style="--n:9;animation-name:type2">hari ini.</span></div></div>
+<div class="tw"><i class="roller"></i><div class="keys"><i style="--d:0"></i><i style="--d:0.77"></i><i style="--d:0.44"></i><i style="--d:0.11"></i><i style="--d:0.88"></i><i style="--d:0.55"></i><i style="--d:0.22"></i><i style="--d:0.99"></i><i style="--d:0.66"></i><i style="--d:0.33"></i><i style="--d:0"></i><i style="--d:0.77"></i><i style="--d:0.44"></i><i style="--d:0.11"></i><i style="--d:0.88"></i><i style="--d:0.55"></i><i style="--d:0.22"></i><i style="--d:0.99"></i><i style="--d:0.66"></i><i style="--d:0.33"></i><i style="--d:0"></i><i style="--d:0.77"></i><i style="--d:0.44"></i><i style="--d:0.11"></i><i style="--d:0.88"></i><i style="--d:0.55"></i><i style="--d:0.22"></i><i style="--d:0.99"></i><i style="--d:0.66"></i><i style="--d:0.33"></i></div></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Penulis &amp; penerbit</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Setiap cerita dimulai dari satu huruf.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Hero animasi untuk penulis, penerbit kecil, atau kelas menulis. Kalimat di kertas bisa diganti di kode.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Baca tulisan terbaru</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 8
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

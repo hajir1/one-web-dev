@@ -9,11 +9,12 @@ import JSZip from "jszip";
 import { packForFramework } from "../../../../assetLibrary/resolve";
 import { Framework, FRAMEWORK_LABELS } from "../helpers/generatorCss";
 import { isDemoMode } from "../../../../demo/demoMode";
+import { deployKey } from "../../helpers/deployHistory";
 import DeployDialog from "../../ui/DeployDialog";
 import CopyButton from "../../../../components/app/CopyButton";
 import type { DeployFile } from "../../helpers/githubDeploy";
 
-/** Satu file hasil generate (dipakai di panel kode & saat di-zip untuk download). */
+/** One generated file (used in the code panel & when zipped for download). */
 export interface GeneratedFile {
   name: string;
   content: string;
@@ -24,24 +25,24 @@ interface CodeExportPanelProps {
   framework: Framework;
   onFrameworkChange: (fw: Framework) => void;
   files: GeneratedFile[];
-  /** Awalan nama file zip, mis. "button" -> "button-react.zip". */
+  /** Zip file name prefix, e.g. "button" -> "button-react.zip". */
   zipBaseName: string;
-  /** Tinggi maksimum area kode. Default: max-h-80. */
+  /** Maximum height of the code area. Default: max-h-80. */
   codeMaxHeightClass?: string;
   /**
-   * Sumber ekspor di server (desain/website tersimpan). null = belum bisa
-   * diekspor (mis. belum disimpan) → `notReadyKey` ditampilkan.
-   * Berkas yang diunduh SELALU dari server; `files` hanya untuk pratinjau.
+   * Export source on the server (a saved design/website). null = cannot
+   * be exported yet (e.g. not saved) → `notReadyKey` is shown.
+   * Downloaded files ALWAYS come from the server; `files` is only for the preview.
    */
   source: ServerExportSource | null;
   notReadyKey?: string;
-  /** v9: unduhan gratis tanpa batas (Susun Website Utuh): kuota tidak ditampilkan. */
+  /** v9: unlimited free downloads (Full Website Compose): the quota is not shown. */
   unlimited?: boolean;
-  /** v17: buka dialog Deploy saat panel tampil (tautan "Deploy" dari Website Saya). */
+  /** v17: opens the Deploy dialog when the panel shows (the "Deploy" link from My Websites). */
   autoDeploy?: boolean;
-  /** Uji coba CRUD: tata letak gambar aset saat di-zip (mis. "express" → public/). Default: framework. */
+  /** CRUD preview: asset image layout when zipped (e.g. "express" → public/). Default: framework. */
   packAs?: string;
-  /** Konten di atas pilihan framework (mis. opsi Include CRUD). */
+  /** Content above the framework choice (e.g. the Include CRUD option). */
   header?: ReactNode;
 }
 
@@ -54,18 +55,18 @@ function triggerDownload(blob: Blob, filename: string) {
   a.click();
   a.remove();
   // Revoke ditunda: beberapa browser (Firefox/Safari) membatalkan unduhan
-  // kalau URL langsung dicabut di tick yang sama dengan click().
+  // if the URL is revoked in the same tick as click().
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/** Jumlah baris yang boleh dilihat gratis untuk satu file. */
+/** Number of lines that can be viewed for free per file. */
 function previewLineCount(total: number): number {
   return Math.min(total, Math.max(6, Math.min(24, Math.floor(total * 0.4))));
 }
 
 /**
- * Potongan kode untuk pratinjau gratis. Sisanya TIDAK dikirim ke DOM,
- * jadi kode lengkap hanya didapat lewat unduhan (kuota / kredit).
+ * A code excerpt for the free preview. The rest is NOT sent to the DOM,
+ * so the full code is only available through a download (quota / credits).
  */
 export function limitedPreview(content: string): { visible: string; hidden: number } {
   const lines = content.split("\n");
@@ -74,10 +75,10 @@ export function limitedPreview(content: string): { visible: string; hidden: numb
 }
 
 /**
- * Panel export kode: pilih framework, pilih file, lihat PRATINJAU terbatas,
- * lalu download kode lengkap sebagai ZIP proyek siap jalan (berisi README).
- * Kode lengkap dibuat SERVER (cek Premium + kuota per akun); setelah kuota
- * gratis habis → dialog kredit.
+ * Code export panel: pick a framework, pick a file, see a limited PREVIEW,
+ * then download the full code as a ready-to-run project ZIP (with a README).
+ * The full code is built by the SERVER (checks Premium + per-account quota); after the free
+ * quota runs out → credit dialog.
  */
 export default function CodeExportPanel({
   framework,
@@ -95,12 +96,12 @@ export default function CodeExportPanel({
   const { t } = useTranslation();
   const [activeFileIdx, setActiveFileIdx] = useState(0);
   const quota = useExportQuota();
-  /** Kunci i18n hasil ekspor terakhir (diterjemahkan saat render). */
+  /** i18n key of the last export result (translated at render time). */
   const [lastResult, setLastResult] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [deployOpen, setDeployOpen] = useState(autoDeploy && framework === "html");
 
-  // Jaga index tetap valid kalau jumlah file berubah (mis. Tabs: script.js muncul/hilang).
+  // Keep the index valid when the file count changes (e.g. Tabs: script.js appears/disappears).
   const safeIdx = Math.min(activeFileIdx, Math.max(files.length - 1, 0));
   useEffect(() => {
     if (activeFileIdx !== safeIdx) setActiveFileIdx(safeIdx);
@@ -113,7 +114,7 @@ export default function CodeExportPanel({
     setActiveFileIdx(0);
   };
 
-  // Mode demo (v12): tanpa server & akun → kode lengkap dibuat di browser dan diunduh tanpa kuota.
+  // Demo mode (v12): no server & account → the full code is built in the browser and downloaded without a quota.
   const demo = isDemoMode();
 
   const downloadFiles = async () => {
@@ -156,14 +157,14 @@ export default function CodeExportPanel({
   };
 
   /**
-   * Simpan berkas hasil server (bukan hasil generate lokal). v7: SELALU zip
-   * (proyek siap jalan + README), dengan satu folder akar bernama proyek.
+   * Saves the files from the server (not the local generated output). v7: ALWAYS a zip
+   * (a ready-to-run project + README), with one root folder named after the project.
    */
   const save = async (out: ExportedFile[]) => {
     if (out.length === 0) throw new Error("server mengirim 0 berkas");
     const root = `${zipBaseName}-${framework}`;
     const zip = new JSZip();
-    // v21: gambar Pustaka Aset (`aset:<id>`) → berkas sungguhan di zip.
+    // v21: Asset Library images (`aset:<id>`) → real files in the zip.
     const packed = await packForFramework(out, packAs ?? framework);
     packed.files.forEach((f) => zip.file(`${root}/${f.name}`, f.content));
     packed.binaries.forEach((b) => zip.file(`${root}/${b.name}`, b.blob));
@@ -172,12 +173,12 @@ export default function CodeExportPanel({
   };
 
   /**
-   * v14: berkas untuk dialog Deploy (hanya HTML). Mode demo: hasil generate lokal;
-   * produksi: berkas dari server lewat alur ekspor biasa (kuota/kredit sama dengan unduh).
+   * v14: files for the Deploy dialog (HTML only). Demo mode: local generated output;
+   * production: files from the server through the normal export flow (same quota/credits as a download).
    */
   const withDeployFiles = async (push: (files: DeployFile[]) => Promise<void>): Promise<"done" | "blocked" | "failed"> => {
     if (demo) {
-      // Galat deploy sudah ditampilkan dialog.
+      // The deploy error is already shown by the dialog.
       return push(files).then(
         () => "done" as const,
         () => "failed" as const,
@@ -198,7 +199,7 @@ export default function CodeExportPanel({
     <>
       {header}
       <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-        {/* Pilihan framework */}
+        {/* Framework choice */}
         <div className="flex flex-wrap gap-1.5 border-b border-gray-200 dark:border-gray-800 px-3 py-2.5">
           {(Object.keys(FRAMEWORK_LABELS) as Framework[]).map((fw) => (
             <button
@@ -315,7 +316,7 @@ export default function CodeExportPanel({
           </p>
         )}
       </div>
-      {framework === "html" && deployOpen && <DeployDialog open onClose={() => setDeployOpen(false)} defaultRepo={zipBaseName} withFiles={withDeployFiles} />}
+      {framework === "html" && deployOpen && <DeployDialog open onClose={() => setDeployOpen(false)} defaultRepo={zipBaseName} withFiles={withDeployFiles} projectKey={source?.kind === "site" ? deployKey("site", source.id) : undefined} />}
     </>
   );
 }

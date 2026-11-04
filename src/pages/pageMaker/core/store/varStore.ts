@@ -14,11 +14,11 @@ import {
 } from "../helpers/cssVars";
 
 /* ================================================================== */
-/* Pustaka variabel global (v7) — persist ke localStorage seperti font. */
-/* Variabel bawaan selalu ada (nilai bisa diubah & direset); variabel   */
-/* buatan pengguna bisa ditambah, diedit, diganti nama, dan dihapus.    */
-/* Perapian referensi di desain (ganti nama / hapus) ada di             */
-/* globalSetting/ui/VariableManager.tsx agar store ini tetap kecil.     */
+/* Global variable library (v7) — persisted to localStorage like fonts. */
+/* Built-in variables always exist (their values can be changed & reset); */
+/* user-created variables can be added, edited, renamed, and deleted.   */
+/* Tidying references in designs (rename / delete) lives in             */
+/* globalSetting/ui/VariableManager.tsx so this store stays small.      */
 /* ================================================================== */
 
 interface VarStore {
@@ -29,8 +29,8 @@ interface VarStore {
   reset: (id: string) => void;
 }
 
-/** Bawaan dulu (urutan tetap), lalu buatan pengguna. Nilai bawaan diambil dari data tersimpan bila valid. */
-/** Variabel bawaan selalu ada (nilai tersimpan menang), lalu variabel buatan pengguna. */
+/** Built-ins first (fixed order), then user-created ones. Built-in values come from stored data when valid. */
+/** Built-in variables always exist (stored values win), then user-created variables. */
 export const withBuiltins = withBuiltinVars;
 
 export const useVarStore = create<VarStore>()(

@@ -6,15 +6,15 @@ import { makeTr, type TplLang } from "./types";
 import type { Framework } from "../pageMaker/core/helpers/generatorCss";
 
 /* ================================================================== */
-/* Unduh template: source code lengkap + aset + README dalam format      */
-/* pilihan (v7: HTML, Laravel Blade, React, Vue, Svelte, Angular).       */
-/* Isi halaman diambil dari server (POST /templates/:id/acquire, hanya   */
-/* untuk template gratis/milik akun); zip disusun di browser.           */
+/* Template download: full source code + assets + README in the          */
+/* chosen format (v7: HTML, Laravel Blade, React, Vue, Svelte, Angular). */
+/* Page content comes from the server (POST /templates/:id/acquire, only */
+/* for free/owned templates); the zip is assembled in the browser.     */
 /* ================================================================== */
 
 const DATA_SVG = /data:image\/svg\+xml;base64,[A-Za-z0-9+/=]+/g;
 
-/** Font sistem (tanpa unduhan font eksternal). */
+/** System fonts (no external font download). */
 const TEMPLATE_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export interface TemplateFile {
@@ -23,10 +23,10 @@ export interface TemplateFile {
 }
 
 /**
- * Ganti data URI aset dengan path berkas. Tanpa `publicDir` (HTML statis): path
- * relatif, berkas di `assets/` merujuk `img/…`, lainnya `assets/img/…`.
- * Dengan `publicDir` (proyek framework/Laravel): path absolut `/assets/img/…`,
- * berkas disimpan di `<publicDir>/assets/img/` (folder statis Vite/Angular/Laravel).
+ * Replaces asset data URIs with file paths. Without `publicDir` (static HTML): relative
+ * paths; files in `assets/` refer to `img/…`, others to `assets/img/…`.
+ * With `publicDir` (framework/Laravel projects): absolute paths `/assets/img/…`,
+ * files stored in `<publicDir>/assets/img/` (the Vite/Angular/Laravel static folder).
  */
 export function externalizeAssets(files: TemplateFile[], publicDir?: string): { files: TemplateFile[]; assets: string[] } {
   const used = new Set<string>();
@@ -34,7 +34,7 @@ export function externalizeAssets(files: TemplateFile[], publicDir?: string): { 
     const prefix = publicDir ? "/assets/img/" : f.name.startsWith("assets/") ? "img/" : "assets/img/";
     const content = f.content.replace(DATA_SVG, (uri) => {
       const name = assetNameOf(uri);
-      if (!name) return uri; // bukan aset template (mis. gambar milik pengguna) → biarkan
+      if (!name) return uri; // not a template asset (e.g. the user's image) → leave it
       used.add(name);
       return `${prefix}${name}.svg`;
     });
@@ -91,8 +91,8 @@ export interface TemplateZip {
 }
 
 /**
- * Susun berkas zip template dalam format `fw` (v7: HTML, Laravel Blade, React,
- * Vue, Svelte, Angular). `title` = nama website (sudah diterjemahkan).
+ * Assembles the template zip files in format `fw` (v7: HTML, Laravel Blade, React,
+ * Vue, Svelte, Angular). `title` = the website name (already translated).
  */
 export function templateFiles(
   t: TemplateRef,
@@ -106,7 +106,7 @@ export function templateFiles(
   const built = buildSite(site, designs, { ...opts, baseFont: opts.baseFont || TEMPLATE_FONT });
   const all = built.files(fw);
   const projectReadme = all.find((f) => f.name === "README.md")?.content ?? "";
-  // Bahasa dokumen mengikuti bahasa konten template.
+  // The document language follows the template content language.
   const raw = all
     .filter((f) => f.name !== "README.md")
     .map((f) => ({ name: f.name, content: f.name.endsWith(".html") ? f.content.replace(/<html lang="[^"]*">/, `<html lang="${lang}">`) : f.content }));
@@ -121,7 +121,7 @@ export function templateFiles(
   return { files, assets };
 }
 
-/** README proyek framework + catatan khusus template (aset & data contoh). */
+/** Framework project README + template-specific notes (assets & sample data). */
 function projectReadmeFor(t: TemplateRef, lang: TplLang, base: string, assets: string[]): string {
   const tr = makeTr(lang);
   const [first, ...rest] = base.split("\n");

@@ -6,7 +6,7 @@ import { isDemoMode } from "../../demo/demoMode";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Sisa waktu promo: "12h 05:31:09" (hari, jam:menit:detik). */
+/** Promo time left: "12h 05:31:09" (days, hours:minutes:seconds). */
 export function PromoCountdown({ className = "" }: { className?: string }) {
   const { t } = useTranslation();
   const r = promoRemaining(usePromoNow());
@@ -19,11 +19,11 @@ export function PromoCountdown({ className = "" }: { className?: string }) {
   );
 }
 
-/** Pita promo di atas katalog/detail: diskon + tanggal berakhir + countdown. */
+/** Promo ribbon above the catalog/detail: discount + end date + countdown. */
 export function PromoBanner() {
   const { t, i18n } = useTranslation();
   const now = usePromoNow();
-  // Mode demo (v12): tanpa harga → tanpa pita promo.
+  // Demo mode (v12): no prices → no promo ribbon.
   if (promoRemaining(now).ended || isDemoMode()) return null;
   const until = new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }).format(promoEndsAt());
   return (
@@ -42,7 +42,7 @@ export function PromoBanner() {
   );
 }
 
-/** Harga template: harga awal dicoret + harga promo (Free tetap "Gratis"). */
+/** Template price: original price struck through + promo price (Free stays "Free"). */
 export function PromoPriceTag({ price, testId, size = "sm" }: { price: number; testId?: string; size?: "sm" | "lg" }) {
   const { t } = useTranslation();
   const p = promoPrice(price, usePromoNow());

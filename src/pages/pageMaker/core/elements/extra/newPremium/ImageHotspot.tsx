@@ -8,7 +8,7 @@ import { clamp, color,  parseHotspots } from "../shared";
 import { tr, f,  outsideEsc } from "./kit";
 import { roomImage } from "../../placeholders";
 
-/* -------------------------- Gambar Hotspot -------------------------- */
+/* -------------------------- Hotspot Image -------------------------- */
 
 export interface ImageHotspotState {
   image: string;

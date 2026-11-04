@@ -10,11 +10,11 @@ export interface GalleryItem {
 }
 
 /**
- * Daftar galeri visual: tiap baris = thumbnail (klik untuk ganti) + keterangan.
- * Urutan diubah dengan seret (atau tombol panah untuk keyboard). "+ Tambah
- * gambar" membuka pemilih Aset (bisa pilih banyak sekaligus). Gambar bawaan
- * template diberi label "Ilustrasi contoh" agar jelas harus diganti.
- * `asText` (opsional) = editor teks lama untuk pengguna mahir.
+ * Visual gallery list: each row = thumbnail (click to replace) + caption.
+ * Reorder by dragging (or arrow buttons for keyboard users). "+ Add
+ * image" opens the Asset picker (multiple selection allowed). Built-in template
+ * images are labeled "Sample illustration" so it is clear they should be replaced.
+ * `asText` (optional) = the old text editor for advanced users.
  */
 export default function GalleryEditor({
   items,

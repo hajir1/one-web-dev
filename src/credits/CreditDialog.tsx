@@ -15,10 +15,10 @@ import { refreshMarketAccount } from "../marketplace/account";
 import { useSession } from "../auth/session";
 
 /**
- * Dialog "fitur ini membutuhkan kredit". Dipasang sekali di halaman yang
- * memakai fitur berbayar. Tidak pernah menganggap pembayaran berhasil:
- * akses item hanya terbuka setelah backend mengonfirmasi (`unlockItem`),
- * dan harga yang dipotong ditentukan server (angka di sini hanya tampilan).
+ * "This feature needs credits" dialog. Mounted once on pages that use
+ * paid features. It never assumes a payment succeeded: item access only
+ * unlocks after the backend confirms (`unlockItem`), and the charged price
+ * is decided by the server (the numbers here are display only).
  */
 export default function CreditDialog() {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ export default function CreditDialog() {
     if (request && status === "idle") void refreshBilling();
   }, [request, status]);
 
-  // Mode demo (v12): tidak ada kredit (requireCredit juga tidak membuka dialog di demo).
+  // Demo mode (v12): no credits (requireCredit does not open the dialog in demo either).
   if (!request || isDemoMode()) return null;
   const values = gateValues(request);
   const cost = requestCost(request);

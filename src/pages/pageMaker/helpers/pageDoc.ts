@@ -13,14 +13,14 @@ import { getSectionPreset, type SectionPreset } from "./sectionPresets";
 import { COLUMN_LAYOUTS, createColumnRow, createInnerRow, fractionLabel } from "./sectionTypes";
 
 /* ================================================================== */
-/* Dokumen halaman: root (main) → Section → Row → Element                */
+/* Page document: root (main) → Section → Row → Element                  */
 /*                                                                    */
 /* Aturan struktur:                                                     */
-/*   - anak langsung root HANYA boleh section                           */
-/*   - anak langsung section HANYA boleh Row (section = layout blok)    */
-/*   - elemen & component selalu berada di dalam sebuah Row             */
-/*     (boleh lewat kolom/grup di dalam Row)                            */
-/*   - section & Row tidak boleh bersarang                              */
+/*   - direct children of the root may ONLY be sections                  */
+/*   - direct children of a section may ONLY be Rows (section = block layout) */
+/*   - elements & components always live inside a Row                    */
+/*     (possibly through columns/groups inside the Row)                  */
+/*   - sections & Rows must not be nested                               */
 /* ================================================================== */
 
 export type PageDoc = ComponentDoc;
@@ -46,21 +46,21 @@ export function createPageRoot(children: BoxNode[] = []): BoxNode {
   });
 }
 
-/** Halaman baru: kosong (pengguna wajib membuat section dulu). */
+/** A new page: empty (the user must create a section first). */
 export function createDefaultPageDoc(): PageDoc {
   return { version: 2, root: createPageRoot() };
 }
 
 export function createSectionFromPreset(preset: SectionPreset | string): BoxNode | null {
   const p = typeof preset === "string" ? getSectionPreset(preset) : preset;
-  // Struktur asli preset (preset dasar: kerangka tanpa contoh isi).
+  // The preset's original structure (base presets: a skeleton without sample content).
   return p ? (p.buildEmpty?.() ?? p.build()) : null;
 }
 
 /**
- * Kerangka kosong dari preset: Section → Row → kolom tetap (layout, latar,
- * padding ikut), tetapi tanpa elemen contoh. Grup di dalam kolom yang menjadi
- * kosong dibuang supaya tidak menyisakan kotak tak berguna.
+ * An empty skeleton from a preset: Section → Row → columns stay (layout, background,
+ * padding included), but without sample elements. Groups inside columns that become
+ * empty are dropped so no useless boxes are left.
  */
 export function emptySection(section: BoxNode): BoxNode {
   const strip = (b: BoxNode, depth: number): BoxNode => {
@@ -73,13 +73,13 @@ export function emptySection(section: BoxNode): BoxNode {
   return strip(section, 0);
 }
 
-/** Section baru dari preset: kerangka kosong (bawaan) atau lengkap dengan contoh isi. */
+/** A new section from a preset: an empty skeleton (default) or complete with sample content. */
 export function createSectionForEditor(preset: SectionPreset | string, withContent = false): BoxNode | null {
   const p = typeof preset === "string" ? getSectionPreset(preset) : preset;
   return p ? presetTree(p, withContent) : null;
 }
 
-/** Pohon yang ditambahkan preset — sama persis dengan yang digambar thumbnail-nya. */
+/** The tree the preset adds, exactly what its thumbnail draws. */
 export function presetTree(p: SectionPreset, withContent: boolean): BoxNode {
   if (withContent) return p.build();
   return p.buildEmpty ? p.buildEmpty() : emptySection(p.build());
@@ -91,14 +91,14 @@ export interface RowVariant {
   id: string;
   name: string;
   description: string;
-  /** Perbandingan lebar kolom (untuk thumbnail); kosong = Row "Sejajar". */
+  /** Column width ratio (for the thumbnail); empty = an "Inline" Row. */
   fr: number[];
   build: () => BoxNode;
 }
 
 /**
- * Varian Row = 20 struktur kolom ala Divi (lihat sectionTypes.ts) + "Sejajar".
- * ID "1"–"4" tetap sama dengan versi sebelumnya (payload drag lama tetap valid).
+ * Row variants = 20 Divi-style column structures (see sectionTypes.ts) + "Inline".
+ * IDs "1"–"4" stay the same as the previous version (old drag payloads stay valid).
  */
 export const ROW_VARIANTS: RowVariant[] = [
   ...COLUMN_LAYOUTS.map((l) => ({
@@ -140,11 +140,11 @@ function containsRow(n: ComponentNode): boolean {
 }
 
 /**
- * Boleh menaruh `node` TEPAT sebagai anak `parentId`?
- *   root     → hanya section
- *   section  → hanya Row
- *   lainnya  → elemen / kontainer biasa (bukan section, bukan Row)
- * (`placeNode` melengkapi ini: konten yang dijatuhkan ke section dibungkus Row otomatis.)
+ * May `node` go DIRECTLY as a child of `parentId`?
+ *   root     → only sections
+ *   section  → only Rows
+ *   others   → regular elements / containers (not sections, not Rows)
+ * (`placeNode` complements this: content dropped on a section is wrapped in a Row automatically.)
  */
 export function canInsertInto(root: BoxNode, parentId: string, node: ComponentNode): boolean {
   const parent = findNode(root, parentId);
@@ -155,7 +155,7 @@ export function canInsertInto(root: BoxNode, parentId: string, node: ComponentNo
   return !isRow(node) && !containsSection(node) && !containsRow(node);
 }
 
-/** Section yang memuat node (atau node itu sendiri bila section). */
+/** The section containing the node (or the node itself when it is a section). */
 export function sectionOf(root: BoxNode, id: string): BoxNode | null {
   let cur: ComponentNode | null = findNode(root, id);
   while (cur) {
@@ -166,7 +166,7 @@ export function sectionOf(root: BoxNode, id: string): BoxNode | null {
   return null;
 }
 
-/** Row yang memuat node (atau node itu sendiri bila Row). */
+/** The Row containing the node (or the node itself when it is a Row). */
 export function rowOf(root: BoxNode, id: string): BoxNode | null {
   let cur: ComponentNode | null = findNode(root, id);
   while (cur) {
@@ -178,7 +178,7 @@ export function rowOf(root: BoxNode, id: string): BoxNode | null {
   return null;
 }
 
-/** Anak langsung `ancestorId` yang memuat `id` (atau `id` sendiri bila anak langsung). */
+/** The direct child of `ancestorId` that contains `id` (or `id` itself when it is a direct child). */
 function childOnPath(root: BoxNode, ancestorId: string, id: string): ComponentNode | null {
   const anc = findNode(root, ancestorId);
   if (!anc || !isBox(anc)) return null;
@@ -187,16 +187,16 @@ function childOnPath(root: BoxNode, ancestorId: string, id: string): ComponentNo
 
 export interface Placed {
   root: BoxNode;
-  /** Id node yang disisipkan (null bila gagal). */
+  /** Id of the inserted node (null on failure). */
   id: string | null;
 }
 
 /**
- * Sisipkan `node` dengan menjaga hierarki Section → Row → Element:
- *   - konten (elemen / kontainer) yang dijatuhkan ke SECTION dibungkus Row baru;
- *   - Row yang dijatuhkan ke dalam Row/kontainer naik jadi saudara Row itu
- *     (tepat di bawah Row yang memuatnya);
- *   - section hanya masuk ke root.
+ * Inserts `node` while keeping the Section → Row → Element hierarchy:
+ *   - content (elements / containers) dropped on a SECTION is wrapped in a new Row;
+ *   - a Row dropped inside a Row/container moves up to become that Row's sibling
+ *     (right below the Row containing it);
+ *   - sections only go into the root.
  */
 export function placeNode(root: BoxNode, parentId: string, index: number, node: ComponentNode): Placed {
   const fail: Placed = { root, id: null };
@@ -226,22 +226,22 @@ export function placeNode(root: BoxNode, parentId: string, index: number, node: 
     : fail;
 }
 
-/* --------------------- tambah "tepat di bawah" ---------------------- */
+/* --------------------- add "right below" ---------------------- */
 
-/** Wadah yang menata anaknya ke samping (grid / baris sejajar). */
+/** A container that lays out its children side by side (grid / inline row). */
 const sideways = (b: BoxNode) => b.layout === "grid" || b.layout === "row";
 
-/** Kotak polos tanpa latar & garis = kolom/wadah, bukan kartu. */
+/** A plain box without background & border = a column/container, not a card. */
 const plainBox = (b: BoxNode) => !b.bgEnabled && !b.borderWidth && !sideways(b);
 
 /**
- * Titik sisip untuk (+) "tambah di bawah" node `id`. Hasilnya SELALU
- * menumpuk ke bawah, tidak pernah menjadi kolom baru di sampingnya:
- *   - induknya menumpuk (stack/blok)  → saudara berikutnya di induk itu;
- *   - kolom polos di grid/baris       → akhir isi kolom itu;
- *   - elemen/kartu di grid/baris      → `wrapId`: dibungkus Stack dulu,
- *                                       konten baru masuk di bawahnya.
- * null = bukan target "di bawah" (section, Row, atau anak root).
+ * Insertion point for (+) "add below" node `id`. The result ALWAYS
+ * stacks downward, never becoming a new column beside it:
+ *   - the parent stacks (stack/block)  → the next sibling in that parent;
+ *   - a plain column in a grid/row     → the end of that column's content;
+ *   - an element/card in a grid/row    → `wrapId`: wrapped in a Stack first,
+ *                                       new content goes below it.
+ * null = not a "below" target (section, Row, or a root child).
  */
 export type BelowSpot = { parentId: string; index: number } | { wrapId: string };
 
@@ -254,12 +254,12 @@ export function belowSpot(root: BoxNode, id: string): BelowSpot | null {
   return { wrapId: id };
 }
 
-/** Bungkus node `id` dengan grup Stack lalu taruh `node` tepat di bawahnya. */
+/** Wraps node `id` in a Stack group, then places `node` right below it. */
 export function placeBelowWrapped(root: BoxNode, id: string, node: ComponentNode): Placed {
   const wrapped = wrapInBox(root, id, "stack");
   const boxId = wrapped.boxId;
   if (!boxId) return { root, id: null };
-  // Kolom/kotak yang dibungkus tetap selebar jalurnya (tanpa ini kolom kosong menyusut ke 0).
+  // A wrapped column/box keeps its track width (without this an empty column shrinks to 0).
   const original = findNode(root, id);
   const base = original && isBox(original) ? updateNode(wrapped.root, boxId, (b) => ({ ...b, align: "stretch" as const })) : wrapped.root;
   const placed = placeNode(base, boxId, 1, node);
@@ -267,10 +267,10 @@ export function placeBelowWrapped(root: BoxNode, id: string, node: ComponentNode
 }
 
 /**
- * Salin node lalu taruh salinannya TEPAT DI BAWAH aslinya (seperti Divi):
- * section/Row/Row dalam/modul di wadah menumpuk → saudara berikutnya;
- * kolom atau modul di grid/baris sejajar → aslinya dibungkus Stack dan
- * salinan masuk di bawahnya (tidak pernah menjadi kolom baru di samping).
+ * Copies a node and places the copy RIGHT BELOW the original (like Divi):
+ * section/Row/inner Row/module in a stacking container → the next sibling;
+ * a column or module in a grid/inline row → the original is wrapped in a Stack and
+ * the copy goes below it (never becoming a new column beside it).
  */
 export function duplicateBelow(root: BoxNode, id: string): { root: BoxNode; newId: string | null } {
   const node = findNode(root, id);
@@ -287,12 +287,12 @@ export function duplicateBelow(root: BoxNode, id: string): { root: BoxNode; newI
 
 export const isInnerRow = (n: ComponentNode | null | undefined): boolean => !!n && isBox(n) && !!n.innerRow;
 
-/** Kolom spesial = kotak yang berisi Row dalam. */
+/** Special column = a box that holds inner Rows. */
 const isSpecialtyColumn = (n: ComponentNode) => isBox(n) && n.children.some(isInnerRow);
 
 /**
- * Bila `id` berada di kolom spesial: posisi untuk Row dalam baru —
- * tepat di bawah Row dalam yang memuat `id`, atau di akhir kolom spesial.
+ * When `id` is in a special column: the position for a new inner Row,
+ * right below the inner Row containing `id`, or at the end of the special column.
  */
 export function innerRowSpot(root: BoxNode, id: string): { columnId: string; index: number } | null {
   let cur = findNode(root, id);
@@ -306,7 +306,7 @@ export function innerRowSpot(root: BoxNode, id: string): { columnId: string; ind
   return null;
 }
 
-/** Row dalam baru dengan struktur kolom `variantId` di kolom spesial. */
+/** A new inner Row with column structure `variantId` in a special column. */
 export function placeInnerRow(root: BoxNode, id: string, variantId: string): Placed {
   const spot = innerRowSpot(root, id);
   const v = ROW_VARIANTS.find((x) => x.id === variantId);
@@ -317,7 +317,7 @@ export function placeInnerRow(root: BoxNode, id: string, variantId: string): Pla
   return { root: insertNode(root, spot.columnId, spot.index, row), id: row.id };
 }
 
-/** Pindahkan node yang sudah ada dengan aturan `placeNode`. */
+/** Moves an existing node with the `placeNode` rules. */
 export function movePageNode(root: BoxNode, id: string, parentId: string, index: number): BoxNode {
   if (!canMoveInto(root, id, parentId)) return root;
   const loc = findParent(root, id);
@@ -336,7 +336,7 @@ export function movePageNode(root: BoxNode, id: string, parentId: string, index:
 
 const DEFAULT_SECTION = () => createSectionFromPreset("single")!;
 
-/** Properti susunan anak yang diwariskan Row saat section lama (flex/grid) dimigrasi. */
+/** Child layout properties a Row inherits when an old (flex/grid) section is migrated. */
 function layoutOf(b: BoxNode): Partial<BoxNode> {
   return {
     layout: b.layout === "block" ? "stack" : b.layout,
@@ -351,9 +351,9 @@ function layoutOf(b: BoxNode): Partial<BoxNode> {
 }
 
 /**
- * Section → pasti blok, anak-anaknya pasti Row. Section lama (layout flex/grid
- * dengan elemen/kolom langsung di dalamnya) dimigrasi: section jadi blok dan
- * isinya dibungkus satu Row yang mewarisi susunan lama — tampilan tetap sama.
+ * Section → always block, its children are always Rows. Old sections (flex/grid layout
+ * with elements/columns directly inside) are migrated: the section becomes a block and
+ * its content is wrapped in one Row that inherits the old layout; the look stays the same.
  */
 function normalizeSection(sec: BoxNode): BoxNode {
   const clean = (n: ComponentNode): ComponentNode => {
@@ -393,7 +393,7 @@ function normalizeSection(sec: BoxNode): BoxNode {
   return { ...sec, layout: "block", gap: 0, children: rows };
 }
 
-/** Paksa struktur valid. Tidak membuang elemen: yang nyasar dibungkus section + Row. */
+/** Forces a valid structure. Does not drop elements: strays are wrapped in a section + Row. */
 export function enforcePageStructure(root: BoxNode): BoxNode {
   const next: BoxNode[] = [];
   let strays: ComponentNode[] = [];
@@ -409,7 +409,7 @@ export function enforcePageStructure(root: BoxNode): BoxNode {
       flush();
       next.push(normalizeSection(c));
     } else if (isBox(c)) {
-      // Kontainer biasa di root → jadi section (gaya & isinya dipertahankan).
+      // A regular container at the root → becomes a section (style & content kept).
       flush();
       next.push(normalizeSection({ ...c, row: undefined, tag: c.tag ?? "section", section: DEFAULT_SECTION().section }));
     } else {
@@ -421,7 +421,7 @@ export function enforcePageStructure(root: BoxNode): BoxNode {
 }
 
 
-/** Asal desain yang valid (ID template katalog) atau undefined. */
+/** A valid design origin (catalog template ID) or undefined. */
 function sanitizeSource(v: unknown): DocSource | undefined {
   if (!v || typeof v !== "object") return undefined;
   const o = v as { templateId?: unknown; version?: unknown };
@@ -429,10 +429,10 @@ function sanitizeSource(v: unknown): DocSource | undefined {
   return typeof o.version === "number" && Number.isFinite(o.version) ? { templateId: o.templateId, version: o.version } : { templateId: o.templateId };
 }
 
-/** Template asal sebuah desain halaman (null = desain dari nol). */
+/** The template a page design came from (null = a design from scratch). */
 export const docTemplateId = (doc: PageDoc | null | undefined): string | null => doc?.source?.templateId ?? null;
 
-/** State tersimpan apa pun → PageDoc valid. Tidak pernah melempar. */
+/** Any saved state → a valid PageDoc. Never throws. */
 export function normalizePageDoc(saved: unknown): PageDoc {
   try {
     if (saved && typeof saved === "object" && Array.isArray((saved as { items?: unknown }).items)) {
@@ -456,7 +456,7 @@ export function normalizePageDoc(saved: unknown): PageDoc {
   }
 }
 
-/** Elemen lama `{ elementType, name, snapshot }` → ElementNode (null bila tipe tak dikenal). */
+/** Old element `{ elementType, name, snapshot }` → ElementNode (null when the type is unknown). */
 function legacyElement(v: unknown): ComponentNode | null {
   if (!v || typeof v !== "object") return null;
   const o = v as { elementType?: unknown; name?: unknown; snapshot?: unknown };
@@ -468,7 +468,7 @@ function legacyElement(v: unknown): ComponentNode | null {
   return doc.root.children.find((n) => n.kind === "element") ?? null;
 }
 
-/** Format Page Maker lama: `items[]` berisi section / component / elemen (snapshot). */
+/** Old Page Maker format: `items[]` holding sections / components / elements (snapshots). */
 function migrateLegacyPage(old: { items: unknown[] }): PageDoc {
   const sections: BoxNode[] = [];
   for (const raw of old.items.slice(0, 200)) {
@@ -483,7 +483,7 @@ function migrateLegacyPage(old: { items: unknown[] }): PageDoc {
     if (c.elementType === "component" && snap.version === 2) {
       row.children.push(...normalizeDoc(snap).root.children);
     } else if (c.elementType === "component" || c.elementType === "section") {
-      // Component/section format lama (templateId + slots): elemen tiap slot dipindah ke Row.
+      // Old component/section format (templateId + slots): each slot's elements move into a Row.
       for (const slot of Object.values(snap.slots ?? {})) {
         const el = legacyElement(slot);
         if (el) row.children.push(el);

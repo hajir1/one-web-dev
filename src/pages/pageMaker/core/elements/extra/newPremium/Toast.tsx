@@ -133,7 +133,7 @@ export const toastElement = defineElement<ToastState>({
   opacity: 1;
   background: rgba(15, 23, 42, 0.06);
 }
-/* Melayang hanya setelah runtime aktif; di canvas Desain tampil di alur. */
+/* Floats only once the runtime is active; in the Design canvas it shows in the flow. */
 .${cls}[data-ready] .${cls}__toast {
   position: fixed;
   ${place}

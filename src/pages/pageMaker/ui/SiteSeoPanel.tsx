@@ -6,18 +6,18 @@ import { SEO_IDEAL, SEO_LIMITS, cleanUrl, resolveSeo, seoAudit, type SeoPageInpu
 
 /* ================================================================== */
 /* Panel SEO folder website (v10)                                        */
-/*   - SEO situs: URL publik, deskripsi & gambar bagikan bawaan,         */
+/*   - site SEO: public URL, default description & share image,          */
 /*     izinkan mesin pencari                                            */
-/*   - SEO per halaman: judul, deskripsi, gambar, sembunyikan            */
-/*   - pratinjau hasil Google + daftar saran                             */
-/* Semua nilai tersimpan di folder website dan ikut ke hasil ekspor.     */
+/*   - per-page SEO: title, description, image, hide                     */
+/*   - Google result preview + a list of suggestions                     */
+/* Every value is stored in the website folder and goes into the export. */
 /* ================================================================== */
 
 const CARD = "rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3";
 const INPUT =
   "w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90";
 
-/** Input/textarea yang menyimpan saat kehilangan fokus. */
+/** An input/textarea that saves on blur. */
 function Field({
   label,
   value,
@@ -165,7 +165,7 @@ export default function SiteSeoPanel({
                 </button>
                 {expanded && (
                   <div className="flex flex-col gap-3 border-t border-gray-200 px-3 py-3 dark:border-gray-800">
-                    {/* Pratinjau hasil pencarian Google */}
+                    {/* Google search result preview */}
                     <div className="rounded-lg bg-gray-50 p-3 dark:bg-white/5" aria-label={t("website.seo.preview")} data-testid="seo-snippet">
                       <p className="truncate text-[11px] text-gray-500">{r.url || `${t("website.seo.yourDomain")}${r.path}`}</p>
                       <p className="truncate text-base text-[#1a0dab] dark:text-[#8ab4f8]">{r.title}</p>

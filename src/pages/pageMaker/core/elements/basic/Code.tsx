@@ -9,15 +9,15 @@ import CodeEditor from "../../ui/CodeEditor";
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* Code Element — HTML mentah + CSS + JavaScript milik pengguna         */
+/* Code Element — the user's raw HTML + CSS + JavaScript                */
 /*                                                                    */
-/* - HTML: dirender apa adanya (tag <script> dibuang; pakai tab JS).    */
+/* - HTML: rendered as is (<script> tags removed; use the JS tab).      */
 /*   React: dangerouslySetInnerHTML · Vue: v-html · Svelte: {@html} ·   */
 /*   Angular: [innerHTML] + DomSanitizer.bypassSecurityTrustHtml.       */
-/* - CSS: di-scope ke elemen ini (`&` = pembungkus), jadi tidak bocor.  */
-/* - JS : runtime Custom JS (element, on, onCleanup, …) — jalan di      */
-/*        Pratinjau & export, tidak di canvas desain.                   */
-/* Bukan untuk komponen framework (JSX/SFC): itu tetap dianggap HTML.   */
+/* - CSS: scoped to this element (`&` = the wrapper), so it does not leak. */
+/* - JS : Custom JS runtime (element, on, onCleanup, …) — runs in       */
+/*        Preview & export, not on the design canvas.                   */
+/* Not for framework components (JSX/SFC): those are still treated as HTML. */
 /* ================================================================== */
 
 export interface CodeState {
@@ -42,14 +42,14 @@ const DEFAULT_STATE: CodeState = {
 
 const MAX_CODE_HTML = 50000;
 
-/** Buang <script>…</script> (tidak dijalankan oleh innerHTML/framework — gunakan tab JavaScript). */
+/** Strips <script>…</script> (not run by innerHTML/frameworks; use the JavaScript tab). */
 export function stripScripts(html: string): string {
   return html.replace(/<script\b[\s\S]*?<\/script\s*>/gi, "").replace(/<\/?script\b[^>]*>/gi, "");
 }
 
 export const hasScriptTag = (html: string) => /<script\b/i.test(html);
 
-/** String JS aman diletakkan di dalam blok <script> SFC. */
+/** A JS string that is safe to put inside an SFC <script> block. */
 const jsString = (s: string) =>
   JSON.stringify(s).replace(/<\//g, "<\\/").replace(/[\u2028\u2029]/g, " ");
 
@@ -125,7 +125,7 @@ export const codeElement = defineElement<CodeState>({
     return {
       css: `.${cls} {\n  display: block;\n  min-width: 0;\n}\n`,
       markup: h("div", { class: cls }, raw(html)),
-      // Framework: HTML disisipkan sebagai string, bukan template (kurung {{ }} / { } tidak ditafsirkan).
+      // Frameworks: HTML is inserted as a string, not a template ({{ }} / { } braces are not interpreted).
       vue: {
         template: `<div class="${cls}" v-html="html"></div>`,
         script: `const html = ${str};`,
@@ -136,7 +136,7 @@ export const codeElement = defineElement<CodeState>({
       },
       angular: {
         template: `<div class="${cls}" [innerHTML]="html"></div>`,
-        classBody: `html: SafeHtml;\n\n// HTML milik pengguna sengaja tidak disanitasi agar tampil persis seperti di Page Maker.\nconstructor(sanitizer: DomSanitizer) {\n  this.html = sanitizer.bypassSecurityTrustHtml(${str});\n}`,
+        classBody: `html: SafeHtml;\n\n// The user's HTML is intentionally not sanitized so it renders exactly as in Page Maker.\nconstructor(sanitizer: DomSanitizer) {\n  this.html = sanitizer.bypassSecurityTrustHtml(${str});\n}`,
         headerImports: `import { DomSanitizer, SafeHtml } from '@angular/platform-browser';`,
       },
     };

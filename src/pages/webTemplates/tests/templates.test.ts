@@ -60,7 +60,7 @@ test("struktur: setiap halaman valid (Section → Row → isi), tanpa Row bersar
             });
           }
         }
-        // Normalisasi Page Maker (dipakai saat desain dibuka) tidak mengubah jumlah elemen.
+        // Page Maker normalization (used when a design opens) does not change the element count.
         const norm = normalizePageDoc(JSON.parse(JSON.stringify(p.doc)));
         assert.equal(collectElements(norm.root).length, collectElements(root).length, `${tpl.id}/${p.key}`);
       }
@@ -78,7 +78,7 @@ test("template Free hanya memakai item gratis; elemen Premium template Premium t
     if (tpl.tier === "free") assert.equal(premiumUsed.size, 0, `${tpl.id}: template gratis tidak boleh memakai elemen premium`);
     const { elementIds, sectionIds } = templateContents(tpl);
     for (const id of premiumUsed) assert.ok(elementIds.includes(id), `${tpl.id}: ${id}`);
-    // Setiap halaman desain mencatat template asalnya.
+    // Every page design records the template it came from.
     for (const p of buildTemplatePages(tpl, "en")) assert.deepEqual(p.doc.source, { templateId: tpl.id, version: tpl.version });
     if (tpl.tier === "free") for (const id of sectionIds) assert.ok(!isPremiumPreset(id.replace("preset:", "")), `${tpl.id}: ${id} premium`);
   }
@@ -88,7 +88,7 @@ test("pratinjau/ekspor: semua halaman ter-compose tanpa peringatan di ID & EN", 
   for (const tpl of WEB_TEMPLATES)
     for (const lang of LANGS) {
       const { site, designs } = templateSite(tpl, lang, tpl.content.brand);
-      // Pratinjau katalog menampilkan template utuh; tanpa izin, elemen Premium hanya ada di template Premium.
+      // The catalog preview shows the whole template; without permission, Premium elements only exist in Premium templates.
       const built = buildSite(site, designs, { icons, allowPremiumElements: true });
       assert.deepEqual(built.warnings, [], `${tpl.id}/${lang}`);
       const locked = buildSite(site, designs, { icons });
@@ -122,13 +122,13 @@ test("toko online: katalog berharga, detail produk, CTA ke halaman detail — ta
     assert.ok(cards.length >= 6, `${tpl.id}: katalog`);
     for (const c of cards) {
       assert.match(c.state.priceText, /^Rp[\d.]+$/);
-      // Kartu koleksi dengan halaman item → produk/<slug>.html (uji coba CRUD).
+      // Collection cards with item pages → produk/<slug>.html (CRUD preview).
       assert.ok(c.state.ctaHref === `${detail.slug}.html` || /^produk\/[a-z0-9-]+\.html$/.test(c.state.ctaHref), c.state.ctaHref);
     }
-    // Tidak ada form yang mengirim ke server pembayaran / tidak ada script.
+    // No form submits to a payment server / no scripts.
     const { site, designs } = templateSite(tpl, "id", tpl.content.brand);
     for (const p of buildSite(site, designs, { icons }).pages) {
-      // Satu-satunya skrip yang boleh: chip filter kategori (uji coba CRUD).
+      // The only allowed script: category filter chips (CRUD trial).
       assert.equal(p.composed.html.script.replace(/\/\* owd-category-filter \*\/[\s\S]*\}\)\(\);/, "").trim(), "");
       assert.doesNotMatch(p.composed.html.body, /<form[^>]+action=/);
     }
@@ -149,7 +149,7 @@ test("unduhan: HTML per halaman + CSS + aset SVG + README; tautan antarhalaman v
         assert.doesNotMatch(f.content, /data:image\/svg\+xml;base64/, `${tpl.id}/${f.name}`);
         if (!f.name.endsWith(".html")) continue;
         assert.match(f.content, new RegExp(`<html lang="${lang}">`));
-        // Halaman item (produk/<slug>.html) memakai <base href="../">: tautan dihitung dari akar.
+        // Item pages (produk/<slug>.html) use <base href="../">: links are computed from the root.
         for (const m of f.content.replace(/<base [^>]*>/, "").matchAll(/(?:href|src)="([^"#:]+)"/g)) {
           const target = m[1];
           assert.ok(names.has(target), `${tpl.id}/${lang}/${f.name}: tautan rusak ${target}`);
@@ -212,14 +212,14 @@ test("edit template: salinan baru (folder + desain), template asli tidak berubah
   assert.equal(sitesFromTemplate("shop-boutique").length, 1);
   assert.equal(sitesFromTemplate("company-agency").length, 0);
 
-  // Salinan kedua: nama folder unik, ID desain baru (tidak menimpa salinan pertama).
+  // A second copy: a unique folder name, new design IDs (does not overwrite the first copy).
   const b = createSiteFromTemplate(tpl, buildTemplatePages(tpl, "id"), tpl.content.brand);
   assert.notEqual(a.siteId, b.siteId);
   assert.equal(new Set([...a.designIds, ...b.designIds]).size, a.designIds.length * 2);
   assert.deepEqual(useDesignStore.getState().designs[SITE_TYPE].map((s) => s.name).sort(), ["Moda Rupa", "Moda Rupa (2)"]);
   assert.equal(uniqueSiteName("Moda Rupa"), "Moda Rupa (3)");
 
-  // Mengedit salinan tidak memengaruhi template.
+  // Editing the copy does not affect the template.
   const copy = useDesignStore.getState().designs[PAGE_DESIGN_TYPE][0];
   copy.state.root.children = [];
   const after = JSON.stringify(buildTemplatePages(tpl, "id").map((p) => [p.key, p.slug, collectElements(p.doc.root).length]));
@@ -267,7 +267,7 @@ test("uji coba CRUD: semua template berkatalog Product Card punya koleksi data; 
       const binds = collectElements(itemBoxIn(itemPage.doc.root)).map((e) => e.bind);
       assert.ok(binds.includes("name") && binds.includes("price"), `${tpl.id}: ${binds}`);
     }
-    // Dimuat ulang: koleksi tetap ada.
+    // Reloaded: the collection is still there.
     assert.equal(collectionsIn(normalizePageDoc(JSON.parse(JSON.stringify(pages.find((p) => collectionsIn(p.doc.root).length).doc))).root).length, 1, tpl.id);
     const { site, designs } = templateSite(tpl, "id", tpl.content.brand);
     const files = buildSite(site, designs, { icons, allowPremiumElements: true, allowPremiumEvents: true }).files("html");

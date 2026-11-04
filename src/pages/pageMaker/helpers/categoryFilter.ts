@@ -6,16 +6,16 @@ import { CATEGORY_MAX, categoriesOf, isValidCollectionSlug, sameCategory, type C
 /* ================================================================== */
 /* Chip filter kategori (uji coba CRUD)                                 */
 /*                                                                    */
-/* Sebuah grup berisi badge / teks / tombol (mis. "Semua · Biji kopi ·   */
-/* Alat seduh") bisa dijadikan filter untuk koleksi data:               */
+/* A group of badges / text / buttons (e.g. "All · Coffee beans ·      */
+/* Brewing tools") can become a filter for a data collection:           */
 /*   - box: `filterOf` = slug koleksi → atribut data-filter             */
-/*   - tiap chip: `chip` = kategori ("" = Semua) → data-chip            */
-/*   - kartu koleksi: `itemCategory` → data-category                    */
-/* Gaya chip tetap milik pengguna: chip aktif & tidak aktif diambil dari  */
-/* chip yang ada (chip "Semua" = gaya aktif, chip lain = gaya biasa).    */
+/*   - each chip: `chip` = category ("" = All) → data-chip             */
+/*   - collection card: `itemCategory` → data-category                  */
+/* Chip styles stay the user's: active & inactive chips are taken from   */
+/* the existing chips (the "All" chip = active style, other chips = normal style). */
 /*                                                                    */
-/* Situs statis: FILTER_JS menyembunyikan kartu di halaman. Dengan       */
-/* backend Express: collections.js memuat ulang data (?kategori=).       */
+/* Static sites: FILTER_JS hides cards on the page. With                */
+/* Express backend: collections.js reloads the data (?kategori=).        */
 /* ================================================================== */
 
 const CHIP_TYPES = new Set(["badge", "text", "button"]);
@@ -24,13 +24,13 @@ const ALL_WORDS = /^(semua|all|semua produk|all products)$/i;
 export const isChipElement = (n: ComponentNode): n is ElementNode => !isBox(n) && CHIP_TYPES.has(n.elementType);
 export const chipText = (el: ElementNode): string => String(el.state?.text ?? "").trim();
 
-/** Box ini bisa dijadikan grup chip filter? (≥ 2 chip, semua anak badge/teks/tombol) */
+/** Can this box become a filter chip group? (≥ 2 chips, every child a badge/text/button) */
 export function canBeFilterBar(box: BoxNode): boolean {
   if (box.collection || box.section || box.itemOf || box.related || box.filterOf) return false;
   return box.children.length >= 2 && box.children.every(isChipElement);
 }
 
-/** Nilai chip dari teksnya: "Semua" → "", selain itu kategori yang cocok (atau teks itu sendiri). */
+/** Chip value from its text: "Semua" → "", otherwise the matching category (or the text itself). */
 function chipValue(text: string, cats: string[], index: number): string {
   if (ALL_WORDS.test(text) || (index === 0 && !text)) return "";
   return cats.find((c) => sameCategory(c, text)) ?? text.slice(0, CATEGORY_MAX);
@@ -45,8 +45,8 @@ const withText = (el: ElementNode, text: string, chip: string): ElementNode => (
 });
 
 /**
- * Samakan chip dengan kategori koleksi. Data tanpa kategori → chip yang ada
- * dipertahankan (hanya diberi nilai dari teksnya).
+ * Matches the chips to the collection categories. Data without categories → the existing chips
+ * are kept (only given a value from their text).
  */
 export function syncFilterBar(box: BoxNode, col: CollectionDef): BoxNode {
   const chips = box.children.filter(isChipElement);
@@ -60,7 +60,7 @@ export function syncFilterBar(box: BoxNode, col: CollectionDef): BoxNode {
   const out: ComponentNode[] = [];
   if (all) out.push({ ...all, chip: "" });
   for (const cat of cats) {
-    // Chip yang sudah ada untuk kategori ini dipakai lagi (id & gaya tetap).
+    // An existing chip for this category is reused (id & style kept).
     const same = chips.find((c) => c !== all && sameCategory(chipText(c), cat));
     out.push(same ? { ...same, chip: cat } : withText(cloneNode(idle) as ElementNode, cat, cat));
   }
@@ -88,7 +88,7 @@ export function unmarkFilterBar(root: BoxNode, boxId: NodeId): BoxNode {
   });
 }
 
-/** Semua grup chip di pohon (urutan dokumen). */
+/** Every chip group in the tree (document order). */
 export function filterBarsIn(root: ComponentNode): BoxNode[] {
   const out: BoxNode[] = [];
   const walk = (n: ComponentNode) => {
@@ -100,7 +100,7 @@ export function filterBarsIn(root: ComponentNode): BoxNode[] {
   return out;
 }
 
-/** Sinkronkan semua grup chip dengan koleksinya (dipanggil saat data berubah). */
+/** Syncs every chip group with its collection (called when the data changes). */
 export function syncFilterBars(root: BoxNode, cols: CollectionDef[], rename?: { from: string; to: string }): BoxNode {
   const walk = (n: ComponentNode): ComponentNode => {
     if (!isBox(n)) return n;
@@ -115,7 +115,7 @@ export function syncFilterBars(root: BoxNode, cols: CollectionDef[], rename?: { 
   return walk(root) as BoxNode;
 }
 
-/** Grup chip tempat node ini berada (atau box itu sendiri). */
+/** The chip group this node belongs to (or the box itself). */
 export function filterBarOf(root: BoxNode, id: NodeId): BoxNode | null {
   let found: BoxNode | null = null;
   const walk = (n: ComponentNode, owner: BoxNode | null): boolean => {
@@ -139,12 +139,12 @@ export const sanitizeCategory = (v: unknown): string | undefined => {
   return s || undefined;
 };
 
-/* ------------------------------ skrip halaman statis ---------------- */
+/* ------------------------------ static page script ---------------- */
 
 /**
- * Skrip filter untuk situs statis (tanpa backend): klik chip →
- * kartu dengan data-category lain disembunyikan. Bila collections.js
- * (backend) ada, skrip ini berhenti supaya filter diambil dari server.
+ * Filter script for static sites (no backend): clicking a chip →
+ * cards with a different data-category are hidden. When collections.js
+ * (backend) exists, this script stops so filtering comes from the server.
  */
 export const FILTER_JS = `/* owd-category-filter */
 (function () {

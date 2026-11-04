@@ -9,13 +9,13 @@ import { clamp, color, parseGallery, parseMarquee, safeImage, seconds } from "./
 import { SAMPLE_SCENES, sceneImage } from "../placeholders";
 
 /* ================================================================== */
-/* Elemen PREMIUM v2: Galeri Lightbox, Marquee Logo, Modal Popup,       */
-/* Before/After, Tombol Kembali ke Atas.                                */
+/* PREMIUM elements v2: Lightbox Gallery, Logo Marquee, Modal Popup,    */
+/* Before/After, Back to Top button.                                    */
 /*                                                                    */
-/* Markup statis (h()) tetap berguna tanpa JS (galeri → tautan gambar,  */
-/* before/after → posisi awal, tombol atas → tautan #top). Interaksi    */
-/* ditambahkan lewat `customCode` (runtime Custom JS) di Pratinjau dan  */
-/* hasil ekspor kelima framework.                                       */
+/* Static markup (h()) stays useful without JS (gallery → image links,  */
+/* before/after → initial position, top button → #top link). Interaction */
+/* is added through `customCode` (the Custom JS runtime) in Preview and */
+/* in the export output of all five frameworks.                         */
 /* ================================================================== */
 
 const tr = (k: string) => i18n.t(`el.x.${k}`);
@@ -986,7 +986,7 @@ export const backToTopElement = defineElement<BackToTopState>({
 .${cls}__sr {
   ${SR_ONLY}
 }
-/* Mengambang hanya setelah runtime aktif (Pratinjau & ekspor); di canvas Desain tetap di alur. */
+/* Floats only once the runtime is active (Preview & export); in the Design canvas it stays in the flow. */
 .${cls}[data-ready] {
   position: fixed;
   bottom: ${clamp(s.bottom, 8, 120)}px;

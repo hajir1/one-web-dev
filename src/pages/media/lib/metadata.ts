@@ -1,13 +1,13 @@
 // ─── lib/metadata.ts ─────────────────────────────────────────────────────────
-// Baca & hapus metadata gambar TANPA encode ulang (lossless) — data piksel
-// tidak disentuh, hanya segmen/chunk metadata yang dibuang.
+// Reads & removes image metadata WITHOUT re-encoding (lossless): pixel data
+// is untouched, only metadata segments/chunks are dropped.
 //
 //   JPEG  buang APP1 (EXIF/XMP), APP13 (IPTC/Photoshop), APP3–APP12, APP15,
-//         COM. Pertahankan APP0 (JFIF), APP2 (profil ICC, opsional),
-//         APP14 (Adobe — wajib untuk JPEG CMYK). Orientasi EXIF bisa
-//         dipertahankan lewat EXIF minimal berisi tag Orientation saja.
-//   PNG   buang tEXt, zTXt, iTXt, eXIf, tIME (+ iCCP bila diminta).
-//   WebP  buang chunk EXIF & XMP, perbarui flag VP8X & ukuran RIFF.
+//         COM. Keep APP0 (JFIF), APP2 (ICC profile, optional),
+//         APP14 (Adobe; required for CMYK JPEGs). EXIF orientation can
+//         be kept through a minimal EXIF containing only the Orientation tag.
+//   PNG   drop tEXt, zTXt, iTXt, eXIf, tIME (+ iCCP when requested).
+//   WebP  drop the EXIF & XMP chunks, update the VP8X flags & RIFF size.
 
 import i18n from "../../../i18n";
 
@@ -15,7 +15,7 @@ type MetaFormat = "jpeg" | "png" | "webp";
 
 export interface MetadataReport {
   format: MetaFormat;
-  /** Ringkasan blok yang ditemukan, mis. "EXIF", "XMP", "Komentar". */
+  /** Summary of blocks found, e.g. "EXIF", "XMP", "Comment". */
   blocks: string[];
   hasExif: boolean;
   hasGps: boolean;
@@ -25,10 +25,10 @@ export interface MetadataReport {
   dateTime?: string;
   serial?: string;
   orientation?: number;
-  /** Teks PNG (mis. prompt AI "parameters"). */
+  /** PNG text (e.g. an AI "parameters" prompt). */
   textKeys: string[];
   hasIcc: boolean;
-  /** Total byte metadata yang bisa dibuang. */
+  /** Total metadata bytes that can be dropped. */
   removableBytes: number;
 }
 
@@ -73,7 +73,7 @@ interface ExifInfo {
   hasGps: boolean;
 }
 
-/** Parse TIFF/EXIF (mulai dari header "II"/"MM"). Toleran terhadap data rusak. */
+/** Parse TIFF/EXIF (starting at the "II"/"MM" header). Tolerant of corrupt data. */
 export function parseExifTiff(t: Uint8Array): ExifInfo {
   const info: ExifInfo = { hasGps: false };
   if (t.length < 8) return info;
@@ -133,7 +133,7 @@ export function parseExifTiff(t: Uint8Array): ExifInfo {
   return info;
 }
 
-/** APP1 EXIF minimal: hanya tag Orientation. */
+/** Minimal APP1 EXIF: only the Orientation tag. */
 export function minimalOrientationApp1(orientation: number): Uint8Array {
   const tiff = [0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 1, 0x01, 0x12, 0, 3, 0, 0, 0, 1, 0, orientation & 0xff, 0, 0, 0, 0, 0, 0];
   const payload = [...Array.from("Exif").map((c) => c.charCodeAt(0)), 0, 0, ...tiff];
@@ -147,7 +147,7 @@ interface JpegSeg {
   marker: number;
   start: number;
   end: number; // eksklusif
-  data: Uint8Array; // payload tanpa marker & panjang
+  data: Uint8Array; // payload without marker & length
 }
 
 function jpegSegments(b: Uint8Array): { segs: JpegSeg[]; scanStart: number } {
@@ -174,10 +174,10 @@ function jpegSegments(b: Uint8Array): { segs: JpegSeg[]; scanStart: number } {
 }
 
 /**
- * Akhir gambar utama (setelah EOI). Data SETELAH EOI — mis. gambar kedua
- * MPF/"depth map" dari ponsel, lengkap dengan EXIF & GPS-nya sendiri —
- * ikut dibuang. Scan progresif (banyak SOS + tabel di antaranya) ditelusuri
- * per segmen agar byte FF D9 di dalam tabel tidak salah dianggap EOI.
+ * End of the main image (after EOI). Data AFTER EOI, e.g. a second
+ * MPF/"depth map" image from phones, complete with its own EXIF & GPS,
+ * is dropped too. Progressive scans (many SOS + tables in between) are walked
+ * per segment so FF D9 bytes inside a table are not mistaken for EOI.
  */
 export function jpegEnd(b: Uint8Array, scanStart: number): number {
   let o = scanStart;
@@ -191,7 +191,7 @@ export function jpegEnd(b: Uint8Array, scanStart: number): number {
       o += 2 + u16be(b, o + 2); // segmen (SOS/DHT/DQT/DRI/…)
       if (m !== 0xda) continue;
     }
-    // Data entropi: lanjut sampai marker sungguhan (bukan FF00 / RSTn / FF pengisi).
+    // Entropy data: continue until a real marker (not FF00 / RSTn / fill FF).
     while (o + 1 < b.length) {
       if (b[o] === 0xff) {
         const n = b[o + 1];
@@ -204,7 +204,7 @@ export function jpegEnd(b: Uint8Array, scanStart: number): number {
       o++;
     }
   }
-  return b.length; // EOI tidak ditemukan (file terpotong): pertahankan apa adanya
+  return b.length; // EOI not found (truncated file): keep as is
 }
 
 const isExif = (s: JpegSeg) => s.marker === 0xe1 && ascii(s.data, 0, 6) === "Exif\0\0";
@@ -250,7 +250,7 @@ function stripJpeg(b: Uint8Array, o: StripOptions): Uint8Array {
     inserted = true;
   };
   for (const s of segs) {
-    // EXIF minimal ditempatkan setelah APP0 (atau di awal bila tidak ada APP0).
+    // The minimal EXIF goes after APP0 (or at the start when there is no APP0).
     if (s.marker !== 0xe0) insertOrientation();
     if (keepJpeg(s, o)) parts.push(b.subarray(s.start, s.end));
   }

@@ -12,7 +12,7 @@ import { formatSize } from "../../lib/format";
 
 const RULES: FileRules = { kinds: BROWSER_DECODABLE_IMAGES, maxBytes: 60 * 1024 * 1024, maxFiles: 1 };
 
-/** Loupe: 9×9 piksel, piksel tengah = yang dipilih. */
+/** Loupe: 9×9 pixels, the center pixel = the selected one. */
 const LOUPE_CELLS = 9;
 const LOUPE_CELL = 13;
 const LOUPE_SIZE = LOUPE_CELLS * LOUPE_CELL;
@@ -25,7 +25,7 @@ interface Loaded {
   height: number;
 }
 
-/** Salin teks; fallback execCommand untuk konteks non-HTTPS / browser lama. */
+/** Copies text; execCommand fallback for non-HTTPS contexts / old browsers. */
 async function copyText(text: string): Promise<boolean> {
   try {
     if (navigator.clipboard && window.isSecureContext) {
@@ -33,7 +33,7 @@ async function copyText(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    /* lanjut ke fallback */
+    /* continue to the fallback */
   }
   try {
     const ta = document.createElement("textarea");
@@ -65,7 +65,7 @@ export default function FindColors() {
   const [palette, setPalette] = useState<PaletteColor[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
 
-  // Canvas penuh (resolusi asli) dibuat SEKALI per gambar, bukan tiap render.
+  // The full canvas (original resolution) is created ONCE per image, not on every render.
   const fullRef = useRef<HTMLCanvasElement | null>(null);
   const viewRef = useRef<HTMLCanvasElement>(null);
   const loupeRef = useRef<HTMLCanvasElement>(null);
@@ -74,7 +74,7 @@ export default function FindColors() {
 
   const shown = locked ?? hover;
 
-  // Bebaskan memori Canvas saat halaman ditinggalkan.
+  // Free canvas memory when leaving the page.
   useEffect(
     () => () => {
       if (fullRef.current) fullRef.current.width = fullRef.current.height = 0;
@@ -97,9 +97,9 @@ export default function FindColors() {
         if (!ctx) throw new Error(t("media.findColors.tooLarge"));
         ctx.clearRect(0, 0, dec.width, dec.height);
         ctx.drawImage(dec.source, 0, 0);
-        if (token !== loadToken.current) return; // ada gambar lebih baru
+        if (token !== loadToken.current) return; // a newer image exists
         fullRef.current = full;
-        // Palet dari salinan kecil (cepat untuk gambar besar).
+        // Palette from a small copy (fast for large images).
         const s = Math.min(1, 220 / Math.max(dec.width, dec.height));
         const small = document.createElement("canvas");
         small.width = Math.max(1, Math.round(dec.width * s));
@@ -123,7 +123,7 @@ export default function FindColors() {
   }, [t]);
   const intake = useFileIntake(RULES, load);
 
-  // Gambar ulang tampilan saat gambar / zoom berubah.
+  // Redraw the view when the image / zoom changes.
   const fitWidth = useRef(0);
   const draw = useCallback(() => {
     const full = fullRef.current;
@@ -152,7 +152,7 @@ export default function FindColors() {
     return () => ro.disconnect();
   }, [draw]);
 
-  /** Baca warna di (x,y) dan gambar loupe. */
+  /** Reads the color at (x,y) and draws the loupe. */
   const sample = useCallback(
     (x: number, y: number): RGBA | null => {
       const full = fullRef.current;
@@ -160,7 +160,7 @@ export default function FindColors() {
       const ctx = full.getContext("2d", { willReadFrequently: true });
       if (!ctx) return null;
       const half = (LOUPE_CELLS - 1) / 2;
-      const data = ctx.getImageData(x - half, y - half, LOUPE_CELLS, LOUPE_CELLS).data; // di luar gambar = transparan
+      const data = ctx.getImageData(x - half, y - half, LOUPE_CELLS, LOUPE_CELLS).data; // outside the image = transparent
       const lc = loupeRef.current?.getContext("2d");
       if (lc) {
         lc.clearRect(0, 0, LOUPE_SIZE, LOUPE_SIZE);
@@ -324,7 +324,7 @@ export default function FindColors() {
                     try {
                       (e.target as HTMLElement).setPointerCapture(e.pointerId);
                     } catch {
-                      /* pointer sudah tidak aktif */
+                      /* the pointer is no longer active */
                     }
                   }
                   onMove(e);
@@ -340,7 +340,7 @@ export default function FindColors() {
                 className="block cursor-crosshair touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                 style={{ imageRendering: zoom > 100 ? "pixelated" : "auto" }}
               />
-              {/* Loupe selalu ada di DOM supaya gerakan pertama langsung terbaca (bug lama: warna pertama hilang). */}
+              {/* The loupe is always in the DOM so the first movement is read immediately (old bug: the first color was lost). */}
               <div
                 aria-hidden
                 className={`pointer-events-none absolute z-10 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-gray-200 transition-opacity dark:bg-gray-900 dark:ring-gray-700 ${loupe ? "opacity-100" : "opacity-0"}`}

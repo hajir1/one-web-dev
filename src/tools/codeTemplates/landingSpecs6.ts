@@ -1,7 +1,7 @@
 import type { LandingSpec } from "./landing";
 import { SENIN_SABTU, SETIAP, jam, langkah } from "./landingKit";
 
-/* Landing v23, bagian 6: jasa rumah & kendaraan (kategori yang masih sedikit). */
+/* Landing v23, part 6: home & vehicle services (categories that are still sparse). */
 export const LANDING_6: LandingSpec[] = [
   {
     id: "lp-laundry-kiloan-wangi",

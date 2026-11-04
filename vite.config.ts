@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
 
-/** Asal (origin) backend dari VITE_API_BASE_URL, sama dengan resolveApiBase() di apiConfig.ts. */
+/** The backend origin from VITE_API_BASE_URL, same as resolveApiBase() in apiConfig.ts. */
 function apiOrigin(raw: string | undefined): string | null {
   const v = (raw ?? "http://localhost:3000").trim();
   if (!/^https?:\/\//.test(v)) return null;
@@ -17,40 +17,40 @@ function apiOrigin(raw: string | undefined): string | null {
 }
 
 /*
- * Path backend bila API dipasang di domain yang sama (reverse proxy), termasuk callback
- * Google, notifikasi/redirect Midtrans, dan unduhan hasil job. Tidak ada rute SPA dengan
- * awalan ini (semua rute SPA ada di bawah /id atau /en), jadi aman dikecualikan dari
- * navigateFallback. Pola yang sama ditulis ulang di dalam urlPattern di bawah karena
- * fungsi itu diserialisasi ke sw.js dan tidak bisa memakai variabel dari file ini.
+ * Backend paths when the API is served on the same domain (reverse proxy), including the Google
+ * callback, Midtrans notifications/redirects, and job result downloads. No SPA route has
+ * this prefix (every SPA route lives under /id or /en), so it is safe to exclude from
+ * navigateFallback. The same pattern is rewritten inside urlPattern below because
+ * that function is serialized into sw.js and cannot use variables from this file.
  */
 const BACKEND_NAV = /^\/(api|auth|billing|payments?|webhooks?|midtrans|jobs|media\/jobs|exports|uploads)(\/|$)/;
 const FILE_NAV = /\/[^/]+\.(xml|txt|json|pdf|zip|png|jpe?g|svg|ico|js|css|map|wasm|webmanifest)$/i;
 
 /**
- * v13: awalan path situs (Vite `base`). Bawaan "/". Untuk GitHub Pages proyek
- * (https://nama.github.io/repo/) isi VITE_BASE_PATH=/repo/. Selalu diawali & diakhiri "/".
+ * v13: site path prefix (Vite `base`). Default "/". For a GitHub Pages project
+ * (https://name.github.io/repo/) set VITE_BASE_PATH=/repo/. Always starts & ends with "/".
  */
 function basePath(raw: string | undefined): string {
   const v = (raw ?? "").trim().replace(/^\/+|\/+$/g, "");
   return v ? `/${v}/` : "/";
 }
 
-/** Modul isi template (sumber template & spesifikasi demo hasil generator). */
+/** Template content modules (template sources & generated demo specs). */
 const TEMPLATE_MODULE = /[\\/]src[\\/](pages[\\/]webTemplates[\\/](templates[\\/]|assets|build|codeTemplates[\\/]files)|demo[\\/]demoSpecs)/;
 
-/** Modul pengganti isi template demo pada build non-demo (lihat plugin owd-demo-content). */
+/** Replacement module for the demo template content in non-demo builds (see the owd-demo-content plugin). */
 const EMPTY_DEMO_CONTENT = "\0owd-demo-content-empty";
 /**
- * Berkas Template Kode (?raw) hanya ikut di build mode demo. Mode fullstack (v21.2)
- * mengambil HTML-nya dari backend v14 (POST /templates/:id/acquire), sehingga isi
- * template Premium tidak ada di dist/ situs produksi.
+ * Code Template files (?raw) are only included in demo mode builds. Fullstack mode (v21.2)
+ * fetches their HTML from backend v14 (POST /templates/:id/acquire), so the content of
+ * Premium templates is not in the production site's dist/.
  */
 const EMPTY_CODE_TEMPLATE = "\0owd-code-template-empty";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   const api = apiOrigin(env.VITE_API_BASE_URL ?? env.VITE_MEDIA_API_BASE);
-  // Mode demo = tanpa backend (sama dengan resolveApiBase() → null di apiConfig.ts).
+  // Demo mode = no backend (same as resolveApiBase() → null in apiConfig.ts).
   const demo = api === null;
   const base = basePath(env.VITE_BASE_PATH);
 
@@ -58,10 +58,10 @@ export default defineConfig(({ mode }) => {
     base,
     worker: {
       format: "es",
-      // Awalan "w-" menandai bundel Web Worker (codec/encoder media) agar mudah dikecualikan dari precache.
+      // The "w-" prefix marks Web Worker bundles (media codecs/encoders) so they are easy to exclude from precache.
       rollupOptions: { output: { entryFileNames: "assets/w-[name]-[hash].js", chunkFileNames: "assets/w-[name]-[hash].js" } },
     },
-    // Codec media dimuat dinamis di worker; dibundel di awal agar `vite dev` tidak reload saat pertama dipakai.
+    // Media codecs load dynamically in the worker; prebundled so `vite dev` does not reload on first use.
     optimizeDeps: {
       include: [
         "@jsquash/avif/decode.js", "@jsquash/avif/encode.js", "@jsquash/jpeg/decode.js", "@jsquash/jpeg/encode.js",
@@ -73,16 +73,16 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          // v13: chunk isi template (hanya ada di build demo) diberi awalan "tpl-" agar tidak
-          // di-precache (lihat globIgnores); diunduh saat template dibuka lalu di-cache runtime.
+          // v13: template content chunks (only in demo builds) get a "tpl-" prefix so they are not
+          // precached (see globIgnores); downloaded when a template opens, then cached at runtime.
           chunkFileNames: (c) =>
             c.moduleIds.length > 0 && c.moduleIds.every((id) => TEMPLATE_MODULE.test(id)) ? "assets/tpl-[name]-[hash].js" : "assets/[name]-[hash].js",
-          // Vendor yang jarang berubah dipisah dari kode aplikasi: cache browser/SW tetap valid antar-deploy.
+          // Rarely changing vendors are split from app code: browser/SW caches stay valid across deploys.
           manualChunks: {
             "vendor-react": ["react", "react-dom", "react-dom/client", "scheduler", "react-router"],
             "vendor-i18n": ["i18next", "react-i18next"],
             "vendor-query": ["@tanstack/react-query"],
-            // Sentry hanya dimuat bila VITE_SENTRY_DSN diisi (lihat observability.ts).
+            // Sentry only loads when VITE_SENTRY_DSN is set (see observability.ts).
             "vendor-sentry": ["@sentry/react"],
           },
         },
@@ -90,9 +90,9 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       {
-        // v13: isi template demo (semua template katalog) HANYA ikut di build mode demo.
-        // Build produksi memakai modul kosong, sehingga isi template Premium tidak pernah
-        // ada di dist/ situs produksi (template produksi tetap diambil dari server).
+        // v13: demo template content (every catalog template) is ONLY included in demo mode builds.
+        // The production build uses an empty module, so Premium template content is never
+        // in the production site's dist/ (production templates still come from the server).
         name: "owd-demo-content",
         enforce: "pre",
         resolveId(source, importer) {
@@ -108,10 +108,10 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       VitePWA({
-        // "prompt": versi baru menunggu sampai pengguna menekan "Muat ulang" (lihat PwaUpdatePrompt).
+        // "prompt": a new version waits until the user presses "Reload" (see PwaUpdatePrompt).
         registerType: "prompt",
         injectRegister: false,
-        // Ikon, favicon, dan offline.html sudah tercakup globPatterns; jangan didaftarkan dua kali.
+        // Icons, favicons, and offline.html are already covered by globPatterns; do not register them twice.
         includeManifestIcons: false,
         manifest: {
           id: base,
@@ -128,7 +128,7 @@ export default defineConfig(({ mode }) => {
           theme_color: "#3b68f0",
           background_color: "#ffffff",
           categories: ["developer", "productivity", "utilities"],
-          // v9: ikon "1" baru (dibuat `npm run icons`, sumber geometri di generate-icons.mjs).
+          // v9: the new "1" icon (made by `npm run icons`, geometry source in generate-icons.mjs).
           icons: [
             { src: "favicon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
             { src: "pwa-64x64.png", sizes: "64x64", type: "image/png" },
@@ -143,50 +143,50 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          // Precache: kerangka aplikasi + chunk rute. Modul besar (codec WASM, encoder audio,
-          // ExcelJS, preset section, model) TIDAK di-precache agar instalasi awal ringan;
-          // semuanya di-cache saat pertama dipakai lewat runtimeCaching di bawah.
+          // Precache: the app shell + route chunks. Large modules (WASM codecs, audio encoders,
+          // ExcelJS, section presets, models) are NOT precached so the initial install stays light;
+          // they are all cached on first use through runtimeCaching below.
           globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
           globIgnores: [
             "**/node_modules/**",
-            "icons/**", // logo lama, tidak dipakai aplikasi (lihat LAPORAN)
+            "icons/**", // old logo, not used by the app (see LAPORAN)
             "favicon.png",
-            "og-image.png", // hanya untuk pratinjau tautan media sosial
-            "brand/**", // berkas sumber logo (SVG/PNG) untuk dipakai di luar aplikasi
-            "assets/w-*.js", // Web Worker media + encoder (dimuat saat alat media dipakai)
-            "assets/sectionPresets-*.js", // ±1,3 MB data preset/template Desain Halaman
-            "assets/excelUtils-*.js", // ExcelJS ±0,9 MB, hanya untuk alat Data
-            "assets/pdf-*.js", // v10: pdf.js ±450 KB, hanya untuk Alat PDF (PDF → gambar, kompres)
-            "assets/pdfLib-*.js", // v10: pdf-lib ±400 KB, hanya untuk Alat PDF
-            "assets/vendor-sentry-*.js", // opsional, hanya bila Sentry aktif
-            "assets/tpl-*.js", // v13: isi template mode demo (dimuat saat template dibuka)
+            "og-image.png", // only for social media link previews
+            "brand/**", // logo source files (SVG/PNG) for use outside the app
+            "assets/w-*.js", // media Web Workers + encoders (loaded when media tools are used)
+            "assets/sectionPresets-*.js", // ±1.3 MB of Page Design preset/template data
+            "assets/excelUtils-*.js", // ExcelJS about 0.9 MB, only for the Data tools
+            "assets/pdf-*.js", // v10: pdf.js about 450 KB, only for the PDF Tools (PDF → images, compression)
+            "assets/pdfLib-*.js", // v10: pdf-lib about 400 KB, only for the PDF Tools
+            "assets/vendor-sentry-*.js", // optional, only when Sentry is active
+            "assets/tpl-*.js", // v13: demo mode template content (loaded when a template opens)
           ],
-          // Batas precache per file. File lebih besar tidak gagal-build, hanya diberi peringatan
-          // dan tetap di-cache saat dipakai (runtimeCaching "owd-lazy-modules").
+          // Precache limit per file. Larger files do not fail the build, they only get a warning
+          // and are still cached on use (runtimeCaching "owd-lazy-modules").
           maximumFileSizeToCacheInBytes: 512 * 1024,
           cleanupOutdatedCaches: true,
           navigateFallback: `${base}index.html`,
           navigateFallbackDenylist: [BACKEND_NAV, /\/(callback|oauth2?)(\/|$)/, /^\/__/, /^\/_vercel\//, FILE_NAV],
           runtimeCaching: [
-            // 1) Backend (auth, kredit, pembayaran Midtrans, callback Google, job, unduhan): selalu jaringan.
+            // 1) Backend (auth, credits, Midtrans payments, Google callback, jobs, downloads): always network.
             ...(api
               ? [{ urlPattern: new RegExp(`^${escapeRe(api)}/`), handler: "NetworkOnly" as const }]
               : []),
             {
-              // Navigasi ke path ini ditangani aturan terakhir (agar offline mendapat offline.html).
+              // Navigation to these paths is handled by the last rule (so offline gets offline.html).
               urlPattern: ({ url, request, sameOrigin }) =>
                 sameOrigin &&
                 request.mode !== "navigate" &&
                 /^\/(api|auth|billing|payments?|webhooks?|midtrans|jobs|media\/jobs|exports|uploads)(\/|$)|\/(callback|oauth2?)(\/|$)/.test(url.pathname),
               handler: "NetworkOnly",
             },
-            // Vercel Web Analytics (skrip & kiriman data): jangan pernah di-cache.
+            // Vercel Web Analytics (script & data beacons): never cache.
             { urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/_vercel/"), handler: "NetworkOnly" },
             {
               urlPattern: /^https:\/\/([a-z0-9-]+\.)*(midtrans\.com|veritrans\.co\.id|accounts\.google\.com|googleapis\.com\/oauth2|sentry\.io)\//,
               handler: "NetworkOnly",
             },
-            // Thumbnail katalog (v21): nama berkas tetap, versi lewat ?v=hash → aman CacheFirst.
+            // Catalog thumbnails (v21): fixed file names, versioned via ?v=hash → safe for CacheFirst.
             {
               urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/thumbs\/[^/]+\.webp$/.test(url.pathname),
               handler: "CacheFirst",
@@ -196,7 +196,7 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [200] },
               },
             },
-            // 2) WASM & modul besar same-origin (nama file ber-hash → aman CacheFirst).
+            // 2) Same-origin WASM & large modules (hashed file names → safe for CacheFirst).
             {
               urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/.+\.wasm$/.test(url.pathname),
               handler: "CacheFirst",
@@ -215,7 +215,7 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [200] },
               },
             },
-            // Runtime ONNX untuk Hapus Latar (URL ber-versi di jsDelivr).
+            // ONNX runtime for Remove Background (versioned URLs on jsDelivr).
             {
               urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/npm\/@huggingface\/transformers@[^/]+\/dist\/.+\.(wasm|mjs)$/,
               handler: "CacheFirst",
@@ -225,7 +225,7 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [200] },
               },
             },
-            // 3) Gambar & font.
+            // 3) Images & fonts.
             {
               urlPattern: ({ request, sameOrigin }) => sameOrigin && request.destination === "image",
               handler: "CacheFirst",
@@ -249,7 +249,7 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [0, 200] },
               },
             },
-            // 4) Navigasi yang tidak dilayani kerangka SPA (mis. path backend) saat offline → offline.html.
+            // 4) Navigation not served by the SPA shell (e.g. backend paths) while offline → offline.html.
             {
               urlPattern: ({ request }) => request.mode === "navigate",
               handler: "NetworkOnly",

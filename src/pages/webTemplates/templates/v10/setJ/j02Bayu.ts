@@ -1,12 +1,12 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 02 · Bayu Kertanegara (portofolio arsitek). Ide besar: portofolio = set gambar kerja A1; proyek = lembar yang digeser (scrub-x). */
+/* 02 · Bayu Kertanegara (architect portfolio). Big idea: portfolio = an A1 drawing set; projects = sheets that slide (scrub-x). */
 
 const C = { kalkir: "#EEF0EA", tinta: "#1F3A5F", pensil: "#A7B0A8", merah: "#C8402F", grafit: "#222524" };
 export const L02 = lookJ({ ink: C.grafit, muted: "#4a5350", primary: C.tinta, primaryDark: "#142844", soft: "#dfe5e3", line: C.pensil, bg: C.kalkir, head: "Archivo", body: "IBM Plex Mono", r: 0 });
 const L = L02;
 
-/** Latar kertas kalkir bergaris modul 24 px. */
+/** Tracing paper background with a 24 px module grid. */
 const GRID = `background-image: linear-gradient(${C.pensil}40 1px, transparent 1px), linear-gradient(90deg, ${C.pensil}40 1px, transparent 1px); background-size: 24px 24px;`;
 
 const PROJECTS: [string, B, B, string, string, B][] = [
@@ -30,7 +30,7 @@ const XP: [string, B, B][] = [
   ["2014", ["S1 Arsitektur, Universitas Diponegoro", "B.Arch, Diponegoro University"], ["Lulus dengan tugas akhir sekolah hemat energi", "Graduated with an energy-efficient school thesis"]],
 ];
 
-/** Kop gambar (title block) di pojok lembar. */
+/** Drawing title block in the corner of the sheet. */
 function titleBlock(j: J): BoxNode {
   const { t } = j;
   const cell = (k: B | string, v: string) => box([Lbl(L, typeof k === "string" ? k : t(k), "#55605c", { size: 10 }), Tx(L, v, { size: 14, color: C.grafit, weight: 600 })], { gap: 2, name: "Sel kop", css: `border: 1px solid ${C.grafit}; padding: 8px 10px; margin: -1px 0 0 -1px;` });
@@ -58,7 +58,7 @@ function foot(j: J): BoxNode {
   });
 }
 
-/** Satu lembar proyek (lebar tetap; di HP selebar layar). */
+/** One project sheet (fixed width; full screen width on phones). */
 function sheet(j: J, [code, name, meta, area, art, note]: (typeof PROJECTS)[number]): BoxNode {
   const { t } = j;
   const s = box(

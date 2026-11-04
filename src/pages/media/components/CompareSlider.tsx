@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { CHECKERBOARD } from "./ui";
 
 /**
- * Perbandingan sebelum/sesudah dengan penggeser. Dipakai Remove Background
- * dan Image Upscaler. `pixelated` memperlihatkan piksel asli saat diperbesar.
+ * Before/after comparison with a slider. Used by Remove Background
+ * and Image Upscaler. `pixelated` shows the original pixels when zoomed in.
  */
 export default function CompareSlider({
   before,
@@ -20,7 +20,7 @@ export default function CompareSlider({
   beforeLabel?: string;
   afterLabel?: string;
   checker?: boolean;
-  /** Warna latar di belakang hasil (mis. pratinjau latar putih). */
+  /** Background color behind the result (e.g. a white background preview). */
   background?: string | null;
   pixelated?: boolean;
 }) {

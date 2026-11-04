@@ -3,7 +3,7 @@ import { SCENE_KOPI, SCENE_LAYANG, SCENE_MERCUSUAR, SCENE_PIRINGAN, SCENE_RASI }
 
 const F = (family: string, weights = "400;500;600") => ({ display: family, href: `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weights}&display=swap` });
 
-/** v23: 5 animasi cerita baru (canvas 2D). */
+/** v23: 5 new story animations (2D canvas). */
 export const ANIM2_SPECS_C: Anim2Spec[] = [
   {
     id: "anim-layangan-bukit",

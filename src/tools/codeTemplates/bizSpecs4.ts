@@ -1,7 +1,7 @@
 import type { BizSpec } from "./biz3d";
 import { SELASA_MINGGU, SENIN_JUMAT, SENIN_SABTU, SETIAP, jam } from "./landingKit";
 
-/* Website 3D bisnis v23, bagian 4: keuangan, penginapan, kebugaran, kecantikan, otomotif. */
+/* Business 3D websites v23, part 4: finance, lodging, fitness, beauty, automotive. */
 export const BIZ_4: BizSpec[] = [
   {
     id: "biz-perencana-keuangan-cermat",

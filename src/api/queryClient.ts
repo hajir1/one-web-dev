@@ -1,31 +1,31 @@
 // ─── api/queryClient.ts ──────────────────────────────────────────────────────
-// Satu QueryClient (TanStack Query) untuk seluruh aplikasi: cache bersama,
-// penggabungan permintaan yang sama (dedup), dan aturan coba ulang.
+// One QueryClient (TanStack Query) for the whole app: shared cache,
+// merging identical requests (dedup), and retry rules.
 //
-// Aturan umum (bisa ditimpa per resource di api/queries.ts):
-// - staleTime 30 detik: berpindah halaman bolak-balik tidak memanggil API lagi.
-// - gcTime 10 menit: data yang tidak dipakai dibuang dari memori.
-// - Error 4xx (401/402/403/404/409/422) TIDAK dicoba ulang: hasilnya tidak akan
-//   berubah. Error jaringan/5xx dicoba ulang 2× dengan jeda bertahap.
-// - Tidak refetch saat jendela fokus kembali (saldo & akun diperbarui
-//   eksplisit setelah transaksi lewat invalidateQueries).
+// General rules (can be overridden per resource in api/queries.ts):
+// - staleTime 30 seconds: navigating back and forth does not call the API again.
+// - gcTime 10 minutes: unused data is dropped from memory.
+// - 4xx errors (401/402/403/404/409/422) are NOT retried: the result will not
+//   changes. Network/5xx errors are retried 2× with increasing delays.
+// - No refetch when the window regains focus (balance & account are updated
+//   explicitly after a transaction via invalidateQueries).
 
 import { QueryClient } from "@tanstack/react-query";
 import { ApiError } from "./client";
 
 export const STALE = {
-  /** Data akun yang sering berubah (saldo, kuota). */
+  /** Account data that changes often (balance, quota). */
   short: 30_000,
-  /** Katalog publik (daftar template, harga). */
+  /** Public catalog (template list, prices). */
   medium: 5 * 60_000,
-  /** Hampir statis (paket kredit, harga fitur). */
+  /** Nearly static (credit packs, feature prices). */
   long: 30 * 60_000,
 } as const;
 
 function shouldRetry(failureCount: number, error: unknown): boolean {
   if (error instanceof ApiError && error.status >= 400 && error.status < 500) return false;
   if ((error as Error)?.name === "AbortError") return false;
-  // Backend belum dikonfigurasi: mencoba ulang tidak mengubah apa pun.
+  // Backend not configured: retrying changes nothing.
   if (error instanceof ApiError && error.code === "API_UNAVAILABLE") return false;
   return failureCount < 2;
 }
@@ -35,7 +35,7 @@ function createQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: STALE.short,
-        // Di luar browser (tes Node) tanpa timer GC agar proses bisa selesai.
+        // Outside the browser (Node tests) no GC timer, so the process can exit.
         gcTime: typeof window === "undefined" ? Infinity : 10 * 60_000,
         retry: shouldRetry,
         retryDelay: (n) => Math.min(500 * 2 ** n, 4000),
@@ -49,7 +49,7 @@ function createQueryClient() {
 export const queryClient = createQueryClient();
 
 /* ------------------------------------------------------------------ */
-/* Kunci query per resource (satu sumber, dipakai hook & invalidasi)     */
+/* Query keys per resource (one source, used by hooks & invalidation)    */
 /* ------------------------------------------------------------------ */
 
 export const qk = {
@@ -71,9 +71,9 @@ export const qk = {
 };
 
 /**
- * Setelah aksi yang mengubah saldo/kepemilikan (beli, checkout lunas, refund
- * admin): tandai data akun basi agar layar yang memakainya memuat ulang.
- * Store saldo & akun marketplace sudah diperbarui dari respons server.
+ * After an action that changes balance/ownership (purchase, paid checkout, admin
+ * refund): mark account data as stale so screens using it reload.
+ * The balance & marketplace account stores are already updated from the server response.
  */
 export function invalidateAccountQueries() {
   void queryClient.invalidateQueries({ queryKey: qk.billing });
@@ -81,13 +81,13 @@ export function invalidateAccountQueries() {
   void queryClient.invalidateQueries({ queryKey: qk.referral });
 }
 
-/** Setelah admin mengubah template/katalog. */
+/** After an admin changes templates/the catalog. */
 export function invalidateCatalogQueries() {
   void queryClient.invalidateQueries({ queryKey: qk.templates });
   void queryClient.invalidateQueries({ queryKey: ["catalog"] });
 }
 
-/** Saat ganti akun/keluar: buang semua data milik akun sebelumnya. */
+/** When switching accounts/signing out: drop all data that belonged to the previous account. */
 export function clearAccountQueries() {
   for (const key of [qk.billing, qk.market, qk.referral, qk.mfa, qk.session]) queryClient.removeQueries({ queryKey: key });
 }

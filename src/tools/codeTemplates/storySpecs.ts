@@ -2,15 +2,15 @@ import type { StorySpec } from "./story3d";
 import { SCENE_KOMPUTER, SCENE_KUCING } from "./storyScenesA";
 
 /* ================================================================== */
-/* 17 template 3D Cerita Scroll (v22). Semua merek, nama, angka, dan    */
-/* kontak fiktif. Alur setiap template berbeda; lihat komentar di atas  */
-/* tiap spesifikasi.                                                    */
+/* 17 3D Scroll Story templates (v22). All brands, names, numbers, and  */
+/* contacts are fictional. Each template's flow is different; see the comment above */
+/* each specification.                                                  */
 /* ================================================================== */
 
 const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
 
 export const STORY_SPECS_A: StorySpec[] = [
-  /* Komputer kosong → layar menyala → kamera masuk ke layar → teks keluar dari layar → layar menampilkan situs jadi. */
+  /* An empty computer → the screen lights up → the camera enters the screen → text comes out of the screen → the screen shows the finished site. */
   {
     id: "story-layar-kosong",
     title: "Studio Barisan · Dari Layar Kosong",
@@ -33,7 +33,7 @@ export const STORY_SPECS_A: StorySpec[] = [
     wa: "6281200001001",
     scene: SCENE_KOMPUTER,
   },
-  /* Kucing duduk → kamera mendekati mata → pupil melebar → masuk ke pupil → semesta → rasi jejak kaki → keluar lagi. */
+  /* Cat sits → the camera approaches the eye → the pupil widens → into the pupil → universe → paw print constellation → back out. */
   {
     id: "story-mata-kucing",
     title: "Semesta Meong · Klinik & Hotel Kucing",

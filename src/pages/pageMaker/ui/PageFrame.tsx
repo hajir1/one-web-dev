@@ -6,7 +6,7 @@ import { useResolvedAssets } from "../../../assetLibrary/resolve";
 
 const NO_LIBS: readonly LibraryId[] = [];
 
-/** URL CDN (+ runtime OWD Motion sebagai data URL) + kode init untuk iframe. */
+/** CDN URLs (+ the OWD Motion runtime as a data URL) + init code for the iframe. */
 const libraryBundle = (ids: readonly LibraryId[]) => {
   const libs = ids.map((id) => LIBRARY_BY_ID[id]).filter(Boolean);
   const js = (list: typeof libs) => list.flatMap((l) => (l.js ? [l.js] : []));
@@ -25,26 +25,26 @@ interface PageFrameProps {
   body: string;
   script: string;
   edit: boolean;
-  /** Tinggi iframe (px). Parent mengikuti tinggi isi yang dilaporkan. */
+  /** Iframe height (px). The parent follows the reported content height. */
   height: number | string;
   title: string;
   onPick?: (id: string | null, dbl: boolean) => void;
   onHover?: (id: string | null) => void;
   onRects?: (rects: RectMap, contentHeight: number) => void;
-  /** Pintasan keyboard yang ditekan saat fokus ada di dalam iframe. */
+  /** Keyboard shortcuts pressed while focus is inside the iframe. */
   onKey?: (key: string, mod: boolean, shift: boolean) => void;
-  /** Klik tautan antarhalaman di pratinjau (id desain tujuan). */
+  /** Click on a link between pages in the preview (target design id). */
   onNavigate?: (designId: string) => void;
-  /** Library CDN terpasang (di mode edit hanya yang `editSafe`). */
+  /** Installed CDN libraries (in edit mode only the `editSafe` ones). */
   libraries?: readonly LibraryId[];
 }
 
-/** iframe sandbox berisi halaman; diperbarui lewat postMessage (tanpa reload). */
+/** A sandboxed iframe holding the page; updated through postMessage (no reload). */
 export default function PageFrame({ css: rawCss, body: rawBody, script: rawScript, edit, height, title, onPick, onHover, onRects, onKey, onNavigate, libraries = NO_LIBS }: PageFrameProps) {
   const ref = useRef<HTMLIFrameElement>(null);
-  // v21: gambar Pustaka Aset (`aset:<id>`) → data URL untuk iframe sandbox.
+  // v21: Asset Library images (`aset:<id>`) → data URLs for the sandboxed iframe.
   const [css, body, script] = useResolvedAssets([rawCss, rawBody, rawScript] as const);
-  const [ready, setReady] = useState(0); // naik tiap iframe (re)load → render ulang
+  const [ready, setReady] = useState(0); // increments on every iframe (re)load → re-render
   const cb = useRef({ onPick, onHover, onRects, onKey, onNavigate });
   cb.current = { onPick, onHover, onRects, onKey, onNavigate };
 

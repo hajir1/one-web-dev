@@ -5,22 +5,22 @@ import type { DemoPreview } from "./demoTemplates";
 import { isCodeTemplate } from "../pages/webTemplates/codeTemplates/catalog";
 
 /* ================================================================== */
-/* Pratinjau template MODE DEMO (v12): HTML dirender di browser lalu     */
-/* ditampilkan di iframe sandbox (srcdoc), menggantikan halaman demo     */
-/* statis dari server. Dipakai untuk thumbnail kartu dan pratinjau detail.*/
+/* DEMO MODE template preview (v12): HTML is rendered in the browser and */
+/* shown in a sandboxed iframe (srcdoc), replacing the static demo pages */
+/* from the server. Used for card thumbnails and the detail preview.    */
 /* ================================================================== */
 
 interface Props {
   templateId: string;
   lang: string;
-  /** Key halaman yang ditampilkan; null = beranda. */
+  /** Key of the page to show; null = home. */
   pageKey?: string | null;
-  /** Thumbnail: hanya beranda, tanpa interaksi. */
+  /** Thumbnail: home only, no interaction. */
   thumb?: boolean;
   title: string;
   className?: string;
   style?: React.CSSProperties;
-  /** Tautan antarhalaman di dalam pratinjau diklik → key halaman tujuan. */
+  /** A link between pages inside the preview was clicked → key of the target page. */
   onNavigate?: (pageKey: string) => void;
   testId?: string;
 }
@@ -35,7 +35,7 @@ export default function DemoTemplateFrame({ templateId, lang, pageKey = null, th
     let alive = true;
     setFailed(false);
     import("./demoTemplates")
-      // Render setelah frame berikutnya supaya indikator muat sempat tampil.
+      // Render after the next frame so the loading indicator has time to show.
       .then((m) => new Promise<void>((r) => requestAnimationFrame(() => r())).then(() => (alive ? m.demoPreview(templateId, lang, icons, thumb) : null)))
       .then((p) => {
         if (!alive) return;
@@ -78,7 +78,7 @@ export default function DemoTemplateFrame({ templateId, lang, pageKey = null, th
       srcDoc={html}
       title={title}
       tabIndex={thumb ? -1 : undefined}
-      // v16: Template Kode butuh tautan keluar (peta, WhatsApp) & unduhan (.ics) di pratinjau detail.
+      // v16: Code Templates need outbound links (maps, WhatsApp) & downloads (.ics) in the detail preview.
       sandbox={!thumb && isCodeTemplate(templateId) ? "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads" : "allow-scripts"}
       referrerPolicy="no-referrer"
       data-testid={testId}

@@ -7,15 +7,15 @@ import { TOOL_BY_ID, type MediaToolId } from "../processing/policy";
 let refreshedOnce = false;
 
 /**
- * Semua informasi akses fitur server untuk satu alat: harga (terpusat),
- * saldo & hak akses (dari backend), rencana biaya untuk input saat ini,
- * dan status gabungan. Dipakai kartu akses dan gerbang server.
+ * All server feature access information for one tool: price (central),
+ * balance & access rights (from the backend), cost plan for the current input,
+ * and the combined status. Used by the access card and the server gate.
  */
 export function useFeatureAccess(tool: MediaToolId, inputs: UsageInput[] = [{}]) {
   return useServerFeatureAccess(TOOL_BY_ID[tool].serverFeature ?? null, inputs);
 }
 
-/** Sama dengan useFeatureAccess, langsung per fitur server (v7: dipakai menu VR & OCR di luar alat Media). */
+/** Same as useFeatureAccess, directly per server feature (v7: used by the VR & OCR menus outside the Media tools). */
 export function useServerFeatureAccess(feature: ServerFeatureId | null, inputs: UsageInput[] = [{}]) {
   const pricing = useBilling((s) => (feature ? s.pricing[feature] : null));
   const account = useBilling((s) => s.account);

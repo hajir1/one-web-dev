@@ -128,7 +128,7 @@ export const museumLiniMasa: TemplateContent = {
 };
 
 /* ------------- 9. Dompetku — aplikasi dompet digital (5 hlm, Premium) ------------- */
-// Premium: typewriter, comparison-table, logo-marquee, testimonials-wall (preset Pro). Library: Animate + Tilt. Memakai elemen Chart.
+// Premium: typewriter, comparison-table, logo-marquee, testimonials-wall (Pro presets). Libraries: Animate + Tilt. Uses the Chart element.
 
 const AP: Palette = { ink: "#082f49", muted: "#3f5b6e", primary: "#0891b2", primaryDark: "#0e7490", soft: "#cffafe", line: "#a5f3fc" };
 const A = lookD(AP, { head: "Sora", body: "Plus Jakarta Sans", shape: "neon", radius: 20, bg: "#f8feff", alt: "#ecfeff", inv: "#082f49", fx: { animate: "fadeInUp", tilt: true } });
@@ -206,7 +206,7 @@ export const appDompetku: TemplateContent = {
 };
 
 /* ------------- 10. Petik Kebun — agrowisata (5 hlm, Premium) ------------- */
-// Premium: countdown, testimonial, pricing (plans), stats-band (preset Pro). Library: AOS. Memakai elemen Chart.
+// Premium: countdown, testimonial, pricing (plans), stats-band (Pro presets). Library: AOS. Uses the Chart element.
 
 const KP: Palette = { ink: "#1a2e05", muted: "#4d5f37", primary: "#ea580c", primaryDark: "#c2410c", soft: "#ffedd5", line: "#fed7aa" };
 const K = lookD(KP, { head: "Righteous", body: "Outfit", shape: "soft", radius: 22, bg: "#fffdf7", alt: "#f7fbe9", inv: "#1a2e05", fx: { aos: "zoom-in" } });

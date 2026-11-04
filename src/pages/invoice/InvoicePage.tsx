@@ -26,7 +26,7 @@ interface Invoice {
 
 const rp = (n: number) => `Rp${formatNumber(n)}`;
 
-/** /:lang/invoice/:id — invoice siap cetak / simpan PDF (Ctrl+P → Simpan sebagai PDF). */
+/** /:lang/invoice/:id: a print-ready invoice / save as PDF (Ctrl+P → Save as PDF). */
 export default function InvoicePage() {
   const { t, i18n } = useTranslation();
   const { id = "" } = useParams();

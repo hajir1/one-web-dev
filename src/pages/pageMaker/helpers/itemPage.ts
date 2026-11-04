@@ -4,15 +4,15 @@ import { cloneNode, collectElements, findNode, updateNode } from "../engine/help
 import { canBecomeCollection, clampRating, formatPrice, materialize, type CollectionDef, type CollectionItem, type ItemValues } from "./collections";
 
 /* ================================================================== */
-/* Uji coba HALAMAN ITEM (detail produk)                                 */
+/* ITEM PAGE trial (product detail)                                      */
 /*                                                                    */
-/*   itemOf   box di halaman detail = satu item koleksi. Elemen di       */
-/*            dalamnya ber-`bind` (nama, harga, …) diisi dari item.      */
-/*            Di editor: item pratinjau (previewId, default item 1).     */
-/*   related  box kartu "Mungkin Anda suka": item lain dengan label      */
-/*            sama dulu, lalu item lain, maksimal `limit`.               */
+/*   itemOf   a box on the detail page = one collection item. Elements in */
+/*            inside it with `bind` (name, price, …) are filled from the item. */
+/*            In the editor: the preview item (previewId, default item 1). */
+/*   related  "You may also like" card box: other items with the label   */
+/*            the same first, then other items, at most `limit`.        */
 /*                                                                    */
-/* URL item: <slug koleksi>/<slug item>.html (statis) atau               */
+/* Item URL: <collection slug>/<item slug>.html (static) or              */
 /* /<slug koleksi>/<slug item> (Express).                                */
 /* ================================================================== */
 
@@ -22,20 +22,20 @@ export const BIND_FIELDS: BindField[] = ["name", "price", "compare_price", "rati
 export interface ItemOf {
   /** Slug koleksi. */
   collection: string;
-  /** Item yang tampil di editor dan di berkas halaman detail utama. */
+  /** The item shown in the editor and in the main detail page file. */
   previewId?: string;
 }
 export interface RelatedOf {
   collection: string;
   limit: number;
-  /** Pola kartu (salinan kartu pertama) bila tidak ada item terkait. */
+  /** Card pattern (a copy of the first card) when there are no related items. */
   pattern?: ComponentNode;
 }
 
 export const RELATED_MAX = 12;
 const TEXT_TYPES = new Set(["text", "badge"]);
 
-/** Elemen ini bisa diikat ke kolom `field`? (tanpa field: ke kolom apa pun) */
+/** Can this element be bound to field `field`? (without a field: to any field) */
 export function canBind(el: ElementNode, field?: BindField): boolean {
   if (el.elementType === "image") return !field || field === "image";
   return TEXT_TYPES.has(el.elementType) && field !== "image";
@@ -43,7 +43,7 @@ export function canBind(el: ElementNode, field?: BindField): boolean {
 
 const stars = (r: number) => "★".repeat(Math.round(r)) + "☆".repeat(5 - Math.round(r));
 
-/** Teks tampil untuk kolom item (gambar: URL). */
+/** Display text for an item field (images: URL). */
 export function bindValue(field: BindField, v: ItemValues): string {
   switch (field) {
     case "price":
@@ -61,7 +61,7 @@ export function bindValue(field: BindField, v: ItemValues): string {
   }
 }
 
-/** Isi elemen terikat di dalam `box` dengan nilai item. */
+/** Fills the bound elements inside `box` with item values. */
 export function applyItemValues(box: BoxNode, v: ItemValues): BoxNode {
   const patch = (n: ComponentNode): ComponentNode => {
     if (isBox(n)) return { ...n, children: n.children.map(patch) };
@@ -76,7 +76,7 @@ export function applyItemValues(box: BoxNode, v: ItemValues): BoxNode {
   return { ...box, children: box.children.map(patch) };
 }
 
-/** Item terkait: label sama dulu, lalu item lain; tanpa item `current`. */
+/** Related items: same label first, then other items; without the `current` item. */
 export function relatedItems(col: CollectionDef, current: CollectionItem | null, limit: number): CollectionItem[] {
   const others = col.items.filter((it) => it.id !== current?.id);
   const label = String(current?.values.label ?? "").trim().toLowerCase();
@@ -85,7 +85,7 @@ export function relatedItems(col: CollectionDef, current: CollectionItem | null,
   return [...same, ...rest].slice(0, Math.max(0, Math.min(RELATED_MAX, limit)));
 }
 
-/** Susun ulang kartu box terkait dari item terkait. */
+/** Rebuild the related box cards from the related items. */
 export function materializeRelated(box: BoxNode, col: CollectionDef, current: CollectionItem | null): BoxNode {
   const rel = box.related!;
   const items = relatedItems(col, current, rel.limit);
@@ -97,7 +97,7 @@ export function materializeRelated(box: BoxNode, col: CollectionDef, current: Co
 export const previewItem = (col: CollectionDef | undefined, itemOf: ItemOf | undefined): CollectionItem | null =>
   !col || !itemOf ? null : (col.items.find((it) => it.id === itemOf.previewId) ?? col.items[0] ?? null);
 
-/** Box halaman item pertama di halaman. */
+/** The first item page box on the page. */
 export function itemBoxIn(root: ComponentNode): BoxNode | null {
   if (!isBox(root)) return null;
   if (root.itemOf) return root;
@@ -108,7 +108,7 @@ export function itemBoxIn(root: ComponentNode): BoxNode | null {
   return null;
 }
 
-/** Semua box `related` di halaman. */
+/** Every `related` box on the page. */
 function relatedBoxes(root: ComponentNode, out: BoxNode[] = []): BoxNode[] {
   if (!isBox(root)) return out;
   if (root.related) out.push(root);
@@ -117,9 +117,9 @@ function relatedBoxes(root: ComponentNode, out: BoxNode[] = []): BoxNode[] {
 }
 
 /**
- * Selaraskan halaman dengan data koleksi: elemen item diisi item pratinjau
- * (atau `itemId` bila diberikan), box terkait disusun dari item terkait.
- * Halaman tanpa itemOf/related kembali apa adanya (objek sama).
+ * Aligns the page with the collection data: item elements are filled with the preview item
+ * (or `itemId` when given), related boxes are built from related items.
+ * Pages without itemOf/related come back as is (the same object).
  */
 export function syncItemPage(root: BoxNode, cols: CollectionDef[], itemId?: string): BoxNode {
   const ib = itemBoxIn(root);
@@ -140,15 +140,15 @@ export function syncItemPage(root: BoxNode, cols: CollectionDef[], itemId?: stri
 
 /* ------------------------------ tandai / lepas ---------------------- */
 
-/** Box ini bisa dijadikan halaman item? (section/grup yang punya elemen yang bisa diikat, bukan koleksi) */
+/** Can this box become an item page? (a section/group with bindable elements, not a collection) */
 export function canBeItemBox(box: BoxNode): boolean {
   if (box.collection || box.related || box.itemOf) return false;
   return collectElements(box).some((e) => canBind(e) && e.elementType !== "product-card");
 }
 
 /**
- * Tebak ikatan dari isi elemen yang sama dengan item pertama (mis. judul
- * "Arabika Gayo 250 g" → nama, "Rp95.000" → harga). Gambar pertama → gambar.
+ * Guesses bindings from element content that matches the first item (e.g. the heading
+ * "Arabika Gayo 250 g" → name, "Rp95.000" → price). The first image → image.
  */
 export function inferBindings(box: BoxNode, v: ItemValues): BoxNode {
   const taken = new Set<BindField>();
@@ -177,7 +177,7 @@ export function markItemBox(root: BoxNode, boxId: NodeId, col: CollectionDef): B
   return syncItemPage(next, [col]);
 }
 
-/** Lepas halaman item: isi elemen tetap (item pratinjau terakhir), ikatan dihapus. */
+/** Detaches the item page: element content stays (the last preview item), bindings are removed. */
 export function unmarkItemBox(root: BoxNode, boxId: NodeId): BoxNode {
   const strip = (n: ComponentNode): ComponentNode => {
     if (isBox(n)) return { ...n, children: n.children.map(strip) };
@@ -200,7 +200,7 @@ export function setPreviewItem(root: BoxNode, boxId: NodeId, itemId: string, col
   return syncItemPage(next, cols);
 }
 
-/** Ikat / lepas satu elemen ke kolom (null = lepas). */
+/** Binds / unbinds one element to a field (null = unbind). */
 export function setBinding(root: BoxNode, elId: NodeId, field: BindField | null, cols: CollectionDef[]): BoxNode {
   const next = updateNode(root, elId, (n) => {
     if (isBox(n)) return n;
@@ -215,7 +215,7 @@ export function setBinding(root: BoxNode, elId: NodeId, field: BindField | null,
   return syncItemPage(next, cols);
 }
 
-/** Box kartu yang bisa jadi "Mungkin Anda suka" (kartu berulang, bukan koleksi). */
+/** A card box that can become "You may also like" (repeated cards, not a collection). */
 export const canBeRelated = (box: BoxNode) => canBecomeCollection(box);
 
 export function markRelated(root: BoxNode, boxId: NodeId, col: CollectionDef, limit = 3): BoxNode {
@@ -239,7 +239,7 @@ export function setRelatedLimit(root: BoxNode, boxId: NodeId, limit: number, col
   return syncItemPage(next, cols);
 }
 
-/** Box itemOf/related tempat node ini berada (untuk panel Pengaturan elemen). */
+/** The itemOf/related box this node belongs to (for the element Settings panel). */
 export function itemAncestor(root: BoxNode, id: NodeId): BoxNode | null {
   let found: BoxNode | null = null;
   const walk = (n: ComponentNode, owner: BoxNode | null): boolean => {
@@ -254,7 +254,7 @@ export function itemAncestor(root: BoxNode, id: NodeId): BoxNode | null {
   return found;
 }
 
-/** Slug koleksi yang dipakai halaman ini (halaman item / terkait). */
+/** The collection slug used by this page (item / related page). */
 export function itemCollectionsUsed(root: BoxNode): string[] {
   const out = new Set<string>();
   const ib = itemBoxIn(root);
@@ -263,7 +263,7 @@ export function itemCollectionsUsed(root: BoxNode): string[] {
   return [...out];
 }
 
-/** Slug koleksi diganti: perbarui rujukan halaman item / terkait. */
+/** Collection slug renamed: update item / related page references. */
 export function renameCollectionRefs(root: BoxNode, from: string, to: string): BoxNode {
   if (from === to) return root;
   const walk = (n: ComponentNode): ComponentNode => {

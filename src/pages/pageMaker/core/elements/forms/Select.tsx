@@ -29,7 +29,7 @@ import i18n from "../../../../../i18n";
 /* ------------------------------------------------------------------ */
 
 export interface SelectState {
-  /* Ukuran & Padding */
+  /* Size & Padding */
   widthMode: "auto" | "fixed" | "full";
   width: number;
   paddingLinked: boolean;
@@ -160,9 +160,9 @@ const DEFAULT_CLASS_NAME = "custom-select";
 /* ------------------------------------------------------------------ */
 
 /**
- * Background select disusun berlapis: [chevron, gradient] di atas
- * background-color. Sebelumnya gradient ditulis ke `background-color`
- * (tidak valid → background hilang) dan menimpa/ditimpa chevron.
+ * The select background is layered: [chevron, gradient] over
+ * background-color. Previously the gradient was written to `background-color`
+ * (invalid → the background disappeared) and overrode/was overridden by the chevron.
  */
 function backgroundLayers(s: SelectState, color: string, withGradient: boolean): string {
   const pad = paddingSides(s);
@@ -336,7 +336,7 @@ function selectSections(s: SelectState, update: Updater<SelectState>): PanelSect
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const selectElement = defineElement<SelectState>({

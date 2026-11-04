@@ -5,12 +5,12 @@ import { BOOT, fontLink, LENIS_STYLE, LIB_IMPORTS, PRELOAD } from "./web3d";
 /* ================================================================== */
 /* Kategori PORTOFOLIO 3D. Library: three + lenis.                      */
 /*                                                                    */
-/* - Hero dengan objek 3D interaktif (bereaksi pada pointer; di HP:     */
-/*   seret untuk memutar, ketuk untuk denyut).                          */
-/* - Tentang, daftar proyek (kartu miring mengikuti kursor), detail     */
-/*   proyek di halaman yang sama (#proyek-…), kontak email & WhatsApp.  */
-/* - Data proyek dalam satu array PROJECTS di awal skrip. HTML statis   */
-/*   dibuat dari array yang sama, jadi konten terbaca penuh tanpa JS.    */
+/* - A hero with an interactive 3D object (reacts to the pointer; on phones: */
+/*   drag to rotate, tap to pulse).                                     */
+/* - About, project list (cards tilting toward the cursor), detail      */
+/*   projects on the same page (#proyek-…), email & WhatsApp contact.   */
+/* - Project data in a single PROJECTS array at the top of the script. Static HTML */
+/*   built from the same array, so the content reads fully without JS.  */
 /* ================================================================== */
 
 export interface Project {
@@ -46,16 +46,16 @@ export interface FolioSpec {
   layout: "split" | "stacked";
 }
 
-/** HTML statis proyek dari fungsi render yang sama dengan skrip template & editor. */
+/** Static project HTML from the same render functions as the template & editor scripts. */
 function staticRender(s: FolioSpec) {
   const api = folioApi();
   const list = withImages(s.projects);
   return { cards: api.renderCards(list, s.colors.accent, s.colors.accent2), details: api.renderDetails(list, s.colors.accent, s.colors.accent2) };
 }
-/** Tiap proyek punya kolom `gambar` (kosong = gambar contoh SVG) supaya bisa diisi lewat editor. */
+/** Each project has an `gambar` field (empty = sample SVG image) so it can be filled through the editor. */
 const withImages = (list: Project[]) => list.map((p) => ({ ...p, gambar: "" }));
 
-/** Variabel tema yang bisa diubah lewat editor tanpa kode. */
+/** Theme variables that can be changed through the no-code editor. */
 function folioVars(s: FolioSpec): ThemeVar[] {
   const c = s.colors;
   return [
@@ -147,7 +147,7 @@ h2 { margin: 0 0 28px; font-family: var(--font-display); font-weight: 700; font-
 .card-year { font-size: 13px; color: var(--accent); font-weight: 600; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 
-/* Detail proyek: dengan JS hanya yang dituju (#proyek-…) yang tampil; tanpa JS semua tampil berurutan. */
+/* Project details: with JS only the target (#proyek-…) shows; without JS all show in order. */
 .details { margin-top: 48px; display: grid; gap: 40px; }
 .detail { padding: clamp(20px, 3vw, 36px); border-radius: 26px; background: var(--surface); border: 1px solid var(--line); scroll-margin-top: 90px; }
 .detail .art { border-radius: 18px; width: 100%; height: auto; }
@@ -188,7 +188,7 @@ const ENGINE = String.raw`
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const root = document.documentElement;
 
-/* 1) Proyek: render ulang dari PROJECTS (HTML statis tetap ada bila JS mati). */
+/* 1) Projects: re-rendered from PROJECTS (the static HTML stays if JS is off). */
 const css = getComputedStyle(root);
 const A1 = css.getPropertyValue("--accent").trim(), A2 = css.getPropertyValue("--accent-2").trim();
 document.getElementById("daftar-proyek").innerHTML = renderCards(PROJECTS, A1, A2);
@@ -196,7 +196,7 @@ document.getElementById("detail-proyek").innerHTML = renderDetails(PROJECTS, A1,
 function focusTarget() { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t && t.classList.contains("detail")) t.focus({ preventScroll: true }); }
 addEventListener("hashchange", focusTarget);
 
-/* 2) Kartu miring mengikuti kursor (hanya pointer halus, tanpa kurangi-gerak). */
+/* 2) Cards tilt toward the cursor (fine pointers only, not with reduced motion). */
 if (!reduce && matchMedia("(pointer: fine)").matches) {
   document.addEventListener("pointermove", (e) => {
     const card = e.target.closest && e.target.closest("[data-tilt]");
@@ -211,7 +211,7 @@ if (!reduce && matchMedia("(pointer: fine)").matches) {
   }, { passive: true });
 }
 
-/* 3) Gulir halus. */
+/* 3) Smooth scrolling. */
 let lenis = null;
 if (!reduce) {
   lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
@@ -370,7 +370,7 @@ export function buildFolio(s: FolioSpec): string {
 <script type="module">
 ${LIB_IMPORTS}
 
-/* ==== DATA PROYEK: ubah di sini (judul, deskripsi, tautan, tag, gambar) ==== */
+/* ==== PROJECT DATA: edit here (title, description, link, tags, image) ==== */
 const PROJECTS = ${dataBlock("PROJECTS", "Daftar proyek", withImages(s.projects), ["slug"])};
 /* ========================================================================== */
 ${RENDER.trim()}
@@ -397,7 +397,7 @@ ${BOOT}`,
 
 /* ------------------------------ objek hero ------------------------- */
 
-/** Blob organik: ShaderMaterial dengan noise, bereaksi pada jarak pointer. */
+/** Organic blob: a ShaderMaterial with noise, reacting to pointer distance. */
 const HERO_BLOB = String.raw`
 function buildHero({ THREE, scene, A1, A2 }) {
   const uniforms = { uTime: { value: 0 }, uAmp: { value: 0.32 }, uPointer: { value: new THREE.Vector2() }, uA: { value: new THREE.Color(A1) }, uB: { value: new THREE.Color(A2) } };
@@ -427,7 +427,7 @@ function buildHero({ THREE, scene, A1, A2 }) {
 }
 `;
 
-/** Simpul torus mengilap + bola yang mengorbit dan menghindar dari pointer. */
+/** A glossy torus knot + spheres that orbit and dodge the pointer. */
 const HERO_KNOT = String.raw`
 function buildHero({ THREE, scene, A1, A2 }) {
   const group = new THREE.Group(); scene.add(group);
@@ -463,7 +463,7 @@ function buildHero({ THREE, scene, A1, A2 }) {
 }
 `;
 
-/** Grid kubus mengambang; pointer membuat riak. */
+/** Floating cube grid; the pointer makes ripples. */
 const HERO_GRID = String.raw`
 function buildHero({ THREE, scene, camera, A1, A2 }) {
   const n = 9, count = n * n, gap = 0.62;
@@ -509,7 +509,7 @@ function buildHero({ THREE, scene, camera, A1, A2 }) {
 }
 `;
 
-/** Awan partikel yang berubah bentuk: bola → simpul → spiral; pointer mendorong partikel. */
+/** Shape-shifting particle cloud: sphere → knot → spiral; the pointer pushes particles. */
 const HERO_MORPH = String.raw`
 function buildHero({ THREE, scene, camera, A1, A2 }) {
   const N = 3600, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
@@ -568,7 +568,7 @@ function buildHero({ THREE, scene, camera, A1, A2 }) {
 }
 `;
 
-/** Cincin batang equalizer yang berdenyut; pointer mengangkat batang terdekat. */
+/** Ring of pulsing equalizer bars; the pointer lifts the nearest bars. */
 const HERO_RING = String.raw`
 function buildHero({ THREE, scene, camera, A1, A2 }) {
   const n = 72, R = 2.4;

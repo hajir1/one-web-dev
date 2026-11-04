@@ -1,6 +1,6 @@
 /* ================================================================== */
-/* Ilustrasi SVG set E (buatan sendiri, ASCII, tanpa URL eksternal;      */
-/* kunci "v4e-<nama>"). Motif menerima warna agar punya banyak varian.   */
+/* Set E SVG illustrations (in-house, ASCII, no external URLs;          */
+/* keys "v4e-<name>"). Motifs take colors so they have many variants.   */
 /* ================================================================== */
 
 const svg = (body: string, w = 800, h = 600) =>
@@ -81,7 +81,7 @@ function sofa(a: string, b: string, body: string, acc: string): string {
   );
 }
 
-/** Buku + gelembung percakapan (bahasa). */
+/** Book + speech bubbles (language). */
 function speech(a: string, b: string, c1: string, c2: string, t1: string, t2: string): string {
   return svg(
     bg(a, b) +
@@ -108,7 +108,7 @@ function reef(a: string, b: string, coral: string, fish: string): string {
   );
 }
 
-/** Kapal penumpang di laut. */
+/** Passenger ship at sea. */
 function ship(a: string, b: string, hull: string, deck: string): string {
   return svg(
     bg(a, b) +
@@ -135,7 +135,7 @@ function weave(a: string, b: string, c1: string, c2: string): string {
   );
 }
 
-/** Vas keramik + roda putar. */
+/** Ceramic vase + potter's wheel. */
 function pottery(a: string, b: string, clay: string, glaze: string): string {
   return svg(
     bg(a, b) +
@@ -148,7 +148,7 @@ function pottery(a: string, b: string, clay: string, glaze: string): string {
   );
 }
 
-/** Panel dasbor: grafik batang + garis + donat. */
+/** Dashboard panel: bar + line + donut charts. */
 function dash(a: string, b: string, panel: string, c1: string, c2: string): string {
   const bars = [120, 180, 150, 220, 260, 210, 300].map((h, i) => `<rect x="${130 + i * 46}" y="${470 - h}" width="30" height="${h}" rx="5" fill="${i === 6 ? c2 : c1}"/>`).join("");
   return svg(
@@ -162,7 +162,7 @@ function dash(a: string, b: string, panel: string, c1: string, c2: string): stri
   );
 }
 
-/** Kecambah tumbuh di atas koin (investasi). */
+/** A sprout growing on top of coins (investment). */
 function growth(a: string, b: string, coin: string, leaf: string): string {
   return svg(
     bg(a, b) +
@@ -173,7 +173,7 @@ function growth(a: string, b: string, coin: string, leaf: string): string {
   );
 }
 
-/** Rak hidroponik dengan pipa & selada. */
+/** Hydroponic rack with pipes & lettuce. */
 function hydro(a: string, b: string, pipe: string, leaf: string): string {
   let plants = "";
   for (let r = 0; r < 3; r++)
@@ -198,7 +198,7 @@ function hands(a: string, b: string, heart: string, skin: string): string {
   );
 }
 
-/** Turbin angin di bukit. */
+/** Wind turbines on a hill. */
 function wind(a: string, b: string, hill: string, blade: string): string {
   const turbine = (x: number, y: number, s: number) =>
     `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-6 0 L-10 260 H10 L6 0Z" fill="${blade}"/><circle r="12" fill="${blade}"/>` +
@@ -218,7 +218,7 @@ function rocket(a: string, b: string, body: string, flame: string): string {
   );
 }
 
-/** Pelajar dengan laptop + papan rumus (bimbel). */
+/** Student with a laptop + formula board (tutoring). */
 function study(a: string, b: string, shirt: string, board: string): string {
   return svg(
     bg(a, b) +
@@ -231,7 +231,7 @@ function study(a: string, b: string, shirt: string, board: string): string {
   );
 }
 
-/** Gudang: rak palet + kotak + forklift. */
+/** Warehouse: pallet racks + boxes + forklift. */
 function warehouse(a: string, b: string, box: string, lift: string): string {
   let boxes = "";
   for (let r = 0; r < 3; r++) for (let i = 0; i < 4; i++) boxes += `<rect x="${110 + i * 80}" y="${150 + r * 110}" width="66" height="70" rx="4" fill="${box}" opacity="${0.75 + ((i + r) % 2) * 0.25}"/><path d="M${126 + i * 80} ${150 + r * 110} V${180 + r * 110}" stroke="#ffffff" stroke-width="4" opacity="0.6"/>`;

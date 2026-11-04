@@ -1,8 +1,8 @@
 // ─── converters/formats.ts ───────────────────────────────────────────────────
-// Format TUJUAN yang bisa dibuat converter, dan pemetaan jenis file sumber
-// (hasil sniffing isi) ke kategori. Format sumber kini lebih luas dari
-// tujuan: GIF/BMP/ICO/AVIF bisa dibaca browser walau tidak bisa di-encode
-// Canvas (sebelumnya file ini ditolak dengan "format tidak dikenali").
+// TARGET formats the converter can create, and the mapping of source file kinds
+// (from content sniffing) to categories. Source formats are now broader than
+// targets: GIF/BMP/ICO/AVIF can be read by the browser even though Canvas cannot
+// encode them (previously these files were rejected with "unrecognized format").
 
 import i18n from "../../../i18n";
 import type { SniffedKind } from "../lib/fileSniff";
@@ -20,18 +20,18 @@ export interface FormatDefinition {
   alpha: boolean;
   /** Kompresi lossy (slider kualitas berlaku). */
   lossy?: boolean;
-  /** Bisa lossless (opsi "Lossless"). */
+  /** Can be lossless (the "Lossless" option). */
   losslessOption?: boolean;
 }
 
-/** Deskripsi format dibaca saat dipakai agar mengikuti bahasa aktif. */
+/** Format descriptions are read at use time so they follow the active language. */
 const fmt = (d: Omit<FormatDefinition, "description">): FormatDefinition =>
   Object.defineProperty(d as FormatDefinition, "description", { get: () => i18n.t(`media.formats.${d.id}`), enumerable: true });
 
 /**
- * Semua format raster di-encode codec WebAssembly di Web Worker
- * (workers/codecWorker.ts), bukan canvas.toBlob — hasilnya sama di semua
- * browser (Safari kini juga bisa membuat WebP/AVIF). SVG dari raster = tracing.
+ * Every raster format is encoded by a WebAssembly codec in a Web Worker
+ * (workers/codecWorker.ts), not canvas.toBlob, so the output is identical in every
+ * browser (Safari can now create WebP/AVIF too). SVG from raster = tracing.
  */
 export const FORMATS: FormatDefinition[] = [
   fmt({ id: "webp", label: "WebP", category: "raster", mime: "image/webp", ext: "webp", alpha: true, lossy: true, losslessOption: true }),
@@ -55,17 +55,17 @@ export function getFormat(id: FormatDefinition["id"]): FormatDefinition {
   return f;
 }
 
-/** Jenis sumber yang bisa dikonversi. */
+/** Source kinds that can be converted. */
 export const SOURCE_KINDS: SniffedKind[] = ["png", "jpeg", "webp", "gif", "bmp", "ico", "avif", "tiff", "jxl", "qoi", "svg"];
 
-/** Sumber yang di-decode codec WASM di worker (browser tidak bisa membacanya). */
+/** Sources decoded by the WASM codec in the worker (the browser cannot read them). */
 export const WORKER_DECODED: SniffedKind[] = ["tiff", "jxl", "qoi"];
 
 export const sourceCategory = (k: SniffedKind): FormatCategory => (k === "svg" ? "vector" : "raster");
 
 /**
- * Format tujuan sebenarnya untuk satu file. "same" = format asli (kompresi
- * ulang); format sumber yang tidak bisa dibuat (mis. HEIC) → PNG.
+ * The actual target format for one file. "same" = the original format (re-
+ * compression); source formats that cannot be created (e.g. HEIC) → PNG.
  */
 export function resolveTarget(target: TargetId, kind: SniffedKind): FormatDefinition {
   if (target !== "same") return getFormat(target);

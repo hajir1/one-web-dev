@@ -1,12 +1,12 @@
 // @ts-nocheck
-// v6: mode admin tanpa kredit di sisi tampilan (backend tetap penentu tagihan).
+// v6: admin no-credit mode on the display side (the backend still decides billing).
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_PRICING, accessState, estimateUses, planCharge, sanitizeAccount } from "../pages/media/processing/pricing";
 import { isAdminFree, setAdminFree } from "../auth/adminFree";
 import { limitText, UNLIMITED_LIMIT } from "../marketplace/hooks";
 
-// v11: diuji dengan tarif kredit (Media kini memakai kuota paket).
+// v11: tested with credit rates (Media now uses plan quotas).
 const p = { ...DEFAULT_PRICING["image-upscaler"], inPlan: false, unlockRequired: true };
 
 test("pengguna biasa: saldo 0 & fitur terkunci → locked, tidak cukup", () => {
@@ -27,7 +27,7 @@ test("admin dari respons server: siap, biaya 0, penggunaan tanpa batas", () => {
   assert.deepEqual({ credits: plan.credits, packUses: plan.packUses, affordable: plan.affordable, shortfall: plan.shortfall }, { credits: 0, packUses: 0, affordable: true, shortfall: 0 });
   assert.ok(plan.creditsWithoutPack > 0, "harga normal tetap terlihat sebagai pembanding");
   assert.equal(estimateUses(p, acc), Infinity);
-  // Server mati tetap "unavailable" walau admin.
+  // A down server is still "unavailable" even for admins.
   assert.equal(accessState(p, { serverAvailable: false, account: acc }), "unavailable");
 });
 

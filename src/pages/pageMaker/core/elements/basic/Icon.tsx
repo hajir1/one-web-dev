@@ -58,7 +58,7 @@ export interface IconMakerState {
   shadowColor: string;
   shadowOpacity: number;
 
-  /* Animasi bawaan */
+  /* Built-in animations */
   animation: "none" | "spin" | "pulse" | "bounce" | "wiggle";
   animationDuration: number;
 
@@ -79,7 +79,7 @@ export interface IconMakerState {
   transitionEasing: string;
 
   cursor: string;
-  /** Teks alternatif. Kosong = ikon dekoratif (aria-hidden). */
+  /** Alternative text. Empty = decorative icon (aria-hidden). */
   ariaLabel: string;
 }
 
@@ -139,7 +139,7 @@ const DEFAULT_STATE: IconMakerState = {
 
 const DEFAULT_CLASS_NAME = "custom-icon";
 
-/** Ikon contoh kalau belum ada ikon dipilih / pustaka kosong. */
+/** Sample icon when no icon is selected yet / the library is empty. */
 const DUMMY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m7 19 5 3 5-3"/></svg>`;
 
 /* ------------------------------------------------------------------ */
@@ -156,7 +156,7 @@ const KEYFRAMES: Record<Exclude<IconMakerState["animation"], "none">, string> = 
 
 function generateIconMakerCss(s: IconMakerState, cls: string): string {
   // Nama keyframes diberi awalan class: sebelumnya "spin"/"pulse"/"bounce"
-  // bentrok dengan keyframes bawaan Tailwind sehingga animasi preview salah.
+  // clashes with Tailwind's built-in keyframes, so the preview animation was wrong.
   const animName = `${cls}-${s.animation}`;
   const animLine =
     s.animation !== "none"
@@ -181,7 +181,7 @@ ${shadowLine(s)}  transition: all ${s.transitionDuration}ms ${s.transitionEasing
   display: block;
 ${animLine}}`;
 
-  // Hover memakai warna hover (sebelumnya background gradient mengabaikan warna hover).
+  // Hover uses the hover color (previously a gradient background ignored the hover color).
   const hover = s.hoverEnabled
     ? `.${cls}:hover {
   background: ${s.hoverBgColor};
@@ -281,7 +281,7 @@ function iconSections(s: IconMakerState, update: Updater<IconMakerState>): Panel
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const iconElement = defineElement<IconMakerState>({
@@ -292,7 +292,7 @@ export const iconElement = defineElement<IconMakerState>({
   defaultClassName: DEFAULT_CLASS_NAME,
   defaults: DEFAULT_STATE,
   spec: (s, cls, icons) => {
-    // Tanpa ikon terpilih → pakai ikon contoh supaya elemen tidak kosong.
+    // No icon selected → use the sample icon so the element is not empty.
     const svg =
       icons(s.iconId, s.size, s.iconColorMode) ??
       renderIconMarkup(DUMMY_SVG, s.size, s.iconColorMode);

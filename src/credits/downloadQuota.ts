@@ -1,12 +1,12 @@
 /* ================================================================== */
-/* Ekspor kode DI SERVER (v4) — POST /exports                            */
+/* Code export ON THE SERVER (v4) — POST /exports                        */
 /*                                                                    */
-/* Kode lengkap tidak lagi dibuat di browser lalu "dilaporkan": server   */
-/* memuat desain yang sudah tersinkron, memeriksa item Premium,         */
-/* mencatat kuota, baru mengirim berkas. Aturan kuota tetap sama:       */
-/*  - 20 ekspor gratis per akun; hasil identik (framework + isi sama)    */
-/*    tidak dihitung lagi (sidik jari dihitung server);                  */
-/*  - setelah habis → ekspor memakai kredit (pay=true setelah setuju).   */
+/* Full code is no longer built in the browser and then "reported": the server */
+/* loads the synced design, checks Premium items,                       */
+/* records the quota, and only then sends the files. Quota rules are unchanged: */
+/*  - 20 free exports per account; identical output (same framework + content) */
+/*    is not counted again (the fingerprint is computed by the server);  */
+/*  - once used up → exports cost credits (pay=true after consent).      */
 /* ================================================================== */
 
 import { FREE_EXPORTS } from "../config/quota";
@@ -19,10 +19,10 @@ import { useVarStore } from "../pages/pageMaker/core/store/varStore";
 import { currentMotionVars } from "../pages/pageMaker/core/store/motionStore";
 
 export { FREE_EXPORTS };
-/** @deprecated nama lama */
+/** @deprecated old name */
 export const FREE_DOWNLOADS = FREE_EXPORTS;
 
-/** v9: "free" = ekspor Susun Website Utuh, gratis tanpa batas (tidak memakai kuota). */
+/** v9: "free" = Full Website Compose export, free and unlimited (does not use the quota). */
 export type ExportRecordResult = "counted" | "repeat" | "paid" | "free" | "blocked";
 
 export interface ExportQuotaInfo {
@@ -34,7 +34,7 @@ export interface ExportQuotaInfo {
 
 export interface ServerExportSource {
   kind: "page" | "site";
-  /** Id desain/website di designStore (harus sudah tersinkron). */
+  /** Design/website id in designStore (must already be synced). */
   id: string;
   rootClass?: string;
 }
@@ -47,19 +47,19 @@ export interface ExportedFile {
 
 type ServerExport = ExportQuotaInfo & { result: "counted" | "repeat" | "paid" | "free"; account?: unknown; files: ExportedFile[]; fingerprint: string };
 
-/** Ikon, font & variabel global pengguna hanya ada di perangkat → ikut dikirim agar kode server sama dengan pratinjau. */
+/** The user's icons, fonts & global variables only exist on the device → sent along so the server code matches the preview. */
 function assets() {
   const { fonts, baseFontId } = useFontStore.getState();
-  // v7: variabel global ikut dikirim (font pustaka jadi variabel di server dari `fonts`).
-  // v9: + nilai bawaan Animasi & 3D (--owd-anim-*, --owd-3d-*); server hanya menulisnya bila dipakai.
+  // v7: global variables are sent too (library fonts become variables on the server from `fonts`).
+  // v9: + default Animation & 3D values (--owd-anim-*, --owd-3d-*); the server only writes them when used.
   const vars = [...useVarStore.getState().vars, ...currentMotionVars()].map(({ name, type, value }) => ({ name, type, value }));
   return { icons: useIconStore.getState().icons, fonts, vars, ...(baseFontId ? { baseFontId } : {}) };
 }
 
 /**
- * Minta server membuat kode. "blocked" = kuota gratis habis dan `pay` belum
- * disetujui (tidak ada yang dicatat, tidak ada berkas). Error lain dilempar
- * sebagai ApiError: 401 belum masuk · 402 PREMIUM_ITEMS_LOCKED { items } ·
+ * Asks the server to build the code. "blocked" = the free quota is used up and `pay`
+ * has not been approved (nothing is recorded, no files). Other errors are thrown
+ * as ApiError: 401 not signed in · 402 PREMIUM_ITEMS_LOCKED { items } ·
  * 402 INSUFFICIENT_CREDITS · 404 DESIGN_NOT_SYNCED.
  */
 export async function serverExport(
@@ -74,7 +74,7 @@ export async function serverExport(
     });
     const quota = { used: r.used, free: r.free, remaining: r.remaining, cost: r.cost };
     patchLimits({ exports: quota });
-    // Ekspor berbayar: server mengirim saldo terbaru.
+    // Paid export: the server sends the latest balance.
     const billing = r.account ? useBilling.getState().setAccountFromServer(r.account) : null;
     if (billing) useMarketStore.setState((s) => ({ account: { ...s.account, balance: billing.balance } }));
     return { result: r.result, quota, files: Array.isArray(r.files) ? r.files : [] };

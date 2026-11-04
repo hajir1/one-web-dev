@@ -1,9 +1,9 @@
 /* ================================================================== */
-/* Utilitas generator Template Kode (v16, bagian J).                    */
-/* Hasilnya berkas HTML mandiri di pages/webTemplates/codeTemplates/.   */
+/* Code Template generator utilities (v16, part J).                     */
+/* The output is self-contained HTML files in pages/webTemplates/codeTemplates/. */
 /* ================================================================== */
 
-/** RNG deterministik (mulberry32): hasil generator selalu sama. */
+/** Deterministic RNG (mulberry32): generator output is always the same. */
 export function rng(seed: number) {
   let a = seed >>> 0;
   const next = () => {
@@ -22,16 +22,16 @@ export function rng(seed: number) {
 }
 export type Rng = ReturnType<typeof rng>;
 
-/** Angka ringkas untuk atribut SVG. */
+/** Compact number for SVG attributes. */
 export const n = (v: number, d = 1) => {
   const s = v.toFixed(d);
   return s.includes(".") ? s.replace(/\.?0+$/, "") : s;
 };
 
-/** Escape teks HTML. */
+/** Escape HTML text. */
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** Rapikan CSS/JS: buang indentasi berlebih dan baris kosong ganda (ukuran lebih kecil, tetap terbaca). */
+/** Tidies CSS/JS: removes excess indentation and double blank lines (smaller, still readable). */
 export function tidy(src: string): string {
   return src
     .split("\n")
@@ -41,49 +41,49 @@ export function tidy(src: string): string {
     .trim();
 }
 
-/* ---------------- penanda edit tanpa kode (v17, lihat editModel.ts) ---------------- */
+/* ---------------- no-code edit markers (v17, see editModel.ts) ---------------- */
 
-/** Atribut teks yang bisa diedit: data-owd-text + label (+ banyak baris). */
+/** Editable text attributes: data-owd-text + label (+ multi-line). */
 export const ot = (key: string, label: string, multi = false) => ` data-owd-text="${key}" data-owd-label="${esc(label)}"${multi ? " data-owd-multi" : ""}`;
-/** Atribut tautan yang bisa diedit. */
+/** Editable link attributes. */
 export const oh = (key: string, label: string) => ` data-owd-href="${key}" data-owd-href-label="${esc(label)}"`;
 
 export interface ThemeVar {
   name: string;
   value: string;
   label: string;
-  /** [min, maks, langkah] untuk penggeser. */
+  /** [min, max, step] for the slider. */
   range?: [number, number, number];
 }
-/** Blok variabel tema yang bisa diedit (form Warna & gaya). */
+/** Editable theme variable block (the Colors & style form). */
 export function themeStyle(vars: ThemeVar[]): string {
   return `<style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
 ${vars.map((v) => `  ${v.name}: ${v.value}; /* ${v.label}${v.range ? ` [${v.range.join(",")}]` : ""} */`).join("\n")}
 }
 </style>`;
 }
 
-/** JSON aman untuk <script> (sama dengan jsonForScript di editModel.ts). */
+/** JSON that is safe for <script> (same as jsonForScript in editModel.ts). */
 export function json(value: unknown): string {
   return JSON.stringify(value, null, 2)
     .replace(/</g, "\\u003c")
     .replace(/\/\*/g, "\\/*")
     .replace(/\*\//g, "*\\/");
 }
-/** Blok data yang bisa diedit lewat form: const NAMA = /*owd:data…*\/{…}/*owd:end*\/; */
+/** A data block editable through the form: const NAME = /*owd:data…*\/{…}/*owd:end*\/; */
 export function dataBlock(name: string, label: string, value: unknown, hide: string[] = []): string {
   return `/*owd:data name="${name}" label="${esc(label)}"${hide.length ? ` hide="${hide.join(",")}"` : ""}*/${json(value)}/*owd:end*/`;
 }
 
 /**
- * Vercel Web Analytics (v19). Dimuat hanya di situs yang sudah online (http/https),
- * bukan di pratinjau/thumbnail (iframe) atau saat dibuka dari berkas lokal.
- * Di hosting selain Vercel hasilnya hanya satu permintaan 404; hapus blok ini bila tidak dipakai.
+ * Vercel Web Analytics (v19). Loaded only on sites that are already online (http/https),
+ * not in previews/thumbnails (iframes) or when opened from a local file.
+ * On hosts other than Vercel the result is just one 404 request; remove this block if unused.
  */
 export const VERCEL_ANALYTICS = `<script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>`;

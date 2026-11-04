@@ -1,14 +1,14 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, particles3, pg, pic, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 09 · Ombak Kidul: sekolah selancar Batu Karas. Ide besar: situs = zine risograf yang distaples; tabel pasang naik baris demi baris. */
+/* 09 · Ombak Kidul: a Batu Karas surf school. Big idea: the site = a stapled risograph zine; the tide table rises row by row. */
 
 const C = { teal: "#00838A", tealGelap: "#006970", oranye: "#FF6C2F", kertas: "#F6F1E7", navy: "#1D2B4F", pasir: "#E3C99A" };
 export const L09 = lookJ({ ink: C.navy, muted: "#3b4560", primary: C.tealGelap, primaryDark: "#00545a", soft: C.pasir, line: C.navy, bg: C.kertas, head: "Instrument Serif", body: "Schibsted Grotesk", r: 4 });
 const L = L09;
 
-/** Cetak dua warna yang meleset: bayangan oranye di belakang huruf. */
+/** Off-register two-color print: an orange shadow behind the letters. */
 const RISO = `text-shadow: 5px 4px 0 rgba(255, 108, 47, 0.75);`;
-/** Halaman zine: kertas, garis tepi tipis, staples di atas. */
+/** A zine page: paper, a thin border, a staple on top. */
 const PAGE = `border: 1.5px solid ${C.navy}; box-shadow: 6px 6px 0 ${C.navy};`;
 
 const TIDES: [B, string, string, string, B, boolean][] = [
@@ -90,7 +90,7 @@ function homePage(j: J): BoxNode[] {
     ],
     { bg: C.navy, padY: 56 },
   );
-  // Tabel pasang: tiap baris naik bergiliran (efek khas template ini).
+  // Tide table: each row rises in turn (this template's signature effect).
   const cols = "minmax(0, .7fr) minmax(0, .7fr) minmax(0, .7fr) minmax(0, .6fr) minmax(0, 1.4fr)";
   const cell = (s: string, o: { b?: boolean; c?: string } = {}) => box([Tx(L, s, { size: 16, weight: o.b ? 700 : 400, color: o.c ?? C.navy })], { name: "Sel" });
   const tide = sec(
@@ -151,7 +151,7 @@ function kelas(j: J): BoxNode[] {
     [["Tiga pagi", "Three mornings"], "Rp900.000", ["3 × 2 jam dengan instruktur yang sama.", "3 × 2 hours with the same instructor."], ["Biasanya hari ketiga sudah bisa berdiri sendiri.", "Most people stand up alone by day three."]],
     [["Seminggu di Batu Karas", "A week in Batu Karas"], "Rp2.600.000", ["5 kelas, sewa papan sore gratis, dan analisis video.", "5 classes, free afternoon board rental, and video review."], ["Pindah dari papan busa ke papan keras.", "Move from foam to a hard board."]],
   ];
-  // Kupon zine: baris bertepi putus-putus yang bisa "digunting".
+  // Zine coupon: a dashed-border row that can be "cut out".
   const coupon = ([name, price, inc, note]: (typeof packs)[number], i: number) =>
     fx(
       grid(

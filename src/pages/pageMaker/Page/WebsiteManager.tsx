@@ -63,11 +63,11 @@ import SiteSeoPanel from "../ui/SiteSeoPanel";
 import { ensureSiteRoom } from "../helpers/siteQuota";
 
 /* ================================================================== */
-/* Website — kelola Folder Website (satu folder = satu website)          */
-/*   - halaman = referensi ke desain Page Maker (tidak disalin)          */
-/*   - urutan, homepage, slug URL, label menu                            */
-/*   - pratinjau dengan navigasi antarhalaman & ekspor satu proyek        */
-/* Perubahan folder langsung tersimpan (localStorage).                  */
+/* Website — manage Website Folders (one folder = one website)           */
+/*   - page = a reference to a Page Maker design (not copied)          */
+/*   - order, homepage, URL slug, menu label                             */
+/*   - preview with navigation between pages & single-project export      */
+/* Folder changes are saved immediately (localStorage).                 */
 /* ================================================================== */
 
 const EMPTY: SavedDesign[] = [];
@@ -82,7 +82,7 @@ const ICON_BTN =
 const INPUT =
   "w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90";
 
-/** Input yang menyimpan saat Enter / kehilangan fokus. */
+/** Input that saves on Enter / blur. */
 function CommitInput({
   value,
   onCommit,
@@ -139,7 +139,7 @@ export default function WebsiteManager() {
   const globalVars = useComposeVars();
   useLibraryFonts();
 
-  // v17: ?site=<id> memilih folder; &step=deploy langsung membuka tab Kode + dialog Deploy.
+  // v17: ?site=<id> selects a folder; &step=deploy opens the Code tab + Deploy dialog directly.
   const [params, setParams] = useSearchParams();
   const [autoDeploy] = useState(() => params.get("step") === "deploy");
   const [selectedId, setSelectedIdState] = useState<string | null>(() => params.get("site"));
@@ -164,7 +164,7 @@ export default function WebsiteManager() {
   useEffect(() => setConfirmDelete(false), [site?.id]);
 
   const MAX_DESIGNS = useMaxDesigns();
-  // Elemen Premium ikut di pratinjau/ekspor bila dimiliki, atau disertakan template asal halaman itu.
+  // Premium elements are included in the preview/export when owned, or included by the template the page came from.
   const premiumFor = usePremiumElementsFor();
   const built = useMemo(
     () => (site ? buildSite(site, designs, { icons, fonts, baseFont, vars: globalVars, allowPremiumElementsFor: premiumFor }) : null),
@@ -176,7 +176,7 @@ export default function WebsiteManager() {
 
   const save = (next: SiteDoc) => site && updateDesign(SITE_TYPE, site.id, next);
 
-  /** Batas folder website: FREE_SITES gratis + slot tambahan (server atau paket simulasi). */
+  /** Website folder limit: FREE_SITES free + extra slots (server or simulated packs). */
   const siteLimit = useSiteLimit();
 
   const createSiteNow = () => {
@@ -188,7 +188,7 @@ export default function WebsiteManager() {
     notify.success(t("website.created", { name }));
   };
 
-  /** Kuota penuh → dialog: bayar slot website atau hapus website lama. */
+  /** Quota full → dialog: pay for a website slot or delete an old website. */
   const createSite = () => {
     if (!ensureSiteRoom({ reason: "create", label: newName.trim(), onRoom: createSiteNow })) return;
     createSiteNow();
@@ -295,7 +295,7 @@ export default function WebsiteManager() {
               )}
             </section>
 
-            {/* ---------------- desain tersimpan ---------------- */}
+            {/* ---------------- saved designs ---------------- */}
             <section className={CARD} aria-labelledby="ws-designs">
               <h2 id="ws-designs" className="mb-3 text-sm font-semibold text-gray-800 dark:text-white/90">
                 {t("website.designs", { current: designs.length, max: limitText(MAX_DESIGNS) })}
@@ -511,7 +511,7 @@ export default function WebsiteManager() {
               {/* ---------------- SEO (v10) ---------------- */}
               <SiteSeoPanel siteName={site.name} doc={doc} pages={pages} onChange={save} />
 
-              {/* ---------------- pratinjau / kode ---------------- */}
+              {/* ---------------- preview / code ---------------- */}
               <section className={`${CARD} flex min-w-0 flex-col gap-3`} aria-label={t("website.previewLabel")}>
                 <div className="flex flex-wrap items-center gap-2">
                   <div role="tablist" className="flex gap-0.5 rounded-lg border border-gray-200 p-0.5 dark:border-gray-700">

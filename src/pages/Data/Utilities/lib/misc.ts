@@ -31,7 +31,7 @@ export function uuids(count: number, upper = false): string {
   return Array.from({ length: n }, () => (upper ? uuidV4().toUpperCase() : uuidV4())).join("\n");
 }
 
-/** Array objek JSON → CSV (kolom = gabungan semua kunci, urutan kemunculan). */
+/** Array of JSON objects → CSV (columns = union of all keys, in order of appearance). */
 export function jsonToCsv(text: string, delimiter: Delimiter = ","): { output: string; rows: number; cols: number } {
   const v = parseJsonStrict(text);
   const arr = Array.isArray(v) ? v : [v];
@@ -52,7 +52,7 @@ export function jsonToCsv(text: string, delimiter: Delimiter = ","): { output: s
   return { output: toCsv([cols, ...rows], delimiter), rows: rows.length, cols: cols.length };
 }
 
-/** CSV → JSON (baris pertama = nama kolom bila `header`). */
+/** CSV → JSON (the first row = column names when `header`). */
 export function csvToJson(text: string, header = true, indent = 2): { output: string; rows: number; cols: number } {
   if (!text.trim()) throw new DataError("emptyInput");
   const rows = parseCsv(text);

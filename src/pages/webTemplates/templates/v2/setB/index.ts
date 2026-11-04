@@ -5,7 +5,7 @@ import { agriCoffeeFarm, gamingEsportsTeam, kidsToystore, logisticsCargo, petsSh
 import { architectureLandscape, educationLanguage, newsMagazine, shopFurniture, startupFintech } from "./b4";
 import { communityCoworking, healthPharmacy, photographyWeddingFilm, professionalNotary, techCybersecurity } from "./b5";
 
-/** Konten template katalog v2 (bagian B), dikunci dengan ID di ../catalogB.ts. */
+/** Catalog v2 template content (part B), keyed by the IDs in ../catalogB.ts. */
 export const V2B_TEMPLATES: Record<string, TemplateContent> = {
   "personal-resume": personalResume,
   "fitness-yoga": fitnessYoga,

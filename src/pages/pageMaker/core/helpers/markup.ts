@@ -3,23 +3,23 @@ import type { GeneratedFile } from "../ui/CodeExportPanel";
 import { IMG_FALLBACK_TAG } from "../../helpers/imagePlaceholder";
 
 /* ================================================================== */
-/* Pohon markup mini → HTML & JSX dari SATU sumber                     */
+/* Mini markup tree → HTML & JSX from ONE source                       */
 /*                                                                    */
-/* Sebelumnya tiap elemen menulis template HTML dan JSX terpisah       */
-/* dengan string manual (rawan beda & lupa escape). Sekarang markup    */
-/* dibangun sekali dengan h(), lalu dirender ke HTML (index.html, Vue, */
-/* Svelte, Angular) atau JSX (React) dengan aturan atribut yang benar. */
+/* Previously each element wrote separate HTML and JSX templates       */
+/* as manual strings (prone to drift & forgotten escaping). Now markup */
+/* is built once with h(), then rendered to HTML (index.html, Vue,     */
+/* Svelte, Angular) or JSX (React) with the correct attribute rules.   */
 /*                                                                    */
 /*   h("button", { class: "btn", type: "button" }, "Klik")            */
 /*   h("span", { class: "btn__icon" }, raw(svg))  // SVG mentah        */
 /*                                                                    */
 /* Awalan atribut menentukan target:                                  */
-/*   "html:"   → semua template HTML (index.html, Vue, Svelte, Angular) */
+/*   "html:"   → all HTML templates (index.html, Vue, Svelte, Angular) */
 /*   "jsx:"    → React (+ preview)                                     */
-/*   "static:" → hanya index.html                                      */
-/*   "vue:" / "svelte:" / "angular:" / "react:" → framework itu saja   */
-/* Nilai { expr: "..." } = ekspresi: di JSX & Svelte ditulis {expr},    */
-/* di Vue/Angular ditulis "expr" (pakai kutip tunggal di dalamnya).    */
+/*   "static:" → index.html only                                       */
+/*   "vue:" / "svelte:" / "angular:" / "react:" → that framework only  */
+/* A { expr: "..." } value = an expression: written {expr} in JSX & Svelte, */
+/* written "expr" in Vue/Angular (use single quotes inside it).        */
 /* ================================================================== */
 
 interface Expr {
@@ -59,8 +59,8 @@ export function h(
   return { kind: "el", tag, attrs, children: flat };
 }
 
-/** Markup HTML mentah (SVG ikon). Di JSX dirender lewat dangerouslySetInnerHTML,
- * jadi raw() harus menjadi SATU-SATUNYA anak dari elemen pembungkusnya. */
+/** Raw HTML markup (SVG icons). In JSX it is rendered via dangerouslySetInnerHTML,
+ * so raw() must be the ONLY child of its wrapping element. */
 export const raw = (html: string): MRaw => ({ kind: "raw", html });
 
 const VOID = new Set(["img", "input", "br", "hr", "meta", "link"]);
@@ -79,14 +79,14 @@ const JSX_ATTR: Record<string, string> = {
 export type RenderTarget = "static" | "react" | "vue" | "svelte" | "angular";
 const PREFIXES = ["html:", "jsx:", "static:", "react:", "vue:", "svelte:", "angular:"];
 
-/** Apakah atribut berawalan `prefix` berlaku untuk target ini? */
+/** Does an attribute prefixed with `prefix` apply to this target? */
 function prefixApplies(prefix: string, target: RenderTarget): boolean {
   if (prefix === "html:") return target !== "react";
   if (prefix === "jsx:") return target === "react";
   return prefix === `${target}:`;
 }
 
-/** Normalisasi nama atribut untuk target; null = lewati. */
+/** Normalize the attribute name for the target; null = skip. */
 function resolveAttrKey(rawKey: string, target: RenderTarget): string | null {
   const prefix = PREFIXES.find((p) => rawKey.startsWith(p));
   if (prefix) {
@@ -115,7 +115,7 @@ function attrsToString(attrs: Attrs, target: RenderTarget): string {
 }
 
 function isInline(el: MElement) {
-  // raw multi-baris (blok HTML/script) tidak boleh ditaruh sebaris.
+  // multi-line raw (HTML/script blocks) must not be put inline.
   return el.children.every((c) => c.kind !== "el" && !(c.kind === "raw" && c.html.includes("\n")));
 }
 
@@ -124,7 +124,7 @@ function render(node: MNode, mode: RenderTarget, depth: number): string {
   const pad = "  ".repeat(depth);
   if (node.kind === "text") return pad + escapeText(node.value);
   if (node.kind === "raw") {
-    // raw multi-baris (mis. isi <script>/blok HTML) ikut di-indent per baris.
+    // Multi-line raw (e.g. <script> content/HTML blocks) is indented per line too.
     return node.html
       .split("\n")
       .map((l) => (l.trim() ? pad + l : l))
@@ -142,7 +142,7 @@ function render(node: MNode, mode: RenderTarget, depth: number): string {
     return `${pad}<${node.tag}${attrs} dangerouslySetInnerHTML={{ __html: ${JSON.stringify(onlyRaw.html)} }} />`;
   }
   if (node.children.length === 0) {
-    // Komponen (PascalCase: <Tabs1 />) ditulis self-closing; tag HTML tetap berpasangan.
+    // Components (PascalCase: <Tabs1 />) are written self-closing; HTML tags stay paired.
     return /^[A-Z]/.test(node.tag)
       ? `${pad}<${node.tag}${attrs} />`
       : `${pad}<${node.tag}${attrs}></${node.tag}>`;
@@ -158,7 +158,7 @@ function render(node: MNode, mode: RenderTarget, depth: number): string {
   return `${pad}<${node.tag}${attrs}>\n${inner}\n${pad}</${node.tag}>`;
 }
 
-/** Render ke template string untuk satu target framework. */
+/** Renders to a template string for one framework target. */
 export function renderFor(target: RenderTarget, nodes: MNode | MNode[], depth = 0): string {
   const list = (Array.isArray(nodes) ? nodes : [nodes]).filter(Boolean);
   if (target === "react" && list.length > 1) {
@@ -171,7 +171,7 @@ export function renderFor(target: RenderTarget, nodes: MNode | MNode[], depth = 
 export const renderHtml = (nodes: MNode | MNode[], depth = 0) => renderFor("static", nodes, depth);
 export const renderJsx = (nodes: MNode | MNode[], depth = 0) => renderFor("react", nodes, depth);
 
-/** Ikon (opsional) + teks, urutan sesuai posisi — dipakai banyak elemen. */
+/** Icon (optional) + text, ordered by position; used by many elements. */
 export function iconTextNodes(
   iconMarkup: string | null,
   iconPosition: "left" | "right",
@@ -189,37 +189,37 @@ export function iconTextNodes(
 /* ================================================================== */
 
 export interface FrameworkSpec {
-  /** PascalCase, mis. "Button" → Button.jsx, button.component.ts. */
+  /** PascalCase, e.g. "Button" → Button.jsx, button.component.ts. */
   name: string;
   css: string;
-  /** Markup statis. Dipakai semua framework kecuali yang di-override. */
+  /** Static markup. Used by every framework except those overridden. */
   markup?: MNode | MNode[];
-  /** Override untuk komponen interaktif (Tabs, dst). */
-  html?: { body?: string; script?: string; /** Tag tambahan di <head> (mis. CSS library CDN). */ head?: string; /** Tag sebelum </body> (mis. JS library CDN). */ tail?: string };
+  /** Override for interactive components (Tabs, etc.). */
+  html?: { body?: string; script?: string; /** Extra tags in <head> (e.g. CDN library CSS). */ head?: string; /** Tags before </body> (e.g. CDN library JS). */ tail?: string };
   react?: { imports?: string; pre?: string; jsx?: string };
   vue?: {
     template?: string;
     script?: string;
-    /** CSS global (blok `<style>` tanpa scoped), mis. Custom CSS yang harus menembus komponen anak. */
+    /** Global CSS (a `<style>` block without scoped), e.g. Custom CSS that must reach child components. */
     globalCss?: string;
   };
   svelte?: { markup?: string; script?: string };
   angular?: {
     template?: string;
     classBody?: string;
-    /** Komponen standalone yang memakai komponen lain: `imports: [...]` + import file-nya. */
+    /** A standalone component that uses other components: `imports: [...]` + their file imports. */
     standalone?: boolean;
     imports?: { name: string; path: string }[];
-    /** Simbol tambahan dari '@angular/core' (mis. ElementRef, ViewChild). */
+    /** Extra symbols from '@angular/core' (e.g. ElementRef, ViewChild). */
     coreImports?: string[];
-    /** Baris import tambahan (bebas) di atas berkas. */
+    /** Extra (free-form) import lines at the top of the file. */
     headerImports?: string;
-    /** Interface yang diimplementasikan kelas (mis. AfterViewInit). */
+    /** Interfaces the class implements (e.g. AfterViewInit). */
     implementsList?: string[];
-    /** `encapsulation: ViewEncapsulation.None` (CSS komponen jadi global). */
+    /** `encapsulation: ViewEncapsulation.None` (component CSS becomes global). */
     encapsulationNone?: boolean;
   };
-  /** Bungkus markup hasil render per framework (mis. {#if} Svelte, @if Angular). */
+  /** Wrap the rendered markup per framework (e.g. Svelte {#if}, Angular @if). */
   wrap?: Partial<Record<RenderTarget, (markup: string) => string>>;
 }
 

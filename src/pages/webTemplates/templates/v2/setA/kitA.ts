@@ -7,20 +7,20 @@ import type { TemplatePageDef } from "../../../types";
 import { FONTS, listingCard, logo, menu, pageWith, theme } from "../../pro/kit";
 
 /* ================================================================== */
-/* Perangkat template v2 bagian A                                        */
+/* Template kit v2 part A                                                */
 /*                                                                    */
-/* Kumpulan penyusun section yang bisa dikombinasikan bebas. Setiap      */
-/* template memilih section, urutan, gaya hero, header & footer sendiri, */
-/* jadi 25 template tidak berasal dari satu fungsi generik. Semua dibuat */
-/* dari elemen Page Maker (Section → Row → Elemen) dan bisa diedit penuh. */
+/* A set of section builders that can be combined freely. Each          */
+/* each template chooses its own sections, order, hero style, header & footer, */
+/* so the 25 templates do not come from one generic function. Everything is built */
+/* from Page Maker elements (Section → Row → Element) and is fully editable. */
 /* ================================================================== */
 
 export { FONTS };
 
-/** Tema template: palet + latar + radius + font judul & isi. */
+/** Template theme: palette + background + radius + heading & body fonts. */
 export interface Look extends ProTheme {
   font: string;
-  /** Latar halaman (root). */
+  /** Page background (root). */
   page: string;
 }
 
@@ -31,21 +31,21 @@ export function look(p: Palette, o: Partial<Omit<Look, "p">> = {}): Look {
 
 export const page = (L: Look, sections: BoxNode[]): PageDoc => pageWith(sections, L.font, L.page);
 
-/* ------------------------------ halaman ---------------------------- */
+/* ------------------------------ pages ---------------------------- */
 
 export const home = (id = "Beranda", en = "Home"): TemplatePageDef => ({ key: "home", slug: { id: "index", en: "index" }, name: { id, en }, home: true });
 
-/** Definisi halaman: kunci, [slug, nama] ID, [slug, nama] EN. */
+/** Page definition: key, [slug, name] ID, [slug, name] EN. */
 export const pg = (key: string, idv: [string, string], env: [string, string]): TemplatePageDef => ({ key, slug: { id: idv[0], en: env[0] }, name: { id: idv[1], en: env[1] } });
 
-/* ------------------------------ teks ------------------------------- */
+/* ------------------------------ text ------------------------------- */
 
 function addCss(n: ElementNode | BoxNode, decl: string): void {
   const cur = n.advanced?.customCss ?? "";
   n.advanced = { ...n.advanced, customCss: cur.includes("{") ? `${cur}\n& { ${decl} }` : `${cur}${cur ? "\n" : ""}${decl}` };
 }
 
-/** Judul dengan font judul tema. */
+/** Heading with the theme heading font. */
 export function H(L: Look, text: string, tag: "h1" | "h2" | "h3" | "h4", o: Parameters<typeof heading>[2] = {}): ElementNode {
   const n = heading(text, tag, { color: L.p.ink, ...o });
   if (L.headFont) addCss(n, `font-family: ${L.headFont};`);
@@ -58,14 +58,14 @@ export const P = (L: Look, text: string, o: Parameters<typeof para>[1] = {}) => 
 export type Act = [string, string, ("primary" | "outline" | "light" | "dark")?];
 export const acts = (L: Look, list: Act[], justify: "start" | "center" = "start") => inline(list.map(([l, h, k]) => linkButton(l, h, k ?? "primary", L.p)), { justify });
 
-/** Kotak ikon (teks/emoji) bergaya. */
+/** Styled icon box (text/emoji). */
 function tile(L: Look, glyph: string, o: { bg?: string; color?: string; round?: boolean } = {}): ElementNode {
   const n = el("text", { text: glyph, tag: "p", fontSize: 22, fontWeight: 800, textColor: o.color ?? L.p.primary, textAlign: "center", widthMode: "auto" }, "Ikon");
   n.advanced = { customCss: `display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: ${o.round ? "999px" : `${Math.max(8, L.radius - 4)}px`}; background: ${o.bg ?? L.p.soft};` };
   return n;
 }
 
-/** Intro section (eyebrow + judul + teks). */
+/** Section intro (eyebrow + heading + text). */
 function introEls(L: Look, c: { eyebrow?: string; title: string; text?: string; align?: "left" | "center"; light?: boolean }): ElementNode[] {
   const align = c.align ?? "center";
   return [
@@ -82,7 +82,7 @@ type Intro = Parameters<typeof intro>[1];
 
 /* ------------------------------ header ----------------------------- */
 
-/** Header dengan bilah info di atas (telepon, jam buka) + logo, menu, CTA. */
+/** A header with an info bar on top (phone, opening hours) + logo, menu, CTA. */
 export function headerBar(brand: string, L: Look, c: { info: string[]; cta?: ElementNode; bg?: string; ink?: string; barInk?: string; nav?: ElementNode }): BoxNode {
   const ink = c.ink ?? L.p.ink;
   const nav = c.nav ?? menu(L.p, ink === "#ffffff" ? "#e2e8f0" : "#334155");
@@ -112,7 +112,7 @@ export function headerBar(brand: string, L: Look, c: { info: string[]; cta?: Ele
   return section("Header", [bar, main], { bg: c.bg ?? "#ffffff", padY: 16, tag: "header" });
 }
 
-/** Header: logo + menu di kiri berdampingan, CTA di kanan (gaya aplikasi). */
+/** Header: logo + menu side by side on the left, CTA on the right (app style). */
 export function headerLeft(brand: string, L: Look, c: { cta?: ElementNode; bg?: string; ink?: string; sticky?: boolean; nav?: ElementNode }): BoxNode {
   const ink = c.ink ?? L.p.ink;
   const nav = c.nav ?? menu(L.p, ink === "#ffffff" ? "#cbd5e1" : "#475569", { gap: 18 });
@@ -135,7 +135,7 @@ export function headerLeft(brand: string, L: Look, c: { cta?: ElementNode; bg?: 
 
 /* ------------------------------ footer ----------------------------- */
 
-/** Footer ringkas satu baris: merek, tautan, hak cipta. */
+/** Compact one-line footer: brand, links, copyright. */
 export function footerSlim(L: Look, brand: string, items: string[], copy: string, o: { bg?: string; ink?: string } = {}): BoxNode {
   const ink = o.ink ?? "#e5e7eb";
   return section(
@@ -165,11 +165,11 @@ interface HeroBase {
   note?: string;
   extra?: (ElementNode | BoxNode)[];
   size?: number;
-  /** Ganti judul teks dengan elemen lain (mis. Teks Mengetik). */
+  /** Replaces the heading text with another element (e.g. Typing Text). */
   titleNode?: ElementNode;
 }
 
-/** Hero dua kolom: teks + gambar (bisa dibalik, latar terang/gelap/gradien). */
+/** Two-column hero: text + image (can be flipped, light/dark/gradient background). */
 export function heroSplit(L: Look, c: HeroBase & { image: string; alt: string; ratio?: string; reverse?: boolean; bg?: string; gradient?: [string, string, number?]; light?: boolean; padY?: number }): BoxNode {
   const ink = c.light ? "#ffffff" : L.p.ink;
   const muted = c.light ? "#d1d5db" : L.p.muted;
@@ -193,7 +193,7 @@ export function heroSplit(L: Look, c: HeroBase & { image: string; alt: string; r
   );
 }
 
-/** Hero sampul: teks rata tengah di latar gelap/berwarna, gambar lebar opsional di bawah. */
+/** Cover hero: centered text on a dark/colored background, an optional wide image below. */
 export function heroCover(L: Look, c: HeroBase & { bg?: string; gradient?: [string, string, number?]; image?: string; alt?: string; light?: boolean; ratio?: string }): BoxNode {
   const light = c.light ?? true;
   const ink = light ? "#ffffff" : L.p.ink;
@@ -215,7 +215,7 @@ export function heroCover(L: Look, c: HeroBase & { bg?: string; gradient?: [stri
   return section("Hero", rows, c.gradient ? { gradient: c.gradient, padY: 112, width: 1040 } : { bg: c.bg ?? L.dark, padY: 112, width: 1040 });
 }
 
-/** Banner judul halaman dalam (breadcrumb + judul + teks). */
+/** Inner page title banner (breadcrumb + title + text). */
 export function pageBanner(L: Look, c: { eyebrow?: string; title: string; text?: string; crumbs?: [string, string][]; bg?: string; light?: boolean; align?: "left" | "center" }): BoxNode {
   const light = c.light ?? false;
   const align = c.align ?? "left";
@@ -254,7 +254,7 @@ export interface Item {
   meta?: string;
 }
 
-/** Kartu fitur/layanan. Varian: card (kartu ber-ikon), line (garis atas), num (bernomor), dark (latar gelap). */
+/** Feature/service cards. Variants: card (icon card), line (top line), num (numbered), dark (dark background). */
 export function cards(L: Look, c: Intro & { items: Item[]; cols?: number; bg?: string; variant?: "card" | "line" | "num" | "dark"; name?: string }): BoxNode {
   const v = c.variant ?? "card";
   const dark = v === "dark";
@@ -278,7 +278,7 @@ export function cards(L: Look, c: Intro & { items: Item[]; cols?: number; bg?: s
   return section(c.name ?? "Kartu", [intro(L, { ...c, light: dark || c.light }), grid(c.items.map(cell), c.cols ?? Math.min(3, c.items.length), { gap: 22, align: "stretch" })], { bg: c.bg ?? (dark ? L.dark : L.bg), padY: 88 });
 }
 
-/** Cerita/teks + gambar berdampingan, dengan daftar poin opsional. */
+/** Story/text + image side by side, with an optional bullet list. */
 export function story(L: Look, c: { eyebrow?: string; title: string; paras: string[]; bullets?: string[]; image: string; alt: string; reverse?: boolean; bg?: string; actions?: Act[]; ratio?: string; light?: boolean; name?: string }): BoxNode {
   const light = !!c.light;
   const txt = col(
@@ -295,7 +295,7 @@ export function story(L: Look, c: { eyebrow?: string; title: string; paras: stri
   return section(c.name ?? "Cerita", [grid(c.reverse ? [txt, pic] : [pic, txt], 2, { gap: 56, align: "center" })], { bg: c.bg ?? L.bg, padY: 88 });
 }
 
-/** Daftar poin bercentang (List Element). */
+/** Checkmark bullet list (List Element). */
 export function checklist(L: Look, items: string[], light = false): ElementNode {
   return el(
     "list",
@@ -334,7 +334,7 @@ export interface Listing {
   href: string;
 }
 
-/** Grid kartu listing (Product Card gratis): kelas, kamar, paket, produk. */
+/** Listing card grid (free Product Card): classes, rooms, packages, products. */
 export function listings(L: Look, c: Intro & { items: Listing[]; cols?: number; bg?: string; name?: string }): BoxNode {
   return section(
     c.name ?? "Daftar",
@@ -343,7 +343,7 @@ export function listings(L: Look, c: Intro & { items: Listing[]; cols?: number; 
   );
 }
 
-/** Tabel data (Table Element gratis): jadwal, tarif, spesifikasi. */
+/** Data table (free Table Element): schedules, rates, specifications. */
 export function tableBlock(L: Look, c: Intro & { columns: string[]; rows: string[][]; bg?: string; note?: string; name?: string }): BoxNode {
   const t = el(
     "table",
@@ -364,7 +364,7 @@ export function tableBlock(L: Look, c: Intro & { columns: string[]; rows: string
   return section(c.name ?? "Tabel", [intro(L, c), stack([t, ...(c.note ? [P(L, c.note, { size: 13 })] : [])], { gap: 10, align: "stretch" })], { bg: c.bg ?? L.bg, padY: 80 });
 }
 
-/** Tab konten (Tabs Element gratis). */
+/** Content tabs (free Tabs Element). */
 export function tabsBlock(L: Look, c: Intro & { tabs: [string, string][]; bg?: string; variant?: "underline" | "pills" | "boxed"; name?: string }): BoxNode {
   return section(
     c.name ?? "Tab",
@@ -379,7 +379,7 @@ export function tabsBlock(L: Look, c: Intro & { tabs: [string, string][]; bg?: s
   );
 }
 
-/** Linimasa vertikal: label waktu di kiri, isi di kanan (satu Row per langkah). */
+/** Vertical timeline: time label on the left, content on the right (one Row per step). */
 export function timeline(L: Look, c: Intro & { steps: [string, string, string][]; bg?: string; name?: string }): BoxNode {
   const rows = c.steps.map(([label, title, text]) => {
     const r = grid(
@@ -396,7 +396,7 @@ export function timeline(L: Look, c: Intro & { steps: [string, string, string][]
   return section(c.name ?? "Linimasa", [intro(L, { ...c, align: c.align ?? "left" }), ...rows], { bg: c.bg ?? L.bg, padY: 88, width: 960 });
 }
 
-/** Langkah horizontal bernomor dalam lingkaran. */
+/** Horizontal steps numbered in circles. */
 export function process(L: Look, c: Intro & { steps: [string, string][]; bg?: string; dark?: boolean }): BoxNode {
   const dark = !!c.dark;
   return section(
@@ -413,7 +413,7 @@ export function process(L: Look, c: Intro & { steps: [string, string][]; bg?: st
   );
 }
 
-/** Galeri gambar dengan keterangan. */
+/** Image gallery with captions. */
 export function gallery(L: Look, c: Intro & { images: [string, string][]; cols?: number; ratio?: string; bg?: string; name?: string }): BoxNode {
   return section(
     c.name ?? "Galeri",
@@ -422,7 +422,7 @@ export function gallery(L: Look, c: Intro & { images: [string, string][]; cols?:
   );
 }
 
-/** Kutipan besar (teks biasa, gratis). */
+/** A large quote (plain text, free). */
 export function bigQuote(L: Look, c: { text: string; name: string; role: string; bg?: string; light?: boolean }): BoxNode {
   const light = c.light ?? true;
   return section(
@@ -454,7 +454,7 @@ export function field(L: Look, f: Field, i: number): ElementNode {
   return el("input", { labelText: f.label, text: f.ph, inputType: f.type ?? "text", hoverBorderColor: L.p.primary, hoverShadowColor: L.p.primary, borderRadius: Math.min(L.radius, 12) }, f.label);
 }
 
-/** Formulir (tanpa pengiriman ke server) + info kontak. */
+/** A form (no server submission) + contact info. */
 export function contact(L: Look, c: Intro & { info: [string, string][]; fields: Field[]; submit: string; bg?: string; note?: string; name?: string; formFirst?: boolean }): BoxNode {
   const info = col(
     [
@@ -482,7 +482,7 @@ export interface Post {
   href: string;
 }
 
-/** Daftar artikel/berita. */
+/** Article/news list. */
 export function posts(L: Look, c: Intro & { items: Post[]; cols?: number; bg?: string; name?: string; readLabel: string }): BoxNode {
   const card = (x: Post) =>
     col(
@@ -498,7 +498,7 @@ export function posts(L: Look, c: Intro & { items: Post[]; cols?: number; bg?: s
   return section(c.name ?? "Artikel", [intro(L, c), grid(c.items.map(card), c.cols ?? 3, { gap: 28 })], { bg: c.bg ?? L.bg, padY: 88 });
 }
 
-/** Isi artikel panjang. */
+/** Long article body. */
 export function article(L: Look, c: { crumbs: [string, string][]; tag: string; title: string; meta: string; image: string; lead: string; blocks: [string, string][]; quote?: string; bullets?: string[] }): BoxNode[] {
   const head = section(
     "Kepala artikel",
@@ -530,7 +530,7 @@ export function article(L: Look, c: { crumbs: [string, string][]; tag: string; t
   return [head, section("Isi artikel", [stack(body, { gap: 16, align: "stretch" })], { bg: L.bg, padY: 24, width: 760 })];
 }
 
-/** Ajakan (CTA) kotak sendiri — berbeda dari preset CTA Pita. */
+/** A standalone call-to-action box, different from the Ribbon CTA preset. */
 export function ctaBox(L: Look, c: { title: string; text?: string; actions: Act[]; bg?: string; light?: boolean; align?: "left" | "center" }): BoxNode {
   const light = c.light ?? true;
   const align = c.align ?? "left";
@@ -539,7 +539,7 @@ export function ctaBox(L: Look, c: { title: string; text?: string; actions: Act[
   return section("Ajakan", [grid([col(kids, { gap: 10, name: "Teks" }), col([acts(L, c.actions)], { name: "Tombol", align: "end" })], "minmax(0, 1.6fr) minmax(0, 1fr)", { gap: 32, align: "center" })], { bg: c.bg ?? L.p.primaryDark, padY: 72 });
 }
 
-/** Papan menu/harga: grup berisi nama, deskripsi, harga. */
+/** Menu/price board: groups with name, description, price. */
 export function menuBoard(L: Look, c: Intro & { groups: { title: string; items: [string, string, string][] }[]; bg?: string; cols?: number; name?: string }): BoxNode {
   const item = ([n, d, pr]: [string, string, string]) =>
     col([inline([para(n, { size: 16, weight: 700, color: L.p.ink, full: false }), para(pr, { size: 16, weight: 700, color: L.p.primaryDark, full: false })], { justify: "between" }), P(L, d, { size: 14 })], { gap: 2, name: "Menu" });
@@ -557,7 +557,7 @@ export function menuBoard(L: Look, c: Intro & { groups: { title: string; items: 
   );
 }
 
-/** FAQ satu kolom (Accordion gratis) — berbeda dari preset FAQ Akordeon. */
+/** Single-column FAQ (free Accordion) — different from the Accordion FAQ preset. */
 export function faqList(L: Look, c: Intro & { items: [string, string][]; bg?: string }): BoxNode {
   return section(
     "FAQ",
@@ -611,7 +611,7 @@ export function logos(L: Look, c: { label: string; names: string[]; bg?: string;
   );
 }
 
-/** Angka sederhana (teks biasa, gratis). */
+/** Simple numbers (plain text, free). */
 export function figures(L: Look, c: { items: [string, string][]; bg?: string; light?: boolean }): BoxNode {
   const light = !!c.light;
   return section(
@@ -621,12 +621,12 @@ export function figures(L: Look, c: { items: [string, string][]; bg?: string; li
   );
 }
 
-/** Video (gratis). */
+/** Video (free). */
 export function videoBlock(L: Look, c: Intro & { url: string; title: string; bg?: string }): BoxNode {
   return section("Video", [intro(L, c), stack([el("video", { source: "youtube", url: c.url, title: c.title, radius: L.radius, shadow: true }, "Video")], { align: "stretch" })], { bg: c.bg ?? L.bg, padY: 80, width: 960 });
 }
 
-/** Banner pengumuman (gratis). */
+/** Announcement banner (free). */
 export function notice(L: Look, c: { badge: string; text: string; link: string; href: string; bg?: string }): BoxNode {
   return section(
     "Pengumuman",
@@ -635,7 +635,7 @@ export function notice(L: Look, c: { badge: string; text: string; link: string; 
   );
 }
 
-/** Profil orang (gratis, tanpa preset Kartu Tim). */
+/** Person profile (free, without the Team Cards preset). */
 export function people(L: Look, c: Intro & { items: { name: string; role: string; photo: string; text?: string }[]; cols?: number; bg?: string; round?: boolean }): BoxNode {
   return section(
     "Profil",
@@ -651,7 +651,7 @@ export function people(L: Look, c: Intro & { items: { name: string; role: string
   );
 }
 
-/** Rating ringkas (gratis). */
+/** Compact rating (free). */
 export const stars = (L: Look, value: number, caption: string) => el("rating", { value, caption, color: "#f59e0b", textColor: L.p.muted }, "Rating");
 
 /* ------------------------------ premium ---------------------------- */
@@ -678,7 +678,7 @@ export function slider(L: Look, c: Partial<Intro> & { slides: { title: string; t
   );
 }
 
-/** Hitung mundur (Premium) dengan teks di samping. */
+/** Countdown (Premium) with text beside it. */
 export function countdownBand(L: Look, c: { eyebrow?: string; title: string; text: string; target: string; finished: string; bg?: string; actions?: Act[] }): BoxNode {
   return section(
     "Hitung mundur",
@@ -707,7 +707,7 @@ export function progressBars(L: Look, c: Intro & { bars: [string, number][]; bg?
   );
 }
 
-/** Kartu testimoni (Premium Testimonial). */
+/** Testimonial card (Premium Testimonial). */
 export function quotes(L: Look, c: Intro & { items: { quote: string; author: string; role: string; avatar: string; rating?: number }[]; cols?: number; bg?: string }): BoxNode {
   return section(
     "Testimoni",
@@ -735,7 +735,7 @@ export interface PlanEl {
   badge?: string;
 }
 
-/** Kartu harga (Premium Pricing). */
+/** Pricing card (Premium Pricing). */
 export function plans(L: Look, c: Intro & { items: PlanEl[]; bg?: string }): BoxNode {
   return section(
     "Paket",
@@ -751,7 +751,7 @@ export function plans(L: Look, c: Intro & { items: PlanEl[]; bg?: string }): Box
   );
 }
 
-/** Harga Bulanan/Tahunan (Premium). Plan: "Nama | bulanan | tahunan | fitur; fitur | CTA". */
+/** Monthly/Yearly pricing (Premium). Plan: "Name | monthly | yearly | feature; feature | CTA". */
 export function priceSwitch(L: Look, c: Intro & { plans: string[]; labels: [string, string, string, string, string]; featured?: number; href: string; bg?: string }): BoxNode {
   const [m, y, save, pm, py] = c.labels;
   return section(
@@ -764,7 +764,7 @@ export function priceSwitch(L: Look, c: Intro & { plans: string[]; labels: [stri
   );
 }
 
-/** Tabel perbandingan (Premium). Baris: "fitur | a | b | c" ("ya"/"tidak" = tanda). */
+/** Comparison table (Premium). Rows: "feature | a | b | c" ("ya"/"tidak" = marks). */
 export function compare(L: Look, c: Intro & { columns: string[]; rows: string[]; highlight?: number; caption: string; bg?: string }): BoxNode {
   return section(
     "Perbandingan",
@@ -773,7 +773,7 @@ export function compare(L: Look, c: Intro & { columns: string[]; rows: string[];
   );
 }
 
-/** Judul mengetik (Premium Typewriter). */
+/** Typing heading (Premium Typewriter). */
 export const typer = (L: Look, prefix: string, words: string[], o: { size?: number; color?: string; word?: string; align?: "left" | "center" } = {}) =>
   el("typewriter", { prefix, words, tag: "h1", fontSize: o.size ?? 56, textColor: o.color ?? L.p.ink, wordColor: o.word ?? L.p.primary, align: o.align ?? "left" }, "Teks Mengetik");
 

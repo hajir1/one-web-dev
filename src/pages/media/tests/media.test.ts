@@ -145,7 +145,7 @@ function buildJpeg({ trailing = true } = {}) {
     ...seg(0xfe, str("komentar rahasia")),
     ...seg(0xdb, [0, ...new Array(64).fill(1)]),
     ...seg(0xc0, [8, 0, 2, 0, 2, 1, 1, 0x11, 0]),
-    ...seg(0xc4, [0, 0xff, 0xd9, 0xff, 0xd9]), // byte FF D9 di dalam tabel (bukan EOI)
+    ...seg(0xc4, [0, 0xff, 0xd9, 0xff, 0xd9]), // FF D9 bytes inside a table (not EOI)
     ...seg(0xda, [1, 1, 0, 0, 63, 0]),
     0x12, 0xff, 0x00, 0x34, 0xff, 0xd0, 0x56, // data entropi: FF00 & RST0
     0xff, 0xd9,
@@ -172,7 +172,7 @@ test("metadata JPEG: GPS, kamera, orientasi terbaca; strip lossless & data setel
   assert.equal(r2.orientation, 6, "orientasi dipertahankan lewat EXIF minimal");
   assert.deepEqual(r2.blocks, ["EXIF"]);
   assert.equal(r2.hasIcc, true);
-  // Segmen gambar utuh: dari DQT sampai EOI identik.
+  // Whole image segment: identical from DQT to EOI.
   const tail = (b) => Array.from(b.slice(b.indexOf(0xdb) - 1, jpegEnd(b, findSos(b))));
   assert.deepEqual(tail(out), tail(jpg));
   assert.equal(out[out.length - 2], 0xff);
@@ -306,7 +306,7 @@ test("unsharp mask: tepi lebih kontras, area rata tidak berubah, alpha utuh", ()
   assert.deepEqual(unsharpMask(d.slice(), w, h, { amount: 0, radius: 1, threshold: 0 }), d);
 });
 
-/* ------------------------------ warna ------------------------------- */
+/* ------------------------------ colors ------------------------------- */
 
 test("warna: konversi, alpha, kontras WCAG, palet dominan", () => {
   assert.equal(toHex({ r: 255, g: 0, b: 128, a: 255 }), "#FF0080");
@@ -328,7 +328,7 @@ test("warna: konversi, alpha, kontras WCAG, palet dominan", () => {
   assert.deepEqual(extractPalette(new Uint8ClampedArray(16)), []);
 });
 
-/* ------------------------------ svg & ukuran ------------------------- */
+/* ------------------------------ svg & size ------------------------- */
 
 test("SVG: satuan panjang & ukuran intrinsik", () => {
   assert.equal(parseSvgLength("100"), 100);
@@ -355,7 +355,7 @@ test("resize: fit-box, tanpa memperbesar, nilai tidak valid, batas Canvas", () =
 
 test("format tujuan: 'format asli' & sumber yang tidak bisa di-encode", () => {
   assert.equal(resolveTarget("same", "jpeg").id, "jpeg");
-  // v5: GIF, AVIF, TIFF, JXL, QOI bisa di-encode (codec WASM) → tetap formatnya.
+  // v5: GIF, AVIF, TIFF, JXL, QOI can be encoded (WASM codec) → keep their format.
   assert.equal(resolveTarget("same", "gif").id, "gif");
   assert.equal(resolveTarget("same", "avif").id, "avif");
   assert.equal(resolveTarget("same", "tiff").id, "tiff");
@@ -364,7 +364,7 @@ test("format tujuan: 'format asli' & sumber yang tidak bisa di-encode", () => {
 });
 
 
-/* ------------------------- v5: format baru ------------------------- */
+/* ------------------------- v5: new formats ------------------------- */
 
 test("sniff: audio & gambar baru (WAV, FLAC, AIFF, MP3, AAC, M4A, QOI, JXL)", () => {
   assert.equal(sniffBytes(bytes("RIFF", 0, 0, 0, 0, "WAVE", "fmt ")), "wav");
@@ -388,7 +388,7 @@ test("BMP: header & urutan piksel BGRA bawah-ke-atas", () => {
   assert.equal(v.getInt32(18, true), 2);
   assert.equal(v.getUint16(28, true), 32);
   const data = new Uint8Array(buf, v.getUint32(10, true));
-  // Baris pertama di file = baris bawah gambar (biru lalu putih transparan).
+  // The first row in the file = the bottom row of the image (blue, then transparent white).
   assert.deepEqual([...data.slice(0, 8)], [255, 0, 0, 255, 255, 255, 255, 0]);
   assert.deepEqual([...data.slice(8, 12)], [0, 0, 255, 255]);
 });
@@ -396,7 +396,7 @@ test("BMP: header & urutan piksel BGRA bawah-ke-atas", () => {
 test("ICO: direktori berisi PNG per ukuran, rasio dipertahankan", async () => {
   const src = { width: 4, height: 2, data: new Uint8ClampedArray(4 * 2 * 4).fill(200) };
   const sq = fitSquare(src, 4);
-  // Gambar 4×2 di kotak 4×4: baris atas & bawah transparan.
+  // A 4×2 image in a 4×4 box: top & bottom rows transparent.
   assert.equal(sq[3], 0);
   assert.equal(sq[(1 * 4 + 1) * 4 + 3], 200);
   const fakePng = async (img) => new Uint8Array([img.width, img.height]).buffer;
@@ -405,7 +405,7 @@ test("ICO: direktori berisi PNG per ukuran, rasio dipertahankan", async () => {
   assert.equal(v.getUint16(2, true), 1);
   assert.equal(v.getUint16(4, true), 2);
   assert.equal(v.getUint8(6), 16);
-  assert.equal(v.getUint8(6 + 16), 0); // 256 ditulis sebagai 0
+  assert.equal(v.getUint8(6 + 16), 0); // 256 is written as 0
   const off = v.getUint32(6 + 16 + 12, true);
   assert.deepEqual([...new Uint8Array(ico, off, 2)], [0, 0]); // 256 & 0xff
 });

@@ -8,9 +8,9 @@ import { safeColor } from "../../helpers/background";
 import i18n from "../../../../../i18n";
 
 /* ================================================================== */
-/* Slider (PREMIUM) — carousel dengan panah, titik, dan autoplay.       */
-/* Interaktif: kode khusus per framework (state index + timer yang      */
-/* selalu dibersihkan saat komponen dilepas).                          */
+/* Slider (PREMIUM): a carousel with arrows, dots, and autoplay.        */
+/* Interactive: framework-specific code (index state + a timer that is  */
+/* always cleared when the component unmounts).                        */
 /* ================================================================== */
 
 interface SlideData extends Record<string, string> {
@@ -49,7 +49,7 @@ const DEFAULT_STATE: SliderState = {
 
 const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, Number.isFinite(n) ? n : a));
 
-/** JSON aman ditanam di <script>. */
+/** JSON that is safe to embed in a <script>. */
 const jsData = (slides: SlideData[]) =>
   JSON.stringify(slides.map((s) => ({ title: s.title, text: s.text })), null, 2).replace(/</g, "\\u003c");
 
@@ -275,7 +275,7 @@ const [tick, setTick] = useState(0);
 
 function go(i) {
   setIndex((i + slides.length) % slides.length);
-  setTick((t) => t + 1); // mulai ulang timer autoplay
+  setTick((t) => t + 1); // restart the autoplay timer
 }
 
 useEffect(() => {

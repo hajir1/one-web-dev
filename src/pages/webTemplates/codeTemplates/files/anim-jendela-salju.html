@@ -6,7 +6,7 @@
 <title data-owd-text="judulTab" data-owd-label="Judul tab browser">Jendela Salju</title>
 <meta name="description" content="Animasi akhir tahun: jendela berembun di malam bersalju, jari menggambar hati di kaca, kristal es tumbuh di sudut, cokelat panas mengepul, dan lampu hias menyala.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -15,7 +15,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --bg-1: #1d1418; /* Latar bawah */
   --bg-2: #2b1d22; /* Latar tengah */
@@ -98,7 +98,7 @@ body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text)
 </div>
 </div>
 <script>
-/* ==== PENGATURAN: lama tiap babak (detik), maju otomatis, dan data adegan ==== */
+/* ==== SETTINGS: length of each act (seconds), auto-advance, and scene data ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
   "detikPerBabak": 4.5,
   "majuOtomatis": true
@@ -113,13 +113,13 @@ function scene(api) {
       const W = api.W, H = api.H, u = Math.min(W, H) / 100;
       const fw = Math.min(W * 0.8, H * 0.95), fh = Math.min(H * 0.7, fw * 0.9), fx = (W - fw) / 2, fy = H * 0.12;
       const draw = seg(B, 0.9, 1.8), frost = seg(B, 1.8, 2.5), lights = seg(B, 2.3, 2.9);
-      /* Luar: langit, salju, rumah-rumah jauh dengan jendela. */
+      /* Outside: sky, snow, distant houses with windows. */
       g.save(); g.beginPath(); g.rect(fx, fy, fw, fh); g.clip();
       g.fillStyle = COL["bg-3"]; g.fillRect(fx, fy, fw, fh);
       g.fillStyle = api.mix(COL["bg-3"], "#ffffff", 0.7); g.beginPath(); g.moveTo(fx, fy + fh); g.lineTo(fx, fy + fh * 0.78); g.quadraticCurveTo(fx + fw * 0.5, fy + fh * 0.7, fx + fw, fy + fh * 0.8); g.lineTo(fx + fw, fy + fh); g.fill();
       for (let i = 0; i < 4; i++) { const hx = fx + fw * (0.12 + i * 0.22), hy = fy + fh * 0.76, hw = fw * 0.1; g.fillStyle = api.mix(COL["bg-1"], COL["bg-3"], 0.4); g.fillRect(hx, hy - hw * 0.6, hw, hw * 0.6); g.beginPath(); g.moveTo(hx - 4, hy - hw * 0.6); g.lineTo(hx + hw / 2, hy - hw); g.lineTo(hx + hw + 4, hy - hw * 0.6); g.fill(); g.fillStyle = rgba(COL["c-2"], 0.85); g.fillRect(hx + hw * 0.35, hy - hw * 0.4, hw * 0.3, hw * 0.22); }
       for (const s of snow) { s[1] += dt * 0.05 * s[2]; if (s[1] > 1) s[1] = 0; g.fillStyle = rgba("#ffffff", 0.85 * s[2]); g.beginPath(); g.arc(fx + s[0] * fw + Math.sin(t + s[2] * 9) * u, fy + s[1] * fh, s[2] * 2.2, 0, 7); g.fill(); }
-      /* Embun: lapisan putih buram dengan lubang berbentuk hati (yang digambar jari). */
+      /* Fog: a frosted white layer with a heart-shaped hole (drawn by a finger). */
       const cx = fx + fw / 2, cy = fy + fh * 0.42, R = Math.min(fw, fh) * 0.24;
       g.fillStyle = rgba("#e8eef6", 0.42);
       g.beginPath(); g.rect(fx, fy, fw, fh);
@@ -128,24 +128,24 @@ function scene(api) {
       g.fill("evenodd");
       if (draw > 0 && draw < 1) { const p = HEART[Math.max(0, n - 1)]; g.fillStyle = rgba("#f2c8a8", 0.9); g.beginPath(); g.ellipse(cx + p[0] * R + u * 1.2, cy + p[1] * R + u * 3, u * 2.2, u * 4, 0.3, 0, 7); g.fill(); }
       if (draw > 0) { g.strokeStyle = rgba("#ffffff", 0.35); g.lineWidth = u * 1.4; g.beginPath(); for (let i = 0; i < n; i++) { const p = HEART[i]; i ? g.lineTo(cx + p[0] * R, cy + p[1] * R) : g.moveTo(cx + p[0] * R, cy + p[1] * R); } g.stroke(); }
-      /* Kristal es di sudut. */
+      /* Ice crystals in the corner. */
       if (frost > 0) {
         const corners = [[fx, fy, 1, 1], [fx + fw, fy, -1, 1], [fx, fy + fh, 1, -1], [fx + fw, fy + fh, -1, -1]];
         g.strokeStyle = rgba("#ffffff", 0.75); g.lineWidth = 1.4;
         for (const c of crystals) { const k = corners[c[0]], L = u * 14 * c[2] * ease(frost), a = c[1] * 0.6 + 0.1; const ex = k[0] + k[2] * Math.cos(a) * L, ey = k[1] + k[3] * Math.sin(a) * L; g.beginPath(); g.moveTo(k[0], k[1]); g.lineTo(ex, ey); for (let j = 1; j < 4; j++) { const q = j / 4, bx = lerp(k[0], ex, q), by = lerp(k[1], ey, q), bl = L * 0.2 * (1 - q); g.moveTo(bx, by); g.lineTo(bx + k[2] * Math.cos(a + 0.8) * bl, by + k[3] * Math.sin(a + 0.8) * bl); g.moveTo(bx, by); g.lineTo(bx + k[2] * Math.cos(a - 0.8) * bl, by + k[3] * Math.sin(a - 0.8) * bl); } g.stroke(); }
       }
       g.restore();
-      /* Kusen jendela dan ambang. */
+      /* Window frame and sill. */
       g.strokeStyle = COL["c-3"]; g.lineWidth = u * 2.2; g.strokeRect(fx, fy, fw, fh); g.lineWidth = u * 1.2; g.beginPath(); g.moveTo(cx, fy); g.lineTo(cx, fy + fh); g.moveTo(fx, fy + fh * 0.55); g.lineTo(fx + fw, fy + fh * 0.55); g.stroke();
       g.fillStyle = COL["c-3"]; g.fillRect(fx - u * 3, fy + fh, fw + u * 6, u * 3);
-      /* Cangkir cokelat panas di ambang. */
+      /* A cup of hot chocolate on the sill. */
       const mx = fx + fw * 0.8, my = fy + fh, mw = u * 6, mh = u * 6, mug = seg(B, 1.9, 2.4);
       if (mug > 0) {
         g.globalAlpha = mug; g.fillStyle = COL["c-1"]; g.fillRect(mx - mw / 2, my - mh, mw, mh); g.strokeStyle = COL["c-1"]; g.lineWidth = u * 1; g.beginPath(); g.arc(mx + mw / 2, my - mh / 2, mh * 0.28, -1.4, 1.4); g.stroke();
         for (let k = 0; k < 3; k++) { const q = (t * 0.3 + k / 3) % 1; g.strokeStyle = rgba("#ffffff", 0.45 * (1 - q) * mug); g.lineWidth = u * 0.5; g.beginPath(); const sx = mx - mw * 0.25 + k * mw * 0.25; g.moveTo(sx, my - mh - u); g.bezierCurveTo(sx - u * 1.5, my - mh - u * 4 - q * u * 4, sx + u * 1.5, my - mh - u * 6 - q * u * 6, sx, my - mh - u * 9 - q * u * 6); g.stroke(); }
         g.globalAlpha = 1;
       }
-      /* Lampu hias di sepanjang kusen atas. */
+      /* String lights along the top of the window frame. */
       if (lights > 0) {
         g.strokeStyle = rgba(COL.ink, 0.5); g.lineWidth = 1; g.beginPath();
         const N = 14; for (let i = 0; i <= N; i++) { const x = fx + (i / N) * fw, y = fy + Math.sin((i / N) * Math.PI * 4) * u * 1.5 + u * 1.2; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
@@ -164,16 +164,16 @@ const dots = [...document.querySelectorAll(".dots i")];
 const btnPause = document.getElementById("pause");
 const btnAgain = document.getElementById("again");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-const N = caps.length + 1; /* babak terakhir = kartu ucapan */
+const N = caps.length + 1; /* last act = greeting card */
 const css = getComputedStyle(document.documentElement);
 const COL = {};
 function readColors() { for (const k of ["bg-1", "bg-2", "bg-3", "c-1", "c-2", "c-3", "ink", "panel"]) COL[k] = css.getPropertyValue("--" + k).trim() || "#888"; COL.speed = parseFloat(css.getPropertyValue("--speed")) || 1; }
 readColors();
 
-/* Huruf berjatuhan untuk efek "letters". */
+/* Falling letters for the "letters" effect. */
 for (const c of caps) if (c.dataset.fx === "letters") { const words = c.textContent.split(/(\s+)/); c.textContent = ""; let i = 0; for (const w of words) { const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i++); s.textContent = w; c.appendChild(s); } }
 
-/* Bantuan untuk adegan. */
+/* Scene helpers. */
 let seed = 7;
 const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -192,7 +192,7 @@ function mix(h1, h2, t) {
 }
 function glowDot(x, y, r, color, a) { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, rgba(color, a)); gr.addColorStop(1, rgba(color, 0)); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 function heart(x, y, s) { g.beginPath(); g.moveTo(x, y + s * 0.35); g.bezierCurveTo(x, y, x - s * 0.5, y - s * 0.1, x - s * 0.5, y + s * 0.25); g.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s); g.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.25); g.bezierCurveTo(x + s * 0.5, y - s * 0.1, x, y, x, y + s * 0.35); g.fill(); }
-/* Titik-titik pembentuk teks (untuk partikel yang menyusun kata). */
+/* Points that form the text (for the particles that spell the word). */
 function textPoints(text, w, h, step, font) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d");
   let fs = h * 0.8; x.font = (font || "700 ") + fs + "px " + (css.getPropertyValue("--font-display") || "serif");
@@ -215,7 +215,7 @@ function resize() {
   if (S.resize) S.resize(W, H);
 }
 
-/* Waktu cerita: B naik pelan menuju target; target naik satu babak tiap detikPerBabak. */
+/* Story time: B rises slowly toward the target; the target rises one act every detikPerBabak. */
 let B = 0, target = 0, t = 0, last = 0, raf = 0, paused = false, held = 0, frameN = 0, shown = -1;
 const beatSec = () => Math.max(1.5, +CONFIG.detikPerBabak || 4.5) / COL.speed;
 function setBeat(i) {

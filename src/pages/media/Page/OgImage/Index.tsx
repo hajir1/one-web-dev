@@ -11,8 +11,8 @@ import { downloadBlob } from "../../lib/download";
 import { OG_SIZE, ogMetaHtml, readableOn, wrapText } from "../../lib/webIcons";
 
 /* ================================================================== */
-/* OG Image Maker (v10): gambar bagikan 1200×630 untuk WhatsApp,        */
-/* Facebook, X, LinkedIn. Judul, subjudul, domain, logo, latar.          */
+/* OG Image Maker (v10): 1200×630 share images for WhatsApp,            */
+/* Facebook, X, LinkedIn. Title, subtitle, domain, logo, background.     */
 /* ================================================================== */
 
 const RULES: FileRules = { kinds: ["png", "jpeg", "webp", "svg", "gif", "avif"], maxBytes: 20 * 1024 * 1024, maxFiles: 1 };
@@ -55,7 +55,7 @@ function draw(c: HTMLCanvasElement, o: Opts, logo: DecodedImage | null) {
     const w = Math.min((logo.width / logo.height) * h, 320);
     ctx.drawImage(logo.source, center ? (W - w) / 2 : pad, y, w, h);
   }
-  // Judul: maks 3 baris; ukuran turun bila panjang.
+  // Title: max 3 lines; the size shrinks when long.
   const titleText = o.title.trim() || " ";
   let size = 76;
   let lines: string[] = [];
@@ -68,7 +68,7 @@ function draw(c: HTMLCanvasElement, o: Opts, logo: DecodedImage | null) {
   ctx.font = `400 ${subSize}px ${FONT}`;
   const subLines = o.subtitle.trim() ? wrapText(o.subtitle, maxW, (s) => ctx.measureText(s).width, 2) : [];
   const blockH = lines.length * size * 1.12 + (subLines.length ? 24 + subLines.length * subSize * 1.3 : 0);
-  // Teks di tengah vertikal (di bawah logo bila ada).
+  // Text vertically centered (below the logo when present).
   const top = logo ? pad + 72 + 40 : pad;
   y = Math.max(top, (H - blockH) / 2) + size;
   ctx.font = `800 ${size}px ${FONT}`;

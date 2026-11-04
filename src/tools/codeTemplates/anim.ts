@@ -1,17 +1,17 @@
 import { dataBlock, doc, esc, n, ot, rng, type Rng, type ThemeVar } from "./shared";
 
 /* ================================================================== */
-/* Kategori ANIMASI DESAIN: taman bercahaya romantis di malam hari.      */
-/* Tanpa library: SVG berlapis + CSS keyframes + canvas 2D.             */
+/* DESIGN ANIMATION category: a romantic glowing garden at night.        */
+/* No library: layered SVG + CSS keyframes + 2D canvas.                 */
 /*                                                                    */
-/* - Lapisan SVG: bintang, bulan, bukit, rumput belakang, bunga belakang,*/
-/*   bunga depan, rumput depan. Tiap lapis berayun dengan jeda berbeda. */
-/* - Cahaya: halo gradasi radial di tiap kelopak & bulan (v19). Dulu   */
-/*   filter blur SVG di lapisan yang berayun: blur dihitung ulang tiap  */
-/*   frame (FPS turun ke ~25). Gradasi tidak perlu dihitung ulang.       */
-/* - Kunang-kunang: canvas 2D, maks 60 partikel, lebih sedikit di layar */
-/*   sempit; berhenti saat tab tidak terlihat.                          */
-/* - Parallax halus mengikuti pointer, mati di HP (bisa diubah).        */
+/* - SVG layers: stars, moon, hills, back grass, back flowers,          */
+/*   front flowers, front grass. Each layer sways with a different delay. */
+/* - Glow: a radial gradient halo on each petal & the moon (v19). Previously */
+/*   an SVG blur filter on swaying layers: the blur was recomputed every */
+/*   frame (FPS dropped to ~25). Gradients do not need recomputing.     */
+/* - Fireflies: 2D canvas, max 60 particles, fewer on screens */
+/*   narrow; stops when the tab is not visible.                         */
+/* - Subtle parallax following the pointer, off on phones (configurable). */
 /* ================================================================== */
 
 type Flower = "tulip" | "rose" | "bell" | "daisy" | "lotus" | "sakura";
@@ -24,7 +24,7 @@ export interface AnimSpec {
   seed: number;
   flower: Flower;
   extra: Extra;
-  /** Warna & kecepatan (variabel CSS di :root). */
+  /** Colors & speed (CSS variables on :root). */
   colors: {
     sky: [string, string, string];
     flower: string;
@@ -39,16 +39,16 @@ export interface AnimSpec {
     ink: string;
   };
   moon: { x: number; y: number; r: number; crescent?: boolean };
-  /** Teks di atas adegan. */
+  /** Text above the scene. */
   to: string;
   heading: string;
   text: string;
   from: string;
-  /** Posisi teks: kiri (bawaan), kanan, atau tengah atas. */
+  /** Text position: left (default), right, or top center. */
   align?: "left" | "right" | "center";
-  /** v17: kolam dengan pantulan bulan (bunga mengapung, mis. teratai). */
+  /** v17: a pond with the moon's reflection (floating flowers, e.g. lotus). */
   pond?: boolean;
-  /** v17: dahan berbunga dari pojok kiri atas (mis. sakura). */
+  /** v17: a flowering branch from the top-left corner (e.g. sakura). */
   branch?: boolean;
   font: { display: string; href: string };
 }
@@ -58,7 +58,7 @@ const H = 900;
 
 /* ----------------------------- bentuk bunga ------------------------ */
 
-/** Cahaya di belakang kelopak: lingkaran bergradasi (pengganti filter blur). */
+/** Glow behind the petals: a gradient circle (replaces the blur filter). */
 const halo = (kind: Flower) => `<circle class="halo" r="${kind === "lotus" ? 42 : kind === "daisy" ? 34 : 30}" fill="url(#halo)"/>`;
 
 function blossomDef(kind: Flower): string {
@@ -102,7 +102,7 @@ function blossomDef(kind: Flower): string {
 
 const leafPath = (len: number, side: 1 | -1) => `M0 0C${n(side * len * 0.4)} ${n(-len * 0.35)} ${n(side * len * 0.85)} ${n(-len * 0.3)} ${n(side * len)} ${n(-len * 0.55)}C${n(side * len * 0.6)} ${n(-len * 0.05)} ${n(side * len * 0.25)} ${n(len * 0.02)} 0 0Z`;
 
-/** Satu bunga: batang, daun, dan kelopak (use #bl). */
+/** One flower: stem, leaves, and petals (use #bl). */
 function flowerSvg(r: Rng, kind: Flower, x: number, base: number, h: number, scale: number, alt: boolean): string {
   const bend = r.range(-h * 0.18, h * 0.18);
   const tipX = kind === "bell" ? bend + r.range(18, 32) * (bend >= 0 ? 1 : -1) : bend;
@@ -124,7 +124,7 @@ function flowerSvg(r: Rng, kind: Flower, x: number, base: number, h: number, sca
   return `<g transform="translate(${n(x)} ${n(base)})"><g class="sw" style="--t:${t}s;--d:${d}s"><path class="st" d="${stem}"/>${leaves.join("")}<use href="#bl"${tone} transform="translate(${n(tipX)} ${n(tipY)}) rotate(${n(rot)}) scale(${n(scale, 2)})"/></g></g>`;
 }
 
-/** Rumpun rumput: beberapa helai dalam satu path. */
+/** Grass tuft: several blades in one path. */
 function grassClump(r: Rng, x: number, base: number, hMax: number, cls: string): string {
   let d = "";
   const blades = r.int(5, 9);
@@ -175,14 +175,14 @@ function hills(r: Rng): string {
 
 /* ----------------------------- adegan ------------------------------ */
 
-/** Teratai mengapung di atas daun bulat (dipakai bila ada kolam). */
+/** Lotus floating on round leaves (used when there is a pond). */
 function floatingFlower(r: Rng, x: number, y: number, scale: number, alt: boolean): string {
   const tone = alt ? ` style="--c:var(--flower-2)"` : "";
   const pad = `<ellipse class="pad" cx="${n(r.range(-10, 10))}" cy="4" rx="${n(34 * scale)}" ry="${n(9 * scale)}"/>`;
   return `<g transform="translate(${n(x)} ${n(y)})">${pad}<g class="bob" style="--t:${n(r.range(5, 8))}s;--d:${n(-r.range(0, 6))}s"><use href="#bl"${tone} transform="scale(${n(scale, 2)})"/></g></g>`;
 }
 
-/** Dahan berbunga dari pojok kiri atas. */
+/** A flowering branch from the top-left corner. */
 function branchLayer(r: Rng): string {
   const main = "M-40 30C120 60 260 110 420 170S700 250 820 236";
   const twigs = ["M160 74C190 30 240 18 290 20", "M330 140C360 200 420 230 470 236", "M520 205C560 160 610 150 660 160", "M260 112C250 160 270 200 300 226"];
@@ -255,7 +255,7 @@ function extraLayer(s: AnimSpec): string {
 
 /* ------------------------------- CSS ------------------------------- */
 
-/** Variabel tema (bisa diedit lewat form Warna & gaya). --speed: 1 normal, 0.5 lebih lambat, 2 lebih cepat. */
+/** Theme variables (editable through the Colors & style form). --speed: 1 normal, 0.5 slower, 2 faster. */
 function themeVars(s: AnimSpec): ThemeVar[] {
   const c = s.colors;
   return [
@@ -307,7 +307,7 @@ body { background: var(--sky-1); color: var(--ink); font-family: var(--font-text
 .ct { fill: var(--flower-center); }
 ${s.flower === "rose" ? ".p2 { fill: none; stroke: var(--glow); stroke-opacity: .75; stroke-width: 2; }" : ""}
 
-/* Ayunan: tiap bunga & rumpun rumput berayun dari pangkalnya, jeda tiap lapis berbeda (--ld). */
+/* Sway: each flower & grass tuft sways from its base, with a different delay per layer (--ld). */
 .sw { transform-box: fill-box; transform-origin: 50% 100%; animation: sway calc(var(--t, 6s) / var(--speed)) ease-in-out calc(var(--ld, 0s) + var(--d, 0s)) infinite alternate; }
 .bloom use { animation: pulse calc(5s / var(--speed)) ease-in-out var(--d, 0s) infinite alternate; }
 
@@ -350,7 +350,7 @@ ${s.flower === "rose" ? ".p2 { fill: none; stroke: var(--glow); stroke-opacity: 
 .hearts i { bottom: -8vh; width: calc(26px * var(--s)); opacity: .8; animation: rise calc(var(--t) / var(--speed)) linear var(--d) infinite; }
 .hearts svg { width: 100%; fill: var(--flower); filter: drop-shadow(0 0 8px var(--glow)); }
 
-/* Teks */
+/* Text */
 .note { position: absolute; left: clamp(20px, 6vw, 96px); top: clamp(56px, 13vh, 140px); max-width: min(560px, calc(100vw - 40px)); z-index: 2; }
 .note .to { margin: 0 0 14px; font-size: 15px; letter-spacing: .08em; color: var(--glow); }
 .note h1 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: clamp(34px, 5.6vw, 68px); line-height: 1.08; color: #fffaf0; text-shadow: 0 2px 18px rgba(0,0,0,.55); }
@@ -384,11 +384,11 @@ ${s.align === "center" ? ".note { left: 50%; transform: translateX(-50%); width:
 
 function script(): string {
   return `
-/* ==== KONFIGURASI (bisa juga diubah lewat editor OneWebDev) ====
-   fireflies        : jumlah maksimum kunang-kunang (batas 60)
-   firefliesNarrow  : jumlah di layar sempit (< 640px)
-   parallax         : parallax mengikuti pointer
-   parallaxOnMobile : aktifkan juga di HP/tablet sentuh */
+/* ==== CONFIGURATION (can also be changed in the OneWebDev editor) ====
+   fireflies        : maximum number of fireflies (limit 60)
+   firefliesNarrow  : number on narrow screens (< 640px)
+   parallax         : parallax follows the pointer
+   parallaxOnMobile : also enable on touch phones/tablets */
 const CONFIG = ${dataBlock("CONFIG", "Pengaturan animasi", { fireflies: 60, firefliesNarrow: 24, parallax: true, parallaxOnMobile: false })};
 /* ================================================================ */
 
@@ -404,7 +404,7 @@ let w = 0, h = 0, dpr = 1, raf = 0;
 const css = getComputedStyle(document.documentElement);
 const speed = () => parseFloat(css.getPropertyValue("--speed")) || 1;
 
-/* Sprite cahaya: digambar sekali, lalu disalin (lebih ringan daripada gradien per partikel). */
+/* Light sprite: drawn once, then copied (lighter than a gradient per particle). */
 const sprite = document.createElement("canvas");
 function makeSprite() {
   const color = css.getPropertyValue("--firefly").trim() || "#ffe08a";
@@ -454,7 +454,7 @@ function frame(now) {
 }
 function start() { cancelAnimationFrame(raf); last = performance.now(); raf = requestAnimationFrame(frame); }
 
-/* Parallax: tiap lapisan bergeser sesuai kedalaman (data-depth, piksel). */
+/* Parallax: each layer shifts by its depth (data-depth, pixels). */
 const layers = [...document.querySelectorAll(".px")].map((el) => ({ el, d: +el.dataset.depth || 0 }));
 let parallaxOn = CONFIG.parallax && (CONFIG.parallaxOnMobile || !coarse.matches);
 function onPointer(e) {

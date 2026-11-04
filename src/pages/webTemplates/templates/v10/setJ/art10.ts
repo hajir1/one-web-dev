@@ -1,10 +1,10 @@
 import { svg, specks } from "./art";
 
-/* Ilustrasi 10 Petak Sembilan: motif tegel semen 20 × 20 (dibuat dari bentuk geometris sederhana) + pres besi. */
+/* Illustration 10 Petak Sembilan: 20 × 20 cement tile motifs (made from simple geometric shapes) + an iron press. */
 
 const P = { semen: "#A7A39A", oker: "#A8442E", hitam: "#1E1E1C", kunyit: "#D8A13A", kapur: "#EFEBE3" };
 
-/** Satu keping tegel: dasar, motif seperempat diputar empat kali, dan butir semen. */
+/** One tile: base, a quarter motif rotated four times, and cement grain. */
 function tile(bg: string, quarter: string, seed: number, center = ""): string {
   const q = [0, 90, 180, 270].map((r) => `<g transform="rotate(${r} 200 200)">${quarter}</g>`).join("");
   return svg(400, 400, `<rect width="400" height="400" fill="${bg}"/>${q}${center}${specks(90, 400, 400, "rgba(30,30,28,.14)", seed, 1.6)}<rect x="1" y="1" width="398" height="398" fill="none" stroke="rgba(30,30,28,.35)" stroke-width="2"/>`);
@@ -22,7 +22,7 @@ const M: Record<string, () => string> = {
   polos: () => tile(P.oker, `<rect x="0" y="0" width="200" height="14" fill="${P.hitam}"/>`, 29),
 };
 
-/** Pres besi tua dari samping, cetakan kuningan di bawahnya. */
+/** An old iron press from the side, with a brass mold below it. */
 function pres(): string {
   return svg(
     900,

@@ -57,12 +57,12 @@ layer(base);
   --color-brand-900: #1c3174;
   --color-brand-950: #121e45;
 
-  /* Token desain OneWebDev (satu sumber):
-     - Warna utama: brand-* (blue-* = alias brand, jadi kelas lama tetap seragam).
-     - Sudut: kontrol (tombol, input, chip) rounded-lg; baris daftar, menu, notifikasi rounded-xl;
-       kartu/panel halaman rounded-2xl (komponen Card di components/app/ui.tsx).
-     - Nama produk di UI & ekspor: "OneWebDev". */
-  /* Biru OneWeb: dipakai juga oleh kelas blue-* yang sudah tersebar di halaman. */
+  /* OneWebDev design tokens (single source):
+     - Primary color: brand-* (blue-* = brand alias, so older classes stay consistent).
+     - Corners: controls (buttons, inputs, chips) rounded-lg; list rows, menus, notifications rounded-xl;
+       page cards/panels rounded-2xl (the Card component in components/app/ui.tsx).
+     - Product name in the UI & exports: "OneWebDev". */
+  /* OneWeb blue: also used by the blue-* classes spread across pages. */
   --color-blue-50: #eef3ff;
   --color-blue-100: #dce6fe;
   --color-blue-200: #c0d2fd;

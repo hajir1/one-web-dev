@@ -1,9 +1,9 @@
 // ─── workers/bgRemovalWorker.ts ──────────────────────────────────────────────
-// Hapus latar di browser dengan transformers.js (Apache-2.0) + model
+// Background removal in the browser with transformers.js (Apache-2.0) + model
 // BiRefNet_lite ONNX (MIT). Pengganti @imgly/background-removal (AGPL-3.0).
 //
-// Worker ini HIDUP TERUS selama halaman terbuka agar model (±115/224 MB)
-// cukup dimuat sekali; batal = worker di-terminate oleh bgRemoval.ts.
+// This worker STAYS ALIVE while the page is open so the model (about 115/224 MB)
+// only loads once; cancel = the worker is terminated by bgRemoval.ts.
 
 import { AutoModel, AutoProcessor, RawImage, env, type PreTrainedModel, type Processor, type Tensor } from "@huggingface/transformers";
 
@@ -27,7 +27,7 @@ function load(dtype: BgDtype, onProgress: (v: number) => void) {
   const device = nav.gpu ? "webgpu" : "wasm";
   const key = `${dtype}:${device}`;
   if (loaded?.key === key) return loaded;
-  // Progres unduhan gabungan semua file model (config, preprocessor, onnx).
+  // Combined download progress of all model files (config, preprocessor, onnx).
   const files = new Map<string, { loaded: number; total: number }>();
   const progress_callback = (p: { status: string; file?: string; loaded?: number; total?: number }) => {
     if (p.status !== "progress" || !p.file) return;
@@ -43,7 +43,7 @@ function load(dtype: BgDtype, onProgress: (v: number) => void) {
   const model = AutoModel.from_pretrained(BG_MODEL_ID, { dtype, device: device as "webgpu" | "wasm", progress_callback });
   const processor = AutoProcessor.from_pretrained(BG_MODEL_ID, { progress_callback });
   loaded = { key, device, model, processor };
-  // Gagal memuat → jangan simpan janji yang sudah gagal.
+  // Failed to load → do not keep the failed promise.
   Promise.all([model, processor]).catch(() => {
     if (loaded?.key === key) loaded = null;
   });
@@ -64,7 +64,7 @@ async function run({ id, file, dtype }: BgRequest) {
   progress(92);
   const mask = await RawImage.fromTensor((matte as unknown as Record<number, Tensor>)[0].sigmoid().mul(255).to("uint8")).resize(image.width, image.height);
 
-  // Gabungkan: piksel asli + alpha dari mask.
+  // Combine: original pixels + alpha from the mask.
   const bmp = await createImageBitmap(file);
   const canvas = new OffscreenCanvas(bmp.width, bmp.height);
   const ctx = canvas.getContext("2d");

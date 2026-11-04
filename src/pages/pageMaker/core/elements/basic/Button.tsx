@@ -116,7 +116,7 @@ function buttonSections(s: ButtonState, update: Updater<ButtonState>): PanelSect
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const buttonElement = defineElement<ButtonState>({

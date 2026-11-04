@@ -18,10 +18,10 @@ import { designUsage, useDesignLimit } from "../helpers/designQuota";
 const NONE: SavedDesign[] = [];
 
 /**
- * Dialog "batas desain tercapai". Menampilkan desain yang ada (terlama dulu)
- * agar PENGGUNA memilih sendiri yang dihapus — setiap hapus perlu konfirmasi.
- * Tidak ada penghapusan otomatis. Setelah ruang cukup, tombol "Lanjutkan"
- * menjalankan aksi yang tertunda.
+ * The "design limit reached" dialog. Shows existing designs (oldest first)
+ * so the USER chooses what to delete; every delete needs confirmation.
+ * Nothing is deleted automatically. Once there is enough space, the "Continue" button
+ * runs the pending action.
  */
 export default function DesignLimitDialog() {
   const { t, i18n } = useTranslation();
@@ -55,7 +55,7 @@ export default function DesignLimitDialog() {
     run?.();
   };
 
-  /** Alternatif menghapus: beli 1 paket desain (simulasi) — kuota langsung bertambah. */
+  /** Alternative to deleting: buy 1 design pack (simulated) — the quota grows immediately. */
   const buyPack = async () => {
     const r = await commerceService.purchaseDesigns(pack.designs);
     if (r.ok) notify.success(t("market.toast.designsAdded", { count: pack.designs }));
@@ -100,7 +100,7 @@ export default function DesignLimitDialog() {
           <Notice tone="warn">{t("designLimit.mustDelete", { count: cap.mustDelete })}</Notice>
         )}
         <p className="text-xs text-gray-500 dark:text-gray-400">{t("designLimit.noAutoDelete")}</p>
-        {/* Mode demo (v12): tanpa pembelian paket desain. */}
+        {/* Demo mode (v12): no design pack purchases. */}
         {!cap.ok && !isDemoMode() && (
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-2.5 text-xs dark:border-blue-500/20 dark:bg-blue-500/10" data-testid="design-limit-pack">
             <span className="min-w-0 flex-1 text-gray-700 dark:text-gray-200">{t("market.limit.orBuy", { designs: pack.designs, credits: pack.credits, balance })}</span>

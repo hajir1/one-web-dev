@@ -1,7 +1,7 @@
 /* ================================================================== */
-/* Ikon ilustrasi UMKM (v23): SVG garis + isian dua warna, 64x64.        */
-/* Garis = currentColor, isian .f1 = aksen, .f2 = aksen kedua.          */
-/* Dipakai di hero, kartu produk, dan latar dekoratif landing page.      */
+/* Small business illustration icons (v23): line SVG + two-color fills, 64x64. */
+/* Lines = currentColor, fill .f1 = accent, .f2 = second accent.        */
+/* Used in the hero, product cards, and decorative landing page backgrounds. */
 /* ================================================================== */
 
 export const ICONS: Record<string, string> = {
@@ -82,11 +82,11 @@ export const ICONS: Record<string, string> = {
 
 export type IconName = keyof typeof ICONS;
 
-/** <svg> ikon: kelas .ico mewarnai garis (currentColor) dan isian .f1/.f2. */
+/** Icon <svg>: the .ico class colors the lines (currentColor) and the .f1/.f2 fills. */
 export const icon = (name: string, cls = "ico", label?: string) =>
   `<svg class="${cls}" viewBox="0 0 64 64" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}>${ICONS[name] ?? ICONS.star}</svg>`;
 
-/** CSS dasar ikon (dipakai semua skin). */
+/** Base icon CSS (used by every skin). */
 export const ICON_CSS = `
 .ico { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
 .ico .f1 { fill: var(--accent); }

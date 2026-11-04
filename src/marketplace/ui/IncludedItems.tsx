@@ -6,8 +6,8 @@ import type { CatalogSnapshot } from "../repository";
 import type { PieceCatalogItem, TemplateCatalogItem } from "../types";
 
 /**
- * Isi template: section & elemen yang dipakai, dengan status akses tiap item
- * Premium. Item bawaan hanya berlaku di desain dari template ini.
+ * Template content: sections & elements used, with the access status of each
+ * Premium item. Built-in items only apply in designs from this template.
  */
 export default function IncludedItems({ tpl, catalog, compact = false }: { tpl: TemplateCatalogItem; catalog: CatalogSnapshot; compact?: boolean }) {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
 /**
- * v9: ikon OneWebDev = angka "1" bergaya kode (garis monospace + kursor
- * terminal) di ubin biru. Geometri sama dengan generate-icons.mjs (favicon/PWA).
+ * v9: OneWebDev icon = a code-styled "1" (monospace stroke + terminal
+ * cursor) on a blue tile. Same geometry as generate-icons.mjs (favicon/PWA).
  */
 export function BrandMark({ className = "h-9 w-9" }: { className?: string }) {
   return (

@@ -1,8 +1,8 @@
-# Kebijakan nama & logo
+# Name and logo policy
 
-Kode OneWebDev boleh di-fork dan dimodifikasi sesuai AGPL-3.0. **Nama "OneWebDev" dan logonya tidak termasuk** dalam lisensi itu.
+The OneWebDev code may be forked and modified under the AGPL-3.0. **The "OneWebDev" name and logo are not covered** by that license.
 
-- Boleh: menyebut bahwa proyek Anda "berbasis OneWebDev" atau "fork dari OneWebDev".
-- Tidak boleh: memakai nama atau logo OneWebDev sebagai nama produk, layanan, atau domain Anda, atau membuat kesan bahwa fork Anda adalah versi resmi.
+- Allowed: saying that your project is "based on OneWebDev" or "a fork of OneWebDev".
+- Not allowed: using the OneWebDev name or logo as the name of your product, service, or domain, or implying that your fork is the official version.
 
-Bila Anda menerbitkan fork sebagai layanan, ganti nama aplikasi (`src/config/legal.ts`, `index.html`, `vite.config.ts`, berkas locale) dan logo (`src/components/app/BrandLogo.tsx`, `public/`).
+If you publish a fork as a service, rename the app (`src/config/legal.ts`, `index.html`, `vite.config.ts`, the locale files) and replace the logo (`src/components/app/BrandLogo.tsx`, `public/`).

@@ -13,7 +13,7 @@ import VerifyPending from "./VerifyPending";
 import { legalPath } from "../../config/legal";
 import { clearStoredReferral, getStoredReferral, normalizeReferralInput, storeReferral } from "../../auth/referralCapture";
 
-/** Kalimat persetujuan dengan tautan S&K dan Kebijakan Privasi (dibuka di tab baru). */
+/** Consent sentence with links to the Terms and Privacy Policy (opened in a new tab). */
 export function TermsConsentText() {
   const { t } = useTranslation();
   const link = "font-semibold text-brand-600 hover:underline dark:text-brand-400";
@@ -32,7 +32,7 @@ export function TermsConsentText() {
   );
 }
 
-/** Tujuan setelah login: hanya path internal (bukan URL luar). */
+/** Destination after login: internal paths only (no external URLs). */
 function safeNext(raw: string | null, lang: string): string {
   if (raw && raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("\\")) return raw;
   return `/${lang}`;
@@ -58,25 +58,25 @@ export default function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [name, setName] = useState("");
-  /** v5: kode referral opsional; terisi otomatis dari tautan undangan (?ref=). */
+  /** v5: optional referral code; filled automatically from the invitation link (?ref=). */
   const [referral, setReferral] = useState(() => normalizeReferralInput(params.get("ref")) ?? (mode === "signup" ? getStoredReferral() : null) ?? "");
   const [referralError, setReferralError] = useState<string | null>(null);
   const referralCode = referral.trim() ? normalizeReferralInput(referral) : null;
-  /** Daftar wajib mencentang persetujuan S&K + Kebijakan Privasi (bukti persetujuan elektronik). */
+  /** Sign-up requires ticking consent to the Terms + Privacy Policy (proof of electronic consent). */
   const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(params.get("error") || params.get("auth_error") ? t("auth.googleFailed") : null);
-  /** Email yang menunggu verifikasi (setelah daftar, atau login ditolak EMAIL_NOT_VERIFIED). */
+  /** Email awaiting verification (after sign-up, or a login rejected with EMAIL_NOT_VERIFIED). */
   const [pending, setPending] = useState<{ email: string; cooldown: number; intro: "signup" | "signin" } | null>(null);
   const backend = isBackendConfigured();
-  /** Daftar: konfirmasi wajib sama; pesan muncul begitu kolom konfirmasi diisi. */
+  /** Sign-up: the confirmation must match; the message appears once the confirmation field is filled. */
   const mismatch = mode === "signup" && password2 !== "" && password2 !== password;
   const confirmOk = mode === "signin" || (password2 !== "" && password2 === password);
 
   useEffect(() => {
     if (backend) void loadAuthMethods();
   }, [backend]);
-  // Sudah masuk → langsung ke tujuan.
+  // Already signed in → go straight to the destination.
   useEffect(() => {
     if (status === "authenticated") navigate(next.replace(/^\/(id|en)(?=\/|$)/, "") || "/", { replace: true });
   }, [status, next, navigate]);

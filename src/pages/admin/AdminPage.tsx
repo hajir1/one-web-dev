@@ -30,9 +30,9 @@ import { PythonTab } from "./tabs/PythonTab";
 import { AuditTab } from "./tabs/AuditTab";
 
 /* ================================================================== */
-/* Panel admin. Semua data & aksi lewat endpoint /admin/* di backend;   */
-/* halaman ini tidak menyimpan apa pun sendiri. Hak akses ditentukan     */
-/* server (403 bila bukan ADMIN), pengecekan peran di sini hanya UI.     */
+/* Admin panel. All data & actions go through the backend /admin/* endpoints; */
+/* this page stores nothing itself. Access rights are decided by the     */
+/* server (403 when not ADMIN); the role check here is UI only.         */
 /* ================================================================== */
 
 const TABS = ["overview", "users", "templates", "catalog", "packages", "payments", "jobs", "python", "audit"] as const;
@@ -115,8 +115,8 @@ export default function AdminPage() {
 }
 
 /**
- * Panel admin wajib sesi yang sudah lolos 2FA (server menolak 403
- * MFA_REQUIRED / MFA_NOT_ENROLLED). Di sini admin mendaftar atau memasukkan kode.
+ * The admin panel requires a session that has passed 2FA (the server rejects with 403
+ * MFA_REQUIRED / MFA_NOT_ENROLLED). Admins enroll or enter a code here.
  */
 function AdminMfaGate({ children }: { children: ReactNode }) {
   const { t } = useTranslation();

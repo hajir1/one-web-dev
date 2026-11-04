@@ -93,7 +93,7 @@ function textSections(
 ): PanelSection[] {
   const tag = getTag(s);
 
-  // Ganti tag + terapkan preset ukuran/ketebalan font untuk tag itu.
+  // Change the tag + apply that tag's font size/weight preset.
   const changeTag = (nextTag: TextTag) => {
     const preset = TAG_PRESETS[nextTag];
     patch({ tag: nextTag, fontSize: preset.fontSize, fontWeight: preset.fontWeight });
@@ -115,7 +115,7 @@ function textSections(
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const textElement = defineElement<TextState>({

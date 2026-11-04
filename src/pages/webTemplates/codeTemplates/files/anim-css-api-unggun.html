@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Api Unggun</title>
+<meta name="description" content="Animasi CSS murni: tiga lapis api unggun berkedip, percikan naik ke langit, cahaya hangat bernapas, dan tenda berdiri di bawah bintang.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#0d0b14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #0d0b14; /* Latar bawah */
+  --bg-2: #1f1a35; /* Latar atas */
+  --c-1: #ff6a2b; /* Api luar */
+  --c-2: #ffc94a; /* Api dalam & percikan */
+  --c-3: #3a4a3a; /* Tanah & tenda */
+  --ink: #fff4e6; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Bitter", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: 50%; top: clamp(56px, 9vh, 96px); transform: translateX(-50%); text-align: center; align-items: center; z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: center; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap {  }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.stars i { width: 2px; height: 2px; border-radius: 50%; background: #fff; animation: tw calc(var(--k) * 2.4) ease-in-out infinite alternate; animation-delay: calc(var(--k) * var(--d)); }
+@keyframes tw { from { opacity: .2; } to { opacity: 1; } }
+.ground { left: 0; right: 0; bottom: 0; height: 16vh; background: linear-gradient(color-mix(in srgb, var(--c-3) 80%, #000), #000); }
+.tent { left: 12%; bottom: 14vh; width: 34vmin; height: 24vmin; background: color-mix(in srgb, var(--c-3) 85%, #fff); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.tent i { left: 40%; bottom: 0; width: 20%; height: 55%; background: #000; clip-path: polygon(50% 0, 100% 100%, 0 100%); opacity: .6; }
+.glow { left: 50%; bottom: 6vh; width: 70vmin; height: 40vmin; margin-left: -35vmin; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c-1) 30%, transparent), transparent); animation: breathe calc(var(--k) * 1.6) ease-in-out infinite alternate; }
+@keyframes breathe { to { scale: 1.12; opacity: .75; } }
+.logs { left: 50%; bottom: 13vh; width: 0; height: 0; }
+.logs i { left: -14vmin; top: -2vmin; width: 28vmin; height: 4vmin; border-radius: 2vmin; background: linear-gradient(#8a5a35, #4a2e18); rotate: 14deg; }
+.logs i + i { rotate: -14deg; }
+.flame { left: 50%; bottom: 14vh; border-radius: 50% 0 50% 50%; rotate: -45deg; transform-origin: 50% 100%; animation: flick calc(var(--k) * .5) ease-in-out infinite alternate; }
+.f1 { width: 20vmin; height: 20vmin; margin-left: -10vmin; background: radial-gradient(circle at 60% 40%, var(--c-2), var(--c-1) 70%); box-shadow: 0 0 40px 10px color-mix(in srgb, var(--c-1) 50%, transparent); }
+.f2 { width: 13vmin; height: 13vmin; margin-left: -6.5vmin; bottom: 14.5vh; background: radial-gradient(circle at 60% 40%, #fff3c4, var(--c-2) 75%); animation-duration: calc(var(--k) * .38); animation-direction: alternate-reverse; }
+.f3 { width: 6vmin; height: 6vmin; margin-left: -3vmin; bottom: 15vh; background: radial-gradient(circle at 60% 40%, #fff, #fff6d8); animation-duration: calc(var(--k) * .3); }
+@keyframes flick { 0% { scale: 1 1; translate: 0 0; } 50% { scale: .9 1.1; } 100% { scale: 1.08 .94; translate: 2px -3px; } }
+.sparks { left: 50%; bottom: 30vh; width: 0; height: 0; }
+.sparks i { left: 0; top: 0; width: 4px; height: 4px; border-radius: 50%; background: var(--c-2); box-shadow: 0 0 8px 2px var(--c-1); animation: spark calc(var(--k) * 3) ease-out infinite; animation-delay: calc(var(--k) * var(--d)); }
+@keyframes spark { 0% { translate: 0 0; opacity: 1; } 100% { translate: var(--x) -40vh; opacity: 0; scale: .3; } }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="stars"><i style="left:14.5%;top:0.3%;--d:-0.67"></i><i style="left:73.4%;top:32.3%;--d:-2.59"></i><i style="left:4.6%;top:0.2%;--d:-1.66"></i><i style="left:26.9%;top:0.1%;--d:-0.05"></i><i style="left:96.7%;top:32.8%;--d:-1.06"></i><i style="left:85.5%;top:53.8%;--d:-1.12"></i><i style="left:64.6%;top:50.6%;--d:-0.51"></i><i style="left:15.5%;top:39.5%;--d:-2.33"></i><i style="left:18.4%;top:10.1%;--d:-0.15"></i><i style="left:46.9%;top:15.2%;--d:-1.32"></i><i style="left:59.7%;top:10.1%;--d:-0.76"></i><i style="left:21.7%;top:6.2%;--d:-0.90"></i><i style="left:58.1%;top:54.9%;--d:-2.01"></i><i style="left:98.0%;top:42.0%;--d:-0.45"></i><i style="left:56.5%;top:40.0%;--d:-1.69"></i><i style="left:33.6%;top:27.8%;--d:-2.46"></i><i style="left:47.1%;top:21.0%;--d:-0.76"></i><i style="left:24.9%;top:21.0%;--d:-2.58"></i><i style="left:6.0%;top:21.5%;--d:-0.62"></i><i style="left:84.3%;top:51.2%;--d:-2.51"></i><i style="left:40.6%;top:21.4%;--d:-2.58"></i><i style="left:61.8%;top:19.2%;--d:-1.29"></i><i style="left:46.5%;top:50.1%;--d:-0.46"></i><i style="left:48.1%;top:13.7%;--d:-0.79"></i><i style="left:4.5%;top:1.6%;--d:-2.12"></i><i style="left:10.0%;top:13.3%;--d:-0.70"></i><i style="left:9.4%;top:23.9%;--d:-2.13"></i><i style="left:88.1%;top:50.2%;--d:-1.72"></i><i style="left:57.4%;top:3.3%;--d:-1.22"></i><i style="left:84.6%;top:1.2%;--d:-1.65"></i><i style="left:27.4%;top:0.2%;--d:-0.38"></i><i style="left:91.2%;top:2.4%;--d:-1.17"></i><i style="left:20.3%;top:18.8%;--d:-1.40"></i><i style="left:0.9%;top:24.7%;--d:-1.62"></i><i style="left:29.0%;top:0.5%;--d:-2.94"></i><i style="left:5.6%;top:16.9%;--d:-1.40"></i><i style="left:39.9%;top:23.2%;--d:-1.25"></i><i style="left:33.3%;top:44.4%;--d:-0.63"></i><i style="left:17.7%;top:32.3%;--d:-2.12"></i><i style="left:57.9%;top:19.9%;--d:-1.63"></i></div>
+<div class="tent"><i></i></div><div class="ground"></div><div class="glow"></div>
+<div class="logs"><i></i><i></i></div>
+<div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div>
+<div class="sparks"><i style="--x:1px;--d:-0.02"></i><i style="--x:-19px;--d:-0.23"></i><i style="--x:60px;--d:-0.51"></i><i style="--x:-4px;--d:-0.92"></i><i style="--x:-12px;--d:-2.87"></i><i style="--x:4px;--d:-1.64"></i><i style="--x:11px;--d:-2.73"></i><i style="--x:46px;--d:-0.81"></i><i style="--x:-27px;--d:-1.10"></i><i style="--x:-47px;--d:-2.41"></i><i style="--x:-32px;--d:-2.37"></i><i style="--x:-54px;--d:-2.20"></i><i style="--x:43px;--d:-2.81"></i><i style="--x:-26px;--d:-2.34"></i><i style="--x:-6px;--d:-2.30"></i><i style="--x:-57px;--d:-2.43"></i><i style="--x:-34px;--d:-0.68"></i><i style="--x:-58px;--d:-2.54"></i></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Malam keakraban</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Duduk dekat api, cerita mengalir.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Cocok untuk undangan kemah, acara komunitas, atau promo paket camping akhir pekan.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Daftar sekarang</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 2
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

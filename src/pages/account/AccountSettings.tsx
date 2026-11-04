@@ -9,7 +9,7 @@ import { ApiError } from "../../api/client";
 import { deleteAccount, downloadMyData, isAdmin, useSession } from "../../auth/session";
 import { LEGAL_DOCS, legalPath } from "../../config/legal";
 
-/** /:lang/account — privasi data (UU PDP), keamanan akun, dokumen legal. */
+/** /:lang/account — data privacy (PDP Law), account security, legal documents. */
 export default function AccountSettings() {
   const { t } = useTranslation();
   const navigate = useLocaleNavigate();

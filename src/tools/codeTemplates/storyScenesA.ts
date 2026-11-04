@@ -1,10 +1,10 @@
 /* ================================================================== */
-/* Adegan 3D Cerita Scroll (v22), bagian A. Setiap adegan adalah         */
-/* function scene(ctx) yang membangun objek lalu mengembalikan           */
-/* { update(S, t, dt) }. S = keadaan cerita dari KEYS (di-scrub OWD Scrub).    */
+/* 3D Scroll Story scenes (v22), part A. Each scene is                   */
+/* function scene(ctx) that builds the objects and then returns         */
+/* { update(S, t, dt) }. S = the story state from KEYS (scrubbed by OWD Scrub). */
 /* ================================================================== */
 
-/** 1. Komputer kosong → zoom ke layar → teks keluar dari layar → layar berisi situs. */
+/** 1. An empty computer → zoom into the screen → text comes out of the screen → the screen shows a site. */
 export const SCENE_KOMPUTER = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, BRAND, paint, mat, seg, lerp } = ctx;
@@ -19,13 +19,13 @@ function scene(ctx) {
   const scr = paint(1024, 600);
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.35), new THREE.MeshBasicMaterial({ map: scr.tex, toneMapped: false }));
   screen.position.set(0, 0.35, 0.085); g.add(screen);
-  /* Papan ketik: badan + 56 tombol (instanced). */
+  /* Keyboard: body + 56 keys (instanced). */
   const kb = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.09, 1.05), mat(COL.obj, { roughness: 0.4 })); kb.position.set(0, -1.46, 1.45); g.add(kb);
   const keys = new THREE.InstancedMesh(new THREE.BoxGeometry(0.17, 0.06, 0.17), mat("#e9e9ef", { roughness: 0.6 }), 56);
   const m4 = new THREE.Matrix4(); let n = 0;
   for (let r = 0; r < 4; r++) for (let c = 0; c < 14; c++) { m4.makeTranslation(-1.36 + c * 0.21, -1.39, 1.1 + r * 0.23); keys.setMatrixAt(n++, m4); }
   g.add(keys);
-  /* Cangkir & tanaman: membuat meja terasa hidup. */
+  /* Cup & plant: make the desk feel alive. */
   const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.24, 0.55, 24, 1, true), mat(COL.accent, { side: THREE.DoubleSide })); cup.position.set(3.2, -1.23, 1.0); g.add(cup);
   const handle = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.04, 8, 16), mat(COL.accent)); handle.position.set(3.5, -1.2, 1.0); g.add(handle);
   const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.26, 0.6, 18), mat(COL.accent2)); pot.position.set(-3.3, -1.2, 0.6); g.add(pot);
@@ -41,7 +41,7 @@ function scene(ctx) {
     g2.fillStyle = "#07080d"; g2.fillRect(0, 0, W, H);
     if (boot < 0.02) { const r = g2.createLinearGradient(0, 0, W, H); r.addColorStop(0, "rgba(255,255,255,.07)"); r.addColorStop(0.5, "rgba(255,255,255,0)"); g2.fillStyle = r; g2.fillRect(0, 0, W, H); return; }
     g2.globalAlpha = boot; g2.fillStyle = COL.veil; g2.fillRect(0, 0, W, H);
-    /* Mode teks: baris diketik. */
+    /* Text mode: lines being typed. */
     const ta = 1 - ui;
     if (ta > 0.01) {
       g2.globalAlpha = boot * ta;
@@ -57,7 +57,7 @@ function scene(ctx) {
       });
       if (S.type < 0.01 && Math.floor(t * 2) % 2 === 0) { g2.fillStyle = COL.accent; g2.fillRect(60, 70, 20, 40); }
     }
-    /* Mode situs: tampilan situs yang dibangun. */
+    /* Site mode: the view of the site being built. */
     if (ui > 0.01) {
       g2.globalAlpha = boot * ui * (1 - end);
       g2.fillStyle = "rgba(255,255,255,.06)"; g2.fillRect(0, 0, W, 70);
@@ -87,7 +87,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 2. Kucing → zoom ke mata → pupil melebar → semesta di dalam mata → rasi jejak kaki. */
+/** 2. A cat → zoom into the eye → the pupil widens → a universe inside the eye → a pawprint constellation. */
 export const SCENE_KUCING = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, paint, mat, glow, seg, lerp, rnd } = ctx;
@@ -108,11 +108,11 @@ function scene(ctx) {
   [-1, 1].forEach((sx) => [-0.06, 0, 0.06].forEach((dy) => wpos.push(sx * 0.2, -0.22, 0.9, sx * 0.95, -0.2 + dy * 3, 0.72)));
   const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(wpos, 3));
   head.add(new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.7 })));
-  /* Ekor: tabung melengkung yang bergoyang. */
+  /* Tail: a curved tube that sways. */
   const tailPivot = new THREE.Group(); tailPivot.position.set(0.7, -1.6, -0.6); cat.add(tailPivot);
   const tc = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0.7, 0.1, -0.3), new THREE.Vector3(1.1, 0.8, -0.2), new THREE.Vector3(0.9, 1.6, 0.1)]);
   tailPivot.add(new THREE.Mesh(new THREE.TubeGeometry(tc, 24, 0.13, 8), fur));
-  /* Mata: iris digambar di kanvas (pupil mengikuti S.pupil), kubah mengilap di atasnya. */
+  /* Eye: the iris is drawn on a canvas (the pupil follows S.pupil), with a glossy dome on top. */
   const irisTex = paint(256, 256);
   const eyes = [];
   [-1, 1].forEach((sx) => {
@@ -136,7 +136,7 @@ function scene(ctx) {
       g2.fillStyle = "rgba(255,255,255,.85)"; g2.beginPath(); g2.ellipse(W * 0.38, H * 0.32, 18, 12, -0.5, 0, 7); g2.fill();
     });
   }
-  /* Semesta di dalam mata kiri: galaksi spiral (titik) yang mengembang. */
+  /* A universe inside the left eye: a spiral galaxy (points) that expands. */
   const space = new THREE.Group(); scene.add(space);
   const N = 4200, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
   const ca = new THREE.Color(COL.accent), cb = new THREE.Color(COL.accent2), cw = new THREE.Color("#ffffff");
@@ -148,7 +148,7 @@ function scene(ctx) {
   const sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); sg.setAttribute("color", new THREE.BufferAttribute(col, 3));
   const stars = new THREE.Points(sg, new THREE.PointsMaterial({ size: 0.22, map: glow(), vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
   space.add(stars);
-  /* Rasi bintang jejak kaki: telapak + 4 jari, garis tergambar bertahap. */
+  /* Paw print constellation: pad + 4 toes, lines drawn step by step. */
   const paw = [], ring = (cx, cy, rx, ry, k) => { for (let i = 0; i <= k; i++) { const a = i / k * Math.PI * 2; paw.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } };
   ring(0, -1.2, 2.2, 1.7, 9); ring(-2.9, 1.6, 0.8, 1.05, 6); ring(-1.0, 2.9, 0.8, 1.05, 6); ring(1.0, 2.9, 0.8, 1.05, 6); ring(2.9, 1.6, 0.8, 1.05, 6);
   const lp = []; for (let i = 0; i < paw.length - 1; i++) { if ([10, 17, 24, 31].indexOf(i + 1) >= 0) continue; lp.push(paw[i][0], paw[i][1], 0, paw[i + 1][0], paw[i + 1][1], 0); }
@@ -164,7 +164,7 @@ function scene(ctx) {
       if (p !== lastPupil) { lastPupil = p; drawIris(p); }
       head.rotation.y = Math.sin(t * 0.4) * 0.12 * (1 - S.pupil); head.rotation.z = Math.sin(t * 0.3) * 0.05 * (1 - S.pupil);
       tailPivot.rotation.z = Math.sin(t * 1.3) * 0.25; tailPivot.rotation.y = Math.sin(t * 0.7) * 0.2;
-      /* Kedip sesekali (kecuali sedang di-zoom). */
+      /* Blink now and then (except while zoomed). */
       const bl = S.pupil < 0.1 ? Math.max(0, 1 - Math.abs(((t % 4.2) - 4.0) / 0.12)) : 0;
       eyes.forEach((o) => { o.lid.scale.y = 0.001 + bl * 0.9; o.lid.rotation.x = -Math.PI / 2 + bl * 0.4; });
       cat.visible = S.space < 0.35;

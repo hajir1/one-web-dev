@@ -14,7 +14,7 @@ const mk = (t: string, patch: object = {}) => createElementNode(t, { ...D[t].def
 const opts = (extra = {}) => ({ rootClass: "demo", icons, ...extra });
 const FR = (n: number) => `repeat(${n}, minmax(0, 1fr))`;
 const cells = (n: number) => Array.from({ length: n }, () => createBox("stack"));
-/** Pengganti preset Component Maker lama untuk tes. */
+/** Replacement for the old Component Maker presets in tests. */
 const presetRoot = (id: string): BoxNode =>
   id === "grid-2x2"
     ? createRoot("grid", { columns: FR(2), children: cells(4) })
@@ -43,7 +43,7 @@ test("compose: tiap elemen tersimpan bisa dirakit tanpa error di semua framework
   const c = compose(root, opts({ allowPremiumElements: true }));
   assert.deepEqual(c.warnings, []);
   assert.equal(c.elementCount, ELEMENT_DEFINITIONS.length);
-  // tanpa kredit: elemen premium tidak ikut, dengan peringatan
+  // without credits: premium elements are left out, with a warning
   const free = compose(root, opts());
   const premium = ELEMENT_DEFINITIONS.filter((d) => d.premium).length;
   assert.ok(premium >= 5);
@@ -83,13 +83,13 @@ test("elemen stateful menjadi komponen anak (non-HTML) dan di-import induk", () 
   assert.match(parent, /import Tabs1 from "\.\/Tabs1";/);
   assert.match(parent, /<Tabs1 \/>/);
   assert.match(parent, /<Alert1 \/>/);
-  // alert non-dismissible di-inline, bukan komponen
+  // non-dismissible alerts are inlined, not a component
   assert.match(parent, /demo__alert-2/);
   assert.match(c.files("angular")[0].content, /imports: \[Tabs1Component, Alert1Component\]/);
   assert.match(c.files("angular").find((f) => f.name === "tabs1.component.ts")!.content, /standalone: true/);
   assert.match(c.files("vue")[0].content, /import Tabs1 from "\.\/Tabs1\.vue";/);
   assert.match(c.files("svelte")[0].content, /import Tabs1 from '\.\/Tabs1\.svelte';|import Tabs1 from "\.\/Tabs1\.svelte";/);
-  // HTML: satu halaman + script gabungan
+  // HTML: one page + a combined script
   assert.ok(c.html.script.includes("demo__tabs-1"));
   assert.ok(c.html.script.includes("demo__alert-1__close"));
 });
@@ -181,7 +181,7 @@ test("normalizeDoc: pembersihan nilai tak valid & id ganda", () => {
   assert.notEqual(d.root.children[0].id, d.root.children[1].id);
   const first = d.root.children[0] as ReturnType<typeof mk>;
   assert.equal(first.state.fontSize, 18);
-  assert.equal(typeof first.state.text, "string"); // tipe salah diganti default
+  assert.equal(typeof first.state.text, "string"); // wrong types replaced with defaults
 });
 
 test("normalizeDoc idempotent", () => {

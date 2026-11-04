@@ -4,9 +4,9 @@ import { AlertTriangle, CheckCircle2, Info, X, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 /* ================================================================== */
-/* Notifikasi hasil operasi (toast) untuk seluruh aplikasi.             */
-/*   notify.success("…") / notify.error("…") dari mana saja.            */
-/* <Toaster/> dipasang sekali di AppLayout.                              */
+/* Operation result notifications (toasts) for the whole app.           */
+/*   notify.success("…") / notify.error("…") from anywhere.             */
+/* <Toaster/> is mounted once in AppLayout.                              */
 /* ================================================================== */
 
 export type ToastTone = "success" | "error" | "info" | "warn";

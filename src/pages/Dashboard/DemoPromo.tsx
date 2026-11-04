@@ -7,7 +7,7 @@ import { DEMO_TEMPLATE_COUNT } from "../../demo/demoTemplateIds";
 
 /* ================================================================== */
 /* Dashboard mode demo (v15): banner promosi OneWebDev,        */
-/* menggantikan daftar menu dan kartu kuota.                            */
+/* replaces the menu list and quota cards.                              */
 /* ================================================================== */
 
 const PAGE_MAKER_PATH = "/page-maker";
@@ -26,7 +26,7 @@ const HIGHLIGHTS: Highlight[] = [
   { key: "vr", icon: Glasses, path: VR_TOUR_PATH, tone: "bg-emerald-400/15 text-emerald-200" },
 ];
 
-/** Jendela browser tiruan: pratinjau website yang sedang dirakit. */
+/** Mock browser window: preview of the website being assembled. */
 function SiteMockup() {
   const { t } = useTranslation();
   return (

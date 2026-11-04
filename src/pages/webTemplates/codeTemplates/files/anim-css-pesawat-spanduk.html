@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Pesawat Spanduk</title>
+<meta name="description" content="Animasi CSS murni: pesawat kecil terbang menembus tiga lapis awan sambil menarik spanduk dan meninggalkan jejak titik-titik.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#cfe9ff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One:wght@400&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #cfe9ff; /* Latar bawah */
+  --bg-2: #7fbfff; /* Latar atas */
+  --c-1: #ef476f; /* Pesawat */
+  --c-2: #ffd166; /* Spanduk */
+  --c-3: #06d6a0; /* Bukit */
+  --ink: #14213d; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Bowlby One", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: 50%; bottom: clamp(84px, 12vh, 120px); transform: translateX(-50%); text-align: center; align-items: center; z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: center; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap {  }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.cl { left: 0; width: 200%; height: 100%; animation: clouds calc(var(--k) * var(--t)) linear infinite; }
+.cl i { width: 22vmin; height: 7vmin; border-radius: 99px; background: #fff; }
+.cl i::before { content: ""; position: absolute; left: 18%; bottom: 40%; width: 50%; height: 160%; border-radius: 50%; background: inherit; }
+.l3 { --t: 60; top: 14%; opacity: .55; scale: .6; } .l3 i { top: 0; }
+.l2 { --t: 34; top: 34%; opacity: .8; } .l2 i { top: 0; }
+.l1 { --t: 18; top: 62%; } .l1 i { top: 0; scale: 1.5; }
+@keyframes clouds { to { translate: -50% 0; } }
+.hills { left: -10%; right: -10%; bottom: -14vh; height: 30vh; border-radius: 50% 50% 0 0; background: var(--c-3); }
+.flight { left: 0; top: 30%; width: 0; height: 0; animation: flyX calc(var(--k) * 12) linear infinite, flyY calc(var(--k) * 4) ease-in-out infinite alternate; }
+@keyframes flyX { from { left: -60vw; } to { left: 130vw; } }
+@keyframes flyY { from { top: 26%; } to { top: 40%; } }
+.plane { left: -12vmin; top: -4vmin; width: 18vmin; height: 8vmin; animation: tilt calc(var(--k) * 4) ease-in-out infinite alternate; }
+@keyframes tilt { from { rotate: 6deg; } to { rotate: -6deg; } }
+.plane .body { left: 0; top: 25%; width: 100%; height: 50%; border-radius: 40% 60% 60% 40% / 50%; background: var(--c-1); }
+.plane .wing { left: 34%; top: -10%; width: 22%; height: 120%; border-radius: 40%; background: color-mix(in srgb, var(--c-1) 70%, #000); }
+.plane .tail { left: 0; top: -10%; width: 16%; height: 50%; background: var(--c-1); clip-path: polygon(0 0, 100% 100%, 0 100%); }
+.plane .prop { right: -6%; top: 10%; width: 4%; height: 80%; border-radius: 4px; background: #333; animation: prop calc(var(--k) * .1) linear infinite alternate; }
+@keyframes prop { to { scale: 1 .1; } }
+.banner { left: -48vmin; top: -3vmin; width: 32vmin; height: 7vmin; display: grid; place-items: center; background: var(--c-2); clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%, 6% 50%); animation: flutter calc(var(--k) * .7) ease-in-out infinite alternate; }
+.banner span { position: static; font: 700 4vmin/1 var(--font-display); letter-spacing: .1em; color: var(--ink); }
+.banner::after { content: ""; position: absolute; right: -4vmin; top: 50%; width: 4vmin; height: 1px; background: #333; }
+@keyframes flutter { to { skew: 0 -3deg; translate: 0 3px; } }
+.trail { left: -110vmin; top: 0; width: 60vmin; height: 4px; background: radial-gradient(circle, #fff 0 2px, transparent 3px) 0 0 / 14px 4px repeat-x; opacity: .8; }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="cl l3"><i style="left:0%"></i><i style="left:36%"></i><i style="left:72%"></i></div><div class="cl l2"><i style="left:10%"></i><i style="left:44%"></i><i style="left:78%"></i></div>
+<div class="flight"><div class="trail"></div><div class="banner"><span>HALO!</span></div><div class="plane"><i class="body"></i><i class="wing"></i><i class="tail"></i><i class="prop"></i></div></div>
+<div class="cl l1"><i style="left:5%"></i><i style="left:43%"></i><i style="left:81%"></i></div><div class="hills"></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Pengumuman</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Kabar ini terlalu besar untuk diam.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Hero animasi untuk pengumuman, diskon besar, atau pembukaan cabang baru. Ganti teks spanduk lewat kode.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Lihat pengumuman</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 7
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

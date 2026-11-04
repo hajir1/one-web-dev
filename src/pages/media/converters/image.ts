@@ -1,14 +1,14 @@
 // ─── converters/image.ts ─────────────────────────────────────────────────────
-// Utilitas bersama: decode gambar, batas ukuran Canvas, dan encode yang
-// DIVERIFIKASI. Sebelumnya, browser yang tidak bisa meng-encode WebP (mis.
-// Safari lama) diam-diam mengembalikan PNG dan file diberi ekstensi .webp.
+// Shared utilities: image decoding, Canvas size limits, and VERIFIED
+// encoding. Previously, browsers that could not encode WebP (e.g. old
+// Safari) silently returned PNG and the file was given a .webp extension.
 
 import i18n from "../../../i18n";
 
 const MAX_INPUT_PIXELS = 50_000_000;
-/** Sisi maksimum Canvas yang aman lintas browser. */
+/** Maximum Canvas side that is safe across browsers. */
 export const MAX_CANVAS_SIDE = 16_384;
-/** Luas Canvas yang aman di Safari/iOS. Di atas ini masih mungkin berhasil di desktop. */
+/** Canvas area that is safe on Safari/iOS. Above this it may still work on desktop. */
 export const SAFE_CANVAS_PIXELS = 16_777_216;
 
 class ImageTooLargeError extends Error {}
@@ -26,7 +26,7 @@ export function throwIfAborted(signal?: AbortSignal) {
   if (signal?.aborted) throw abortError();
 }
 
-/** Decode file gambar raster (orientasi EXIF diterapkan oleh browser). */
+/** Decodes a raster image file (EXIF orientation is applied by the browser). */
 export async function decodeImage(file: Blob, signal?: AbortSignal): Promise<DecodedImage> {
   throwIfAborted(signal);
   if (typeof createImageBitmap === "function") {
@@ -36,7 +36,7 @@ export async function decodeImage(file: Blob, signal?: AbortSignal): Promise<Dec
       return { source: bmp, width: bmp.width, height: bmp.height, close: () => bmp.close() };
     } catch (e) {
       if ((e as Error)?.name === "AbortError") throw e;
-      // Lanjut ke <img> (mis. ICO/SVG/format yang tidak didukung createImageBitmap).
+      // Fall back to <img> (e.g. ICO/SVG/formats createImageBitmap does not support).
     }
   }
   const url = URL.createObjectURL(file);
@@ -52,7 +52,7 @@ export async function decodeImage(file: Blob, signal?: AbortSignal): Promise<Dec
     if (!img.naturalWidth || !img.naturalHeight) throw new Error(i18n.t("media.convert.invalidSize"));
     return { source: img, width: img.naturalWidth, height: img.naturalHeight, close: () => {} };
   } finally {
-    // Data piksel sudah ter-decode; URL tidak dibutuhkan lagi.
+    // The pixel data is already decoded; the URL is no longer needed.
     setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 }
@@ -77,13 +77,13 @@ export function context2d(canvas: HTMLCanvasElement, opts?: CanvasRenderingConte
   return ctx;
 }
 
-/** Bebaskan memori Canvas besar segera (penting di Safari). */
+/** Frees large Canvas memory right away (important on Safari). */
 export function releaseCanvas(canvas: HTMLCanvasElement) {
   canvas.width = 0;
   canvas.height = 0;
 }
 
-/** canvas.toBlob yang memastikan format hasil benar-benar sesuai permintaan. */
+/** canvas.toBlob that makes sure the output format really matches the request. */
 export function encodeCanvas(canvas: HTMLCanvasElement, mime: string, quality?: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -106,7 +106,7 @@ export function encodeCanvas(canvas: HTMLCanvasElement, mime: string, quality?: 
 
 const encodeSupport = new Map<string, boolean>();
 
-/** Apakah browser ini bisa meng-encode `mime` lewat Canvas? (hasil di-cache) */
+/** Can this browser encode `mime` via Canvas? (result cached) */
 export async function canEncode(mime: string): Promise<boolean> {
   if (encodeSupport.has(mime)) return encodeSupport.get(mime)!;
   let ok: boolean;

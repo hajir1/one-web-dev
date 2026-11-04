@@ -25,13 +25,13 @@ const LOOK: Record<MediaToolId, { icon: LucideIcon; accent: Accent }> = {
   "og-image": { icon: Share2, accent: "emerald" },
 };
 
-/** Perbandingan teknis — tiap baris berdasar mekanisme, bukan angka karangan. Teks di `media.hub.comparison.*`. */
+/** Technical comparison: each row is based on a mechanism, not made-up numbers. Text in `media.hub.comparison.*`. */
 const COMPARISON = ["performance", "resources", "fileSize", "privacy", "connection", "cost", "scalability", "quality", "formats"] as const;
 
 export default function MediaHub() {
   const { t } = useTranslation();
   const pricing = useBilling((st) => st.pricing);
-  // Mode demo (v12): hanya alat yang berjalan di browser; info server & harga disembunyikan.
+  // Demo mode (v12): only tools that run in the browser; server info & prices are hidden.
   const demo = isDemoMode();
   const tools = demo ? MEDIA_TOOLS.filter((x) => x.modes.browser) : MEDIA_TOOLS;
   return (

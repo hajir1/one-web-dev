@@ -4,7 +4,7 @@ import { SCENE_JAMPASIR, SCENE_LAMPU, SCENE_PESAWAT } from "./storyScenesC";
 const F = (display: string, text: string, q: string) => ({ display, text, href: `https://fonts.googleapis.com/css2?${q}&display=swap` });
 
 export const STORY_SPECS_C: StorySpec[] = [
-  /* Kertas datar di meja → sudut dilipat → jadi pesawat kertas → terbang melewati cincin kata → mendarat lagi. */
+  /* Flat paper on a desk → a corner folds → becomes a paper plane → flies through word rings → lands again. */
   {
     id: "story-pesawat-kertas",
     title: "Lipat Kata · Agensi Konten & Penulisan",
@@ -27,7 +27,7 @@ export const STORY_SPECS_C: StorySpec[] = [
     wa: "6281200001007",
     scene: SCENE_PESAWAT,
   },
-  /* Bola lampu gelap → filamen menyala → kamera masuk ke filamen → filamen pecah jadi jaringan saraf berdenyut. */
+  /* A dark light bulb → the filament lights up → the camera enters the filament → the filament breaks into a pulsing neural network. */
   {
     id: "story-bola-lampu",
     title: "Nalar Labs · Konsultan AI",
@@ -51,7 +51,7 @@ export const STORY_SPECS_C: StorySpec[] = [
     wa: "6281200001008",
     scene: SCENE_LAMPU,
   },
-  /* Jam pasir → pasir turun mengikuti scroll → tutup terbuka → butir terbang membentuk cincin lini waktu → kamera berjalan di cincin. */
+  /* Hourglass → sand falls with the scroll → lid opens → grains fly into a timeline ring → the camera travels along the ring. */
   {
     id: "story-jam-pasir",
     title: "Batik Laras · Sejak 1987",

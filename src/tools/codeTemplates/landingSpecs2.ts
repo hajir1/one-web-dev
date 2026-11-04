@@ -1,7 +1,7 @@
 import type { LandingSpec } from "./landing";
 import { SELASA_MINGGU, SENIN_SABTU, SETIAP, jam, langkah } from "./landingKit";
 
-/* Landing UMKM v23, bagian 2: minuman & kopi (10). */
+/* Small business landing pages v23, part 2: drinks & coffee (10). */
 export const LANDING_2: LandingSpec[] = [
   {
     id: "lp-kopi-teras-sawah",

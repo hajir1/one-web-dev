@@ -6,7 +6,7 @@
 <title>Undangan Syukuran Rumah Baru Keluarga Santoso</title>
 <meta name="description" content="Undangan syukuran rumah baru bernuansa terakota dan krem: sampul berupa krepyak jendela yang bilah-bilahnya berputar terbuka satu per satu dari atas.">
 <script>
-/* Vercel Web Analytics: aktifkan menu "Analytics" di dashboard proyek Vercel. */
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 (function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
 </script>
@@ -17,7 +17,7 @@ window.va = window.va || function () { (window.vaq = window.vaq || []).push(argu
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.css">
 <style id="owd-theme">
-/* Warna & gaya: ubah di sini atau lewat editor OneWebDev. */
+/* Colors & style: edit here or in the OneWebDev editor. */
 :root {
   --primary: #a4532f; /* Warna utama */
   --on-primary: #ffffff; /* Teks di atas warna utama */
@@ -69,7 +69,7 @@ button { font: inherit; }
 .btn svg { width: 18px; height: 18px; }
 .cover .btn { background: var(--cover-ink); color: var(--cover-bg); }
 
-/* Bagian */
+/* Sections */
 section { padding: clamp(64px, 10vw, 104px) 20px; }
 .wrap { max-width: 880px; margin: 0 auto; }
 .center { text-align: center; }
@@ -146,7 +146,7 @@ textarea { min-height: 110px; resize: vertical; }
 .closing .names { margin: 18px 0 0; font-family: var(--font-script); font-size: clamp(40px, 9vw, 60px); color: var(--primary); line-height: 1.1; }
 footer { padding: 28px 20px 96px; text-align: center; font-size: 13px; color: var(--ink-soft); }
 
-/* Tombol musik & toast */
+/* Music button & toast */
 .music { position: fixed; right: 16px; bottom: 16px; z-index: 40; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--primary); color: var(--on-primary); display: grid; place-items: center; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); }
 .music[hidden] { display: none; }
 .music svg { width: 22px; height: 22px; }
@@ -165,6 +165,7 @@ footer { padding: 28px 20px 96px; text-align: center; font-size: 13px; color: va
 
 .cover { background: none; perspective: 1400px; }
 .cover.open { transform: none; opacity: 1; }
+.cover[hidden] { display: none; }
 .op { position: absolute; z-index: 0; background: var(--cover-bg); will-change: transform; }
 .cover-inner { transition: opacity .35s ease, transform .35s ease; }
 .cover.open .cover-inner { opacity: 0; transform: translateY(-14px) scale(.98); }
@@ -199,7 +200,7 @@ footer { padding: 28px 20px 96px; text-align: center; font-size: 13px; color: va
 <script src="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
 <script>
-/* ==== KONFIGURASI UNDANGAN: ubah semua data acara di sini (atau lewat editor OneWebDev) ==== */
+/* ==== INVITATION SETTINGS: edit all event data here (or in the OneWebDev editor) ==== */
 const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nada,musik.tempoMs,konfeti"*/{
   "id": "rumah-santoso",
   "judul": "Syukuran Rumah Baru",
@@ -335,19 +336,19 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
 }/*owd:end*/;
 /* ============================================================== */
 /* ================================================================== */
-/* Di bawah ini mesin undangan. Ubah data di CONFIG saja.              */
+/* Below is the invitation engine. Only edit the data in CONFIG.       */
 /* ================================================================== */
 (function () {
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var tz = CONFIG.zonaWaktu || "Asia/Jakarta";
-  /* Bagian yang ditampilkan (bisa dimatikan satu per satu). */
+  /* Sections shown (each one can be turned off). */
   var show = Object.assign({ hitungMundur: true, galeri: true, ucapan: true, amplop: true, rsvp: true }, CONFIG.tampilkan || {});
-  /* Gambar dari pengguna: hanya http(s) atau data:image. */
+  /* User images: only http(s) or data:image. */
   function imgSrc(u) { u = String(u || "").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);)/i.test(u) ? u : ""; }
 
-  /* Buat elemen dengan aman (teks lewat textContent, bukan innerHTML). */
+  /* Create elements safely (text via textContent, not innerHTML). */
   function h(tag, attrs, kids) {
     var el = document.createElement(tag);
     if (attrs) for (var k in attrs) {
@@ -370,7 +371,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   };
   function icon(name) { var s = document.createElement("span"); s.innerHTML = ICON[name]; return s.firstChild; }
 
-  /* Tanggal & waktu dalam zona acara. */
+  /* Date & time in the event's time zone. */
   function fmtDate(iso) { return new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: tz }).format(new Date(iso)); }
   function fmtTime(iso) { return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }).format(new Date(iso)).replace(".", ":"); }
   function mapUrl(ev) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ev.peta || (ev.tempat + ", " + ev.alamat)); }
@@ -390,7 +391,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   $("#cover-date").textContent = fmtDate(CONFIG.acara[0].mulai);
   document.title = CONFIG.judul + " · " + CONFIG.namaSampul;
 
-  /* ------------------------------ isi --------------------------------- */
+  /* ------------------------------ content --------------------------------- */
   var main = $("#main");
   function section(id, cls, kids) { return h("section", { id: id, class: cls || null }, [h("div", { class: "wrap" }, kids)]); }
   function aos(el, anim, delay) { if (!window.AOS) return el; el.setAttribute("data-aos", anim || "fade-up"); if (delay) el.setAttribute("data-aos-delay", String(delay)); return el; }
@@ -398,7 +399,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   // Pembuka & profil
   var people = CONFIG.tokoh.map(function (p, i) {
     return aos(h("article", { class: "profile" }, [
-      // data-owd-img: di editor, klik foto langsung membuka isian foto ini (v21).
+      // data-owd-img: in the editor, clicking a photo opens that photo's field directly (v21).
       imgSrc(p.foto) ? h("div", { class: "avatar", "data-owd-img": "tokoh." + i + ".foto" }, [h("img", { src: imgSrc(p.foto), alt: "Foto " + p.panggilan, loading: "lazy" })]) : h("div", { class: "avatar", "aria-hidden": "true", "data-owd-img": "tokoh." + i + ".foto", text: p.panggilan.charAt(0) }),
       h("h3", { text: p.panggilan }),
       h("p", { class: "full", text: p.nama }),
@@ -418,7 +419,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   var units = [["hari", 864e5], ["jam", 36e5], ["menit", 6e4], ["detik", 1e3]];
   var countEl = h("div", { class: "count", role: "timer", "aria-live": "off" }, units.map(function (u) { return h("div", null, [h("b", { "data-u": u[0], text: "0" }), h("span", { text: u[0].charAt(0).toUpperCase() + u[0].slice(1) })]); }));
   var doneEl = h("p", { class: "count-done", hidden: true, text: CONFIG.teksSelesai });
-  // v21: tanggal tujuan bisa diatur sendiri; kosong/tidak valid → waktu mulai acara pertama.
+  // v21: the target date can be set separately; empty/invalid → the start time of the first event.
   var countDate = CONFIG.tanggalHitungMundur && !isNaN(new Date(CONFIG.tanggalHitungMundur)) ? CONFIG.tanggalHitungMundur : CONFIG.acara[0].mulai;
   if (show.hitungMundur) main.append(section("hitung-mundur", "alt center", [aos(h("h2", { class: "title", text: CONFIG.judulHitungMundur })), aos(h("p", { class: "lead", text: fmtDate(countDate) })), aos(countEl), doneEl]));
   var target = new Date(countDate).getTime();
@@ -455,7 +456,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   var gal = h("div", { class: "swiper gallery", "aria-label": "Galeri foto" }, [h("div", { class: "swiper-wrapper" }, slides), h("div", { class: "swiper-pagination" })]);
   if (show.galeri && CONFIG.galeri.length) main.append(section("galeri", "alt center", [aos(h("h2", { class: "title", text: CONFIG.judulGaleri })), aos(h("p", { class: "lead", text: CONFIG.pengantarGaleri })), gal]));
 
-  /* Gambar pengganti (SVG) untuk galeri. Ganti dengan <img> foto asli bila ada. */
+  /* Placeholder (SVG) images for the gallery. Replace with real <img> photos when available. */
   function placeholder(i) {
     var c = getComputedStyle(document.documentElement);
     var a = c.getPropertyValue("--c" + ((i % 4) + 1)).trim();
@@ -475,8 +476,8 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
     return svg;
   }
 
-  // v20: penerima kiriman OneWebDev (diisi saat deploy/unduh oleh pemilik yang login).
-  // Tanpa itu: ucapan tersimpan di perangkat tamu dan RSVP lewat WhatsApp saja.
+  // v20: OneWebDev submission receiver (filled in on deploy/download by the signed-in owner).
+  // Without it: wishes are stored on the guest's device and RSVPs go through WhatsApp only.
   var SERVER = window.OWD_FORM && typeof window.OWD_FORM.submit === "string" ? window.OWD_FORM : null;
   function send(data) {
     if (!SERVER) return Promise.resolve(false);
@@ -492,7 +493,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   var wishList = h("div", { class: "wishes", "aria-live": "polite" });
   function renderWishes() {
     wishList.replaceChildren();
-    // Ucapan sendiri yang baru dikirim tampil dulu, lalu ucapan semua tamu dari server, lalu contoh.
+    // The guest's own just-sent wishes show first, then all guests' wishes from the server, then the samples.
     var seen = {};
     loadWishes().concat(remoteWishes).filter(function (w) { var k = w.nama + "\n" + w.teks; if (seen[k]) return false; seen[k] = 1; return true; })
       .concat(remoteWishes.length ? [] : CONFIG.ucapanContoh).forEach(function (w) {
@@ -545,14 +546,14 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
     ]));
   }
 
-  // RSVP: tercatat di OneWebDev (bila tersambung) dan/atau dikirim lewat WhatsApp.
+  // RSVP: recorded in OneWebDev (when connected) and/or sent via WhatsApp.
   var waNumber = String(CONFIG.rsvp.whatsapp || "").replace(/\D/g, "");
   var rsvp = h("form", { onsubmit: function (e) {
     e.preventDefault();
     var f = e.target, nama = f.nama.value.trim();
     if (!nama) { say("Mohon isi nama Anda."); return; }
     var msg = CONFIG.rsvp.templatPesan.replace("{nama}", nama).replace("{hadir}", f.hadir.value).replace("{jumlah}", f.jumlah.value).replace("{acara}", CONFIG.rsvp.namaAcara || CONFIG.namaSampul);
-    // WhatsApp dibuka langsung di event klik (pemblokir popup); pencatatan berjalan di belakang.
+    // WhatsApp opens directly in the click event (popup blockers); recording runs in the background.
     if (waNumber) window.open("https://wa.me/" + waNumber + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
     send({ _kind: "rsvp", nama: nama.slice(0, 60), hadir: f.hadir.value, jumlah: f.jumlah.value, _hp: f._hp.value }).then(function (ok) {
       if (ok) { say("Terima kasih, konfirmasi Anda sudah tercatat."); f.reset(); f.nama.value = nama; }
@@ -597,7 +598,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   }
 
   /* ------------------------------- musik ------------------------------- */
-  /* Bila CONFIG.musik.url kosong, melodi lembut dibuat dengan Web Audio (tanpa berkas). */
+  /* If CONFIG.musik.url is empty, a soft melody is made with Web Audio (no file). */
   var musicBtn = $("#music");
   var audio = null, actx = null, synthTimer = null, playing = false;
   function synthStart() {
@@ -636,7 +637,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
   function stopMusic() { if (audio) audio.pause(); else synthStop(); setPlaying(false); }
   musicBtn.addEventListener("click", function () { playing ? stopMusic() : startMusic(); });
 
-  /* ------------------------- buka undangan ----------------------------- */
+  /* ------------------------- open the invitation ----------------------------- */
   $("#open").addEventListener("click", function () {
     var cover = $("#cover");
     cover.classList.add("open");
@@ -651,7 +652,7 @@ const CONFIG = /*owd:data name="CONFIG" label="Data undangan" hide="id,musik.nad
     setTimeout(function () { cover.hidden = true; $("#profil").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }, reduce ? 50 : 900);
   });
 
-  /* Library: AOS & Swiper (opsional; halaman tetap jalan tanpa keduanya). */
+  /* Libraries: AOS & Swiper (optional; the page still works without them). */
   if (window.AOS) AOS.init({ once: true, duration: 800, easing: "ease-out-cubic", offset: 60, disable: reduce });
   if (window.Swiper && document.querySelector(".gallery")) new Swiper(".gallery", { slidesPerView: 1.15, spaceBetween: 14, centeredSlides: true, loop: false, grabCursor: true, keyboard: { enabled: true }, a11y: { enabled: true }, pagination: { el: ".swiper-pagination", clickable: true }, breakpoints: { 640: { slidesPerView: 2.2 }, 960: { slidesPerView: 3 } } });
 

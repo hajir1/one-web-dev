@@ -5,12 +5,12 @@ import { useTranslation } from "react-i18next";
 
 /* ================================================================== */
 /* Service worker (vite-plugin-pwa, registerType "prompt").             */
-/* - Versi baru tidak aktif diam-diam: kartu "Muat ulang untuk           */
-/*   memperbarui" muncul, pengguna yang memutuskan kapan.                */
-/* - Cek pembaruan tiap jam & saat tab kembali aktif, agar tab yang      */
-/*   dibiarkan terbuka lama tidak terjebak di versi lama.                */
-/* - Dipasang sekali di root (main.tsx), jadi juga tampil di Desain       */
-/*   Halaman yang layar penuh.                                          */
+/* - A new version never activates silently: a "Reload to               */
+/*   update" card appears and the user decides when.                     */
+/* - Checks for updates every hour & when the tab becomes active, so     */
+/*   tabs left open for a long time do not get stuck on an old version.  */
+/* - Mounted once at the root (main.tsx), so it also shows in the        */
+/*   full-screen Page Design.                                           */
 /* ================================================================== */
 
 const CHECK_EVERY_MS = 60 * 60 * 1000;
@@ -42,7 +42,7 @@ export default function PwaUpdatePrompt() {
       if (!reg) return;
       const check = async () => {
         if (reg.installing || !navigator.onLine) return;
-        // Lewati cache HTTP agar sw.js versi baru benar-benar terdeteksi.
+        // Bypass the HTTP cache so a new sw.js is really detected.
         const res = await fetch(swUrl, { cache: "no-store", headers: { "cache-control": "no-cache" } }).catch(() => null);
         if (res?.status === 200) await reg.update().catch(() => undefined);
       };

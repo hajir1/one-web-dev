@@ -14,9 +14,9 @@ import type { NewPageChoice } from "../ui/studio/AddPageDialog";
 import { useSaveTarget } from "../ui/studio/saveTarget";
 
 /* ================================================================== */
-/* Studio (v20): /studio/:siteId = satu website, banyak halaman.        */
-/* Dipisah dari PageMaker.tsx (no. 15): daftar halaman, simpan          */
-/* otomatis, buka/tambah/ganti nama/hapus halaman, salin header-footer. */
+/* Studio (v20): /studio/:siteId = one website, many pages.             */
+/* Split out of PageMaker.tsx (no. 15): page list, save                 */
+/* automatically, open/add/rename/delete pages, copy header-footer. */
 /* ================================================================== */
 
 interface StudioArgs {
@@ -29,14 +29,14 @@ interface StudioArgs {
   pageDesigns: SavedDesign[];
   searchParams: URLSearchParams;
   setSearchParams: SetURLSearchParams;
-  /** Dipanggil setelah halaman dimuat (mis. pilihan elemen kembali ke root). */
+  /** Called after a page loads (e.g. the element selection returns to the root). */
   onPageLoaded: () => void;
 }
 
 export function useStudioSite({ t, push, design, history, siteId, siteDocs, pageDesigns, searchParams, setSearchParams, onPageLoaded }: StudioArgs) {
   const siteMode = !!siteId;
   const { doc, editRoot } = history;
-  /* ---------------- Studio: halaman website ---------------- */
+  /* ---------------- Studio: website pages ---------------- */
   const localeNavigate = useLocaleNavigate();
   const saveDesignToStore = useDesignStore((st) => st.saveDesign);
   const updateDesignInStore = useDesignStore((st) => st.updateDesign);
@@ -55,7 +55,7 @@ export function useStudioSite({ t, push, design, history, siteId, siteDocs, page
 
   const saveSite = useCallback((next: SiteDoc) => site && updateDesignInStore(SITE_TYPE, site.id, next), [site, updateDesignInStore]);
 
-  // Simpan otomatis (Studio): perubahan tersimpan 0,8 detik setelah berhenti mengedit.
+  // Autosave (Studio): changes are saved 0.8 seconds after you stop editing.
   const saveNowRef = useRef(design.handleSaveChanges);
   saveNowRef.current = design.handleSaveChanges;
   const dirtyRef = useRef(design.isDirty);
@@ -78,7 +78,7 @@ export function useStudioSite({ t, push, design, history, siteId, siteDocs, page
     return () => window.removeEventListener("pagehide", onHide);
   }, [siteMode, flush]);
 
-  /** Buka halaman: riwayat undo dimulai baru (undo tidak menyeberang ke halaman lain). */
+  /** Opens a page: the undo history starts fresh (undo does not cross into other pages). */
   const loadPage = useCallback(
     (d: SavedDesign) => {
       design.handleLoad(d);
@@ -107,7 +107,7 @@ export function useStudioSite({ t, push, design, history, siteId, siteDocs, page
     [design.activeDesignId, flush, loadPage],
   );
 
-  // Pertama kali (atau halaman aktif dihapus): buka ?page=, beranda, atau halaman pertama.
+  // The first time (or when the active page is deleted): open ?page=, the home page, or the first page.
   const wantedPage = searchParams.get("page");
   useEffect(() => {
     if (!siteMode || !siteDoc) return;
@@ -119,7 +119,7 @@ export function useStudioSite({ t, push, design, history, siteId, siteDocs, page
   }, [siteMode, siteDoc, sitePages, design.activeDesignId]);
 
   const currentPage = sitePages.find((p) => p.designId === design.activeDesignId) ?? null;
-  /** Isi terbaru sebuah halaman (halaman yang sedang diedit = isi editor). */
+  /** The latest content of a page (the page being edited = the editor content). */
   const pageDocOf = useCallback(
     (id: string) => (id === design.activeDesignId ? doc : normalizePageDoc(useDesignStore.getState().designs[PAGE_TYPE]?.find((x) => x.id === id)?.state)),
     [design.activeDesignId, doc],
@@ -154,7 +154,7 @@ export function useStudioSite({ t, push, design, history, siteId, siteDocs, page
     if (!siteDoc) return;
     const page = sitePages.find((p) => p.designId === id);
     let next = setLabel(siteDoc, id, name);
-    // Slug ikut nama bila belum pernah diubah manual (URL = nama halaman).
+    // The slug follows the name unless it was changed manually (URL = page name).
     if (page && !page.isHome && page.slug === slugify(page.title)) {
       const taken = new Set(next.pages.filter((p) => p.designId !== id).map((p) => p.slug));
       next = setSlug(next, id, uniqueSlug(slugify(name), taken)).doc;

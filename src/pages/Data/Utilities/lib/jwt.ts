@@ -2,16 +2,16 @@ import { DataError } from "../../shared/errors";
 import { base64ToBytes } from "./encoding";
 
 /* ================================================================== */
-/* JWT decoder. HANYA mendekode header & payload (Base64URL).            */
-/* Tanda tangan TIDAK diverifikasi — itu butuh kunci/secret dan harus     */
-/* dilakukan di server. Token tidak pernah dikirim ke mana pun.          */
+/* JWT decoder. ONLY decodes the header & payload (Base64URL).           */
+/* The signature is NOT verified: that needs a key/secret and must      */
+/* be done on the server. The token is never sent anywhere.            */
 /* ================================================================== */
 
 export interface DecodedJwt {
   header: Record<string, unknown>;
   payload: unknown;
   signature: string;
-  /** Klaim waktu (detik Unix) yang ditemukan. */
+  /** Time claims (Unix seconds) found. */
   times: { claim: "exp" | "iat" | "nbf"; seconds: number; iso: string }[];
   status: "valid-time" | "expired" | "not-yet-valid" | "no-exp";
 }

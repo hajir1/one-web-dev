@@ -1,7 +1,7 @@
 import type { TemplateMeta } from "../../../../config/templates";
 import { TEMPLATE_PRICE } from "../../../../config/marketplace";
 
-/** Metadata 25 template katalog v2 (bagian A). Konten: ./setA/. */
+/** Metadata for the 25 v2 catalog templates (part A). Content: ./setA/. */
 export const V2A_CATALOG: TemplateMeta[] = [
   { id: "cafe-kopi-senja", version: 1, category: "restaurant", tier: "free", price: TEMPLATE_PRICE.free, accent: "#c2410c", tags: ["kafe", "coffee", "menu"], isNew: true },
   { id: "fitness-gym-pulse", version: 2, category: "fitness", tier: "premium", price: 115, accent: "#ca8a04", tags: ["gym", "kelas", "membership"], isNew: true },

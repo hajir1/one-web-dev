@@ -1,14 +1,14 @@
 /* ================================================================== */
 /* ATURAN KUOTA TERPUSAT (Web Maker)                                    */
 /*                                                                    */
-/* - Desain halaman Page Maker: MAKSIMAL 10 tersimpan (semua desain,     */
-/*   termasuk hasil modifikasi template). Bila penuh, pengguna harus     */
-/*   menghapus desain lama — aplikasi TIDAK menghapus otomatis.         */
-/* - Folder website: 2 gratis; berikutnya memakai kredit (site-slot).   */
-/* - Ekspor kode: 20 ekspor berhasil gratis (lihat credits/downloadQuota).*/
+/* - Page Maker page designs: a MAXIMUM of 10 saved (all designs,        */
+/*   including modified templates). When full, users must                */
+/*   delete old designs; the app does NOT delete anything automatically. */
+/* - Website folders: 2 free; after that they use credits (site-slot).  */
+/* - Code export: 20 successful exports free (see credits/downloadQuota).*/
 /*                                                                    */
-/* Catatan keamanan: kuota di frontend hanya untuk UX. Penegakan yang    */
-/* sebenarnya harus dilakukan backend per akun.                          */
+/* Security note: frontend quotas are for UX only. Enforcement           */
+/* must really be enforced by the backend per account.                   */
 /* ================================================================== */
 
 export const MAX_DESIGNS = 10;
@@ -17,18 +17,18 @@ export const FREE_EXPORTS = 20;
 
 export interface CapacityCheck {
   ok: boolean;
-  /** Jumlah saat ini. */
+  /** Current count. */
   current: number;
-  /** Jumlah yang akan ditambahkan. */
+  /** Count to be added. */
   adding: number;
   max: number;
-  /** Sisa slot sebelum penambahan. */
+  /** Remaining slots before the addition. */
   free: number;
-  /** Berapa yang harus dihapus agar penambahan muat (0 bila ok). */
+  /** How many must be deleted for the addition to fit (0 when ok). */
   mustDelete: number;
 }
 
-/** Cek apakah `adding` desain baru masih muat di batas MAX_DESIGNS. */
+/** Checks whether `adding` new designs still fit within MAX_DESIGNS. */
 export function designCapacity(current: number, adding = 1, max = MAX_DESIGNS): CapacityCheck {
   const cur = Math.max(0, Math.floor(current));
   const add = Math.max(0, Math.floor(adding));
@@ -37,5 +37,5 @@ export function designCapacity(current: number, adding = 1, max = MAX_DESIGNS): 
   return { ok: mustDelete === 0, current: cur, adding: add, max, free, mustDelete };
 }
 
-/** Folder website gratis masih tersedia? */
+/** Are free website folders still available? */
 export const canCreateFreeSite = (currentSites: number, extraSlots = 0) => currentSites < FREE_SITES + Math.max(0, extraSlots);

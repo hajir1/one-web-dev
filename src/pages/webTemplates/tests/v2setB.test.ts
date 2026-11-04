@@ -12,7 +12,7 @@ import { isValidPrice, TEMPLATE_PRICE } from "../../../config/marketplace";
 import { templateContents } from "../../../marketplace/data/templateCatalog";
 import { ASSET_NAMES } from "../assets";
 
-/* Katalog v2 bagian B: 25 template (1 Free + 24 Premium), 4–10 halaman. */
+/* v2 catalog part B: 25 templates (1 Free + 24 Premium), 4–10 pages. */
 
 const IDS = [
   "personal-resume",
@@ -45,7 +45,7 @@ const IDS = [
 const LANGS = ["id", "en"] as const;
 const setB = () => WEB_TEMPLATES.filter((t) => IDS.includes(t.id));
 
-/** Item Premium (section preset & elemen) yang dipakai template. */
+/** Premium items (section presets & elements) used by the template. */
 function premiumItems(tpl: WebTemplate): string[] {
   const { sectionIds, elementIds } = templateContents(tpl);
   return [
@@ -60,7 +60,7 @@ test("v2 set B: 25 template berurutan, konten & metadata cocok, terdaftar di reg
   assert.deepEqual(Object.keys(V2B_TEMPLATES).sort(), [...IDS].sort());
   assert.equal(setB().length, 25, "semua template set B muncul di WEB_TEMPLATES");
   for (const m of V2B_CATALOG) {
-    // Premium naik ke v2 karena kini memakai library (templates/libraryPlan.ts).
+    // Premium moved up to v2 because it now uses libraries (templates/libraryPlan.ts).
     assert.equal(m.version, m.tier === "premium" ? 2 : 1, m.id);
     assert.equal(m.isNew, true, m.id);
     assert.ok(TEMPLATE_CATEGORIES.includes(m.category), `${m.id}: kategori ${m.category}`);
@@ -138,7 +138,7 @@ test("v2 set B: merek unik, identitas visual beragam, aset v2b- terdaftar", () =
     const b = V2B_TEMPLATES[id].brand;
     assert.equal(all.filter((x) => x === b).length, 1, `${id}: merek ${b} unik di katalog`);
   }
-  // Tipografi: pasangan font teks (root) + font judul H1 bervariasi.
+  // Typography: body font pair (root) + varied H1 heading fonts.
   const typo = new Set(
     setB().map((t) => {
       const root = buildTemplatePages(t, "id")[0].doc.root;

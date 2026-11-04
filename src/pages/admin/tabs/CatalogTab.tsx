@@ -99,4 +99,4 @@ function CatalogRowView({ it, onChanged }: { it: CatalogRow; onChanged: () => vo
   );
 }
 
-/* ------------------------------ paket kredit ------------------------------ */
+/* ------------------------------ credit packs ------------------------------ */

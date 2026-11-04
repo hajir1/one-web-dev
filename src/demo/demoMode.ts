@@ -1,26 +1,26 @@
 // ─── demo/demoMode.ts ────────────────────────────────────────────────────────
-// MODE DEMO (v12) = frontend dijalankan tanpa backend (`VITE_API_BASE_URL=off`).
-// Dipakai untuk demonstrasi ke pengguna baru: tidak ada akun, kredit, paket,
-// atau pembelian. Aturan mode ini:
-//   - menu & halaman Kredit, Paket, Akun, Riwayat pekerjaan, Tim, Admin,
-//     masuk/daftar, Toko, dan /dokumentasi disembunyikan (rute diarahkan ke Dashboard);
-//   - semua template katalog dibundel di frontend (lihat demoTemplateIds.ts);
-//   - v15: folder website, desain halaman, dan Tur 360° (tur, scene, hotspot)
-//     tanpa batas (marketplace/hooks.ts, pages/vr/model.ts `vrCap`);
-//   - semua section, elemen, event, dan fitur Premium terbuka, tanpa label
-//     "gratis"/Premium/kredit (teks di demoLocale.ts dan `demo.*` locale);
-//   - Dashboard menampilkan banner promosi, bukan daftar menu;
-//   - hanya alat yang berjalan di browser; alat/mode server (berbayar) disembunyikan.
-// Tidak ada variabel env baru: mode ini aktif bila backend tidak dikonfigurasi.
+// DEMO MODE (v12) = the frontend runs without a backend (`VITE_API_BASE_URL=off`).
+// Used to demonstrate the app to new users: no accounts, credits, plans,
+// or purchases. Rules of this mode:
+//   - Credits, Packs, Account, Job history, Team, Admin menus & pages,
+//     sign-in/sign-up, Store, and /dokumentasi are hidden (routes redirect to the Dashboard);
+//   - every catalog template is bundled in the frontend (see demoTemplateIds.ts);
+//   - v15: website folders, page designs, and 360° Tours (tours, scenes, hotspots)
+//     unlimited (marketplace/hooks.ts, pages/vr/model.ts `vrCap`);
+//   - every Premium section, element, event, and feature is unlocked, without
+//     "free"/Premium/credit labels (text in demoLocale.ts and the `demo.*` locale keys);
+//   - the Dashboard shows a promo banner instead of the menu list;
+//   - only tools that run in the browser; server (paid) tools/modes are hidden.
+// No new env variable: this mode is active when no backend is configured.
 
 import { isBackendConfigured } from "../pages/media/processing/apiConfig";
 
-/** true = aplikasi berjalan sebagai demo frontend-only. */
+/** true = the app runs as a frontend-only demo. */
 export const isDemoMode = (): boolean => !isBackendConfigured();
 
 /**
- * Rute (tanpa prefix bahasa) yang tidak ada di mode demo. Halaman akun,
- * pembayaran, dan alat yang hanya berjalan di server (berbayar).
+ * Routes (without the language prefix) that do not exist in demo mode. Account,
+ * payment, and server-only (paid) tool pages.
  */
 export const DEMO_HIDDEN_PATHS: readonly string[] = [
   "/credits",
@@ -41,11 +41,11 @@ export const DEMO_HIDDEN_PATHS: readonly string[] = [
   "/forgot-password",
   "/reset-password",
   "/invoice",
-  // v15: panduan lengkap lama penuh aturan kredit & Premium; /docs tetap ada.
+  // v15: the old full guide is full of credit & Premium rules; /docs still exists.
   "/dokumentasi",
 ];
 
-/** Apakah `path` (tanpa prefix bahasa) disembunyikan di mode demo. */
+/** Whether `path` (without the language prefix) is hidden in demo mode. */
 export function isDemoHiddenPath(path: string): boolean {
   return DEMO_HIDDEN_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 }

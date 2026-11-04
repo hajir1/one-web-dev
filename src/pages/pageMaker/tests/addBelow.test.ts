@@ -5,7 +5,7 @@ import { createBox, createElementNode, findNode, findParent } from "../engine/he
 import { belowSpot, createPageRoot, placeBelowWrapped, placeNode } from "../helpers/pageDoc";
 import { createRegularSection } from "../helpers/sectionTypes";
 
-/* (+) "tambah di bawah" tidak boleh membuat kolom baru di samping. */
+/* (+) "add below" must not create a new column beside it. */
 
 const text = () => createElementNode("text", {}, "Text");
 
@@ -44,7 +44,7 @@ test("(+) di bawah elemen yang langsung di grid → dibungkus Stack, isi baru di
   const wrap = findParent(r, el.id)!.parent;
   assert.equal(wrap.layout, "stack");
   assert.deepEqual(wrap.children.map((c) => c.id), [el.id, add.id]);
-  // jumlah sel grid tetap 3 (2 kolom + 1 grup), tidak bertambah
+  // the grid cell count stays 3 (2 columns + 1 group), it does not grow
   assert.equal((findNode(r, row.id) as BoxNode).children.length, 3);
 });
 
@@ -62,7 +62,7 @@ test("section, Row, dan anak root bukan target (+) di bawah", () => {
   assert.ok(isBox(row));
 });
 
-/* ------------------- salin tepat di bawah (ala Divi) ------------------- */
+/* ------------------- copy right below (Divi style) ------------------- */
 
 import { duplicateBelow, innerRowSpot, isInnerRow, placeInnerRow } from "../helpers/pageDoc";
 import { createSpecialtySection } from "../helpers/sectionTypes";
@@ -99,17 +99,17 @@ test("spesialisasi: Row dalam bertanda, salinannya di bawah, Row dalam baru tepa
   const special = ((sec.children[0] as BoxNode).children as BoxNode[]).find((c) => c.name === "Kolom Spesial")!;
   const [in1, in2] = special.children as BoxNode[];
   assert.ok(isInnerRow(in1) && isInnerRow(in2));
-  // salin Row dalam 1 → tepat di bawahnya
+  // copy inner Row 1 → right below it
   const dup = duplicateBelow(root, in1.id);
   assert.deepEqual((findNode(dup.root, special.id) as BoxNode).children.map((c) => c.id), [in1.id, dup.newId, in2.id]);
-  // kolom di dalam Row dalam 2 → Row dalam baru tepat di bawah Row dalam 2
+  // a column inside inner Row 2 → a new inner Row right below inner Row 2
   const cell = in2.children[0];
   assert.deepEqual(innerRowSpot(root, cell.id), { columnId: special.id, index: 2 });
   const placed = placeInnerRow(root, in1.id, "3");
   const kids = (findNode(placed.root, special.id) as BoxNode).children as BoxNode[];
   assert.equal(kids[1].id, placed.id);
   assert.ok(kids[1].innerRow && kids[1].children.length === 3 && !kids[1].row);
-  // kolom samping bukan kolom spesial
+  // the side column is not the special column
   const side = ((sec.children[0] as BoxNode).children as BoxNode[]).find((c) => c.name.startsWith("Kolom Samping"))!;
   assert.equal(innerRowSpot(root, side.id), null);
 });

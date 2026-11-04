@@ -13,12 +13,12 @@ import TourPreview from "../ui/TourPreview";
 import type { Tour } from "../model";
 
 /* ================================================================== */
-/* Pratinjau tur layar penuh: /vr/tour-360/pratinjau/:tourId            */
+/* Full-screen tour preview: /vr/tour-360/pratinjau/:tourId             */
 /*                                                                    */
-/* Dibuka di tab baru dari editor. Runtime A-Frame-nya sama dengan      */
-/* hasil ekspor, tetapi foto dibaca dari penyimpanan browser ini        */
-/* (IndexedDB), jadi tidak perlu server atau unggah. Perubahan di tab   */
-/* editor ikut tampil di sini.                                          */
+/* Opened in a new tab from the editor. Its A-Frame runtime is the same as */
+/* the export, but photos are read from this browser's storage          */
+/* (IndexedDB), so no server or upload is needed. Changes in the editor */
+/* tab show here too.                                                   */
 /* ================================================================== */
 
 const STORE_KEY = "onewebdev-vr-tours-v1";
@@ -29,7 +29,7 @@ export default function TourViewer() {
   const { t } = useTranslation();
   const tour = useTourStore((s) => s.tours.find((x) => x.id === tourId) ?? null);
 
-  // Tab editor menyimpan ke localStorage → muat ulang di sini (event "storage").
+  // The editor tab saves to localStorage → reload here (the "storage" event).
   useEffect(() => {
     const on = (e: StorageEvent) => {
       if (e.key === STORE_KEY) void useTourStore.persist.rehydrate();

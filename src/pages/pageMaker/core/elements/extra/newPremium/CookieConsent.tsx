@@ -93,7 +93,7 @@ export const cookieConsentElement = defineElement<CookieConsentState>({
   outline: 2px solid ${color(s.acceptBg, "#2563eb")};
   outline-offset: 2px;
 }
-/* Melayang di bawah layar hanya setelah runtime aktif. */
+/* Floats at the bottom of the screen only once the runtime is active. */
 .${cls}[data-ready] {
   position: fixed;
   bottom: 16px;

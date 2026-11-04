@@ -10,7 +10,7 @@ import { useGlobalVars } from "../hooks/useGlobalVars";
 const FONT_MANAGE_HREF = "/global-setting?tab=font";
 
 interface FontSelectProps {
-  /** String CSS `font-family` di elemen: "" = ikuti pengaturan global, `var(--x)` = referensi variabel font. */
+  /** The element's CSS `font-family` string: "" = follow the global setting, `var(--x)` = a font variable reference. */
   value: string;
   onChange: (stack: string) => void;
 }
@@ -18,19 +18,19 @@ interface FontSelectProps {
 interface Opt {
   value: string;
   label: string;
-  /** Stack untuk pratinjau nama font memakai font aslinya. */
+  /** Stack used to preview a font name in its own font. */
   stack?: string;
   group: string;
   hint?: string;
 }
 
 /**
- * Pemilih font panel Styling (v7). Pilihan:
- *  - "Ikuti pengaturan global" (bawaan, nilai kosong → mewarisi font halaman/judul global);
- *  - variabel font dari Pengaturan Global (font judul, font isi, font pustaka, variabel font
- *    buatan pengguna) — disimpan sebagai REFERENSI `var(--x)`, jadi ikut berubah otomatis;
- *  - font sistem (nilai tetap).
- * Setiap nama ditampilkan dengan font aslinya.
+ * Styling panel font picker (v7). Options:
+ *  - "Follow the global setting" (default, empty value → inherits the global page/heading font);
+ *  - font variables from Global Settings (heading font, body font, library fonts, user-created
+ *    font variables), stored as a `var(--x)` REFERENCE so they update automatically;
+ *  - system fonts (fixed values).
+ * Each name is shown in its own font.
  */
 export default function FontSelect({ value, onChange }: FontSelectProps) {
   const { t } = useTranslation();

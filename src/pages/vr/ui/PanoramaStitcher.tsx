@@ -19,7 +19,7 @@ interface Photo {
   url: string;
 }
 
-/** v7: dialog VR Panorama Stitcher (lihat ../stitch.ts). */
+/** v7: VR Panorama Stitcher dialog (see ../stitch.ts). */
 export default function PanoramaStitcher({ open, onClose, onDone }: { open: boolean; onClose: () => void; onDone: (file: File) => Promise<void> }) {
   const { t } = useTranslation();
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -32,7 +32,7 @@ export default function PanoramaStitcher({ open, onClose, onDone }: { open: bool
   const access = useServerFeatureAccess(STITCH.feature, [{ photos: Math.max(1, count) }]);
 
   useEffect(() => () => abort.current?.abort(), []);
-  // Lepas URL pratinjau saat foto dibuang / komponen ditutup.
+  // Revoke preview URLs when photos are removed / the component closes.
   const urls = useRef<string[]>([]);
   urls.current = photos.map((p) => p.url);
   useEffect(() => () => urls.current.forEach((u) => URL.revokeObjectURL(u)), []);
@@ -82,7 +82,7 @@ export default function PanoramaStitcher({ open, onClose, onDone }: { open: bool
       onClose();
     } catch (e) {
       if ((e as Error)?.name === "AbortError") return;
-      // Python mati / saldo kurang / terkunci → pesan ramah dari serverClient; kredit tidak dipotong.
+      // Python down / insufficient balance / locked → a friendly message from serverClient; no credits charged.
       if (e instanceof ServiceUnavailableError || e instanceof ServerUnavailableError) setError(t("vr.stitch.unavailable"));
       else if (e instanceof InsufficientCreditError || e instanceof FeatureLockedError) setError(e.message);
       else setError(e instanceof Error ? e.message : t("errors.server.failed"));

@@ -12,7 +12,7 @@ export function PaymentsTab() {
   const { t } = useTranslation();
   const [f, setF] = useState({ q: "", status: "", page: 1 });
   const q = useAdminGet<Paged & { payments: Row[] }>(`/admin/payments${qs({ ...f, pageSize: 25 })}`);
-  /** Refund: nominal (kosong = sisa penuh), alasan, dan apakah diteruskan ke Midtrans. */
+  /** Refund: amount (empty = the full remainder), reason, and whether it is forwarded to Midtrans. */
   const refund = (p: Row) => {
     const remaining = Number(p.amount) - Number(p.refundAmount ?? 0);
     const raw = window.prompt(t("admin.refund.amountPrompt", { max: formatIdr(remaining) }), String(remaining));

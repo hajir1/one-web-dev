@@ -1,11 +1,11 @@
 import { DataError } from "./errors";
 
 /* ================================================================== */
-/* CSV/TSV sesuai RFC 4180:                                            */
-/*  - field ber-kutip boleh berisi pemisah, "" (kutip ganda), dan ENTER  */
-/*  - pemisah dideteksi dari baris pertama (, ; tab |), bukan dicampur   */
-/*  - BOM UTF-8 dibuang; teks non-UTF-8 (ekspor Excel Windows) dibaca     */
-/*    sebagai Windows-1252                                              */
+/* CSV/TSV per RFC 4180:                                               */
+/*  - quoted fields may contain separators, "" (double quotes), and newlines */
+/*  - the separator is detected from the first row (, ; tab |), never mixed */
+/*  - the UTF-8 BOM is dropped; non-UTF-8 text (Windows Excel export) is read */
+/*    as Windows-1252                                                   */
 /* ================================================================== */
 
 export type Delimiter = "," | ";" | "\t" | "|";
@@ -23,7 +23,7 @@ export function decodeText(buffer: ArrayBuffer | Uint8Array): string {
   return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
 }
 
-/** Hitung pemisah di luar tanda kutip pada baris (logis) pertama. */
+/** Counts separators outside quotes on the first (logical) line. */
 export function detectDelimiter(text: string): Delimiter {
   const counts = new Map<Delimiter, number>(CANDIDATES.map((d) => [d, 0]));
   let inQuotes = false;
@@ -47,13 +47,13 @@ export function detectDelimiter(text: string): Delimiter {
   return best;
 }
 
-/** Parse CSV → baris string[][]. Baris kosong total dilewati. */
+/** Parse CSV → string[][] rows. Fully empty rows are skipped. */
 export function parseCsv(text: string, delimiter: Delimiter = detectDelimiter(text)): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let field = "";
   let inQuotes = false;
-  let quotedAt = -1; // baris tempat kutip dibuka (untuk pesan error)
+  let quotedAt = -1; // the line where the quote was opened (for the error message)
   let line = 1;
 
   const endRow = () => {
@@ -99,14 +99,14 @@ export function parseCsv(text: string, delimiter: Delimiter = detectDelimiter(te
 
 const needsQuote = (s: string, d: string) => s.includes(d) || /["\r\n]/.test(s) || /^\s|\s$/.test(s);
 
-/** Nilai sel → teks CSV (objek/array di-JSON-kan). */
+/** Cell value → CSV text (objects/arrays are JSON-encoded). */
 function cellText(v: unknown): string {
   if (v === null || v === undefined) return "";
   if (typeof v === "object") return JSON.stringify(v);
   return String(v);
 }
 
-/** Baris → teks CSV (CRLF, kutip bila perlu). */
+/** Rows → CSV text (CRLF, quoted when needed). */
 export function toCsv(rows: unknown[][], delimiter: Delimiter = ","): string {
   return rows
     .map((r) =>

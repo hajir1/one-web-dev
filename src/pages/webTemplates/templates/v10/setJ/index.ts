@@ -10,7 +10,7 @@ import { j08 } from "./j08Roda";
 import { j09 } from "./j09Ombak";
 import { j10 } from "./j10Petak";
 
-/** Konten template katalog v10 (bagian J, 3D + efek scroll), dikunci dengan ID di ../catalogJ.ts. */
+/** Catalog v10 template content (part J, 3D + scroll effects), keyed by the IDs in ../catalogJ.ts. */
 export const V10J_TEMPLATES: Record<string, TemplateContent> = {
   "j3d-tanah-liat-kasongan": j01,
   "j3d-bayu-kertanegara": j02,

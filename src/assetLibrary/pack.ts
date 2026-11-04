@@ -1,14 +1,14 @@
 import { assetFileName, findAssetIds, MISSING_ASSET, replaceAssetRefs } from "./refs";
 
 /* ================================================================== */
-/* Saat unduh zip / deploy: setiap `aset:<id>` di berkas hasil diganti   */
-/* jalur berkas sungguhan, dan gambarnya ikut sebagai berkas biner.     */
+/* On zip download / deploy: every `aset:<id>` in the output files is replaced */
+/* with a real file path, and the image is included as a binary file.   */
 /*                                                                    */
 /*   HTML statis & template kode → assets/img/<nama>.<ext>, dirujuk      */
-/*     relatif dari folder berkas (index.html → assets/img/…,            */
+/*     relative to the file's folder (index.html → assets/img/…,         */
 /*     assets/x.css → img/…).                                            */
 /*   React/Vue/Svelte/Angular/Blade → public/assets/img/…, dirujuk        */
-/*     /assets/img/… (folder public/ disajikan apa adanya).             */
+/*     /assets/img/… (the public/ folder is served as is).              */
 /* ================================================================== */
 
 export interface TextFile {
@@ -30,7 +30,7 @@ export type PackLayout = "static" | "public";
 
 export const layoutFor = (framework: string): PackLayout => (framework === "html" ? "static" : "public");
 
-/** Jalur relatif dari folder berkas `from` ke `target` (keduanya relatif akar proyek). */
+/** Relative path from the folder of file `from` to `target` (both relative to the project root). */
 export function relativePath(from: string, target: string): string {
   const dir = from.split("/").slice(0, -1);
   const t = target.split("/");
@@ -70,7 +70,7 @@ export async function packAssets<F extends TextFile>(files: F[], layout: PackLay
   return { files: out, binaries, missing };
 }
 
-/** Biner → base64 (untuk GitHub API). */
+/** Binary → base64 (for the GitHub API). */
 export async function blobToBase64(b: Blob): Promise<string> {
   const buf = new Uint8Array(await b.arrayBuffer());
   let s = "";

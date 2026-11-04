@@ -18,9 +18,9 @@ import {
 import { isDemoMode } from "../demo/demoMode";
 
 /* ================================================================== */
-/* Daftar topik dokumentasi — SATU sumber untuk tombol Bantuan di tiap   */
-/* menu, laci dokumentasi, dan halaman /docs.                            */
-/* Isi tiap topik (ID & EN) ada di locales: docs.topics.<id>.             */
+/* Documentation topic list: the ONE source for the Help button in each  */
+/* menu, the documentation drawer, and the /docs page.                  */
+/* Each topic's content (ID & EN) lives in the locales: docs.topics.<id>. */
 /* ================================================================== */
 
 export type DocTopicId =
@@ -45,7 +45,7 @@ export interface DocTopic {
   id: DocTopicId;
   group: DocGroup;
   icon: LucideIcon;
-  /** Halaman aplikasi yang dijelaskan topik ini (untuk tombol "Buka alat"). */
+  /** The app page this topic explains (for the "Open tool" button). */
   path: string;
 }
 
@@ -66,7 +66,7 @@ export const DOC_TOPICS: DocTopic[] = [
   { id: "vr", group: "vr", icon: Glasses, path: "/vr/tour-360" },
 ];
 
-/** Mode demo (v12): topik Kredit, Paket & Konversi Server tidak ditampilkan. */
+/** Demo mode (v12): the Credits, Packs & Server Conversion topics are hidden. */
 const DEMO_HIDDEN_TOPICS: DocTopicId[] = ["credits", "plans", "data-server"];
 export const visibleDocTopics = (): DocTopic[] => (isDemoMode() ? DOC_TOPICS.filter((d) => !DEMO_HIDDEN_TOPICS.includes(d.id)) : DOC_TOPICS);
 export const isVisibleDocTopic = (v: unknown): v is DocTopicId => isDocTopic(v) && (!isDemoMode() || !DEMO_HIDDEN_TOPICS.includes(v));

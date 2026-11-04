@@ -6,19 +6,19 @@ import { laravelCrudFiles, laravelCrudReadme, laravelRoutes } from "./laravel";
 import { expressCrudFiles, expressReadme } from "./express";
 
 /* ================================================================== */
-/* "Include CRUD": gabungkan kode backend ke berkas ekspor halaman.      */
+/* "Include CRUD": merges backend code into the page export files.      */
 /*                                                                    */
 /*   laravel  → format Laravel Blade + Model/Migration/Controller/...    */
-/*   express  → format HTML dipindah ke public/ + server Express         */
+/*   express  → the HTML format is moved to public/ + an Express server  */
 /* ================================================================== */
 
 export type CrudStack = "laravel" | "express";
 
 /**
- * Stack yang ditawarkan di "Include CRUD". Keputusan uji coba: hanya
- * Node.js (Express), karena proyeknya utuh dan berdiri sendiri. Generator
- * Laravel tetap ada (withCrud("laravel", …)) untuk dipakai lagi nanti
- * sebagai proyek Laravel utuh.
+ * Stacks offered under "Include CRUD". Preview decision: only
+ * Node.js (Express), because the project is complete and standalone. The
+ * Laravel generator still exists (withCrud("laravel", …)) for later use
+ * as a complete Laravel project.
  */
 export const ALL_CRUD_STACKS: { id: CrudStack; label: string; framework: Framework }[] = [
   { id: "laravel", label: "Laravel", framework: "blade" },
@@ -26,19 +26,19 @@ export const ALL_CRUD_STACKS: { id: CrudStack; label: string; framework: Framewo
 ];
 export const CRUD_STACKS = ALL_CRUD_STACKS.filter((s) => s.id === "express");
 export const DEFAULT_CRUD_STACK: CrudStack = "express";
-/** Stack tersimpan → stack yang masih ditawarkan. */
+/** Stored stack → a stack that is still offered. */
 export const isOfferedStack = (v: unknown): v is CrudStack => CRUD_STACKS.some((s) => s.id === v);
 
 export const frameworkForStack = (s: CrudStack): Framework => ALL_CRUD_STACKS.find((x) => x.id === s)!.framework;
 export const stackForFramework = (fw: Framework): CrudStack | null => CRUD_STACKS.find((x) => x.framework === fw)?.id ?? null;
 
 const hasCollection = (content: string) => /\bdata-collection="/.test(content);
-/** Halaman yang butuh skrip pemuat data (koleksi, halaman item, item terkait). */
+/** Pages that need the data loader script (collections, item pages, related items). */
 const hasDynamic = (content: string) => /\bdata-(collection|item|related)="/.test(content);
 
 /**
- * Berkas ekspor + CRUD. `files` = hasil `projectFiles` untuk framework
- * stack itu (blade / html). Koleksi kosong → berkas apa adanya.
+ * Export files + CRUD. `files` = the `projectFiles` output for that stack's
+ * framework (blade / html). Empty collections → files as is.
  */
 export function withCrud(stack: CrudStack, files: GeneratedFile[], collections: CollectionDef[], siteName: string): GeneratedFile[] {
   const cols = uniqueCollections(collections);
@@ -58,11 +58,11 @@ export function withCrud(stack: CrudStack, files: GeneratedFile[], collections: 
     return out;
   }
 
-  // Express: situs statis disajikan dari public/. Berkas halaman item statis
-  // (<koleksi>/<slug>.html) tidak dipakai: server menyajikan /<koleksi>/:slug.
+  // Express: the static site is served from public/. Static item page files
+  // (<collection>/<slug>.html) are not used: the server serves /<collection>/:slug.
   const itemDirs = new Set(cols.map((c) => c.slug));
   const isItemFile = (name: string) => /^[a-z][a-z0-9-]*\/[^/]+\.(html|css)$/.test(name) && itemDirs.has(name.slice(0, name.indexOf("/")));
-  /** Halaman item per koleksi: berkas HTML yang punya data-item="<slug>". */
+  /** Item pages per collection: HTML files that have data-item="<slug>". */
   const itemPages: Record<string, string> = {};
   for (const f of files) {
     if (f.lang !== "html" || isItemFile(f.name)) continue;

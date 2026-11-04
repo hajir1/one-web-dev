@@ -2,30 +2,30 @@ import type { DragEvent } from "react";
 import type { BoxLayout, NodeId } from "./componentTypes";
 
 /* ================================================================== */
-/* Drag & drop — payload dan perhitungan posisi jatuh                   */
+/* Drag & drop — payload and drop position calculation                  */
 /* ================================================================== */
 
 const DND_MIME = "application/x-component-maker";
 
 export type DragPayload =
-  /** Memindahkan node yang sudah ada di pohon. */
+  /** Moves a node that is already in the tree. */
   | { kind: "node"; id: NodeId }
-  /** Elemen dari pustaka (desain tersimpan atau bawaan). */
+  /** An element from the library (saved or built-in design). */
   | { kind: "element"; elementType: string }
-  /** Kontainer kosong baru. */
+  /** A new empty container. */
   | { kind: "box"; layout: BoxLayout }
-  /** Preset section baru — Page Maker. */
+  /** New section preset — Page Maker. */
   | { kind: "section"; presetId: string }
-  /** Row baru (Section → Row → Element) — Page Maker. */
+  /** New row (Section → Row → Element) — Page Maker. */
   | { kind: "row"; variant: string };
 
-// dataTransfer.getData() tidak bisa dibaca saat dragover (hanya saat drop),
-// jadi payload yang sedang diseret disimpan di sini.
+// dataTransfer.getData() cannot be read during dragover (only on drop),
+// so the payload being dragged is stored here.
 let current: DragPayload | null = null;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
 
-/** Untuk `useSyncExternalStore`: tahu kapan ada seretan aktif. */
+/** For `useSyncExternalStore`: knows when a drag is active. */
 export function subscribeDrag(l: () => void) {
   listeners.add(l);
   return () => {
@@ -36,14 +36,14 @@ export const getDragSnapshot = () => current;
 
 export function startDrag(e: DragEvent, payload: DragPayload, label: string) {
   current = payload;
-  // Ditunda: mengubah DOM saat dragstart bisa membatalkan seretan di beberapa browser.
+  // Deferred: changing the DOM during dragstart can cancel the drag in some browsers.
   setTimeout(notify, 0);
   e.dataTransfer.effectAllowed = payload.kind === "node" ? "move" : "copy";
   try {
     e.dataTransfer.setData(DND_MIME, JSON.stringify(payload));
     e.dataTransfer.setData("text/plain", label);
   } catch {
-    /* beberapa browser membatasi setData; payload tetap tersedia lewat `current` */
+    /* some browsers restrict setData; the payload is still available through `current` */
   }
 }
 
@@ -63,14 +63,14 @@ export function currentDrag(e?: DragEvent): DragPayload | null {
   }
 }
 
-/** Letak jatuh: sisipkan di `parentId` pada `index`. */
+/** Drop location: insert into `parentId` at `index`. */
 export interface DropTarget {
   parentId: NodeId;
   index: number;
-  /** Baris pohon yang jadi acuan visual + jenis penanda. */
+  /** The tree row used as the visual reference + the marker kind. */
   rowId: NodeId | "end";
   mode: "before" | "after" | "inside" | "first-child" | "end";
-  /** Kedalaman garis penanda (indentasi). */
+  /** Marker line depth (indentation). */
   depth: number;
 }
 
@@ -80,19 +80,19 @@ export interface TreeRowInfo {
   isRoot: boolean;
   depth: number;
   parentId: NodeId | null;
-  /** Posisi di daftar anak induknya. */
+  /** Position in the parent's child list. */
   index: number;
   childCount: number;
   expanded: boolean;
 }
 
 /**
- * Dari baris yang sedang di-hover + posisi pointer (0..1 dari atas baris)
- * tentukan letak jatuhnya. Aturannya mengikuti editor layer pada umumnya:
- *  - baris elemen: separuh atas = sebelum, separuh bawah = sesudah
- *  - baris box:    25% atas = sebelum, 25% bawah = sesudah (atau anak pertama
- *                  kalau sedang terbuka), tengah = masuk ke dalam (di akhir)
- *  - root: selalu masuk ke dalam (di akhir)
+ * From the hovered row + the pointer position (0..1 from the top of the row),
+ * decides the drop location. The rules follow typical layer editors:
+ *  - element row: top half = before, bottom half = after
+ *  - box row:     top 25% = before, bottom 25% = after (or first child
+ *                  when it is expanded), middle = inside (at the end)
+ *  - root: always inside (at the end)
  */
 export function dropForRow(row: TreeRowInfo, ratio: number): DropTarget {
   if (row.isRoot) {

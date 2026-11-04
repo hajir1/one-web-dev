@@ -10,7 +10,7 @@ import { ART04 } from "./art04";
 import { ART03 } from "./art03";
 import { ART02 } from "./art02";
 
-/* Ilustrasi set J: per template, kunci v10j-<id>-<nama>. */
+/* Set J illustrations: per template, key v10j-<id>-<name>. */
 const PER_TEMPLATE: [string, Record<string, () => string>][] = [
   ["j3d-tanah-liat-kasongan", ART01],
   ["j3d-bayu-kertanegara", ART02],

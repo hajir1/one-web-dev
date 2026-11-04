@@ -6,12 +6,12 @@ import type { TplLang } from "./types";
 import { isDemoMode } from "../../demo/demoMode";
 
 /* ================================================================== */
-/* Isi template dari SERVER                                             */
+/* Template content from the SERVER                                     */
 /*                                                                    */
-/* Metadata template publik (GET /templates), tetapi isinya (pohon        */
-/* halaman Page Maker) hanya dikirim lewat POST /templates/:id/acquire:   */
-/* template gratis, atau Premium yang sudah dibeli (402 bila belum).     */
-/* Isi di-cache di memori selama tab terbuka (tidak disimpan ke disk).    */
+/* Public template metadata (GET /templates), but its content (tree       */
+/* Page Maker pages) is only sent through POST /templates/:id/acquire:  */
+/* free templates, or Premium ones already purchased (402 if not).      */
+/* Content is cached in memory while the tab is open (not stored on disk). */
 /* ================================================================== */
 
 export interface TemplateRef {
@@ -31,7 +31,7 @@ const cache = new Map<string, Promise<BuiltTemplatePage[]>>();
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 
-/** Validasi halaman dari server; halaman tanpa pohon dokumen dibuang. */
+/** Validates pages from the server; pages without a document tree are dropped. */
 export function sanitizePages(raw: unknown, ref: TemplateRef): BuiltTemplatePage[] {
   if (!Array.isArray(raw)) return [];
   const out: BuiltTemplatePage[] = [];
@@ -51,14 +51,14 @@ export function sanitizePages(raw: unknown, ref: TemplateRef): BuiltTemplatePage
 }
 
 /**
- * Ambil isi template (setiap pemanggilan mengembalikan salinan baru).
- * Melempar ApiError 402 TEMPLATE_LOCKED bila Premium belum dimiliki.
+ * Fetches template content (every call returns a new copy).
+ * Throws ApiError 402 TEMPLATE_LOCKED when the Premium template is not owned yet.
  */
 export async function acquireTemplate(ref: TemplateRef, lang: TplLang): Promise<BuiltTemplatePage[]> {
   const key = `${ref.id}:${ref.version}:${lang}`;
   let p = cache.get(key);
   if (!p && isDemoMode()) {
-    // Mode demo (v12): isi dibangun di browser dari template bawaan frontend.
+    // Demo mode (v12): content is built in the browser from the frontend's built-in templates.
     p = import("../../demo/demoTemplates").then((m) => m.demoAcquire(ref, lang));
     cache.set(key, p);
     p.catch(() => cache.delete(key));
@@ -72,8 +72,8 @@ export async function acquireTemplate(ref: TemplateRef, lang: TplLang): Promise<
 }
 
 /**
- * v21.2: HTML Template Kode dari backend v14 (gratis, atau Premium yang sudah dibeli;
- * ApiError 402 TEMPLATE_LOCKED bila belum). Dipasang sebagai sumber loadCodeTemplate().
+ * v21.2: Code Template HTML from backend v14 (free, or Premium already purchased;
+ * ApiError 402 TEMPLATE_LOCKED if not). Installed as the loadCodeTemplate() source.
  */
 export async function acquireCodeTemplateHtml(id: string): Promise<string> {
   const r = await api<{ html?: unknown }>(`/templates/${encodeURIComponent(id)}/acquire`, { method: "POST", body: { lang: "id" } });
@@ -81,10 +81,10 @@ export async function acquireCodeTemplateHtml(id: string): Promise<string> {
   return r.html;
 }
 
-/** Lupakan cache (mis. setelah keluar akun). */
+/** Forget the cache (e.g. after signing out). */
 export const clearTemplateCache = () => cache.clear();
 
-/** Folder website + desain sementara (TIDAK disimpan) untuk ekspor zip. */
+/** A temporary website folder + designs (NOT saved) for the zip export. */
 export function templateSiteFromPages(t: TemplateRef, pages: BuiltTemplatePage[], siteName: string): { site: SavedDesign; designs: SavedDesign[]; pages: BuiltTemplatePage[] } {
   const now = Date.now();
   const designs: SavedDesign[] = pages.map((p) => ({ id: `tpl-${t.id}-${p.key}`, name: p.name, state: p.doc, updatedAt: now }));
@@ -98,7 +98,7 @@ export function templateSiteFromPages(t: TemplateRef, pages: BuiltTemplatePage[]
   return { site: { id: `tpl-site-${t.id}`, name: siteName, state: doc, updatedAt: now }, designs, pages };
 }
 
-/** URL berkas demo statis (HTML hasil render server) untuk satu halaman. */
+/** Static demo file URL (HTML rendered by the server) for one page. */
 export function demoPageUrl(demoUrl: string | undefined, page?: { slug?: string; home?: boolean }): string | null {
   if (!demoUrl) return null;
   const base = demoUrl.replace(/index\.html$/, "");

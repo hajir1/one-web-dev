@@ -5,17 +5,17 @@ import idCore from "./locales/split/id.core.json";
 /* ================================================================== */
 /* Internasionalisasi (i18next + react-i18next)                         */
 /*                                                                    */
-/* - Bahasa aktif SELALU berasal dari prefix URL: /id/... atau /en/...  */
-/*   (lihat `LangRoute` di App.tsx). Pilihan terakhir disimpan hanya     */
-/*   untuk mengarahkan URL tanpa prefix (mis. "/" atau tautan lama).     */
-/* - Teks dipecah dua (scripts/split-locales.mjs): "core" (shell,       */
-/*   beranda, auth, akun) dan "rest" (fitur besar: template, Studio,     */
-/*   media, docs, ...). Hanya core Bahasa Indonesia yang ikut bundle     */
-/*   awal; rest dimuat saat halaman fitur dibuka (lihat lazyPage).       */
-/*   Bahasa Inggris seluruhnya dimuat saat dibutuhkan.                   */
-/* - Modul non-React (pesan error, kebijakan Media, dsb.) memanggil      */
-/*   `i18n.t()` saat dipakai — bukan saat modul dimuat.                 */
-/* - Kode program, identifier teknis, dan konten buatan pengguna TIDAK  */
+/* - The active language ALWAYS comes from the URL prefix: /id/... or /en/... */
+/*   (see `LangRoute` in App.tsx). The last choice is stored only        */
+/*   to redirect URLs without a prefix (e.g. "/" or old links).          */
+/* - Text is split in two (scripts/split-locales.mjs): "core" (shell,   */
+/*   home, auth, account) and "rest" (large features: templates, Studio, */
+/*   media, docs, ...). Only the Indonesian core ships in the initial    */
+/*   bundle; rest loads when a feature page opens (see lazyPage).        */
+/*   English is loaded entirely when needed.                             */
+/* - Non-React modules (error messages, Media policy, etc.) call         */
+/*   `i18n.t()` at use time, not when the module loads.                 */
+/* - Program code, technical identifiers, and user-created content are NOT */
 /*   diterjemahkan.                                                     */
 /* ================================================================== */
 
@@ -41,7 +41,7 @@ void i18n.use(initReactI18next).init({
   returnNull: false,
   initAsync: false,
   showSupportNotice: false,
-  // Komponen ikut dirender ulang saat bagian "rest" selesai dimuat.
+  // Components re-render once the "rest" part has loaded.
   react: { useSuspense: false, bindI18nStore: "added" },
 });
 
@@ -57,7 +57,7 @@ const restLoaders: Record<Lang, () => Promise<Bundle>> = {
 
 const restLoading = new Map<Lang, Promise<void>>();
 
-/** Muat teks fitur (bagian "rest") untuk bahasa ini. Aman dipanggil berulang. */
+/** Loads the feature text ("rest" part) for this language. Safe to call repeatedly. */
 export function ensureFullLocale(lang: Lang = currentLang()): Promise<void> {
   let p = restLoading.get(lang);
   if (!p) {
@@ -66,7 +66,7 @@ export function ensureFullLocale(lang: Lang = currentLang()): Promise<void> {
         i18n.addResourceBundle(lang, "translation", res, true, false);
       })
       .catch((err) => {
-        restLoading.delete(lang); // coba lagi di navigasi berikutnya
+        restLoading.delete(lang); // try again on the next navigation
         throw err;
       });
     restLoading.set(lang, p);
@@ -74,13 +74,13 @@ export function ensureFullLocale(lang: Lang = currentLang()): Promise<void> {
   return p;
 }
 
-/** Pastikan bundle bahasa termuat lalu aktifkan. Aman dipanggil berulang. */
+/** Ensures the language bundle is loaded, then activates it. Safe to call repeatedly. */
 export async function activateLanguage(lang: Lang): Promise<void> {
   if (!i18n.hasResourceBundle(lang, "translation")) {
     const res = await coreLoaders[lang]();
     i18n.addResourceBundle(lang, "translation", res, true, false);
   }
-  // Halaman fitur yang sudah terbuka butuh teks lengkap bahasa baru.
+  // Feature pages that are already open need the full text of the new language.
   if (lang !== DEFAULT_LANG || restLoading.has(DEFAULT_LANG)) void ensureFullLocale(lang).catch(() => undefined);
   if (i18n.language !== lang) await i18n.changeLanguage(lang);
   if (typeof document !== "undefined") {
@@ -95,14 +95,14 @@ export async function activateLanguage(lang: Lang): Promise<void> {
 }
 
 /**
- * Pengganti `import()` untuk React.lazy pada halaman fitur: chunk halaman dan
- * teks fiturnya diunduh bersamaan, halaman baru tampil setelah keduanya siap.
+ * Replacement for `import()` with React.lazy on feature pages: the page chunk and
+ * its feature text download together, and the new page shows once both are ready.
  */
 export function withFullLocale<T>(load: () => Promise<T>): () => Promise<T> {
   return () => Promise.all([load(), ensureFullLocale()]).then(([m]) => m);
 }
 
-/** Bahasa pilihan untuk URL tanpa prefix: pilihan tersimpan → bahasa browser → bawaan. */
+/** Preferred language for URLs without a prefix: stored choice → browser language → default. */
 export function preferredLang(): Lang {
   try {
     const saved = localStorage.getItem(PREF_KEY);
@@ -120,19 +120,19 @@ export function preferredLang(): Lang {
   return DEFAULT_LANG;
 }
 
-/** Bahasa aktif saat ini (untuk modul non-React). */
+/** The current active language (for non-React modules). */
 export const currentLang = (): Lang => (isLang(i18n.language) ? i18n.language : DEFAULT_LANG);
 
 /* ----------------------------- path URL ----------------------------- */
 
-/** "/en/media-tools" → { lang: "en", rest: "/media-tools" }; tanpa prefix → lang null. */
+/** "/en/media-tools" → { lang: "en", rest: "/media-tools" }; no prefix → lang null. */
 export function splitLangPath(pathname: string): { lang: Lang | null; rest: string } {
   const m = /^\/([a-z]{2})(?=\/|$)(.*)$/.exec(pathname);
   if (m && isLang(m[1])) return { lang: m[1], rest: m[2] || "/" };
   return { lang: null, rest: pathname || "/" };
 }
 
-/** Tambahkan prefix bahasa ke path absolut internal. Path relatif / URL luar dibiarkan. */
+/** Add the language prefix to an internal absolute path. Relative paths / external URLs are left alone. */
 export function localizePath(to: string, lang: Lang): string {
   if (!to.startsWith("/") || to.startsWith("//")) return to;
   const { rest } = splitLangPath(to.replace(/[?#].*$/, ""));
@@ -140,13 +140,13 @@ export function localizePath(to: string, lang: Lang): string {
   return `/${lang}${rest === "/" ? "" : rest}${tail}`;
 }
 
-/** Path yang sama dalam bahasa lain (query & hash dipertahankan). */
+/** The same path in another language (query & hash are kept). */
 export function switchLangPath(pathname: string, search: string, hash: string, lang: Lang): string {
   const { rest } = splitLangPath(pathname);
   return `/${lang}${rest === "/" ? "" : rest}${search}${hash}`;
 }
 
-/** Format angka sesuai bahasa aktif. */
+/** Format numbers for the active language. */
 export function formatNumber(n: number, opts?: Intl.NumberFormatOptions, lang: Lang = currentLang()): string {
   return n.toLocaleString(LANG_LABEL[lang].locale, opts);
 }

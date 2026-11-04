@@ -9,7 +9,7 @@ import { ApiError } from "../../api/client";
 import { resetPassword } from "../../auth/session";
 import AuthLayout from "./AuthPageLayout";
 
-/** /:lang/reset-password?token=… — tujuan tautan di email atur ulang sandi. */
+/** /:lang/reset-password?token=… — target of the link in the password reset email. */
 export default function ResetPassword() {
   const { t } = useTranslation();
   const [params] = useSearchParams();
@@ -20,7 +20,7 @@ export default function ResetPassword() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(token ? null : t("auth.reset.invalid"));
 
-  // Token tidak dibiarkan di URL/riwayat browser.
+  // Do not leave the token in the URL/browser history.
   useEffect(() => {
     if (token) window.history.replaceState(null, "", window.location.pathname);
   }, [token]);

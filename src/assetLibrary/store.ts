@@ -7,12 +7,12 @@ import { AssetError, prepareImage } from "./prepareImage";
 import { ASSET_LIMITS, type AssetBackend, type AssetMeta } from "./types";
 
 /* ================================================================== */
-/* Pustaka Aset (v21): satu daftar gambar per akun (atau per browser di  */
-/* mode demo), dipakai bersama semua website & template kode. Gambar    */
-/* yang sama (logo, foto) bisa dipakai ulang tanpa diunggah dua kali.   */
+/* Asset Library (v21): one image list per account (or per browser in    */
+/* demo mode), shared by every website & code template. The same image  */
+/* (logo, photo) can be reused without uploading it twice.              */
 /* ================================================================== */
 
-/** Server bila backend aktif DAN pengguna sudah masuk; selain itu IndexedDB. */
+/** Server when the backend is active AND the user is signed in; otherwise IndexedDB. */
 export function currentBackend(): AssetBackend {
   return !isDemoMode() && useSession.getState().user ? serverBackend : localBackend;
 }
@@ -27,7 +27,7 @@ interface AssetState {
   loaded: boolean;
   loading: boolean;
   error: boolean;
-  /** Naik tiap kali isi berubah (pratinjau menerjemahkan ulang). */
+  /** Increments whenever the content changes (previews resolve again). */
   version: number;
   load: (force?: boolean) => Promise<void>;
   upload: (files: File[], onProgress?: (done: number, total: number) => void) => Promise<UploadResult>;
@@ -91,7 +91,7 @@ export const useAssets = create<AssetState>((set, get) => ({
   },
 }));
 
-/** Ganti akun / masuk / keluar → daftar & cache dimuat ulang dari tempat yang benar. */
+/** Switch account / sign in / sign out → list & cache reload from the right place. */
 onUserChange(() => {
   blobCache.clear();
   dataCache.clear();
@@ -107,7 +107,7 @@ export function assetBlob(id: string): Promise<Blob | null> {
     p = be
       .blob(id)
       .catch(() => null)
-      // Gambar yang diunggah sebelum masuk akun masih ada di browser ini → tetap tampil & ikut diekspor.
+      // Images uploaded before signing in are still in this browser → keep showing & exporting them.
       .then((b) => b ?? (be.kind === "server" ? localBackend.blob(id).catch(() => null) : null));
     blobCache.set(id, p);
     void p.then((b) => b || blobCache.delete(id));
@@ -123,7 +123,7 @@ const readDataUrl = (b: Blob) =>
     r.readAsDataURL(b);
   });
 
-/** data URL aset (untuk pratinjau di iframe sandbox, yang tidak bisa membuka blob: milik aplikasi). */
+/** Asset data URL (for previews in a sandboxed iframe, which cannot open the app's blob: URLs). */
 export function assetDataUrl(id: string): Promise<string | null> {
   let p = dataCache.get(id);
   if (!p) {

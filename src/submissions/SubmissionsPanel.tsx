@@ -22,9 +22,9 @@ import {
 } from "./api";
 
 /* ================================================================== */
-/* Panel "Kiriman" (v20): RSVP, ucapan, dan isi formulir dari situs     */
-/* yang sudah online. Dipakai di Studio (website) dan editor template   */
-/* kode (undangan). Mode demo: penjelasan + contoh, tanpa server.       */
+/* The "Submissions" panel (v20): RSVPs, wishes, and form entries from sites */
+/* that are already online. Used in Studio (websites) and the template editor */
+/* code (invitations). Demo mode: explanation + sample, no server.      */
 /* ================================================================== */
 
 const KINDS: (SubmissionKind | "all")[] = ["all", "rsvp", "ucapan", "form"];

@@ -48,14 +48,14 @@ export interface BreadcrumbsState {
   currentColor: string;
   currentFontWeight: number;
 
-  /* Ikon untuk item pertama (Home) */
+  /* Icon for the first item (Home) */
   iconId: string | null;
   iconSize: number;
   iconGap: number;
   iconColorMode: "currentColor" | "original";
   iconOnly: boolean;
 
-  /* Kotak pembungkus */
+  /* Wrapper box */
   paddingLinked: boolean;
   paddingTop: number;
   paddingRight: number;
@@ -141,7 +141,7 @@ const SEPARATORS: Record<Exclude<BreadcrumbsState["separator"], "custom">, strin
   pipe: "|",
 };
 
-/** Escape isi string CSS `content: "..."`. */
+/** Escape the content of a CSS string `content: "..."`. */
 const cssString = (v: string) => v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, " ");
 
 /* ------------------------------------------------------------------ */
@@ -183,7 +183,7 @@ ${shadowLine(s)}  font-size: ${s.fontSize}px;
   gap: ${s.separatorGap}px;
 }`);
 
-  // Pemisah dibuat lewat CSS: tidak ikut dibacakan screen reader & tidak mengotori markup.
+  // The separator is made with CSS: not read by screen readers & does not clutter the markup.
   rules.push(`.${cls}__item + .${cls}__item::before {
   content: "${cssString(sep)}";
   color: ${s.separatorColor};
@@ -379,7 +379,7 @@ function breadcrumbSections(
 
 
 /* ------------------------------------------------------------------ */
-/* Definisi — dipakai halaman ini dan Component Maker                  */
+/* Definition: used by this page and Component Maker                    */
 /* ------------------------------------------------------------------ */
 
 export const breadcrumbsElement = defineElement<BreadcrumbsState>({

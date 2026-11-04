@@ -194,7 +194,7 @@ export default function ImageConverter() {
         </aside>
 
         {/* -------------------------- antrean -------------------------- */}
-        {/* Di HP, unggah & antrean tampil lebih dulu; pengaturan di bawahnya. */}
+        {/* On phones, upload & queue come first; settings go below. */}
         <div className="order-1 flex min-w-0 flex-col gap-4 lg:order-none">
           <Dropzone
             rules={RULES}

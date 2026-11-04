@@ -1,9 +1,9 @@
 /* ================================================================== */
-/* Adegan 3D Cerita Scroll (v22), bagian E: kardus → bola dunia, pena →  */
-/* tinta → huruf, sel → DNA → grafik, pintu di gurun → hutan.           */
+/* 3D Scroll Story scenes (v22), part E: cardboard box → globe, pen →    */
+/* ink → letters, cell → DNA → chart, a door in the desert → forest.    */
 /* ================================================================== */
 
-/** 14. Kardus tertutup → tutup terbuka → barang melayang keluar → kardus terurai rata → bola dunia muncul dengan jalur kiriman. */
+/** 14. A closed cardboard box → the lid opens → items float out → the box unfolds flat → a globe appears with shipping routes. */
 export const SCENE_KARDUS = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow, rnd } = ctx;
@@ -12,7 +12,7 @@ function scene(ctx) {
   const panel = (w, h) => { const g = new THREE.Group(); const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, T), [kraft, kraft, kraft, kraft, kraft, kraftIn]); g.add(m); return { g, m }; };
   const box = new THREE.Group(); scene.add(box);
   const bottom = new THREE.Mesh(new THREE.BoxGeometry(S2 * 2, T, S2 * 2), kraft); box.add(bottom);
-  /* Sisi berengsel di tepi bawah; tutup berengsel di tepi atas sisi. */
+  /* Sides hinged at the bottom edge; lid hinged at the top edge of a side. */
   const sides = [], flaps = [];
   for (let i = 0; i < 4; i++) {
     const hinge = new THREE.Group(); hinge.rotation.y = (i * Math.PI) / 2; box.add(hinge);
@@ -23,13 +23,13 @@ function scene(ctx) {
     if (i % 2 === 0) { const tp = new THREE.Mesh(new THREE.BoxGeometry(0.34, S2 * 0.6, T * 1.4), tapeM); tp.position.y = S2 * 0.3; fp.add(tp); }
     sides.push(pivot); flaps.push(fp);
   }
-  /* Barang: ponsel, buku, sepatu (bentuk sederhana) dengan cahaya lembut. */
+  /* Goods: phone, book, shoes (simple shapes) with soft light. */
   const items = [];
   const phone = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.82, 0.06), mat("#1f2430", { roughness: 0.3, metalness: 0.3 })); items.push(phone);
   const book = new THREE.Group(); const bc = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.95, 0.16), mat(COL.accent2)); book.add(bc); const pg = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.9, 0.17), mat("#f8f4ea")); pg.position.x = 0.03; book.add(pg); items.push(book);
   const shoe = new THREE.Group(); const sole = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.1, 0.36), mat("#ffffff")); shoe.add(sole); const up = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), mat(COL.accent)); up.scale.set(1.5, 0.9, 0.62); up.position.set(-0.05, 0.05, 0); shoe.add(up); items.push(shoe);
   items.forEach((it) => scene.add(it));
-  /* Bola dunia: bola + garis lintang/bujur + titik daratan + busur kiriman. */
+  /* Globe: sphere + latitude/longitude lines + land dots + shipping arcs. */
   const globe = new THREE.Group(); globe.position.y = 2.2; scene.add(globe);
   const R = 1.6;
   globe.add(new THREE.Mesh(new THREE.SphereGeometry(R, 48, 32), mat(COL.bg2, { roughness: 0.8 })));
@@ -67,13 +67,13 @@ function scene(ctx) {
   };
 }`;
 
-/** 15. Pena tinta → setetes tinta jatuh → menyebar di kertas → butir tinta naik membentuk nama → pena menandatangani. */
+/** 15. Ink pen → a drop of ink falls → spreads on paper → ink grains rise to form a name → the pen signs. */
 export const SCENE_PENA = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, CONFIG, BRAND, mat, seg, lerp, rnd } = ctx;
   const paper = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.03, 8.4), mat("#fbf8f1", { roughness: 0.95 })); paper.position.y = -0.02; scene.add(paper);
   for (let i = 0; i < 12; i++) { const l = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.012), new THREE.MeshBasicMaterial({ color: "#c9d3e6" })); l.rotation.x = -Math.PI / 2; l.position.set(0, 0.0, -2.6 + i * 0.5); scene.add(l); }
-  /* Pena: laras, cincin emas, mata pena pipih dengan belahan. */
+  /* Pen: barrel, gold ring, flat nib with a slit. */
   const pen = new THREE.Group(); scene.add(pen);
   const tip = new THREE.Group(); pen.add(tip);
   const nibS = new THREE.Shape(); nibS.moveTo(0, 0); nibS.quadraticCurveTo(0.17, 0.35, 0.16, 0.7); nibS.lineTo(-0.16, 0.7); nibS.quadraticCurveTo(-0.17, 0.35, 0, 0);
@@ -84,7 +84,7 @@ function scene(ctx) {
   const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.205, 0.205, 0.08, 24), gold); ring.position.y = 1.28; tip.add(ring);
   const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.19, 2.6, 24), mat(COL.obj, { roughness: 0.2, metalness: 0.2 })); barrel.position.y = 2.6; tip.add(barrel);
   const cap = new THREE.Mesh(new THREE.SphereGeometry(0.19, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), mat(COL.obj)); cap.position.y = 3.9; tip.add(cap);
-  /* Tinta: tetes, genangan (lingkaran bergerigi), butir yang membentuk teks. */
+  /* Ink: drops, a pool (jagged circle), and grains that form the text. */
   const ink = mat(COL.accent2, { roughness: 0.15 });
   const drop = new THREE.Mesh(new THREE.SphereGeometry(0.07, 14, 10), ink); drop.scale.set(1, 1.5, 1); scene.add(drop);
   const sh = new THREE.Shape(); for (let i = 0; i <= 64; i++) { const a = (i / 64) * Math.PI * 2, r = 1 + Math.sin(a * 5) * 0.08 + Math.sin(a * 11 + 1) * 0.05; const x = Math.cos(a) * r, y = Math.sin(a) * r; if (i) sh.lineTo(x, y); else sh.moveTo(x, y); }
@@ -100,14 +100,14 @@ function scene(ctx) {
   for (let i = 0; i < PN; i++) { const tg = targets[Math.floor((i / PN) * targets.length)]; const a = rnd() * 6.283, r = Math.sqrt(rnd()) * 0.9; pdat.push({ sx: Math.cos(a) * r, sz: 1.6 + Math.sin(a) * r, tx: tg[0], ty: 1.4 + tg[1], d: rnd() * 0.4 }); }
   const parts = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(pp, 3)), new THREE.PointsMaterial({ color: COL.accent2, size: 0.045 }));
   scene.add(parts);
-  /* Tanda tangan: kurva yang tergambar mengikuti ujung pena. */
+  /* Signature: a curve drawn following the pen tip. */
   const sig = new THREE.CatmullRomCurve3([[-1.6, 3.0], [-1.2, 2.6], [-0.9, 3.1], [-0.6, 2.7], [-0.2, 3.0], [0.1, 2.6], [0.4, 3.05], [0.8, 2.75], [1.3, 2.95], [1.8, 2.7]].map((p) => new THREE.Vector3(p[0], 0.008, p[1])));
   const sp = sig.getPoints(160);
   const sline = new THREE.Line(new THREE.BufferGeometry().setFromPoints(sp), new THREE.LineBasicMaterial({ color: COL.accent2 })); scene.add(sline);
   const hover = new THREE.Vector3(0.0, 1.4, 1.6);
   return {
     update(S, t) {
-      /* Pena: melayang miring di atas genangan, lalu turun menandatangani. */
+      /* Pen: hovers tilted above the pool, then comes down to sign. */
       const sg = S.sign, k = seg(sg, 0, 0.06);
       if (sg > 0.001) { const p = sig.getPointAt(Math.min(0.999, sg)); tip.position.set(p.x, 0.02 + (1 - k) * 1.2, p.z); }
       else tip.position.set(hover.x + seg(S.letters, 0, 0.5) * 2.6, 1.4 + Math.sin(t * 1.2) * 0.06 + seg(S.letters, 0, 0.5) * 0.6, hover.z);
@@ -127,7 +127,7 @@ function scene(ctx) {
   };
 }`;
 
-/** 16. Satu sel → membelah 2, 4, 8 → kamera masuk ke inti → heliks DNA berputar → anak tangga DNA lepas menjadi grafik batang. */
+/** 16. One cell → divides into 2, 4, 8 → the camera enters the nucleus → a DNA helix spins → the DNA rungs break off into a bar chart. */
 export const SCENE_SEL = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow } = ctx;
@@ -140,7 +140,7 @@ function scene(ctx) {
     for (let k = 0; k < 6; k++) { const o = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), mat(COL.accent2)); o.position.set(Math.cos(k * 1.7) * 0.6, Math.sin(k * 2.3) * 0.5, Math.sin(k * 1.1) * 0.55); g.add(o); }
     scene.add(g); cells.push({ g, m, n });
   }
-  /* Heliks DNA: dua untai bola + anak tangga silinder (instanced). */
+  /* DNA helix: two strands of spheres + cylinder rungs (instanced). */
   const dna = new THREE.Group(); scene.add(dna);
   const RN = 40, H = 6, sA = new THREE.InstancedMesh(new THREE.SphereGeometry(0.09, 10, 8), mat(COL.accent2, { roughness: 0.3 }), RN * 2);
   const rungs = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 6), mat("#ffffff", { roughness: 0.5 }), RN);
@@ -191,11 +191,11 @@ function scene(ctx) {
   };
 }`;
 
-/** 17. Pintu berdiri sendirian di gurun → pintu terbuka, cahaya keluar → kamera melangkah masuk → dunia berganti jadi hutan → kunang-kunang. */
+/** 17. A door standing alone in a desert → the door opens, light pours out → the camera steps in → the world becomes a forest → fireflies. */
 export const SCENE_PINTU = String.raw`
 function scene(ctx) {
   const { THREE, scene, COL, mat, seg, lerp, glow, rnd, hemi, key } = ctx;
-  /* Langit hutan: berubah jadi senja saat kunang-kunang keluar. */
+  /* Forest sky: turns to dusk as the fireflies come out. */
   const skyDay = new THREE.Color("#e9e2c8"), skyNight = new THREE.Color("#101c2c"), fogDay = new THREE.Color(COL.bg);
   const sky = new THREE.Color();
   /* Gurun */
@@ -226,7 +226,7 @@ function scene(ctx) {
   for (let i = 0; i < FN; i++) fd.push([(rnd() - 0.5) * 30, 0.5 + rnd() * 3, (rnd() - 0.5) * 30, rnd() * 6]);
   const flies = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(fp, 3)), new THREE.PointsMaterial({ size: 0.45, map: glow(), color: "#fff6b0", transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
   forest.add(flies);
-  /* Pintu: kusen + daun pintu berengsel + gagang; cahaya di ambangnya. */
+  /* Door: frame + hinged leaf + handle; light at the threshold. */
   const doorG = new THREE.Group(); scene.add(doorG);
   const wood = mat(COL.obj, { roughness: 0.7 });
   [[-0.78, 1.25, 0.14, 2.6], [0.78, 1.25, 0.14, 2.6]].forEach((p) => { const m = new THREE.Mesh(new THREE.BoxGeometry(p[2], p[3], 0.3), wood); m.position.set(p[0], p[1], 0); doorG.add(m); });

@@ -9,13 +9,13 @@ import { assetRef } from "./refs";
 
 type Tab = "library" | "upload" | "url";
 
-/** URL gambar dari luar yang boleh dipakai (bukan javascript:/data: non-gambar). */
+/** External image URLs that are allowed (not javascript: or non-image data:). */
 export const isUsableImageUrl = (u: string) => /^(https?:\/\/[^\s"'<>]+|\/[^\s"'<>]*|\.\/[^\s"'<>]*)$/i.test(u.trim());
 
 /**
- * Pemilih gambar tunggal yang sama di semua tempat (elemen Gambar, galeri,
- * latar, foto undangan, …): tab "Aset saya", "Unggah", "URL".
- * Hasil: `aset:<id>` (pustaka) atau URL biasa.
+ * The same single-image picker everywhere (Image element, gallery,
+ * background, invitation photo, …): tabs "My assets", "Upload", "URL".
+ * Result: `aset:<id>` (library) or a plain URL.
  */
 export default function ImagePickerDialog({
   open,

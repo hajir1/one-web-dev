@@ -18,8 +18,8 @@ import {
 } from "../../helpers/collections";
 
 /* ================================================================== */
-/* Pengaturan › Koleksi data: tandai Row/grup kartu sebagai koleksi,     */
-/* atau buka dashboard-nya. Uji coba: kartu harus Product Card.          */
+/* Settings › Data collections: mark a Row/card group as a collection,   */
+/* or open its dashboard. Preview: the cards must be Product Cards.     */
 /* ================================================================== */
 
 const INPUT =
@@ -64,7 +64,7 @@ export function CollectionBoxPanel({ box, onMark, onUnmark, onOpen }: { box: Box
   );
 }
 
-/** Catatan di Pengaturan kartu yang isinya diatur koleksi. */
+/** A note in the Settings of cards whose content is managed by a collection. */
 export function CollectionCardNote({ name, onOpen }: { name: string; onOpen: () => void }) {
   const { t } = useTranslation();
   return (
@@ -78,8 +78,8 @@ export function CollectionCardNote({ name, onOpen }: { name: string; onOpen: () 
 }
 
 /**
- * Styling › Tampilan data (opsional): cara kartu koleksi dimuat di halaman
- * publik. Default "Tampilkan semua"; mode lain memuat per halaman dari API.
+ * Styling › Data display (optional): how collection cards load on the public
+ * page. Default "Show all"; other modes load per page from the API.
  */
 export function CollectionDisplayPanel({
   col,
@@ -90,14 +90,14 @@ export function CollectionDisplayPanel({
   col: CollectionDef;
   onChange: (d: CollectionDisplay) => void;
   onView?: (v: CollectionView) => void;
-  /** Jumlah grup chip filter yang terhubung ke koleksi ini di halaman. */
+  /** Number of filter chip groups connected to this collection on the page. */
   filterBars?: number;
 }) {
   const { t } = useTranslation();
   const d = displayOf(col);
   const view = col.view ?? {};
   const cats = categoriesOf(col);
-  // Kategori tersimpan yang sudah tidak ada di data tetap tampil supaya bisa diganti.
+  // Stored categories no longer in the data still show so they can be replaced.
   const catOptions = view.category && !cats.some((c) => c.toLowerCase() === view.category!.toLowerCase()) ? [...cats, view.category] : cats;
   return (
     <div className="space-y-3 text-sm" data-testid="collection-display">

@@ -9,10 +9,10 @@ import { clamp, color, fieldName, parseOptions, parseSocialLinks, parseTimeline 
 import { BRAND_ICONS, brandSvg } from "./brandIcons";
 
 /* ================================================================== */
-/* Elemen GRATIS v2: Pemisah (Divider), Textarea, Grup Radio,           */
-/* Tautan Sosial, Timeline.                                             */
+/* FREE elements v2: Divider, Textarea, Radio Group,                    */
+/* Social Links, Timeline.                                              */
 /*                                                                    */
-/* Semua statis (h() saja) → identik di 5 framework, tanpa runtime JS.  */
+/* Everything static (h() only) → identical across the 5 frameworks, no JS runtime. */
 /* ================================================================== */
 
 const tr = (k: string) => i18n.t(`el.x.${k}`);
@@ -400,7 +400,7 @@ export interface SocialLinksState {
   hoverColor: string;
   newTab: boolean;
   align: "left" | "center" | "right";
-  /** true = latar memakai warna resmi tiap merek; false = warna latar/ikon di bawah. */
+  /** true = the background uses each brand's official color; false = the background/icon colors below. */
   brandColors: boolean;
 }
 

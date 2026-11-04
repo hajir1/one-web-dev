@@ -1,13 +1,13 @@
 /* ================================================================== */
-/* Elemen GRATIS v3: Input Label Mengambang, Kolom Pencarian, Input      */
-/* Angka, Unggah Berkas, Tombol Segmen, Avatar, Kutipan, Paginasi,       */
+/* FREE elements v3: Floating Label Input, Search Field, Input           */
+/* Number, File Upload, Segmented Buttons, Avatar, Quote, Pagination,    */
 /* Langkah Proses, Peta, Skeleton Loading.                               */
 /*                                                                    */
-/* Sebagian besar murni HTML + CSS. Input Angka & Unggah Berkas memakai  */
-/* sedikit JS (runtime Custom JS) yang hanya menambah kenyamanan; tanpa  */
-/* JS keduanya tetap berfungsi sebagai input bawaan browser.            */
+/* Mostly pure HTML + CSS. Number Input & File Upload use               */
+/* a little JS (the Custom JS runtime) that only adds convenience; without */
+/* JS both still work as the browser's built-in inputs.                 */
 /* ================================================================== */
-/* Dipecah per elemen di folder newFree/ (no. 15); berkas ini hanya mengekspor ulang. */
+/* Split per element in the newFree/ folder (no. 15); this file only re-exports. */
 
 export * from "./newFree/FloatingInput";
 export * from "./newFree/SearchBar";

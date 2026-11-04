@@ -58,7 +58,7 @@ import {
 /* Template v2 A16–A20: Arsitek, Berita, SaaS CRM, Skincare, Universitas.*/
 /* ================================================================== */
 
-/* ------------------- 16. Ruang Garis Studio (6 hlm) ------------------ */
+/* ------------------- 16. Ruang Garis Studio (6 pages) ------------------ */
 
 const RG: Palette = { ink: "#1c1917", muted: "#57534e", primary: "#57534e", primaryDark: "#292524", soft: "#f5f5f4", line: "#d6d3d1" };
 const rg = look(RG, { bg: "#ffffff", alt: "#f5f5f4", dark: "#1c1917", radius: 0, headFont: FONTS.elegant, font: FONTS.grotesk });
@@ -713,8 +713,8 @@ export const saasCrmRelasi: TemplateContent = {
   },
 };
 
-/* ------------------- 19. Glowna Skin Lab (toko, 7 hlm) --------------- */
-// Toko tanpa transaksi: semua kartu produk menuju halaman detail; tanpa elemen ber-script.
+/* ------------------- 19. Glowna Skin Lab (store, 7 pages) --------------- */
+// A store without transactions: every product card leads to the detail page; no scripted elements.
 
 const GS: Palette = { ink: "#4a044e", muted: "#86587f", primary: "#db2777", primaryDark: "#be185d", soft: "#fdf2f8", line: "#fbcfe8" };
 const gs = look(GS, { bg: "#ffffff", alt: "#fff5f9", dark: "#4a044e", radius: 24, headFont: FONTS.rounded, font: FONTS.rounded });

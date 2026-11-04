@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-owd-text="judulTab" data-owd-label="Judul tab browser">Kincir Angin</title>
+<meta name="description" content="Animasi CSS murni: baling-baling kincir angin berputar, tiga lajur kebun tulip bergulir dengan kecepatan berbeda, dan awan melintas pelan.">
+<script>
+/* Vercel Web Analytics: enable the "Analytics" menu in the Vercel project dashboard. */
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+(function () { if (!/^https?:$/.test(location.protocol) || window.top !== window.self || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return; var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s); })();
+</script>
+<meta name="theme-color" content="#fdf6e9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap">
+<style id="owd-theme">
+/* Colors & style: edit here or in the OneWebDev editor. */
+:root {
+  --bg-1: #fdf6e9; /* Latar bawah */
+  --bg-2: #9fd1f2; /* Latar atas */
+  --c-1: #e94b5f; /* Tulip & atap */
+  --c-2: #ffb703; /* Tulip kuning */
+  --c-3: #5f9e4a; /* Ladang */
+  --ink: #1f2a37; /* Warna teks */
+  --speed: 1; /* Kecepatan animasi [0.25,3,0.05] */
+}
+</style>
+<style>
+:root { --k: calc(1s / var(--speed)); --font-display: "Quicksand", Georgia, serif; --font-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg-1); color: var(--ink); font-family: var(--font-text); overflow: hidden; }
+.stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, var(--bg-2), var(--bg-1)); }
+.scene, .scene * { position: absolute; }
+.scene { inset: 0; }
+.scene i, .scene b, .scene span { display: block; }
+
+.cap { position: absolute; left: clamp(16px, 6vw, 96px); top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 12px; width: min(520px, calc(100vw - 32px)); animation: capIn calc(var(--k) * 1.2) cubic-bezier(.2,.8,.2,1) both; }
+.cap .kicker { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c-1); }
+.cap h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5.4vw, 64px); line-height: 1.05; text-wrap: balance; text-shadow: 0 2px 24px color-mix(in srgb, var(--bg-1) 70%, transparent); }
+.cap p.text { margin: 0; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: color-mix(in srgb, var(--ink) 84%, transparent); text-shadow: 0 1px 12px color-mix(in srgb, var(--bg-1) 80%, transparent); }
+.cap .cta { align-self: flex-start; margin-top: 6px; display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; background: var(--c-1); color: var(--bg-1); font-weight: 600; text-decoration: none; box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--c-1) 80%, #000); }
+.cap .cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes capIn { from { opacity: 0; translate: 0 20px; } }
+
+.controls { position: absolute; right: 16px; bottom: 16px; z-index: 6; display: flex; gap: 8px; }
+.controls button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); background: color-mix(in srgb, var(--bg-1) 55%, transparent); color: var(--ink); font: 500 14px var(--font-text); cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.controls button:focus-visible { outline: 2px solid var(--c-1); outline-offset: 2px; }
+.stage.paused *, .stage.paused *::before, .stage.paused *::after { animation-play-state: paused !important; }
+@media (max-width: 640px) {
+  .cap { left: 16px; right: auto; top: clamp(56px, 9vh, 96px); transform: none; }
+  .controls { right: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage *::before, .stage *::after { animation-play-state: paused !important; }
+  .cap { animation: none; }
+}
+
+/* ---- scene ---- */
+
+.cloud { width: 30vmin; height: 8vmin; border-radius: 99px; background: #fff; opacity: .85; animation: drift calc(var(--k) * 36) linear infinite; }
+.cloud::before { content: ""; position: absolute; left: 20%; bottom: 40%; width: 46%; height: 150%; border-radius: 50%; background: inherit; }
+.c1 { top: 12%; animation-delay: calc(var(--k) * -10); }
+.c2 { top: 26%; scale: .65; animation-delay: calc(var(--k) * -24); }
+@keyframes drift { from { left: -35vmin; } to { left: 105%; } }
+.band { left: 0; width: 200%; animation: rows calc(var(--k) * var(--t)) linear infinite; }
+.b3 { --t: 30; bottom: 22vh; height: 8vh; background: radial-gradient(8px 10px at 50% 60%, var(--c-1) 98%, transparent) 0 0 / 22px 100%, color-mix(in srgb, var(--c-3) 70%, var(--bg-2)); }
+.b2 { --t: 20; bottom: 12vh; height: 11vh; background: radial-gradient(12px 15px at 50% 55%, var(--c-2) 98%, transparent) 0 0 / 32px 100%, color-mix(in srgb, var(--c-3) 85%, #000); }
+.b1 { --t: 12; bottom: 0; height: 13vh; background: radial-gradient(16px 20px at 50% 50%, var(--c-1) 98%, transparent) 0 0 / 44px 100%, var(--c-3); }
+@keyframes rows { to { translate: -50% 0; } }
+.mill { left: 64%; bottom: 20vh; width: 16vmin; height: 40vmin; margin-left: -8vmin; clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%); background: linear-gradient(90deg, #efe6d4, #fffaf0 50%, #e2d6bf); }
+.mill::before { content: ""; position: absolute; left: -10%; right: -10%; top: -14%; height: 22%; background: color-mix(in srgb, var(--c-1) 70%, #000); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.door { left: 38%; bottom: 0; width: 24%; height: 18%; border-radius: 50% 50% 0 0; background: color-mix(in srgb, var(--c-1) 60%, #000); }
+.win { left: 40%; top: 36%; width: 20%; height: 12%; border-radius: 50%; background: color-mix(in srgb, var(--c-2) 40%, #fff); }
+.hub { left: 64%; bottom: calc(20vh + 37vmin); width: 0; height: 0; animation: turn calc(var(--k) * 6) linear infinite; }
+@keyframes turn { to { rotate: 360deg; } }
+.hub i { left: -2vmin; top: 0; width: 4vmin; height: 28vmin; transform-origin: 50% 0; rotate: var(--a); background: repeating-linear-gradient(0deg, #6b4e31 0 3px, transparent 3px 14px), repeating-linear-gradient(90deg, #6b4e31 0 3px, color-mix(in srgb, #fff 80%, var(--c-2)) 3px 50%); border: 3px solid #6b4e31; }
+.hub b { left: -2.4vmin; top: -2.4vmin; width: 4.8vmin; height: 4.8vmin; border-radius: 50%; background: #4a3522; }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="scene" aria-hidden="true">
+<div class="cloud c1"></div><div class="cloud c2"></div>
+<div class="band b3"></div><div class="band b2"></div>
+<div class="mill"><i class="door"></i><i class="win"></i></div><div class="hub"><i style="--a:0deg"></i><i style="--a:90deg"></i><i style="--a:180deg"></i><i style="--a:270deg"></i><b></b></div>
+<div class="band b1"></div>
+</div>
+<main class="cap">
+  <p class="kicker" data-owd-text="label" data-owd-label="Label kecil">Wisata kebun</p>
+  <h1 data-owd-text="judul" data-owd-label="Judul">Angin baik sedang bertiup.</h1>
+  <p class="text" data-owd-text="pesan" data-owd-label="Pesan" data-owd-multi>Hero animasi untuk agrowisata, toko bunga, atau undangan piknik keluarga akhir pekan.</p>
+  <a class="cta" href="#" data-owd-href="tautan" data-owd-href-label="Tautan tombol" data-owd-text="tombol" data-owd-label="Teks tombol">Pesan tiket</a>
+</main>
+<div class="controls">
+  <button type="button" id="pause" aria-pressed="false">Jeda</button>
+  <button type="button" id="again">Ulangi</button>
+</div>
+</div>
+<script>
+/* ==== SETTINGS: autoplay, and the second shown as a still frame ==== */
+const CONFIG = /*owd:data name="CONFIG" label="Pengaturan animasi"*/{
+  "mainOtomatis": true,
+  "detikDiam": 4
+}/*owd:end*/;
+const stage = document.querySelector(".stage");
+const btnPause = document.getElementById("pause");
+const btnAgain = document.getElementById("again");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const anims = () => (document.getAnimations ? document.getAnimations() : []);
+/* Freeze every CSS animation on one chosen frame (thumbnails, reduce motion). */
+function still() { const ms = (+CONFIG.detikDiam || 0) * 1000; for (const a of anims()) { try { a.currentTime = ms; a.pause(); } catch (e) {} } }
+function setPaused(p) { stage.classList.toggle("paused", p); btnPause.textContent = p ? "Lanjutkan" : "Jeda"; btnPause.setAttribute("aria-pressed", String(p)); }
+btnPause.addEventListener("click", () => setPaused(!stage.classList.contains("paused")));
+btnAgain.addEventListener("click", () => { if (reduce.matches) return still(); for (const a of anims()) { try { a.currentTime = 0; a.play(); } catch (e) {} } setPaused(false); });
+/* Hidden tab: pause; visible again: resume unless the visitor paused it. */
+let pausedByUser = false;
+document.addEventListener("visibilitychange", () => { if (document.hidden) { pausedByUser = stage.classList.contains("paused"); stage.classList.add("paused"); } else if (!pausedByUser && !reduce.matches && !window.OWD_THUMB) stage.classList.remove("paused"); });
+reduce.addEventListener("change", () => (reduce.matches ? still() : btnAgain.click()));
+if (window.OWD_THUMB || reduce.matches) still();
+else if (CONFIG.mainOtomatis === false) setPaused(true);
+</script>
+</body>
+</html>

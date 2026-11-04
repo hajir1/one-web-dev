@@ -5,15 +5,15 @@ import { isVarRef } from "./cssVars";
 import { detachColor, detachNumber, useVarPicker, VarButton, VarChip } from "../ui/VarPicker";
 
 /* ------------------------------------------------------------------ */
-/* Small UI helpers — primitif tampilan yang dipakai SEMUA panel.      */
-/* Semua kontrol form di panel styling wajib memakai komponen di sini  */
-/* (bukan <input>/<select> mentah) supaya tampilannya seragam.         */
+/* Small UI helpers: display primitives used by EVERY panel.            */
+/* Every form control in the styling panel must use the components here */
+/* (not raw <input>/<select>) so they look consistent.                 */
 /* ------------------------------------------------------------------ */
 
 const CONTROL_CLASS =
   "w-full rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-800 dark:text-white/90 px-2.5 py-1.5 outline-none focus:border-blue-700 dark:focus:border-blue-500";
 
-/** Kartu bersection dengan judul (dipakai di luar accordion, mis. Nama Class). */
+/** A sectioned card with a title (used outside the accordion, e.g. Class Name). */
 export function Section({
   title,
   children,
@@ -31,7 +31,7 @@ export function Section({
   );
 }
 
-/** Sub-judul di dalam satu kategori accordion (mis. "Belum dicentang"). */
+/** Subheading inside one accordion category (e.g. "Unchecked"). */
 export function Group({
   title,
   children,
@@ -51,7 +51,7 @@ export function Group({
   );
 }
 
-/** Dua kolom sejajar. */
+/** Two aligned columns. */
 export function Row({ children }: { children: ReactNode }) {
   return <div className="grid grid-cols-2 gap-2">{children}</div>;
 }
@@ -81,11 +81,11 @@ export function Field({
 }
 
 /**
- * Input angka. Menyimpan teks lokal supaya field bisa dikosongkan sementara
- * saat mengetik (sebelumnya langsung jadi 0), dan nilai dijepit ke min/max.
+ * Number input. Keeps local text so the field can be emptied temporarily
+ * while typing (previously it became 0 right away), and the value is clamped to min/max.
  */
 export function NumberInput(props: {
-  /** v7: bisa berisi referensi variabel `var(--x)` (string). */
+  /** v7: may contain a `var(--x)` variable reference (string). */
   value: number | string;
   onChange: (v: number) => void;
   min?: number;
@@ -98,7 +98,7 @@ export function NumberInput(props: {
   if (typeof value === "string" && isVarRef(value))
     return <VarChip value={value} onDetach={() => onChange(detachNumber(value, vars))} />;
   const num = typeof value === "number" ? value : Number(value) || 0;
-  // Variabel ukuran hanya untuk field ber-satuan px (bukan ms, %, ×, dst).
+  // Size variables only for px-unit fields (not ms, %, ×, etc.).
   const pick = vars && suffix === "px" ? <VarButton type="size" onPick={(ref) => onChange(ref as unknown as number)} /> : null;
   return (
     <div className="flex items-center gap-1.5">
@@ -127,7 +127,7 @@ function PlainNumberInput({
 }) {
   const [text, setText] = useState(String(value));
 
-  // Sinkron kalau nilai berubah dari luar (muat desain, reset, dst).
+  // Sync when the value changes from outside (design load, reset, etc.).
   useEffect(() => {
     if (Number(text) !== value) setText(String(value));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,7 +170,7 @@ function PlainNumberInput({
   );
 }
 
-/** Ubah warna CSS apa pun jadi #rrggbb untuk <input type="color"> (fallback hitam). */
+/** Turns any CSS color into #rrggbb for <input type="color"> (black fallback). */
 function toHex6(value: string): string {
   const v = value.trim();
   if (/^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase();
@@ -189,9 +189,9 @@ function toHex6(value: string): string {
 }
 
 /**
- * Pemilih warna + input teks. Teks boleh berisi nilai CSS apa pun
- * (transparent, rgb(), dst); picker selalu menerima hex valid supaya
- * browser tidak memunculkan warning "value does not conform".
+ * Color picker + text input. The text may hold any CSS value
+ * (transparent, rgb(), etc.); the picker always receives a valid hex so
+ * the browser does not show a "value does not conform" warning.
  */
 export function ColorInput({
   value,
@@ -292,7 +292,7 @@ export interface SelectOption<V extends string | number = string> {
   group?: string;
 }
 
-/** <select> seragam. Nilai angka (mis. font-weight) tetap dikembalikan sebagai angka. */
+/** A uniform <select>. Numeric values (e.g. font-weight) are still returned as numbers. */
 export function SelectInput<V extends string | number>({
   value,
   onChange,
@@ -365,11 +365,11 @@ export function RangeInput({
 }
 
 /**
- * Textarea yang terikat ke nilai terstruktur lewat `format`/`parse`.
- * Teks lokal hanya disinkronkan ulang kalau nilai berubah DARI LUAR
- * (muat desain / reset) — sebelumnya textarea List & Select tetap
- * menampilkan isi lama setelah desain dimuat. Perbandingan memakai
- * hasil `format`, jadi aman walau induk membuat array baru tiap render.
+ * A textarea bound to a structured value through `format`/`parse`.
+ * Local text is only resynced when the value changes FROM OUTSIDE
+ * (design load / reset); previously the List & Select textareas kept
+ * showing old content after a design loaded. The comparison uses
+ * the `format` output, so it is safe even when the parent creates a new array every render.
  */
 export function SyncedTextarea<T>({
   value,
@@ -421,7 +421,7 @@ const splitLines = (t: string) =>
     .map((l) => l.trim())
     .filter(Boolean);
 
-/** Textarea "satu item per baris" yang terikat ke array string. */
+/** A "one item per line" textarea bound to a string array. */
 export function LinesInput({
   value,
   onChange,
@@ -445,7 +445,7 @@ export function LinesInput({
   );
 }
 
-/** Pilihan tombol kecil berderet (pengganti select untuk 2–4 opsi). */
+/** A row of small option buttons (replaces a select for 2–4 options). */
 export function Segmented<V extends string>({
   value,
   onChange,

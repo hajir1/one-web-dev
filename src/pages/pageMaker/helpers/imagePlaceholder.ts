@@ -1,16 +1,16 @@
 /* ================================================================== */
-/* Placeholder gambar                                                  */
+/* Image placeholders                                                  */
 /*                                                                    */
-/* Gambar yang gagal dimuat (atau tanpa src) diganti SVG data-URI:     */
-/* bingkai + gunung + matahari di latar abu lembut. Tanpa file luar,   */
-/* jadi hasil unduhan tetap utuh. Teks alt tetap di atribut (SEO dan   */
-/* pembaca layar), hanya tidak tampil di layar.                        */
+/* Images that fail to load (or have no src) are replaced with an SVG data URI: */
+/* frame + mountain + sun on a soft gray background. No external files, */
+/* so downloads stay complete. The alt text stays in the attribute (SEO and */
+/* screen readers), it is just not shown on screen.                    */
 /*                                                                    */
-/* Dipakai di: canvas/pratinjau Desain Halaman (pageShell), HTML hasil */
-/* unduhan (siteExport, markup), dan demo template (dari siteExport).  */
+/* Used in: the Page Design canvas/preview (pageShell), the downloaded HTML */
+/* (siteExport, markup), and template demos (from siteExport).         */
 /* ================================================================== */
 
-/** Warna latar placeholder; mengisi sisa ruang bila rasio wadah berbeda dari 4:3. */
+/** Placeholder background color; fills the remaining space when the container ratio differs from 4:3. */
 const IMG_PLACEHOLDER_BG = "#eef1f5";
 
 const SVG =
@@ -23,14 +23,14 @@ const SVG =
   `<circle cx="219" cy="134" r="8" fill="#94a3b8"/>` +
   `</svg>`;
 
-/** SVG placeholder sebagai data-URI (aman dipakai di atribut src). */
+/** The placeholder SVG as a data URI (safe to use in a src attribute). */
 export const IMG_PLACEHOLDER = `data:image/svg+xml,${encodeURIComponent(SVG)}`;
 
 /**
- * Skrip mandiri (ES5) untuk <head>: listener `error` fase capture
- * menangkap gambar gagal sebelum ikon rusak/alt sempat terlihat lama.
- * Gambar tanpa src (atau src kosong) diganti saat DOM siap dan saat
- * konten baru ditambahkan (canvas editor merender ulang isi halaman).
+ * A standalone (ES5) script for <head>: a capture-phase `error` listener
+ * catches failed images before the broken icon/alt shows for long.
+ * Images without a src (or with an empty src) are replaced when the DOM is ready and when
+ * new content is added (the editor canvas re-renders the page content).
  */
 export const IMG_FALLBACK_SCRIPT = `(function () {
   var P = ${JSON.stringify(IMG_PLACEHOLDER)};
@@ -70,5 +70,5 @@ export const IMG_FALLBACK_SCRIPT = `(function () {
   else start();
 })();`;
 
-/** Tag <script> siap tempel di <head>. */
+/** <script> tag ready to paste into <head>. */
 export const IMG_FALLBACK_TAG = `<script>${IMG_FALLBACK_SCRIPT}</script>`;

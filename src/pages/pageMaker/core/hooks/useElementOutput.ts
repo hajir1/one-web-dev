@@ -10,15 +10,15 @@ import { useIconStore } from "../store/iconStore";
 import { useFontStore } from "../store/fontStore";
 import { withFontCss } from "../helpers/fontCss";
 
-/** Pencari ikon yang ikut berubah saat pustaka ikon berubah. */
+/** An icon finder that updates when the icon library changes. */
 export function useIconLookup(): IconLookup {
   const icons = useIconStore((st) => st.icons);
   return useMemo(() => makeIconLookup(icons), [icons]);
 }
 
 /**
- * CSS + markup + file hasil generate sebuah elemen, dari definisinya.
- * Dipakai semua halaman Element Maker.
+ * An element's CSS + markup + generated files, from its definition.
+ * Used by every Element Maker page.
  */
 export function useElementOutput<S>(
   def: ElementDefinition<S>,
@@ -29,7 +29,7 @@ export function useElementOutput<S>(
   const lookup = useIconLookup();
   const spec = useMemo(() => def.spec(s, cls, lookup), [def, s, cls, lookup]);
   const fonts = useFontStore((st) => st.fonts);
-  // Kode export mandiri: font pustaka yang dipakai ikut dimuat (@import / @font-face).
+  // Standalone export code: library fonts in use are loaded too (@import / @font-face).
   const files = useMemo(
     () =>
       generateFrameworkFiles(framework, {

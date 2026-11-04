@@ -18,7 +18,7 @@ import { removeBackgroundInWorker } from "../../workers/bgRemoval";
 
 const RULES: FileRules = { kinds: ["png", "jpeg", "webp", "bmp", "avif"], maxBytes: 20 * 1024 * 1024, maxFiles: 50 };
 
-/** BiRefNet_lite (MIT): fp16 ±115 MB (hemat), fp32 ±224 MB (paling presisi di CPU/wasm). */
+/** BiRefNet_lite (MIT): fp16 ±115 MB (lighter), fp32 ±224 MB (most precise on CPU/wasm). */
 type ModelId = "fp16" | "fp32";
 type BgMode = "transparent" | "white" | "color";
 
@@ -32,7 +32,7 @@ function explain(err: unknown): Error {
   return err instanceof Error ? err : new Error(msg || i18n.t("media.removeBackground.errors.failed"));
 }
 
-/** Tempel hasil transparan di atas warna latar (opsional). */
+/** Places the transparent result over a background color (optional). */
 async function flatten(png: Blob, color: string): Promise<Blob> {
   const img = await decodeImage(png);
   const c = createCanvas(img.width, img.height);

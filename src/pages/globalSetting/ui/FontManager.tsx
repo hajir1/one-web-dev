@@ -72,7 +72,7 @@ function BaseFontCard() {
   );
 }
 
-/* ---------------- v7: font judul & isi (variabel global) ---------------- */
+/* ---------------- v7: heading & body fonts (global variables) ---------------- */
 
 function GlobalFontsCard() {
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ function GlobalFontsCard() {
   );
 }
 
-/* --------------------------- form tambah font ----------------------- */
+/* --------------------------- add font form ----------------------- */
 
 function AddFontForm() {
   const { t } = useTranslation();
@@ -240,7 +240,7 @@ function WeightChips({
   );
 }
 
-/* ------------------------------ daftar font ------------------------- */
+/* ------------------------------ font list ------------------------- */
 
 function StatusPill({ font }: { font: GlobalFont }) {
   const { t } = useTranslation();

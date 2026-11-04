@@ -6,23 +6,23 @@ import type { CssVar } from "../helpers/cssVars";
 /* ================================================================== */
 /* Pengaturan Global → Animasi & 3D (v9)                                */
 /*                                                                    */
-/* Nilai bawaan untuk animasi CSS dan elemen 3D. Disimpan di perangkat  */
-/* (seperti font & variabel) dan ditulis sebagai variabel CSS di :root  */
-/* (`motionVars`), sehingga pratinjau dan semua format ekspor membaca   */
-/* nilai yang sama. Elemen yang mengisi nilainya sendiri tetap menang.   */
+/* Default values for CSS animations and 3D elements. Stored on the device */
+/* (like fonts & variables) and written as CSS variables on :root       */
+/* (`motionVars`), so the preview and every export format read          */
+/* the same values. Elements that set their own values still win.       */
 /* ================================================================== */
 
 export type ThreeQuality = "auto" | "low" | "high";
 
 export interface ThreeDefaults {
-  /** auto = turunkan detail di HP / perangkat lemah. */
+  /** auto = lower detail on phones / weak devices. */
   quality: ThreeQuality;
   autoRotate: boolean;
-  /** Pengali kecepatan putar 0,2–3. */
+  /** Rotation speed multiplier 0.2–3. */
   rotateSpeed: number;
-  /** Batas devicePixelRatio (1–2): makin kecil makin ringan di HP. */
+  /** devicePixelRatio cap (1–2): smaller is lighter on phones. */
   maxDpr: number;
-  /** Bisa diputar/digeser dengan mouse/jari. */
+  /** Can be rotated/dragged with the mouse/finger. */
   interactive: boolean;
 }
 
@@ -61,7 +61,7 @@ export function sanitizeThree(v: unknown): ThreeDefaults {
   };
 }
 
-/** Variabel :root yang dibaca CSS animasi & runtime 3D (compose hanya menulisnya bila dipakai). */
+/** :root variables read by the animation CSS & the 3D runtime (compose only writes them when used). */
 export function motionVars(anim: MotionDefaults, three: ThreeDefaults): CssVar[] {
   const v = (name: string, type: CssVar["type"], value: string): CssVar => ({ id: `motion-${name}`, name, type, value });
   return [
@@ -99,7 +99,7 @@ export const useMotionStore = create<MotionStore>()(
   ),
 );
 
-/** Snapshot non-React (ekspor server). */
+/** Non-React snapshot (server export). */
 export const currentMotionVars = () => {
   const { anim, three } = useMotionStore.getState();
   return motionVars(anim, three);

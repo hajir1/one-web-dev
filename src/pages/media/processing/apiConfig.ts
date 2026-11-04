@@ -1,24 +1,24 @@
 // ─── processing/apiConfig.ts ─────────────────────────────────────────────────
-// Konfigurasi bersama SEMUA klien API (auth, billing, marketplace, template,
-// desain, job server, admin). Hanya base URL publik dari env — TIDAK ada API
-// key, secret pembayaran, atau kredensial di frontend. Autentikasi memakai
-// cookie sesi (credentials: "include"); lihat src/api/client.ts.
+// Shared configuration for ALL API clients (auth, billing, marketplace, templates,
+// designs, server jobs, admin). Only the public base URL from env; NO API
+// keys, payment secrets, or credentials in the frontend. Authentication uses
+// session cookie (credentials: "include"); see src/api/client.ts.
 
 import i18n from "../../../i18n";
 
 export interface ApiConfig {
-  /** Base URL backend Nest; null = frontend dijalankan tanpa backend. */
+  /** Nest backend base URL; null = the frontend runs without a backend. */
   baseUrl: string | null;
   fetch: typeof fetch;
   pollMs: number;
-  /** Batas waktu total menunggu satu job (ms). */
+  /** Total time limit for waiting on one job (ms). */
   timeoutMs: number;
 }
 
 /**
- * Base URL backend Nest (satu-satunya gateway API). Urutan:
- * VITE_API_BASE_URL → VITE_MEDIA_API_BASE (nama lama) → http://localhost:3000.
- * Isi "off" untuk menjalankan frontend tanpa backend (fitur server nonaktif).
+ * Nest backend base URL (the only API gateway). Order:
+ * VITE_API_BASE_URL → VITE_MEDIA_API_BASE (old name) → http://localhost:3000.
+ * Set "off" to run the frontend without a backend (server features disabled).
  */
 export const DEFAULT_API_BASE = "http://localhost:3000";
 
@@ -43,16 +43,16 @@ export const apiConfig: ApiConfig = {
   timeoutMs: 10 * 60_000,
 };
 
-/** Untuk pengujian / saat backend siap. */
+/** For testing / when the backend is ready. */
 export function configureApi(c: Partial<ApiConfig>) {
   Object.assign(apiConfig, c);
 }
 
 export const isBackendConfigured = () => !!apiConfig.baseUrl;
 
-/** Pesan baku saat fitur server dijalankan sebelum layanannya aktif. */
+/** Standard message when a server feature runs before its service is active. */
 export const SERVER_UNAVAILABLE_MESSAGE = "Server belum tersedia. Fitur ini akan dapat digunakan setelah layanan server diaktifkan.";
-/** Versi terjemahan (ikut bahasa aktif) dari pesan baku di atas. */
+/** Translated version (follows the active language) of the standard messages above. */
 export const serverUnavailableMessage = () => i18n.t("errors.serverUnavailable");
 export const billingUnavailableMessage = () => i18n.t("errors.billingUnavailable");
 export const BILLING_UNAVAILABLE_MESSAGE =

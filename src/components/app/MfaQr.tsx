@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 
 /**
- * v9: kode QR untuk URL otpauth:// (dipindai aplikasi autentikator).
- * Dibuat di browser (paket `qrcode`, dimuat lazy) sehingga rahasia 2FA
- * tidak pernah dikirim ke layanan pihak ketiga.
+ * v9: QR code for the otpauth:// URL (scanned by an authenticator app).
+ * Generated in the browser (the `qrcode` package, lazy loaded) so the 2FA secret
+ * is never sent to a third-party service.
  */
 export default function MfaQr({ value }: { value: string }) {
   const { t } = useTranslation();

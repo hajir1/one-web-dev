@@ -48,7 +48,7 @@ import {
 
 /* ================================================================== */
 /* Template v3 C11–C15: Percetakan, Laundry, Florist, Dekorasi bunga,   */
-/* Toko gawai.                                                          */
+/* Gadget store.                                                        */
 /* ================================================================== */
 
 /* ------------- 11. Cetak Kilat (PREMIUM, 6 hlm) — bento CMYK --------- */
@@ -178,7 +178,7 @@ export const laundryBersih: TemplateContent = {
   },
 };
 
-/* -------------- 13. Florist Kembang (PREMIUM, 5 hlm) — garis manis ---- */
+/* -------------- 13. Florist Kembang (PREMIUM, 5 pages) — sweet lines ---- */
 
 const KR: Palette = { ink: "#500724", muted: "#86506a", primary: "#db2777", primaryDark: "#be185d", soft: "#fce7f3", line: "#f9a8d4" };
 const kr = lookC(KR, { head: "Caveat", body: "Poppins", skin: "line", radius: 32, bg: "#fffbfd", alt: "#fdf0f6", dark: "#3d0a1f", fx: { aos: "fade-left", tilt: { max: 9 } }, btnR: 999, accent2: "#f97316" });
@@ -317,7 +317,7 @@ export const floristWeddingBloom: TemplateContent = {
   },
 };
 
-/* ---------------- 15. Toko Gawai (PREMIUM, 9 hlm) — bento ------------ */
+/* ---------------- 15. Toko Gawai (PREMIUM, 9 pages) — bento ------------ */
 
 const TG: Palette = { ink: "#0b1220", muted: "#4b5563", primary: "#2563eb", primaryDark: "#1d4ed8", soft: "#dbeafe", line: "#bfdbfe" };
 const tg = lookC(TG, { head: "Sora", body: "Inter", skin: "bento", radius: 20, bg: "#ffffff", alt: "#f3f6fb", dark: "#0b1220", fx: { aos: "fade-up", tilt: { max: 10, glare: true } }, btnR: 12, accent2: "#06b6d4" });
@@ -332,7 +332,7 @@ const tgFoot = (tr: Tr) =>
     backTop: tr("Ke atas", "Top"),
   });
 
-/** Detail produk (Product Card tetap gratis; halaman ini memakai elemen biasa). */
+/** Product detail (Product Card stays free; this page uses regular elements). */
 function productDetail(L: LC, tr: Tr, href: (k: string) => string) {
   const pics = col(
     [fxPic(L, image(asset("v3c-gadget"), "Petir Nova 12", { ratio: "1 / 1", radius: L.radius })), gbox([asset("v3c-gadget-dark"), asset("v3c-gadget"), asset("v3c-gadget-dark")].map((s) => image(s, "Petir Nova 12", { ratio: "1 / 1", radius: 12 })), "repeat(3, minmax(0, 1fr))", { gap: 10, name: "Thumbnail", stack: false })],

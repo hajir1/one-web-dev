@@ -1,7 +1,7 @@
 import type { StyleState, TextTag } from "./generatorCss";
 import i18n from "../../../../i18n";
 
-/** State khusus elemen Text: StyleState + tag yang WAJIB ada. */
+/** State specific to the Text element: StyleState + a REQUIRED tag. */
 export interface TextState extends StyleState {
   tag: TextTag;
 }
@@ -16,7 +16,7 @@ export const TAG_OPTIONS: { value: TextTag; label: string }[] = [
   { value: "p", label: "P — Paragraf" },
 ];
 
-/** TAG_OPTIONS dengan label mengikuti bahasa aktif (dipanggil saat render). */
+/** TAG_OPTIONS with labels in the active language (called at render time). */
 export const tagOptions = (): { value: TextTag; label: string }[] => [
   { value: "h1", label: i18n.t("el.f.tagH1") },
   { value: "h2", label: i18n.t("el.f.tagH2") },
@@ -28,9 +28,9 @@ export const tagOptions = (): { value: TextTag; label: string }[] => [
 ];
 
 /**
- * Ukuran & ketebalan font wajar per tag. Diterapkan SETIAP kali tag diganti
- * (menimpa fontSize/fontWeight sebelumnya); tetap bisa diubah manual lagi
- * lewat section "Tipografi" setelahnya.
+ * Sensible font size & weight per tag. Applied EVERY time the tag changes
+ * (overwriting the previous fontSize/fontWeight); they can still be changed manually again
+ * in the "Typography" section afterwards.
  */
 export const TAG_PRESETS: Record<
   TextTag,
@@ -46,8 +46,8 @@ export const TAG_PRESETS: Record<
 };
 
 /**
- * Satu-satunya tempat fallback tag. Desain lama di localStorage yang dibuat
- * sebelum field `tag` ada bisa memuat state tanpa `tag`, jadi tetap dijaga.
+ * The only place for the tag fallback. Old designs in localStorage created
+ * before the `tag` field existed may load state without `tag`, so it is still guarded.
  */
 export function getTag(s: { tag?: TextTag }): TextTag {
   return s.tag ?? "p";

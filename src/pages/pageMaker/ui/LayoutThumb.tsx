@@ -1,6 +1,6 @@
 import type { SpecialtyLayout } from "../helpers/sectionTypes";
 
-/* Thumbnail struktur kolom (gaya panel "Sisipkan Baris" Divi). Lebar balok = fr asli. */
+/* Column structure thumbnail (Divi "Insert Row" panel style). Bar width = the real fr. */
 
 const TONE = {
   teal: "bg-teal-400 dark:bg-teal-500",
@@ -23,7 +23,7 @@ export function ColumnBars({ fr, tone = "teal", height = 22 }: { fr: number[]; t
   );
 }
 
-/** Kolom spesial (berisi baris dalam) digambar oranye, kolom samping merah. */
+/** The special column (holding inner rows) is drawn orange, side columns red. */
 export function SpecialtyBars({ layout, height = 40 }: { layout: SpecialtyLayout; height?: number }) {
   return (
     <div className="flex w-full gap-1" style={{ height }} aria-hidden="true">

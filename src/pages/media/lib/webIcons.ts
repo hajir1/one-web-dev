@@ -1,14 +1,14 @@
 // ─── lib/webIcons.ts ─────────────────────────────────────────────────────────
-// Logika murni Favicon Generator & OG Image Maker (v10): penyusun berkas ICO,
-// daftar ukuran ikon, site.webmanifest, dan potongan HTML <head>. Render ke
-// canvas dilakukan di halaman (browser), jadi modul ini bisa diuji di Node.
+// Pure logic for the Favicon Generator & OG Image Maker (v10): ICO file builder,
+// icon size list, site.webmanifest, and an HTML <head> snippet. Rendering to
+// canvas happens in the page (browser), so this module can be tested in Node.
 
 export interface IconSpec {
   name: string;
   size: number;
-  /** Latar diisi penuh (apple-touch-icon tidak boleh transparan). */
+  /** Fully filled background (apple-touch-icon must not be transparent). */
   opaque?: boolean;
-  /** Ruang aman 80% di tengah untuk ikon maskable Android. */
+  /** The 80% safe area in the center for Android maskable icons. */
   maskable?: boolean;
 }
 
@@ -22,12 +22,12 @@ export const ICON_SPECS: IconSpec[] = [
   { name: "maskable-icon-512x512.png", size: 512, opaque: true, maskable: true },
 ];
 
-/** Ukuran yang dimasukkan ke favicon.ico. */
+/** Sizes included in favicon.ico. */
 export const ICO_SIZES = [16, 32, 48] as const;
 
 /**
- * Susun favicon.ico dari PNG (format "PNG di dalam ICO", didukung semua
- * browser modern dan Windows Vista+). `pngs` berisi ukuran sisi & bytes PNG.
+ * Builds favicon.ico from PNGs (the "PNG inside ICO" format, supported by every
+ * modern browser and Windows Vista+). `pngs` holds side sizes & PNG bytes.
  */
 export function buildIco(pngs: { size: number; bytes: Uint8Array }[]): Uint8Array {
   if (!pngs.length) throw new Error("ICO butuh minimal 1 gambar");
@@ -37,13 +37,13 @@ export function buildIco(pngs: { size: number; bytes: Uint8Array }[]): Uint8Arra
   const out = new Uint8Array(total);
   const v = new DataView(out.buffer);
   v.setUint16(0, 0, true); // reserved
-  v.setUint16(2, 1, true); // 1 = ikon
+  v.setUint16(2, 1, true); // 1 = icon
   v.setUint16(4, pngs.length, true);
   let offset = header + entry * pngs.length;
   pngs.forEach((p, i) => {
     if (p.size < 1 || p.size > 256) throw new Error("Ukuran ikon ICO 1–256 px");
     const at = header + i * entry;
-    out[at] = p.size === 256 ? 0 : p.size; // 0 berarti 256
+    out[at] = p.size === 256 ? 0 : p.size; // 0 means 256
     out[at + 1] = p.size === 256 ? 0 : p.size;
     out[at + 2] = 0; // palet
     out[at + 3] = 0;
@@ -83,7 +83,7 @@ export function webManifest(o: { name: string; shortName?: string; themeColor: s
   );
 }
 
-/** Potongan HTML untuk <head>. */
+/** HTML snippet for <head>. */
 export function faviconHtml(themeColor: string, withSvg: boolean): string {
   return [
     `<link rel="icon" href="/favicon.ico" sizes="48x48" />`,
@@ -101,9 +101,9 @@ export function faviconHtml(themeColor: string, withSvg: boolean): string {
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 
 /**
- * Pecah teks menjadi baris yang muat di `maxWidth` (pengukur lebar disuntik
- * supaya bisa diuji tanpa canvas). Kata yang terlalu panjang dipotong paksa.
- * Baris ke-`maxLines` diakhiri "…" bila masih ada sisa.
+ * Splits text into lines that fit `maxWidth` (the width measurer is injected
+ * so it can be tested without canvas). Words that are too long are cut forcibly.
+ * Line `maxLines` ends with "…" when text remains.
  */
 export function wrapText(text: string, maxWidth: number, measure: (s: string) => number, maxLines: number): string[] {
   const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
@@ -112,7 +112,7 @@ export function wrapText(text: string, maxWidth: number, measure: (s: string) =>
   const push = (s: string) => lines.push(s);
   for (let w of words) {
     while (measure(w) > maxWidth && w.length > 1) {
-      // Potong kata sangat panjang (mis. URL) per karakter.
+      // Break very long words (e.g. URLs) per character.
       let cut = w.length - 1;
       while (cut > 1 && measure(w.slice(0, cut)) > maxWidth) cut--;
       if (cur) {
@@ -138,7 +138,7 @@ export function wrapText(text: string, maxWidth: number, measure: (s: string) =>
   return kept;
 }
 
-/** Warna teks yang terbaca di atas latar (hitam/putih), berdasarkan luminans relatif WCAG. */
+/** Text color readable on the background (black/white), based on WCAG relative luminance. */
 export function readableOn(hex: string): "#111827" | "#ffffff" {
   const h = safeHex(hex);
   const ch = [1, 3, 5].map((i) => {
@@ -146,7 +146,7 @@ export function readableOn(hex: string): "#111827" | "#ffffff" {
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
   const lum = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
-  // Kontras terhadap putih vs hitam, pilih yang lebih tinggi.
+  // Contrast against white vs black; pick the higher one.
   return (1.05 / (lum + 0.05) >= (lum + 0.05) / 0.05 ? "#ffffff" : "#111827");
 }
 

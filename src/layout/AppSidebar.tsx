@@ -12,7 +12,7 @@ import { splitLangPath } from "../i18n";
 import { prefetchRoute } from "../api/queries";
 import { useSession } from "../auth/session";
 
-/* Menu diambil dari config/menu.ts — sumber yang sama dengan kartu di Dashboard. */
+/* The menu comes from config/menu.ts, the same source as the Dashboard cards. */
 
 const AppSidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -25,16 +25,16 @@ const AppSidebar: React.FC = () => {
   const [heights, setHeights] = useState<Record<string, number>>({});
   const refs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Prefetch data halaman tujuan saat kursor/fokus di menu (TanStack Query).
+  // Prefetch the destination page's data on cursor/focus over the menu (TanStack Query).
   const signedIn = useSession((s) => s.status === "authenticated");
   const prefetch = useCallback((to: string) => prefetchRoute(to, signedIn), [signedIn]);
 
   const leafActive = useCallback((leaf: MenuLeaf) => isLeafActive(leaf, path), [path]);
-  // Mode demo (v12): tanpa alat server/Toko dan tanpa menu akun (kredit, paket, riwayat, tim).
+  // Demo mode (v12): no server tools/Store and no account menu (credits, plans, history, team).
   const demo = isDemoMode();
   const sections = visibleMenuSections();
 
-  // Buka kelompok yang berisi halaman aktif.
+  // Open the group that contains the active page.
   useEffect(() => {
     const sec = sections.find((s) => s.items.some(leafActive));
     setOpenSection(sec ? sec.id : null);

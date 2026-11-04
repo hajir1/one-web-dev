@@ -1,13 +1,13 @@
 import type { TemplateCatalogItem, Tier } from "./types";
 
 /* ================================================================== */
-/* Filter & urutan katalog template (murni, dipakai UI dan tes)          */
+/* Template catalog filtering & sorting (pure, used by the UI and tests) */
 /* ================================================================== */
 
 export type TemplateSort = "featured" | "price-asc" | "price-desc" | "category" | "name";
 
 export interface TemplateQuery {
-  /** Cari di nama, deskripsi, dan tag. */
+  /** Searches names, descriptions, and tags. */
   text: string;
   category: "all" | string;
   tier: "all" | Tier;
@@ -16,7 +16,7 @@ export interface TemplateQuery {
 
 export const DEFAULT_TEMPLATE_QUERY: TemplateQuery = { text: "", category: "all", tier: "all", sort: "featured" };
 
-/** Normalisasi teks pencarian: huruf kecil, tanpa diakritik, spasi tunggal. */
+/** Normalizes search text: lowercase, no diacritics, single spaces. */
 const normalizeSearch = (s: string) =>
   s
     .toLowerCase()
@@ -26,8 +26,8 @@ const normalizeSearch = (s: string) =>
     .trim();
 
 /**
- * Terapkan filter & urutan. `categoryLabel` dipakai untuk urutan kategori
- * sesuai bahasa tampilan. Urutan "featured" = urutan katalog asli.
+ * Applies filters & sorting. `categoryLabel` is used to sort categories
+ * in the display language. The "featured" order = the original catalog order.
  */
 export function queryTemplates(list: TemplateCatalogItem[], q: TemplateQuery, categoryLabel: (c: string) => string = (c) => c): TemplateCatalogItem[] {
   const words = normalizeSearch(q.text).split(" ").filter(Boolean);
@@ -51,13 +51,13 @@ export function queryTemplates(list: TemplateCatalogItem[], q: TemplateQuery, ca
 }
 
 /* ------------------------------------------------------------------ */
-/* Halaman katalog: filter & nomor halaman di URL                        */
+/* Catalog page: filters & page number in the URL                       */
 /* ------------------------------------------------------------------ */
 
 const SORT_VALUES: TemplateSort[] = ["featured", "price-asc", "price-desc", "category", "name"];
 const MAX_PAGE = 10_000;
 
-/** Filter + halaman dari query string (?q&category&tier&sort&page). Nilai tidak dikenal → default. */
+/** Filters + page from the query string (?q&category&tier&sort&page). Unknown values → default. */
 export function templateQueryFromSearch(search: URLSearchParams, categories: readonly string[]): TemplateQuery & { page: number } {
   const category = search.get("category") ?? "all";
   const tier = search.get("tier");
@@ -72,7 +72,7 @@ export function templateQueryFromSearch(search: URLSearchParams, categories: rea
   };
 }
 
-/** Query string untuk filter + halaman; nilai default tidak ditulis agar URL tetap pendek. */
+/** Query string for filters + page; default values are omitted so the URL stays short. */
 export function templateSearchFromQuery(q: TemplateQuery & { page: number }): URLSearchParams {
   const s = new URLSearchParams();
   if (q.text.trim()) s.set("q", q.text.trim());
@@ -84,14 +84,14 @@ export function templateSearchFromQuery(q: TemplateQuery & { page: number }): UR
 }
 
 /**
- * Nomor halaman yang ditampilkan: selalu halaman pertama & terakhir, plus
- * tetangga halaman aktif; celah diganti "…". Mis. (6, 25) → 1 … 5 6 7 … 25.
+ * Page numbers to display: always the first & last page, plus the
+ * active page's neighbors; gaps become "…". E.g. (6, 25) → 1 … 5 6 7 … 25.
  */
 export function pageList(current: number, pages: number, around = 1): (number | "gap")[] {
   if (pages <= 1) return [1];
   const keep = new Set([1, pages]);
   for (let p = current - around; p <= current + around; p++) if (p >= 1 && p <= pages) keep.add(p);
-  // Celah satu angka tidak perlu "…": tampilkan angkanya.
+  // A one-number gap does not need "…": show the number.
   const sorted = [...keep].sort((a, b) => a - b);
   const out: (number | "gap")[] = [];
   sorted.forEach((p, i) => {
@@ -103,5 +103,5 @@ export function pageList(current: number, pages: number, around = 1): (number | 
   return out;
 }
 
-/** Rentang item yang tampil di halaman ini (1-based), mis. 11–20 dari 47. */
+/** Range of items shown on this page (1-based), e.g. 11–20 of 47. */
 export const pageRange = (page: number, limit: number, total: number) => (total === 0 ? { from: 0, to: 0 } : { from: (page - 1) * limit + 1, to: Math.min(total, page * limit) });

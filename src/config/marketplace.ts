@@ -1,28 +1,28 @@
 /* ================================================================== */
-/* ATURAN HARGA & PAKET KATALOG (Free/Premium) — satu sumber angka        */
+/* CATALOG PRICING & PACK RULES (Free/Premium) — one source of numbers    */
 /*                                                                    */
-/* Dipakai katalog template, section, element, dan paket desain.        */
-/* Komponen UI tidak menulis angka sendiri.                             */
+/* Used by the template, section, element, and design pack catalogs.    */
+/* UI components never hardcode their own numbers.                      */
 /*                                                                    */
-/* Nilai di sini = cadangan TAMPILAN (mis. sebelum katalog server        */
-/* dimuat). Harga yang ditagih, tier, dan kepemilikan ditentukan server   */
-/* (backend Nest, dapat diubah admin).                                   */
+/* Values here are DISPLAY fallbacks (e.g. before the server catalog     */
+/* loads). Charged prices, tiers, and ownership are decided by the server */
+/* (Nest backend, editable by admins).                                   */
 /* ================================================================== */
 
 /*
- * Satuan harga: 1 kredit = Rp1.000 (paket kredit besar lebih murah per kredit).
+ * Price unit: 1 credit = Rp1,000 (larger credit packs are cheaper per credit).
  */
 
-/** Template website: Free = 0 kredit (gratis), Premium = 20–300 kredit (Rp20rb–Rp300rb; 15 kredit/halaman + bonus kualitas, lihat marketplace/templatePricing.ts). */
+/** Website templates: Free = 0 credits, Premium = 20–300 credits (Rp20k–Rp300k; 15 credits/page + quality bonus, see marketplace/templatePricing.ts). */
 export const TEMPLATE_PRICE = { free: 0, premiumMin: 20, premiumMax: 300 } as const;
 
-/** Section & element: Free = 0, Premium = 5–10 kredit (Rp5rb–Rp10rb, sesuai kompleksitas & nilai fungsional). */
+/** Sections & elements: Free = 0, Premium = 5–10 credits (Rp5k–Rp10k, based on complexity & functional value). */
 export const ITEM_PRICE = { free: 0, premiumMin: 5, premiumMax: 10 } as const;
 
 /**
- * v9: elemen 3D (semuanya Premium). Lebih mahal dari elemen biasa karena
- * berisi runtime WebGL (Three.js) + gambar statis cadangan. Lihat
- * USULAN-3D-DAN-HARGA.md; server/admin tetap bisa mengubah harganya.
+ * v9: 3D elements (all Premium). More expensive than regular elements because
+ * they contain a WebGL runtime (Three.js) + a static fallback image. See
+ * USULAN-3D-DAN-HARGA.md; the server/admin can still change the price.
  */
 export const ELEMENT_3D_PRICE: Record<string, number> = {
   "three-product": 20,
@@ -34,8 +34,8 @@ export const ELEMENT_3D_PRICE: Record<string, number> = {
 export const ELEMENT_3D_RANGE = { min: 10, max: 25 } as const;
 
 /**
- * Template Free = 0 kredit dan dipakai TANPA pembelian. Bendera ini tetap
- * ada bila suatu saat template Free diberi harga dan ditagih saat dipakai.
+ * Free template = 0 credits and used WITHOUT purchase. This flag stays
+ * in case Free templates are ever priced and charged on use.
  */
 export const FREE_TEMPLATE_CHARGES_ON_USE = false;
 
@@ -44,14 +44,14 @@ export const FREE_TEMPLATE_CHARGES_ON_USE = false;
 /* ------------------------------------------------------------------ */
 
 /**
- * Promo seluruh template: diskon 40% dari harga awal sampai akhir
- * 10 Januari 2027 (WIB). Harga promo dibulatkan ke kredit terdekat,
- * minimal 1 untuk template berbayar. Setelah `endsAt`, harga kembali normal.
+ * Sitewide template promo: 40% off the original price until the end of
+ * 10 January 2027 (WIB). Promo prices are rounded to the nearest credit,
+ * at least 1 for paid templates. After `endsAt`, prices return to normal.
  */
 export const TEMPLATE_PROMO = { percentOff: 40, endsAt: "2027-01-10T23:59:59+07:00" } as const;
 
 /* ------------------------------------------------------------------ */
-/* Paket folder website                                                 */
+/* Website folder packs                                                 */
 /* ------------------------------------------------------------------ */
 
 export interface SitePackage {
@@ -63,9 +63,9 @@ export interface SitePackage {
 }
 
 /**
- * Slot folder website tambahan (di atas FREE_SITES). Makin banyak makin
- * murah per website: 1 = 15 kredit (Rp15rb), 10 = 105 kredit (10,5/website), dst.
- * Jumlah lain dihitung dari kombinasi paket termurah (lihat pricing.ts).
+ * Extra website folder slots (above FREE_SITES). The more you buy, the
+ * cheaper per website: 1 = 15 credits (Rp15k), 10 = 105 credits (10.5/website), etc.
+ * Other amounts are computed from the cheapest pack combination (see pricing.ts).
  */
 export const SITE_PACKAGES: SitePackage[] = [
   { id: "site-pack-1", sites: 1, credits: 15 },
@@ -75,53 +75,53 @@ export const SITE_PACKAGES: SitePackage[] = [
   { id: "site-pack-50", sites: 50, credits: 400 },
 ];
 
-/** Batas slot website dalam sekali beli. */
+/** Maximum website slots in a single purchase. */
 export const MAX_SITES_PER_PURCHASE = 100;
 
 /**
- * Komposisi 10 preset section BARU. Brief menyebut 4 Free + 6 Premium di
- * spesifikasi dan 2 Free + 8 Premium di daftar pengujian; dipakai 4 + 6.
- * Untuk mengubah, pindahkan id antar-daftar di
- * pages/pageMaker/helpers/sectionPresetsPro.ts (PRO_FREE_IDS) — tes ikut
- * membaca angka ini.
+ * Composition of the 10 NEW section presets. The brief says 4 Free + 6 Premium in
+ * the spec and 2 Free + 8 Premium in the test list; 4 + 6 is used.
+ * To change it, move ids between the lists in
+ * pages/pageMaker/helpers/sectionPresetsPro.ts (PRO_FREE_IDS); the tests
+ * read this number too.
  */
 export const NEW_SECTION_SPLIT = { free: 4, premium: 6 } as const;
 
 /**
- * Menu VR — Tur 360°. Gratis: maks. 3 scene per tur, hotspot pindah scene
- * & info teks, ekspor HTML. "Tur 360° Pro" dibuka SEKALI per akun:
- * hingga 30 scene per tur + hotspot gambar & audio. 50 kredit = Rp50.000
- * sekali bayar (pembanding: Kuula/CloudPano ±US$20–27 per BULAN; tur
- * berjalan di browser sehingga tidak ada biaya server per buka).
+ * VR menu: 360° Tours. Free: max. 3 scenes per tour, scene-jump & text info
+ * hotspots, HTML export. "360° Tour Pro" is unlocked ONCE per account:
+ * up to 30 scenes per tour + image & audio hotspots. 50 credits = Rp50,000
+ * one-time (for comparison: Kuula/CloudPano about US$20–27 per MONTH; tours
+ * run in the browser so there is no per-view server cost).
  */
 export const VR_PRO = { id: "vr-pro", price: 50 } as const;
 
-/** Komposisi katalog template. */
+/** Template catalog composition. */
 export const TEMPLATE_SPLIT = { free: 32, premium: 378 } as const;
 
 /* ------------------------------------------------------------------ */
-/* Paket desain halaman                                                */
+/* Page design packs                                                   */
 /* ------------------------------------------------------------------ */
 
 export interface DesignPackage {
   id: string;
-  /** Jumlah desain halaman baru yang ditambahkan ke kuota. */
+  /** Number of new page designs added to the quota. */
   designs: number;
   credits: number;
   highlight?: boolean;
 }
 
-/** 1 paket = 5 desain = 5 kredit (Rp5rb). Paket besar 50 desain = 30 kredit (diskon 40%). */
+/** 1 pack = 5 designs = 5 credits (Rp5k). Large pack of 50 designs = 30 credits (40% off). */
 export const DESIGN_PACKAGES: DesignPackage[] = [
   { id: "design-pack-5", designs: 5, credits: 5 },
   { id: "design-pack-50", designs: 50, credits: 30, highlight: true },
 ];
 
-/** Batas jumlah desain dalam sekali beli (mencegah salah ketik 5000). */
+/** Maximum number of designs in a single purchase (prevents a typo like 5000). */
 export const MAX_DESIGNS_PER_PURCHASE = 200;
 
 /* ------------------------------------------------------------------ */
-/* Validasi harga (dipakai tes & data katalog)                          */
+/* Price validation (used by tests & catalog data)                      */
 /* ------------------------------------------------------------------ */
 
 export type PricedKind = "template" | "section" | "element" | "element3d";

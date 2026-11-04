@@ -3,9 +3,9 @@ import { Database } from "lucide-react";
 import { CRUD_STACKS, type CrudStack } from "../../helpers/crud";
 
 /* ================================================================== */
-/* Panel Kode › "Include CRUD": sertakan dashboard CRUD + backend untuk  */
-/* koleksi data di website. Pilihan stack mengatur format ekspor:        */
-/* Laravel → Laravel Blade, Node.js (Express) → HTML di public/.         */
+/* Code panel › "Include CRUD": include a CRUD dashboard + backend for   */
+/* the website's data collections. The stack choice sets the export format: */
+/* Laravel → Laravel Blade, Node.js (Express) → HTML in public/.         */
 /* ================================================================== */
 
 export default function CrudExportBar({
@@ -16,11 +16,11 @@ export default function CrudExportBar({
   onToggle,
   onStack,
 }: {
-  /** Nama koleksi di website. */
+  /** Collection name on the website. */
   collections: string[];
   enabled: boolean;
   stack: CrudStack;
-  /** Format yang dipilih cocok dengan stack (CRUD benar-benar ikut). */
+  /** The selected format matches the stack (CRUD is really included). */
   active: boolean;
   onToggle: (on: boolean) => void;
   onStack: (s: CrudStack) => void;

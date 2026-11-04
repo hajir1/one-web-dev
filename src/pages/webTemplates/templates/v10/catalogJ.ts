@@ -1,9 +1,9 @@
 import type { TemplateMeta } from "../../../../config/templates";
 
 /**
- * Metadata template katalog v10 (bagian J, 3D + efek scroll OWD Scroll). Konten: ./setJ/.
- * Dibuat per batch (10 template per batch, 2 di antaranya portofolio).
- * Harga = showcasePrice set I: 25/halaman + 20/jenis 3D (elemen three-* atau tilt) + bonus kualitas.
+ * Catalog v10 template metadata (part J, 3D + OWD Scroll effects). Content: ./setJ/.
+ * Built per batch (10 templates per batch, 2 of them portfolios).
+ * Price = set I showcasePrice: 25/page + 20/3D kind (three-* or tilt elements) + quality bonus.
  */
 export const V10J_CATALOG: TemplateMeta[] = [
   { id: "j3d-tanah-liat-kasongan", version: 1, category: "craft", tier: "premium", price: 95, accent: "#B5532A", tags: ["gerabah", "kerajinan", "Kasongan", "pot tanaman", "3d"], isNew: true },

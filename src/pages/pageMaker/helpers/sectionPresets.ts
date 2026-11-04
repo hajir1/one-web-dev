@@ -6,19 +6,19 @@ import { PRO_FREE_IDS, PRO_PRESETS, stamp, trFor } from "./sectionPresetsPro";
 import { withSampleContent } from "./presetSamples";
 
 /* ================================================================== */
-/* Preset section — dasar (8 gratis + 14 premium) + 10 preset Pro       */
-/* (4 gratis + 6 premium, lihat sectionPresetsPro.ts).                  */
+/* Section presets — basic (8 free + 14 premium) + 10 Pro presets       */
+/* (4 free + 6 premium, see sectionPresetsPro.ts).                      */
 /*                                                                    */
-/* Preset hanyalah pohon awal: sebuah section (pita selebar halaman)    */
-/* berisi Row dengan kolom/sel kosong yang bisa diisi lewat (+).        */
-/* Setelah dibuat, semuanya bisa diubah bebas lewat popup pengaturan.   */
+/* A preset is just an initial tree: a section (a full-width band)      */
+/* containing Rows with empty columns/cells that can be filled through (+). */
+/* Once created, everything can be changed freely through the settings popup. */
 /* ================================================================== */
 
 type SectionFamily = "stack" | "row" | "grid";
 
 type PresetTier = "free" | "premium";
 
-/** Jumlah preset yang tersedia di versi gratis. */
+/** Number of presets available in the free version. */
 export const FREE_PRESET_LIMIT = 12;
 
 export interface SectionPreset {
@@ -26,15 +26,15 @@ export interface SectionPreset {
   name: string;
   family: SectionFamily;
   description: string;
-  /** "free" = langsung dipakai; "premium" = butuh kredit. */
+  /** "free" = usable right away; "premium" = needs credits. */
   tier: PresetTier;
-  /** Preset Pro (berisi konten) yang ditambahkan pada rilis katalog ini. */
+  /** Pro presets (with content) added in this catalog release. */
   isNew?: boolean;
-  /** Kategori katalog (hero, features, …). */
+  /** Catalog category (hero, features, …). */
   category?: string;
-  /** Section lengkap (dengan contoh isi bila preset punya). */
+  /** A complete section (with sample content when the preset has it). */
   build: () => BoxNode;
-  /** Kerangka kosong khusus (bawaan: emptySection(build())). */
+  /** Custom empty scaffold (default: emptySection(build())). */
   buildEmpty?: () => BoxNode;
 }
 
@@ -54,8 +54,8 @@ const column = (name: string, patch: Partial<BoxNode> = {}, place: Place = {}): 
   });
 
 /**
- * Section = pita BLOK (tata letak normal). Isinya selalu Row; susunan kolom
- * ada di Row-nya, bukan di section.
+ * Section = a BLOCK band (normal layout). Its content is always Rows; the column
+ * layout lives on the Row, not on the section.
  */
 function section(
   name: string,
@@ -213,7 +213,7 @@ const BASE_PRESETS: Omit<SectionPreset, "tier">[] = [
   },
 ];
 
-/** Gambar latar contoh (SVG data URI, tanpa jaringan) untuk preset bergambar. */
+/** Sample background image (SVG data URI, no network) for image presets. */
 function svgData(svg: string): string {
   return (
     "data:image/svg+xml;utf8," +
@@ -407,7 +407,7 @@ const PREMIUM_PRESETS: Omit<SectionPreset, "tier">[] = [
   },
 ];
 
-/** 8 preset gratis (urutan tampil), sisanya premium. */
+/** 8 free presets (display order), the rest are premium. */
 const FREE_IDS = ["single", "hero-center", "hero-split", "features-3", "content-sidebar", "cta", "navbar", "footer-4"];
 
 const BASE_BY_ID = Object.fromEntries(BASE_PRESETS.map((p) => [p.id, p]));
@@ -419,8 +419,8 @@ function BASE_PRICING() {
 }
 
 /**
- * `name` & `description` = getter i18n (bahasa aktif saat dibaca); teks
- * Indonesia di atas menjadi nilai cadangan. `id` tidak pernah diterjemahkan.
+ * `name` & `description` = i18n getters (active language when read); the
+ * Indonesian text above is the fallback value. `id` is never translated.
  */
 function localized(p: Omit<SectionPreset, "tier">, tier: PresetTier): SectionPreset {
   return {
@@ -428,7 +428,7 @@ function localized(p: Omit<SectionPreset, "tier">, tier: PresetTier): SectionPre
     family: p.family,
     tier,
     category: p.category ?? CATEGORY_OF[p.id] ?? "layout",
-    // Section hasil preset mencatat ID asalnya (katalog & daftar isi template).
+    // Sections from presets record their source ID (catalog & template table of contents).
     build: () => stamp(p.id, withSampleContent(p.id, p.build(), trFor(i18n.language))),
     buildEmpty: () => stamp(p.id, p.build()),
     get name() {
@@ -440,7 +440,7 @@ function localized(p: Omit<SectionPreset, "tier">, tier: PresetTier): SectionPre
   };
 }
 
-/** Kategori katalog preset dasar. */
+/** Basic preset catalog categories. */
 const CATEGORY_OF: Record<string, string> = {
   single: "layout",
   "hero-center": "hero",
@@ -466,7 +466,7 @@ const CATEGORY_OF: Record<string, string> = {
   "banner-dark": "cta",
 };
 
-/** Preset Pro: nama & deskripsi dua bahasa langsung dari definisinya. */
+/** Pro presets: bilingual name & description straight from their definition. */
 function localizedPro(p: (typeof PRO_PRESETS)[number]): SectionPreset {
   const en = () => i18n.language?.startsWith("en");
   return {

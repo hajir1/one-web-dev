@@ -49,10 +49,10 @@ import { GenericFontContext } from "../../core/ui/PanelStyling";
 import { useGlobalVars } from "../../core/hooks/useGlobalVars";
 
 /* ================================================================== */
-/* Inspector — properti node terpilih                                   */
+/* Inspector — properties of the selected node                          */
 /*                                                                    */
-/* Elemen memakai panel styling ASLI dari Element Maker (definisi yang  */
-/* sama), jadi tidak ada konfigurasi yang hilang saat dipakai ulang.    */
+/* Elements use the ORIGINAL styling panel from Element Maker (the same */
+/* definition), so no configuration is lost when reused.               */
 /* ================================================================== */
 
 export interface InspectorHandlers {
@@ -62,9 +62,9 @@ export interface InspectorHandlers {
   patchPlace: (id: NodeId, place: Place, key?: string) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   editElement: (id: NodeId, fn: (state: any) => any, key?: string) => void;
-  /** Ubah field node elemen (bukan state-nya), mis. `events`. */
+  /** Changes a field of the element node (not its state), e.g. `events`. */
   patchElement: (id: NodeId, patch: Partial<ElementNode>, key?: string) => void;
-  /** Reset elemen / kontainer ke bawaan. */
+  /** Resets an element / container to its defaults. */
   resetElement: (id: NodeId) => void;
   duplicate: (id: NodeId) => void;
   remove: (id: NodeId) => void;
@@ -75,9 +75,9 @@ export interface InspectorHandlers {
 interface InspectorProps {
   root: BoxNode;
   node: ComponentNode;
-  /** Section tambahan untuk elemen (mis. JavaScript / event). */
+  /** Extra sections for an element (e.g. JavaScript / events). */
   elementExtras?: (el: ElementNode) => PanelSection[];
-  /** Section tambahan untuk kontainer (mis. background lengkap). */
+  /** Extra sections for containers (e.g. the full background). */
   boxExtras?: (box: BoxNode) => PanelSection[];
   classNameField: {
     value: string;
@@ -88,7 +88,7 @@ interface InspectorProps {
   on: InspectorHandlers;
 }
 
-/** Teks UI untuk fungsi non-komponen di file ini (dipanggil saat render). */
+/** UI text for the non-component functions in this file (called at render time). */
 const t = (key: string, opts?: Record<string, unknown>): string => i18n.t(key, opts);
 
 /* ------------------------- form penempatan ------------------------- */
@@ -254,8 +254,8 @@ function boxSections(
   patch: (p: Partial<BoxNode>, key?: string) => void,
 ): PanelSection[] {
   const bg = boxBackground(box);
-  // Edit pertama pada data lama: tulis semua field background sekaligus
-  // (gambar lama di section.bgImage ikut dipindah) supaya tidak ada yang hilang.
+  // First edit on old data: write every background field at once
+  // (the old image in section.bgImage is moved along) so nothing is lost.
   const setBg = (k: keyof BgFields, v: unknown) => {
     const next = { ...bg, [k]: v } as BoxNode;
     patch(
@@ -515,7 +515,7 @@ function IconBtn({
 }
 
 export default function Inspector({ root, node, elementExtras, boxExtras, classNameField, on }: InspectorProps) {
-  // Berlangganan perubahan bahasa (fungsi panel di atas memakai i18n.t langsung).
+  // Subscribe to language changes (the panel functions above use i18n.t directly).
   const { t } = useTranslation();
   const globalVars = useGlobalVars();
   const path = useMemo(() => pathTo(root, node.id), [root, node.id]);
@@ -573,8 +573,8 @@ export default function Inspector({ root, node, elementExtras, boxExtras, classN
       const patch = (p: object) => on.editElement(el.id, (st) => ({ ...st, ...p }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sections = def.sections(r.state, update as Updater<any>, patch);
-      // v7: font untuk semua elemen berteks. Elemen dengan generator font sendiri
-      // menampilkannya di bagian Tipografi; sisanya mendapat bagian "Font" ini.
+      // v7: fonts for every text element. Elements with their own font generator
+      // show it in the Typography section; the rest get this "Font" section.
       const genericFont = GENERIC_FONT_TYPES.has(el.elementType);
       if (genericFont)
         sections.splice(Math.min(1, sections.length), 0, {

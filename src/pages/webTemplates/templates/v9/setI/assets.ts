@@ -3,9 +3,9 @@ import { artKeyI } from "./keys";
 import { V9I_SPECS } from "./specs";
 
 /* ================================================================== */
-/* Ilustrasi set I: 6 gambar per template dari 3 motif set G (kunci      */
-/* "v9i-<id>-0..5"). 0–2 warna lembut palet, 3–5 varian tercermin.       */
-/* Avatar memakai avatar set G (v6g-face-*). SVG buatan sendiri.         */
+/* Set I illustrations: 6 images per template from 3 set G motifs (keys */
+/* "v9i-<id>-0..5"). 0–2 soft palette colors, 3–5 mirrored variants.     */
+/* Avatars use the set G avatars (v6g-face-*). In-house SVG.           */
 /* ================================================================== */
 
 function inks(s: (typeof V9I_SPECS)[number]): [Ink, Ink] {

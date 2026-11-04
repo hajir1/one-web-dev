@@ -12,7 +12,7 @@ import { Chip, btn } from "./ui";
 import { AdminFreeBadge } from "../../../components/app/AdminFreeBadge";
 import { buyAddon, formatBytes, minutes, planName, VIDEO_MINUTE_FEATURES } from "../../plans/plans";
 
-/** Halaman Credits (dulu /media-tools/kredit). */
+/** The Credits page (formerly /media-tools/kredit). */
 export const STORE_PATH = CREDITS_PATH;
 
 const STATE_TONE: Record<AccessState, "gray" | "green" | "amber" | "blue" | "rose"> = {
@@ -33,7 +33,7 @@ export function AccessChip({ state }: { state: AccessState }) {
   );
 }
 
-/** v11: rincian akses fitur paket langganan: paket, pemakaian, sisa kuota, batas berkas. */
+/** v11: plan feature access details: plan, usage, remaining quota, file limits. */
 function PlanAccessDetails({ access }: { access: FeatureAccess }) {
   const { t } = useTranslation();
   const { account, quota, entitlement, pricing: p } = access;
@@ -172,16 +172,16 @@ export function AccessDetails({ access, showPlan = true }: { access: FeatureAcce
   );
 }
 
-/** Tombol aksi sesuai status: beli kredit, buka akses, muat ulang. */
+/** Action button for the status: buy credits, unlock access, reload. */
 export function AccessActions({ access, compact }: { access: FeatureAccess; compact?: boolean }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const storeLink = `${STORE_PATH}?feature=${access.feature}`;
-  // v6: admin tidak perlu membeli kredit/paket.
+  // v6: admins do not need to buy credits/plans.
   if (access.account?.adminFree) return null;
 
-  // v11: fitur paket langganan → lihat/naik paket, atau beli tambahan kuota bulan ini.
+  // v11: subscription plan features → view/upgrade the plan, or buy extra quota this month.
   if (access.pricing.inPlan) {
     const problem = access.quota?.problem;
     const addon = problem === "units" ? "units" : problem === "video" ? "video" : null;
@@ -263,7 +263,7 @@ export function AccessActions({ access, compact }: { access: FeatureAccess; comp
   );
 }
 
-/** Kartu akses fitur server (tampil di panel samping saat mode server dipilih). */
+/** Server feature access card (shown in the side panel when server mode is selected). */
 export default function FeatureAccessCard({ tool, inputs }: { tool: MediaToolId; inputs?: UsageInput[] }) {
   const { t } = useTranslation();
   const access = useFeatureAccess(tool, inputs);

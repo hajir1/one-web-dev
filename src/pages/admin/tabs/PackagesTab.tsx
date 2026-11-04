@@ -12,14 +12,14 @@ import { td, useAdminGet, act } from "../adminApi";
 interface PackageRow {
   id: string;
   credits: number;
-  /** Rupiah bulat (Midtrans hanya IDR). */
+  /** Whole rupiah (Midtrans is IDR only). */
   priceIdr: number;
   highlight: boolean;
   active: boolean;
   sortOrder: number;
 }
 
-/** Harga paket wajib rupiah bulat ≥ Rp10.000 (sama dengan validasi backend). */
+/** Pack prices must be whole rupiah ≥ Rp10,000 (same as the backend validation). */
 const validIdr = (raw: string) => /^\d+$/.test(raw.trim()) && Number(raw) >= 10000 && Number(raw) <= 100_000_000;
 
 export function PackagesTab() {
@@ -78,7 +78,7 @@ interface GatewayInfo {
   check?: { ok: boolean; httpStatus: number | null; message: string | null };
 }
 
-/** Status Midtrans untuk admin: lingkungan, kecocokan key, URL yang harus diisi di dashboard, dan uji key. */
+/** Midtrans status for admins: environment, key match, URLs to fill in the dashboard, and a key test. */
 function GatewayStatus() {
   const { t } = useTranslation();
   const q = useAdminGet<GatewayInfo>("/admin/payments/gateway");

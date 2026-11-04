@@ -10,7 +10,7 @@ import { requireCredit } from "./credits";
 
 export type ExportRunResult = "counted" | "repeat" | "paid" | "free" | "blocked" | "failed" | "signin";
 
-/** Status kuota ekspor gratis (dari server) + `run()` yang meminta server membuat kode. */
+/** Free export quota status (from the server) + `run()` that asks the server to build the code. */
 export function useExportQuota() {
   const status = useSession((s) => s.status);
   const exports = useMarketStore((s) => s.account.limits.exports);
@@ -20,9 +20,9 @@ export function useExportQuota() {
   }, [status, marketStatus]);
 
   /**
-   * Jalankan ekspor: sinkronkan desain → server membuat kode (cek Premium &
-   * kuota) → `save(files)` mengunduh berkas DARI SERVER. Kuota habis → dialog
-   * kredit; bila disetujui, server memotong kredit lalu berkas diunduh.
+   * Runs the export: sync the design → the server builds the code (checks Premium &
+   * quota) → `save(files)` downloads the files FROM THE SERVER. Quota used up → credit
+   * dialog; if approved, the server charges credits and the files download.
    */
   const run = useCallback(async (source: ServerExportSource, framework: string, save: (files: ExportedFile[]) => Promise<void>): Promise<ExportRunResult> => {
     if (useSession.getState().status !== "authenticated") {
@@ -76,5 +76,5 @@ export function useExportQuota() {
   return { remaining: signedIn && marketStatus === "ready" ? exports.remaining : null, total: exports.free || FREE_EXPORTS, run };
 }
 
-/** @deprecated nama lama. */
+/** @deprecated old name. */
 export const useDownloadQuota = useExportQuota;

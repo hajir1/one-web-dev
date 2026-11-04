@@ -8,8 +8,8 @@ import FileRow from "./FileRow";
 import { Notice, Panel, btn } from "./ui";
 
 /**
- * Daftar antrean + aksi massal (proses semua, batalkan, unduh semua sebagai
- * ZIP, hapus semua). Dipakai Image Converter, Remove Background, dan Hapus
+ * Queue list + bulk actions (process all, cancel, download all as a
+ * ZIP, remove all). Used by Image Converter, Remove Background, and Remove
  * Metadata.
  */
 export default function QueuePanel({
@@ -30,7 +30,7 @@ export default function QueuePanel({
   zipName: string;
   showResultThumb?: boolean;
   rowExtra?: (item: QueueItem) => ReactNode;
-  /** Default: queue.run(). Halaman dengan mode server memasang gerbang biaya di sini. */
+  /** Default: queue.run(). Pages with a server mode install a cost gate here. */
   onRunAll?: () => void;
   onRunOne?: (id: string) => void;
 }) {

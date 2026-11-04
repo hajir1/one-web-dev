@@ -28,7 +28,7 @@ test("paket kredit berjenjang dalam Rupiah: makin besar makin murah; 100 kredit 
   assert.deepEqual(packageSavings(p100), { listIdr: 100000, idr: 10000, percent: 10 });
   assert.deepEqual(packageSavings(DEFAULT_CREDIT_PACKAGES[0]), { listIdr: 20000, idr: 0, percent: 0 });
   assert.equal(formatIdr(47500), "Rp47.500");
-  // Paket dari server divalidasi; data rusak / desimal / dolar dibuang.
+  // Packs from the server are validated; broken / decimal / dollar data is dropped.
   assert.deepEqual(sanitizePackages([{ id: "b", credits: 20, priceIdr: 16000 }, { id: "a", credits: 10, priceIdr: 9000 }]).map((p) => p.id), ["a", "b"]);
   assert.equal(sanitizePackages([{ id: "x", credits: -1, priceIdr: 1000 }]), null, "data rusak → pakai paket bawaan");
   assert.equal(sanitizePackages([{ id: "x", credits: 10, priceIdr: 9999.5 }]), null, "rupiah wajib bilangan bulat");
@@ -47,7 +47,7 @@ test("menu: Media tanpa pembelian kredit; Data mempertahankan 2 fitur utama; Cre
   assert.deepEqual(data.slice(0, 2), ["excelToJson", "sqlConverter"]);
   assert.ok(sec["web-maker"].items.some((i) => i.path === "/web-templates"));
   assert.equal(CREDITS_PATH, "/credits");
-  // Setiap menu punya topik bantuan.
+  // Every menu has a help topic.
   const topics = new Set(DOC_TOPICS.map((d) => d.id));
   for (const s of MENU_SECTIONS) for (const i of s.items) assert.ok(topics.has(i.doc), `${i.key} → ${i.doc}`);
 });
@@ -75,7 +75,7 @@ test("terjemahan: kunci ID = EN, tidak ada teks kosong, semua t(\"…\") statis 
   };
   const id = flat(JSON.parse(readFileSync(join(ROOT, "locales/id.json"), "utf8")));
   const en = flat(JSON.parse(readFileSync(join(ROOT, "locales/en.json"), "utf8")));
-  // Bahasa Indonesia hanya punya bentuk jamak "other"; samakan sufiks plural sebelum membandingkan.
+  // Indonesian only has the "other" plural form; normalize the plural suffix before comparing.
   const base = (keys) => [...new Set(keys.map((k) => k.replace(/_(zero|one|two|few|many|other)$/, "")))].sort();
   assert.deepEqual(base(Object.keys(id)), base(Object.keys(en)));
   for (const [k, v] of Object.entries(en)) assert.ok(v !== "" && v !== null, `kosong: ${k}`);
@@ -125,7 +125,7 @@ test("item berbayar (template/slot): akses hanya setelah server mengonfirmasi; k
   assert.match(unlocks[0].key, /^item-template:shop-boutique-/);
   assert.equal(hasItem(key), true);
   assert.equal(useBilling.getState().account.balance, 2, "saldo dari respons server");
-  // Sudah dimiliki → tidak ada permintaan/biaya baru.
+  // Already owned → no new request/cost.
   await unlockItem(key, "premium-template");
   assert.equal(calls.filter((c) => c.u.endsWith("/billing/unlock-item")).length, 1);
   await assert.rejects(unlockItem("bad key!", "premium-template"));
@@ -134,7 +134,7 @@ test("item berbayar (template/slot): akses hanya setelah server mengonfirmasi; k
 });
 
 test("locale split (core + rest) sama dengan sumber dan tidak basi", async () => {
-  // @ts-expect-error skrip .mjs tanpa tipe
+  // @ts-expect-error untyped .mjs script
   const { splitLocale, REST_KEYS } = await import("../../scripts/split-locales.mjs");
   for (const lang of ["id", "en"]) {
     const all = JSON.parse(readFileSync(join(ROOT, `locales/${lang}.json`), "utf8"));
@@ -144,7 +144,7 @@ test("locale split (core + rest) sama dengan sumber dan tidak basi", async () =>
     assert.deepEqual(core, want.core, `${lang}.core basi: jalankan npm run locales`);
     assert.deepEqual(rest, want.rest, `${lang}.rest basi: jalankan npm run locales`);
     for (const k of REST_KEYS) assert.ok(!(k in core), `${k} tidak boleh di core`);
-    // Beranda & shell tidak boleh butuh bagian rest.
+    // The home page & shell must not need the rest part.
     for (const k of ["nav", "home", "demo", "common", "auth", "app"]) assert.ok(k in core, `${k} harus di core`);
   }
 });

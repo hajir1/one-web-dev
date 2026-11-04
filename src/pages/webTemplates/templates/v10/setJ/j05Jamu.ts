@@ -1,6 +1,6 @@
 import { box, btn, contentJ, footer, form, fx, grid, H, header, home, Lbl, line, lookJ, pg, pic, product3, sec, stack, Tx, type B, type BoxNode, type J } from "./kitJ";
 
-/* 05 · Jamu Bakul: jamu kaleng. Ide besar: bakul jamu gendong diganti kaleng; tiap varian satu pita warna selebar layar (scale). */
+/* 05 · Jamu Bakul: canned herbal drinks. Big idea: the carried jamu basket replaced by cans; each variant is one screen-wide color band (scale). */
 
 const C = { kunyit: "#E8A317", kencur: "#F4ECD6", sirih: "#3F6B3A", aren: "#6B3E26", jahe: "#B8432F", hitam: "#1d1712" };
 export const L05 = lookJ({ ink: C.hitam, muted: "#4f4237", primary: C.jahe, primaryDark: "#8e3020", soft: "#f1dfb7", line: C.hitam, bg: C.kencur, head: "Bricolage Grotesque", body: "Spectral", r: 999 });
@@ -33,7 +33,7 @@ function foot(j: J): BoxNode {
   });
 }
 
-/** Pita varian selebar layar: nama raksasa + rasa + komposisi + gambar cukil. */
+/** Full-width variant band: giant name + flavor + ingredients + woodcut image. */
 function band(j: J, v: (typeof VARIANTS)[number], i: number): BoxNode {
   const { t } = j;
   const txt = box(

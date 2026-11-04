@@ -1,27 +1,27 @@
-// @ts-nocheck — skrip Node (tsx), tidak ikut bundle aplikasi.
+// @ts-nocheck — Node script (tsx), not part of the app bundle.
 /* ================================================================== */
-/* Generator THUMBNAIL KATALOG TEMPLATE (v20).                          */
+/* TEMPLATE CATALOG THUMBNAIL generator (v20).                          */
 /*                                                                    */
-/*   npm run gen:thumbs                 semua template                  */
-/*   npm run gen:thumbs -- id1,id2      hanya template tertentu         */
-/*   THUMB_PARALLEL=8                   jumlah tab paralel (bawaan 4)   */
+/*   npm run gen:thumbs                 all templates                   */
+/*   npm run gen:thumbs -- id1,id2      only specific templates         */
+/*   THUMB_PARALLEL=8                   number of parallel tabs (default 4) */
 /*                                                                    */
-/* Butuh Playwright + Chromium (sekali saja, tidak ikut package.json):  */
+/* Needs Playwright + Chromium (one time only, not in package.json):    */
 /*   npm i -D playwright && npx playwright install chromium            */
 /*                                                                    */
-/* Tiap template dirender persis seperti thumbnail lama (beranda,        */
-/* lebar 1280 px, mode thumbnail), dipotret, lalu disimpan sebagai WebP  */
-/* 640×416 di public/thumbs/<id>.<id|en>.webp. Template Kode hanya satu  */
-/* bahasa (.id). Daftar + hash isi ditulis ke                           */
-/* src/demo/thumbs.generated.ts (dipakai kartu katalog & cache-busting).*/
-/* Sebelum v20 tiap kartu memuat halaman utuh di iframe (123 iframe     */
-/* hidup setelah menggulir, ±200 permintaan font, satu konteks WebGL per */
-/* kartu 3D). Jalankan ulang setiap kali template ditambah/diubah;      */
-/* tes demo gagal bila ada template tanpa thumbnail.                     */
+/* Each template is rendered exactly like the old thumbnail (home page, */
+/* 1280 px wide, thumbnail mode), captured, then saved as a 640×416     */
+/* WebP at public/thumbs/<id>.<id|en>.webp. Code Templates have only one */
+/* language (.id). The list + content hashes are written to             */
+/* src/demo/thumbs.generated.ts (used by catalog cards & cache busting).*/
+/* Before v20 each card loaded a whole page in an iframe (123 iframes   */
+/* come alive after scrolling, ±200 font requests, one WebGL context per */
+/* 3D cards). Run again whenever templates are added/changed;           */
+/* the demo test fails when a template has no thumbnail.                */
 /*                                                                    */
-/* Opsional: THUMB_CDN_DIR=<folder> menyajikan cdn.jsdelivr.net/unpkg   */
-/* dari salinan lokal (<folder>/npm/<paket>@<versi>/...), untuk mesin    */
-/* tanpa akses CDN.                                                     */
+/* Optional: THUMB_CDN_DIR=<folder> serves cdn.jsdelivr.net/unpkg       */
+/* from a local copy (<folder>/npm/<package>@<version>/...), for machines */
+/* without CDN access.                                                  */
 /* ================================================================== */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -37,18 +37,18 @@ const here = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(here, "../../public/thumbs");
 const MANIFEST = resolve(here, "../demo/thumbs.generated.ts");
 const CODE_DIR = resolve(here, "../pages/webTemplates/codeTemplates/files");
-const VIEW = { width: 1280, height: 832 }; // kartu: lebar 1280 diperkecil ke ±320 px, tinggi 208 px
-const SIZE = { width: 640, height: 416 }; // 2× ukuran kartu
+const VIEW = { width: 1280, height: 832 }; // card: 1280 wide scaled down to about 320 px, 208 px tall
+const SIZE = { width: 640, height: 416 }; // 2× the card size
 const QUALITY = 0.8;
 const PARALLEL = Number(process.env.THUMB_PARALLEL) || 4;
-const SETTLE_MS = 1200; // animasi masuk (AOS/animate.css) selesai
+const SETTLE_MS = 1200; // entrance animations (AOS/animate.css) finished
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 const only = process.argv[2] ? new Set(process.argv[2].split(",")) : null;
 const icons = makeIconLookup([]);
 const cdnDir = process.env.THUMB_CDN_DIR ? resolve(process.env.THUMB_CDN_DIR) : null;
 
-/** Daftar pekerjaan: [id, bahasa]. */
+/** Job list: [id, language]. */
 const jobs: [string, "id" | "en"][] = [];
 for (const id of [...CODE_TEMPLATE_IDS, ...DEMO_TEMPLATE_IDS.filter((x) => !CODE_TEMPLATE_IDS.includes(x))]) {
   if (only && !only.has(id)) continue;
@@ -77,7 +77,7 @@ async function main() {
       if (!existsSync(f)) return route.fulfill({ status: 404 });
       route.fulfill({ status: 200, body: readFileSync(f), headers: { "content-type": MIME[f.split(".").pop()!] ?? "application/octet-stream", "access-control-allow-origin": "*" } });
     });
-  // Halaman induk kosong: template dimuat di iframe sandbox (sama seperti katalog), lalu dipotret.
+  // An empty parent page: the template loads in a sandboxed iframe (same as the catalog), then is captured.
   await ctx.route("https://thumbs.local/", (r) => r.fulfill({ status: 200, contentType: "text/html", body: `<!doctype html><style>html,body{margin:0;overflow:hidden}iframe{display:block;border:0;width:${VIEW.width}px;height:${VIEW.height}px;background:#fff}</style><iframe sandbox="allow-scripts"></iframe>` }));
 
   const manifest: Record<string, string> = {};
@@ -137,7 +137,7 @@ async function main() {
   );
   await browser.close();
 
-  // Gabung dengan manifest lama (berguna saat hanya sebagian template dipotret ulang).
+  // Merge with the old manifest (useful when only some templates are recaptured).
   const old: Record<string, string> = {};
   if (only && existsSync(MANIFEST)) for (const m of readFileSync(MANIFEST, "utf8").matchAll(/"([^"]+)": "([0-9a-f]{8})"/g)) old[m[1]] = m[2];
   const all = { ...old, ...manifest };
@@ -145,8 +145,8 @@ async function main() {
   const keys = Object.keys(all).filter((k) => present.has(k)).sort();
   writeFileSync(
     MANIFEST,
-    `/* DIHASILKAN oleh src/tools/genThumbs.ts (npm run gen:thumbs). Jangan diedit langsung. */
-/** Thumbnail statis katalog: "<id>.<id|en>" → hash isi (cache-busting). Berkas: public/thumbs/<id>.<lang>.webp */
+    `/* GENERATED by src/tools/genThumbs.ts (npm run gen:thumbs). Do not edit by hand. */
+/** Static catalog thumbnails: "<id>.<id|en>" → content hash (cache busting). Files: public/thumbs/<id>.<lang>.webp */
 export const THUMBS: Record<string, string> = {
 ${keys.map((k) => `  "${k}": "${all[k]}",`).join("\n")}
 };

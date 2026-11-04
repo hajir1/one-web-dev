@@ -3,7 +3,7 @@ import type { GSpec } from "./spec";
 
 /* ================================================================== */
 /* Set G batch 3 (G41–G60): katering, barbershop, museum, notaris,      */
-/* kursus mengemudi, toko roti, yoga, toko buku, mebel, coworking,      */
+/* driving course, bakery, yoga, bookstore, furniture, coworking,       */
 /* panel surya, perak, rekrutmen, sewa kapal, anyaman, daycare, rumah   */
 /* produksi, media desa, lab uji, kelurahan.                            */
 /* ================================================================== */

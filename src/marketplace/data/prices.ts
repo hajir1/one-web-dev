@@ -6,16 +6,16 @@ import { serverPiece } from "../serverCatalog";
 import type { ItemId, Tier } from "../types";
 
 /* ================================================================== */
-/* Harga section & elemen (kredit). Sinkron, tanpa memuat katalog        */
-/* template, supaya Page Maker bisa menampilkan harga seketika.          */
+/* Section & element prices (credits). Synchronous, without loading the */
+/* template catalog, so Page Maker can show prices instantly.           */
 /* ================================================================== */
 
-/** Fitur yang dibuka sekali per akun (kunci item `feature:<id>`). Nama = konten, tidak diterjemahkan. */
+/** Features unlocked once per account (item key `feature:<id>`). Name = content, not translated. */
 export const FEATURE_ITEMS: Record<string, { name: string; price: number }> = {
   [VR_PRO.id]: { name: "Tur 360° Pro", price: VR_PRO.price },
 };
 
-/** Elemen yang ditambahkan pada rilis katalog ini (label "Baru"). */
+/** Elements added in this catalog release ("New" label). */
 export const NEW_ELEMENT_TYPES = [
   "floating-input",
   "search-bar",
@@ -38,14 +38,14 @@ export const NEW_ELEMENT_TYPES = [
   "form-wizard",
 ];
 
-/** v9: 5 elemen 3D Premium (juga diberi label "Baru"). */
+/** v9: 5 Premium 3D elements (also labeled "New"). */
 export const ELEMENTS_3D = Object.keys(ELEMENT_3D_PRICE);
 export const isNewElement = (type: string) => NEW_ELEMENT_TYPES.includes(type) || ELEMENTS_3D.includes(type);
 
-/** Elemen rilis sebelumnya (v2) — dipakai tes lama. */
+/** Elements from the previous release (v2), used by older tests. */
 export const ELEMENTS_V2 = ["divider", "textarea", "radio-group", "social-links", "timeline", "gallery-lightbox", "logo-marquee", "modal-popup", "before-after", "back-to-top", "chart"];
 
-/** Elemen Premium yang kompleks = 10 kredit (Rp10rb); lainnya 5 kredit (Rp5rb). */
+/** Complex Premium elements = 10 credits (Rp10k); others 5 credits (Rp5k). */
 const ELEMENT_PRICE: Record<string, number> = {
   slider: ITEM_PRICE.premiumMax,
   "stats-counter": ITEM_PRICE.premiumMax,
@@ -63,17 +63,17 @@ const ELEMENT_PRICE: Record<string, number> = {
 
 export const elementPrice = (type: string, tier: Tier): number => (tier === "free" ? ITEM_PRICE.free : (ELEMENT_PRICE[type] ?? ITEM_PRICE.premiumMin));
 
-/** Preset Pro (berisi konten lengkap) = 2 kredit, preset dasar = 1. */
+/** Pro preset (with full content) = 2 credits, basic preset = 1. */
 export const sectionPrice = (id: string, tier: Tier): number => (tier === "free" ? ITEM_PRICE.free : id.startsWith("pro-") ? ITEM_PRICE.premiumMax : ITEM_PRICE.premiumMin);
 
-/** Tier & harga item section/elemen/fitur dari ID-nya (nilai server bila sudah dimuat); null bila tidak dikenal. */
+/** Tier & price of a section/element/feature item from its ID (server value once loaded); null when unknown. */
 export function pieceInfo(itemId: ItemId): { kind: "section" | "element" | "feature"; refId: string; tier: Tier; price: number; name: string } | null {
   const local = localPieceInfo(itemId);
   const srv = serverPiece(itemId);
   return local && srv ? { ...local, tier: srv.tier, price: srv.price } : local;
 }
 
-/** Nilai bawaan frontend (dipakai sebelum katalog server dimuat). */
+/** Frontend default values (used before the server catalog loads). */
 function localPieceInfo(itemId: ItemId): { kind: "section" | "element" | "feature"; refId: string; tier: Tier; price: number; name: string } | null {
   const p = parseItemId(itemId);
   if (!p || p.kind === "template") return null;

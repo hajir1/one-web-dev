@@ -25,6 +25,10 @@ import { LANDING_SPECS } from "../../../../tools/codeTemplates/landingAll";
 import { buildLanding } from "../../../../tools/codeTemplates/landing";
 import { BIZ_SPECS } from "../../../../tools/codeTemplates/bizAll";
 import { buildBiz } from "../../../../tools/codeTemplates/biz3d";
+import { ANIM_CSS_SPECS } from "../../../../tools/codeTemplates/animCssScenes";
+import { buildAnimCss } from "../../../../tools/codeTemplates/animCss";
+import { INVITE_SPECS_V29 } from "../../../../tools/codeTemplates/inviteV29";
+import { STORY_SPECS_F } from "../../../../tools/codeTemplates/storySpecsF";
 import { STORY_OF } from "../../../../tools/codeTemplates/bizStory";
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), "../files");
@@ -36,10 +40,10 @@ const ALLOWED_HOSTS = ["https://cdn.jsdelivr.net/npm/", "https://cdn.jsdelivr.ne
 
 const dataOf = (html: string, name: string) => readModel(html).data.find((d) => d.name === name)?.value;
 
-test("katalog: 237 template (v16: 12, v17: +10, v18: +15, v22: +50, v23: +150), id unik, kategori dikenal", () => {
-  assert.equal(CODE_TEMPLATE_CATALOG.length, 237);
-  assert.equal(new Set(CODE_TEMPLATE_CATALOG.map((t) => t.id)).size, 237);
-  const per: Record<string, number> = { animation: 27, invitation: 35, web3d: 5, portfolio3d: 5, motion3d: 25, landing: 100, biz3d: 40 };
+test("katalog: 277 template (v16: 12, v17: +10, v18: +15, v22: +50, v23: +150, v29: +40), id unik, kategori dikenal", () => {
+  assert.equal(CODE_TEMPLATE_CATALOG.length, 277);
+  assert.equal(new Set(CODE_TEMPLATE_CATALOG.map((t) => t.id)).size, 277);
+  const per: Record<string, number> = { animation: 37, invitation: 50, web3d: 5, portfolio3d: 5, motion3d: 40, landing: 100, biz3d: 40 };
   for (const [g, n] of Object.entries(per)) assert.equal(CODE_TEMPLATE_CATALOG.filter((t) => t.code.group === g).length, n, g);
   for (const t of CODE_TEMPLATE_CATALOG) assert.ok(TEMPLATE_CATEGORIES.includes(t.category), `${t.id}: kategori ${t.category}`);
 });
@@ -55,6 +59,7 @@ test("berkas hasil generator sama dengan sumbernya (jalankan npm run gen:code bi
     ...ANIM2_SPECS.map((s) => [s.id, buildAnim2(s)] as [string, string]),
     ...LANDING_SPECS.map((s) => [s.id, buildLanding(s)] as [string, string]),
     ...BIZ_SPECS.map((s) => [s.id, buildBiz(s)] as [string, string]),
+    ...ANIM_CSS_SPECS.map((s) => [s.id, buildAnimCss(s)] as [string, string]),
   ];
   assert.deepEqual(built.map(([id]) => id).sort(), CODE_TEMPLATE_CATALOG.map((t) => t.id).sort());
   for (const [id, html] of built) assert.equal(read(id), html, id);
@@ -102,7 +107,7 @@ test("animasi: SVG berlapis, keyframes, cahaya tanpa filter blur (v19), canvas m
     const html = read(t.id);
     assert.ok((html.match(/class="px/g) ?? []).length >= 6, `${t.id}: lapisan`);
     assert.match(html, /@keyframes sway/);
-    // v19: filter blur di lapisan yang berayun dihitung ulang tiap frame (FPS turun ke ~25); cahaya = gradasi radial.
+    // v19: a blur filter on swaying layers is recomputed every frame (FPS drops to ~25); glow = a radial gradient.
     assert.doesNotMatch(html, /feGaussianBlur|filter="url\(/);
     assert.match(html, /<radialGradient id="halo">/);
     assert.match(html, /class="halo"/);
@@ -116,13 +121,13 @@ test("animasi: SVG berlapis, keyframes, cahaya tanpa filter blur (v19), canvas m
 test("undangan: CONFIG di awal skrip, ?to=, musik tidak otomatis, .ics, salin, WhatsApp, peta tanpa API key", () => {
   for (const t of CODE_TEMPLATE_CATALOG.filter((x) => x.code.group === "invitation")) {
     const html = read(t.id);
-    const inline = /<script>\s*\/\* ==== KONFIGURASI UNDANGAN[^\n]*\nconst CONFIG = \/\*owd:data name="CONFIG"[^*]*\*\/\{/.test(html);
+    const inline = /<script>\s*\/\* ==== INVITATION SETTINGS[^\n]*\nconst CONFIG = \/\*owd:data name="CONFIG"[^*]*\*\/\{/.test(html);
     assert.ok(inline, `${t.id}: CONFIG di awal skrip`);
     assert.match(html, /Kepada Yth\./);
     assert.match(html, /get\("to"\)/);
     assert.match(html, /Buka Undangan/);
     assert.doesNotMatch(html, /autoplay/i);
-    // Musik hanya dimulai di handler tombol "Buka Undangan" atau tombol musik.
+    // Music only starts in the "Open Invitation" button handler or the music button.
     const js = scriptBlocks(html);
     assert.equal((js.match(/startMusic\(\);/g) ?? []).length, 2, `${t.id}: startMusic dipanggil dari 2 tempat (buka & tombol)`);
     assert.match(js, /BEGIN:VCALENDAR/);
@@ -142,11 +147,11 @@ test("3D: library dipatok + CDN cadangan, konten tidak tertutup loader, satu can
     assert.match(html, /const CDN = \["https:\/\/cdn\.jsdelivr\.net\/npm\/","https:\/\/unpkg\.com\/"\];/);
     assert.match(html, /esm\("three@0\.169\.0\/build\/three\.module\.min\.js"\)/);
     assert.match(html, /esm\("lenis@1\.1\.13\/dist\/lenis\.mjs"\)/);
-    // Tidak ada stylesheet/skrip CDN yang menahan tampilan pertama.
+    // No CDN stylesheet/script holds up the first paint.
     assert.doesNotMatch(html, /<link rel="stylesheet" href="https:\/\/cdn\.jsdelivr/);
     assert.doesNotMatch(html, /<script src="https:\/\/cdn\.jsdelivr/);
     assert.match(html, /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^"]*" media="print" onload="this\.media='all'">/);
-    // Loader hanya penanda kecil, bukan lapisan layar penuh.
+    // The loader is only a small marker, not a full-screen layer.
     assert.doesNotMatch(html, /\.loader \{ position: fixed; inset: 0/);
     assert.equal((html.match(/<canvas\b/g) ?? []).length, 1, `${t.id}: satu canvas`);
     assert.equal((html.match(/new THREE\.WebGLRenderer/g) ?? []).length, 1, `${t.id}: satu konteks`);
@@ -169,7 +174,7 @@ test("3D: library dipatok + CDN cadangan, konten tidak tertutup loader, satu can
 test("portofolio: PROJECTS di awal skrip, konten statis lengkap tanpa JS, kontak email & WhatsApp", () => {
   for (const t of CODE_TEMPLATE_CATALOG.filter((x) => x.code.group === "portfolio3d")) {
     const html = read(t.id);
-    assert.match(html, /\/\* ==== DATA PROYEK[^\n]*\nconst PROJECTS = \/\*owd:data name="PROJECTS"[^*]*\*\/\[/);
+    assert.match(html, /\/\* ==== PROJECT DATA[^\n]*\nconst PROJECTS = \/\*owd:data name="PROJECTS"[^*]*\*\/\[/);
     const projects = dataOf(html, "PROJECTS") as { slug: string; judul: string; tautan: string; tag: string[]; deskripsi: string[] }[];
     assert.ok(projects.length >= 3);
     const text = visibleText(html);
@@ -198,7 +203,7 @@ test("3D motion: OWD Scrub (pengganti GSAP) + Motion + three dalam satu halaman,
     assert.match(html, /const CONFIG = \/\*owd:data name="CONFIG"/);
     const cfg = dataOf(html, "CONFIG") as { profil: Record<string, unknown> };
     assert.ok(Object.keys(cfg.profil).length >= 4, `${t.id}: biodata`);
-    // Panel kode statis (tanpa JS) = render dari CONFIG.
+    // The static code panel (without JS) = rendered from CONFIG.
     const region = /<!--owd:render name="code"-->([\s\S]*?)<!--owd:end-->/.exec(html)![1];
     assert.equal(region, motionApi().bioHtml(cfg), `${t.id}: panel kode statis sesuai CONFIG`);
     const poses = JSON.parse(/const POSES = (\[.*\]);/.exec(html)![1]) as { screen: string; s: number }[];
@@ -220,7 +225,7 @@ test("3D motion: biodata kode dalam js, py, dan json; teks di-escape", () => {
   assert.equal(api.bioText({ ...base, bahasa: "py" }), '# Halo\nsaya = {\n    "nama": "A <b>",\n    "umur": 3,\n    "aktif": True,\n    "alat": ["x", "y"],\n}');
   assert.equal(api.bioText({ ...base, komentar: "", bahasa: "json" }), '{\n  "nama": "A <b>",\n  "umur": 3,\n  "aktif": true,\n  "alat": ["x", "y"]\n}');
   assert.doesNotMatch(api.bioHtml({ ...base, bahasa: "js" }), /<b>/);
-  // Editor: ubah biodata → panel kode statis ikut berubah.
+  // Editor: change the bio → the static code panel changes too.
   const html = read("motion-ruang-kode");
   const cfg = dataOf(html, "CONFIG") as Record<string, unknown>;
   const out = applyEdits(html, { data: { CONFIG: { ...cfg, profil: { nama: "Dewi Lestari" } } } }, MOTION_REGIONS);
@@ -229,9 +234,9 @@ test("3D motion: biodata kode dalam js, py, dan json; teks di-escape", () => {
   assert.equal(Object.keys(regionsFor("motion-ruang-kode")).length, 1);
 });
 
-/* ---------------- v22: 50 template baru ---------------- */
+/* ---------------- v22: 50 new templates ---------------- */
 test("v22: 17 cerita 3D, 16 animasi cerita, 17 undangan; semuanya terdaftar di katalog", () => {
-  assert.equal(STORY_SPECS.length, 17);
+  assert.equal(STORY_SPECS.length, 32);
   assert.equal(ANIM2_SPECS.length, 21);
   assert.equal(INVITE_SPECS_V22.length, 17);
   const ids = new Set(CODE_TEMPLATE_CATALOG.map((t) => t.id));
@@ -279,16 +284,16 @@ test("v22 animasi cerita: satu canvas 2D tanpa library, babak bertahap, kartu uc
 
 test("v22 undangan: setiap undangan punya animasi pembuka sendiri yang selesai sebelum sampul hilang", () => {
   const opens = new Set<string>();
-  for (const s of [...INVITE_SPECS_V22, ...INVITE_SPECS_V23]) {
+  for (const s of [...INVITE_SPECS_V22, ...INVITE_SPECS_V23, ...INVITE_SPECS_V29]) {
     const html = read(s.id);
     const m = /class="op ([a-z-]+)/.exec(html);
     assert.ok(m, `${s.id}: animasi pembuka`);
     opens.add(m![1]);
   }
-  assert.equal(opens.size, INVITE_SPECS_V22.length + INVITE_SPECS_V23.length, "animasi pembuka tidak ada yang sama");
+  assert.equal(opens.size, INVITE_SPECS_V22.length + INVITE_SPECS_V23.length + INVITE_SPECS_V29.length, "animasi pembuka tidak ada yang sama");
 });
 
-/* ---------------- v23: 150 template baru ---------------- */
+/* ---------------- v23: 150 new templates ---------------- */
 const plain = (html: string) => visibleText(html).replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 test("v23: 100 landing page, 40 website 3D bisnis, 5 undangan, 5 animasi; 30 landing + 5 web 3D untuk UMKM", () => {
   assert.equal(LANDING_SPECS.length, 100);
@@ -300,7 +305,7 @@ test("v23: 100 landing page, 40 website 3D bisnis, 5 undangan, 5 animasi; 30 lan
   for (const s of BIZ_SPECS) assert.equal(byId.get(s.id)?.code.group, "biz3d", s.id);
   assert.equal(CODE_TEMPLATE_CATALOG.filter((t) => t.code.group === "landing" && t.tags.includes("umkm")).length, 30);
   assert.equal(CODE_TEMPLATE_CATALOG.filter((t) => t.code.group === "biz3d" && t.tags.includes("umkm")).length, 5);
-  // 3D disebar rata: satu template per kategori.
+  // 3D spread evenly: one template per category.
   assert.equal(new Set(BIZ_SPECS.map((s) => s.category)).size, 40);
 });
 
@@ -389,7 +394,7 @@ test("edit tanpa kode: setiap template punya teks, warna, dan data yang bisa die
     assert.ok(m.texts.length >= 4, `${t.id}: teks`);
     assert.ok(m.vars.length >= 5, `${t.id}: variabel warna`);
     assert.ok(m.vars.some((v) => v.kind === "color"), `${t.id}: ada warna`);
-    // Satu blok data; website 3D bisnis (v27) punya blok kedua DAFTAR untuk daftar yang bisa ditambah/dihapus.
+    // One data block; 3D business websites (v27) have a second DAFTAR block for lists that can be added to/removed.
     assert.equal(m.data.length, t.id.startsWith("biz-") ? 2 : 1, `${t.id}: jumlah blok data`);
     const regions = regionsFor(t.id);
     const same = applyEdits(html, { data: Object.fromEntries(m.data.map((d) => [d.name, d.value])) }, regions);
@@ -446,22 +451,22 @@ test("3D bisnis (v27): daftar bisa ditambah, diduplikat, diurutkan, dihapus; HTM
   const items = (h: string) => (h.match(/<li class="item card"/g) ?? []).length;
   const before = items(html);
   assert.equal(before, d.katalog.length);
-  // tambah + duplikat
+  // add + duplicate
   const added = { ...d, katalog: [...d.katalog, { ...d.katalog[0], nama: "Menu <Baru>", kategori: d.kategori[1] }, d.katalog[0]] };
   let out = applyEdits(html, { data: { DAFTAR: added } }, regions);
   assert.equal(items(out), before + 2);
   assert.ok(out.includes("Menu &lt;Baru&gt;") && !out.includes("Menu <Baru>"));
   assert.ok(out.includes(`data-c="1"`));
-  // kategori baru jadi tab filter baru
+  // a new category becomes a new filter tab
   out = applyEdits(html, { data: { DAFTAR: { ...d, kategori: [...d.kategori, "Musiman"] } } }, regions);
   assert.ok(out.includes(`data-f="${d.kategori.length}"`) && out.includes(">Musiman</button>"));
-  // urutkan + hapus FAQ
+  // reorder + delete FAQ
   const faq = [d.faq[1], d.faq[0]];
   out = applyEdits(html, { data: { DAFTAR: { ...d, faq } } }, regions);
   assert.ok(out.indexOf(d.faq[1].tanya) < out.indexOf(d.faq[0].tanya));
   out = applyEdits(html, { data: { DAFTAR: { ...d, faq: [] } } }, regions);
   assert.ok(!out.includes("<details class=\"card\""));
-  // paket baru muncul juga di pilihan formulir
+  // a new package also appears in the form options
   out = applyEdits(html, { data: { DAFTAR: { ...d, paket: [...d.paket, { ...d.paket[0], nama: "Paket Kantor" }] } } }, regions);
   assert.ok(out.includes("<option>Paket Kantor</option>") && out.includes("Pilih Paket Kantor"));
 });
@@ -479,4 +484,49 @@ test("v27.1 web 3D bisnis: storyboard berbeda per template (dunia + urutan adega
   assert.equal(combos.size, BIZ_SPECS.length, "setiap template punya kombinasi dunia + urutan adegan sendiri");
   assert.ok(worlds.size >= 12, "minimal 12 dunia");
   assert.ok([...worlds.values()].every((n) => n <= 4), "satu dunia paling banyak dipakai 4 template");
+});
+
+/* ---------------- v29: 40 new templates ---------------- */
+test("v29: 15 new 3D scroll stories, 15 invitations, 10 pure CSS animations; all in the catalog", () => {
+  assert.equal(STORY_SPECS_F.length, 15);
+  assert.equal(INVITE_SPECS_V29.length, 15);
+  assert.equal(ANIM_CSS_SPECS.length, 10);
+  const byId = new Map(CODE_TEMPLATE_CATALOG.map((t) => [t.id, t]));
+  for (const s of STORY_SPECS_F) assert.equal(byId.get(s.id)?.code.group, "motion3d", s.id);
+  for (const s of INVITE_SPECS_V29) assert.equal(byId.get(s.id)?.code.group, "invitation", s.id);
+  for (const s of ANIM_CSS_SPECS) assert.equal(byId.get(s.id)?.code.group, "animation", s.id);
+});
+
+test("v29 stories: every story declares all of its scene values in the hero pose", () => {
+  for (const s of STORY_SPECS_F) {
+    const used = new Set([...s.scene.matchAll(/\bS\.([a-z]+)/g)].map((m) => m[1]).filter((k) => k !== "veil" && k !== "sway"));
+    const hero = Object.keys(s.acts[0].key);
+    for (const k of used) assert.ok(hero.includes(k), `${s.id}: ${k} missing from the hero key`);
+  }
+});
+
+test("v29 CSS animations: no canvas, no library, keyframes only, pause/replay, still frame for thumbnails", () => {
+  const scenes = new Set<string>();
+  for (const s of ANIM_CSS_SPECS) {
+    const html = read(s.id);
+    assert.doesNotMatch(html, /<canvas\b|<svg\b/, `${s.id}: pure CSS`);
+    assert.doesNotMatch(html, /cdn\.jsdelivr\.net\/npm\/|unpkg\.com/, `${s.id}: no library`);
+    assert.ok((html.match(/@keyframes /g) ?? []).length >= 4, `${s.id}: keyframes`);
+    assert.doesNotMatch(scriptBlocks(html), /requestAnimationFrame/, `${s.id}: CSS drives the motion`);
+    assert.match(html, /id="pause"/, s.id);
+    assert.match(html, /id="again"/, s.id);
+    assert.match(html, /OWD_THUMB/, s.id);
+    assert.match(html, /visibilitychange/, s.id);
+    assert.match(html, /prefers-reduced-motion: reduce/, s.id);
+    for (const v of ["--bg-1:", "--c-1:", "--ink:", "--speed:"]) assert.ok(html.includes(v), `${s.id}: ${v}`);
+    const cfg = dataOf(html, "CONFIG") as { mainOtomatis: boolean; detikDiam: number };
+    assert.equal(typeof cfg.mainOtomatis, "boolean", s.id);
+    assert.ok(cfg.detikDiam >= 0, s.id);
+    scenes.add(s.scene.css);
+  }
+  assert.equal(scenes.size, ANIM_CSS_SPECS.length, "every animation has its own scene");
+});
+
+test("v29 invitations: the cover is really hidden after the opening animation", () => {
+  for (const s of INVITE_SPECS_V29) assert.match(read(s.id), /\.cover\[hidden\] \{ display: none; \}/, s.id);
 });
