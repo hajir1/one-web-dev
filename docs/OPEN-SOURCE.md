@@ -15,14 +15,14 @@ Status per v25. ✓ = sudah dikerjakan di kode, ☐ = langkah Anda saat membuat 
 
 ## 3. Lisensi
 
-- ✓ `LICENSE`: AGPL-3.0 (teks resmi dari SPDX).
+- ✓ `LICENSE`: MIT, atas nama hajir (OneWebDev).
 - ✓ `LICENSE-TEMPLATES.md`: website hasil ekspor milik pengguna (boleh komersial, tanpa atribusi); template gratis dipakai siapa saja; **tidak boleh dijual ulang sebagai template**.
-- ✓ `package.json`: `"license": "AGPL-3.0-only"`.
-- ✓ Lisensi MIT TailAdmin (dasar dashboard) disimpan di `LICENSES/MIT-TailAdmin.txt` dan dikutip di `THIRD_PARTY_NOTICES.md`. MIT boleh digabung ke proyek AGPL selama pemberitahuannya tetap ada.
+- ✓ `package.json`: `"license": "MIT"`.
+- ✓ Lisensi MIT TailAdmin (dasar dashboard) disimpan di `LICENSES/MIT-TailAdmin.txt` dan dikutip di `THIRD_PARTY_NOTICES.md`. Pemberitahuan MIT TailAdmin tetap harus ada.
 
 ## 4. Lisensi pihak ketiga
 
-- ✓ `THIRD_PARTY_NOTICES.md` dibuat otomatis (`npm run notices`): 303 paket, semuanya lisensi yang cocok dengan AGPL-3.0 (MIT, ISC, Apache-2.0, BSD, MPL-2.0, BlueOak, CC0, Unlicense).
+- ✓ `THIRD_PARTY_NOTICES.md` dibuat otomatis (`npm run notices`): 303 paket, semuanya lisensi yang cocok dengan MIT (MIT, ISC, Apache-2.0, BSD, MPL-2.0, BlueOak, CC0, Unlicense).
 - ✓ Model hapus latar di browser: BiRefNet lite (MIT). Teks UI yang menyebut "ISNet" untuk mode browser sudah diperbaiki (ISNet hanya dipakai di server).
 - ☐ Gambar contoh di template: pastikan semua berasal dari sumber berlisensi bebas atau buatan sendiri.
 
@@ -43,7 +43,7 @@ Status per v25. ✓ = sudah dikerjakan di kode, ☐ = langkah Anda saat membuat 
 
 ## 8. Janji tertulis
 
-- ✓ README bagian "Janji versi frontend-only": gratis dan lengkap, tanpa versi Pro dari kode ini, dan setiap rilis AGPL tetap AGPL.
+- ✓ README bagian "Janji versi frontend-only": gratis dan lengkap, tanpa versi Pro dari kode ini, dan rilis lama yang berlisensi AGPL tetap AGPL.
 
 ## Teks antarmuka frontend-only
 

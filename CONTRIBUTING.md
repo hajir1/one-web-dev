@@ -36,4 +36,4 @@ CI fails when there are **new** problems (overflow on phones, JavaScript errors,
 
 ## Contribution license
 
-By submitting a contribution, you agree that it is released under the same license as the project (AGPL-3.0; templates are also covered by `LICENSE-TEMPLATES.md`).
+By submitting a contribution, you agree that it is released under the same license as the project (MIT; templates are also covered by `LICENSE-TEMPLATES.md`).

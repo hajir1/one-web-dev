@@ -1,6 +1,6 @@
 # OneWebDev — frontend
 
-A collection of developer tools that run in the browser: build websites from 600+ templates, design pages with drag and drop and export them to HTML, React, Vue, Svelte, or Angular, process data (Excel, JSON, SQL, PDF), edit media (images, audio, video), and create 360° tours.
+A collection of developer tools that run in the browser: build websites from 400+ templates, design pages with drag and drop and export them to HTML, React, Vue, Svelte, or Angular, process data (Excel, JSON, SQL, PDF), edit media (images, audio, video), and create 360° tours.
 
 **The frontend-only version** (`VITE_API_BASE_URL=off`) runs without a server and without an account. Every template, element, and feature inside it is fully open; your data stays in your browser and files are never uploaded.
 
@@ -11,14 +11,14 @@ React 19 + Vite 6 + TypeScript + Tailwind CSS 4.
 ## The frontend-only promise
 
 - The frontend-only version is **free and complete**. No locked features, no trial limits, and no "Pro version" of this code.
-- Every version already released under the AGPL-3.0 **stays AGPL-3.0 forever**. A release's license cannot be taken back; even if the project changes direction, code that is already open remains yours to use, fork, and build on.
+- The code is released under the **MIT license**. A release's license cannot be taken back; even if the project changes direction, code that is already open remains yours to use, fork, and build on. Versions released earlier under the AGPL-3.0 stay available under the AGPL-3.0 for anyone who received them.
 - Analytics are **off** by default in this version (see Privacy).
 
 ## License
 
 | Part | License | What it means |
 | --- | --- | --- |
-| Application code | [AGPL-3.0](LICENSE) | Free to use, modify, and share. If you run a modified version as an online service, you must publish its full source under the same license. |
+| Application code | [MIT](LICENSE) | Free to use, modify, and share, including commercially. Keep the copyright and license notice. |
 | Templates and exported websites | [LICENSE-TEMPLATES.md](LICENSE-TEMPLATES.md) | Your website is yours (commercial use allowed, no attribution required). Templates are free for anyone to use, but **may not be resold as templates**. |
 | OneWebDev name and logo | [TRADEMARK.md](TRADEMARK.md) | Forks are welcome, but use your own name and logo. |
 | Third-party libraries | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Includes the TailAdmin base (MIT). Update with `npm run notices`. |
@@ -71,9 +71,9 @@ If OneWebDev helps you, you can support its development on [Ko-fi](https://ko-fi
 
 ## Bahasa Indonesia
 
-OneWebDev adalah kumpulan alat developer yang berjalan di browser: rakit website dari 600+ template, desain halaman dengan drag & drop lalu ekspor ke HTML, React, Vue, Svelte, atau Angular, olah data dan media, serta buat tur 360°. Versi frontend-only (`VITE_API_BASE_URL=off`) gratis, lengkap, berjalan tanpa server dan tanpa akun, dan data Anda tetap di browser.
+OneWebDev adalah kumpulan alat developer yang berjalan di browser: rakit website dari 400+ template, desain halaman dengan drag & drop lalu ekspor ke HTML, React, Vue, Svelte, atau Angular, olah data dan media, serta buat tur 360°. Versi frontend-only (`VITE_API_BASE_URL=off`) gratis, lengkap, berjalan tanpa server dan tanpa akun, dan data Anda tetap di browser.
 
-- **Lisensi:** kode aplikasi AGPL-3.0. Website hasil ekspor sepenuhnya milik Anda (boleh komersial, tanpa atribusi), tetapi template **tidak boleh dijual ulang sebagai template**. Detail lengkap ada di dokumen berbahasa Inggris di atas.
+- **Lisensi:** kode aplikasi berlisensi MIT. Website hasil ekspor sepenuhnya milik Anda (boleh komersial, tanpa atribusi), tetapi template **tidak boleh dijual ulang sebagai template**. Detail lengkap ada di dokumen berbahasa Inggris di atas.
 - **Mulai:** `npm ci`, `cp .env.demo .env.local`, lalu `npm run dev`.
 - **Kontribusi:** issue dan pull request boleh dalam bahasa Indonesia atau Inggris. Lihat [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Dukungan:** bila OneWebDev bermanfaat, Anda bisa mendukung pengembangannya lewat [Ko-fi](https://ko-fi.com/hajir1) atau [Saweria](https://saweria.co/hajir1). Keduanya juga ada di tombol **Sponsor** GitHub (lihat [`.github/FUNDING.yml`](.github/FUNDING.yml)).

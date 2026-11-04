@@ -1,10 +1,10 @@
 # Template and exported website license
 
-The OneWebDev application code is licensed under the **GNU AGPL-3.0** (see `LICENSE`). This file adds special terms for **website templates** and **exported websites**, so that regular users are not bound by the AGPL.
+The OneWebDev application code is licensed under the **MIT license** (see `LICENSE`). This file adds special terms for **website templates** and **exported websites**. For the template files these terms apply instead of the MIT license, in particular the rule that templates may not be resold as templates.
 
 ## 1. Your website belongs to you
 
-Websites, pages, or code that you create or export with OneWebDev, including those based on the built-in templates, are **not bound by the AGPL**. You may:
+Websites, pages, or code that you create or export with OneWebDev, including those based on the built-in templates, are **not bound by any copyleft or resale rule of the application license**. You may:
 
 - use them for yourself, your clients, or your business (commercial use);
 - modify, publish, and host them anywhere;
@@ -29,6 +29,6 @@ Sample images, icons, and 3D objects in the templates are made in-house by OneWe
 
 ## 5. Scope
 
-The terms in this file apply to the contents of the `src/pages/webTemplates/` folder and to every exported website. The rest of the repository remains under the AGPL-3.0.
+The terms in this file apply to the contents of the `src/pages/webTemplates/` folder and to every exported website. The rest of the repository remains under the MIT license.
 
 _This summary is written in plain language and is not legal advice._
